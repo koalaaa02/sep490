@@ -30,7 +30,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductSku  extends Auditable{
+public class ProductSku  extends Auditable{//SKU (Stock Keeping Unit) or phân loại sản phẩm
+	//là một mã số duy nhất được sử dụng để xác định và theo dõi hàng hóa trong kho.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -69,5 +70,5 @@ public class ProductSku  extends Auditable{
     private Product product;
 
     @OneToMany(mappedBy = "sku")
-    private List<AttributeValue> attributeValues;
+    private List<AttributeValue> attributeValues;//các giá trị thuôc tính mà sản phẩm mang: red, M, cotton
 }

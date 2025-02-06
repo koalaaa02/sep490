@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Category extends Auditable{
+public class Category extends Auditable{//danh mục sản phẩm
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

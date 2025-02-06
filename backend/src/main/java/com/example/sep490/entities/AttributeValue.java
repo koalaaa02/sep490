@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AttributeValue  extends Auditable{
+public class AttributeValue  extends Auditable{//giá trị của thuộc tính : Color: red, yellow
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

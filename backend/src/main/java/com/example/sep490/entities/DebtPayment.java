@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DebtPayment  extends Auditable{
+public class DebtPayment  extends Auditable{//lịch sử trả nợ cho Invoice, có thể trả từng phần
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
