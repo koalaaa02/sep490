@@ -1,8 +1,10 @@
 package com.example.sep490.entities;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.sep490.entities.enums.InvoiceStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,23 +15,28 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-public class Invoice {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Invoice  extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "seller_id")
-    private User seller;
-
-    @ManyToOne
     @JoinColumn(name = "agent_id")
-    private User agent; // Đại lý nợ
+    private User agent; // người Đại lý nợ
 
-    private double totalAmount;
-    private double paidAmount = 0.0; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
+    private BigDecimal totalAmount; //tổng nợ
+    
+    private BigDecimal paidAmount = BigDecimal.ZERO;; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
 
     @Enumerated(EnumType.STRING)
     private InvoiceStatus status; // UNPAID, PARTIALLY_PAID, PAID

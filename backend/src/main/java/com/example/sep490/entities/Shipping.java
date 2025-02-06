@@ -6,17 +6,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-
-@Entity
-public class Shipping {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String provider;
-    private String trackingNumber;
-
-    @OneToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-}
+//
+//@Entity
+//public class Shipping {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    private String provider;
+//    private String trackingNumber;
+//
+//    @OneToOne
+//    @JoinColumn(name = "order_id")
+//    private Order order;
+//}

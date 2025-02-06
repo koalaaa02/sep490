@@ -1,11 +1,11 @@
 package com.example.sep490.entities;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.entities.enums.PaymentMethod;
+import com.example.sep490.entities.enums.TransactionStatus;
+import com.example.sep490.entities.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -17,7 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -26,44 +25,42 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "`Order`")
+@Table(name = "transactions")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order  extends Auditable{
+public class Transaction  extends Auditable{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // Một đơn hàng thuộc về một customer
+    @OneToOne
+    @JoinColumn(name = "order_id", nullable = true)
+    private Order order;
 
-    @ManyToOne
-    @JoinColumn(name = "shop_id", nullable = false)
-    private Shop shop; // Một đơn hàng thuộc về một shop
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method; // CARD, COD
     
+    private String transactionId; // Mã giao dịch từ VNPAY/...
+
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private OrderStatus status;
+    private BigDecimal amount;  // số tiền
     
-    private BigDecimal shippingFee;
+    private String message; //nội dung chuyển khoản
 
-    private BigDecimal totalAmount;
-        
-    @OneToMany(mappedBy = "order")
-    private List<OrderDetail> orderDetails;
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod; // CARD, COD
-    
-    @OneToOne(mappedBy = "order")
-    private Transaction transaction;
+    @Column(nullable = false)
+    private TransactionType transactionType;
 
-    @ManyToOne
-    @JoinColumn(name = "shipping_address_id")
-    private ShippingAddress shippingAddress; 
-    
-    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionStatus status;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }
+

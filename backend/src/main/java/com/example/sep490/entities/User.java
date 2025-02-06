@@ -6,6 +6,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import com.example.sep490.entities.enums.UserType;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,11 +15,18 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-public class User {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class User extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,14 +39,24 @@ public class User {
     private String email;
     private String password;
     
+    @Column(nullable = false)
+    @ColumnDefault("true")
+    private boolean isActive = true;
+    
+    @ColumnDefault("'ROLE_CUSTOMER'")
+    private String roles;
+
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'CUSTOMER'")
+    @ColumnDefault("'ROLE_CUSTOMER'")
     private UserType userType; // CUSTOMER, SELLER, AGENT
 
     @OneToMany(mappedBy = "user")
-    private List<Order> orders;
+    private List<Order> orders; // order customer mua
     
-    @OneToMany(mappedBy = "seller")
-    private List<Invoice> invoices;
+    @OneToMany(mappedBy = "agent")
+    private List<Invoice> invoices; // mỗi agent có thể nợ nhiều hóa đơn
+    
+    @OneToOne(mappedBy = "manager") // Mỗi seller có thể quản lý một shop
+    private Shop shop; // Một shop chỉ có một người quản lý
 }
 
