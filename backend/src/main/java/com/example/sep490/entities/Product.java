@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Product extends Auditable{
+public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

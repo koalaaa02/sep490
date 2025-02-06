@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Supplier  extends Auditable{
+public class Supplier  extends Auditable{//nhà cung câps sản phẩm
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

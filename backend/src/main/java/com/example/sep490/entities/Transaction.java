@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Transaction  extends Auditable{
+public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào, được thanh toán online
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

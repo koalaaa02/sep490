@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Invoice  extends Auditable{
+public class Invoice  extends Auditable{//hóa đơn nợ cho đơn hàng nào (nếu đơn hàng đó được seller tạo, còn đơn customer tự đặt sẽ không có invoice)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShippingAddress  extends Auditable{
+public class ShippingAddress  extends Auditable{//một user có nhiều địa chỉ giao hàng, 1 Order chỉ mang 1 địa chỉ giao hàng
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

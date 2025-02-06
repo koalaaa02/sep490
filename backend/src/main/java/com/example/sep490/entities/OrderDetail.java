@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDetail  extends Auditable{
+public class OrderDetail  extends Auditable{//lưu chi tiết đơn hàng
 	@EmbeddedId
     private OrderDetailId id;
 

@@ -8,6 +8,7 @@ import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.entities.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,7 +32,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order  extends Auditable{
+public class Order  extends Auditable{//đơn hàng nè
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -64,6 +65,9 @@ public class Order  extends Auditable{
     @ManyToOne
     @JoinColumn(name = "shipping_address_id")
     private ShippingAddress shippingAddress; 
+    
+    @Nullable
+    private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
     
     
 }

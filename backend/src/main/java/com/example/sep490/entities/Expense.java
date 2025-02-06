@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Expense  extends Auditable{
+public class Expense  extends Auditable{//Quản lí số tiền chi tiêu
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

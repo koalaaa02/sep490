@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Shop  extends Auditable{
+public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó được cập nhật role seller)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

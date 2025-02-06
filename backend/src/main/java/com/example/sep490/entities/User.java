@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends Auditable{
+public class User extends Auditable{ //thông tin tài khoản
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

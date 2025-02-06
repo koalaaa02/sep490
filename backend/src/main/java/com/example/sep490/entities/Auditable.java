@@ -32,7 +32,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @EqualsAndHashCode
-public abstract class Auditable {
+public abstract class Auditable {//Class nào kế thừa nó sẽ mang thuộc tính này
     
     @Column(name = "is_delete")
     @ColumnDefault("false")
