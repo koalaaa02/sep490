@@ -1,8 +1,8 @@
 package com.example.sep490.entities.enums;
 
 public enum UserType {
-    CUSTOMER,
-    SELLER,
-    AGENT,
-    ADMIN
+    ROLE_CUSTOMER,
+    ROLE_SELLER,
+    ROLE_AGENT,
+    ROLE_ADMIN
 }

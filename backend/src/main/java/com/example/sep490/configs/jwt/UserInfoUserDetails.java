@@ -1,6 +1,6 @@
 package com.example.sep490.configs.jwt;
 
-import com.example.sep490.entities.UserInfo;
+import com.example.sep490.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,12 +12,13 @@ import java.util.stream.Collectors;
 
 public class UserInfoUserDetails implements UserDetails {
 
-
+	private Long id;
     private String name;
     private String password;
     private List<GrantedAuthority> authorities;
 
-    public UserInfoUserDetails(UserInfo userInfo) {
+    public UserInfoUserDetails(User userInfo) {
+    	id=userInfo.getId();
         name=userInfo.getName();
         password=userInfo.getPassword();
         authorities= Arrays.stream(userInfo.getRoles().split(","))
@@ -30,6 +31,10 @@ public class UserInfoUserDetails implements UserDetails {
         return authorities;
     }
 
+    public Long getId(){
+        return id;
+    }
+    
     @Override
     public String getPassword() {
         return password;

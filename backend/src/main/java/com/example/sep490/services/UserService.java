@@ -1,7 +1,7 @@
 package com.example.sep490.services;
 
-import com.example.sep490.entities.UserInfo;
-import com.example.sep490.repositories.UserInfoRepository;
+import com.example.sep490.entities.User;
+import com.example.sep490.repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,14 +17,14 @@ public class UserService {
 
 
     @Autowired
-    private UserInfoRepository repository;
+    private UserRepository repository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
   
 
-    public String addUser(UserInfo userInfo) {
+    public String addUser(User userInfo) {
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         repository.save(userInfo);
         return "user added to system ";

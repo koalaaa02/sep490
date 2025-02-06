@@ -11,7 +11,7 @@ public class BasePagination {
 
     public Pageable createPageRequest(int page, int size, String sortBy, String direction) {
         Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
-        return PageRequest.of(page, size, sort);
+        return PageRequest.of(page-1, size, sort);
     }
 
     public <T> PageResponse<T> createPageResponse(Page<T> pageData) {

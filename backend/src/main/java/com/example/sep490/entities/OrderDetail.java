@@ -1,6 +1,9 @@
 package com.example.sep490.entities;
 
+import java.util.List;
+
 import com.example.sep490.entities.compositeKeys.OrderDetailId;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -12,9 +15,17 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
-public class OrderDetail {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class OrderDetail  extends Auditable{
 	@EmbeddedId
     private OrderDetailId id;
 
