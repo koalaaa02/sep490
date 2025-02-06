@@ -9,3 +9,9 @@ public enum ExpenseType {
     OTHER // Chi phí khác
 }  
 
+//@GetMapping("/expense-types")
+//public List<String> getExpenseTypes() {
+//    return Arrays.stream(ExpenseType.values())
+//                 .map(Enum::name) // Lấy tên enum dưới dạng chuỗi
+//                 .collect(Collectors.toList());
+//}

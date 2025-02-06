@@ -60,7 +60,5 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @Column(nullable = false)
     private TransactionStatus status;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }
 

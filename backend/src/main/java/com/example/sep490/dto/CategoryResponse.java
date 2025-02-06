@@ -1,6 +1,5 @@
 package com.example.sep490.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.example.sep490.entities.Category;

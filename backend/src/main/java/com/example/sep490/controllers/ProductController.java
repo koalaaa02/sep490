@@ -3,7 +3,6 @@ package com.example.sep490.controllers;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRequest;
-import com.example.sep490.dto.ProductDTO;
 import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.entities.Product;
 import com.example.sep490.services.JwtService;

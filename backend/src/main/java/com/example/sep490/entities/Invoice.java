@@ -34,12 +34,12 @@ public class Invoice  extends Auditable{//hóa đơn nợ cho đơn hàng nào (
     @JoinColumn(name = "agent_id")
     private User agent; // người Đại lý nợ
 
-    private BigDecimal totalAmount; //tổng nợ
+    private BigDecimal totalAmount; //tổng nợ phải trả
     
     private BigDecimal paidAmount = BigDecimal.ZERO;; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
 
     @Enumerated(EnumType.STRING)
-    private InvoiceStatus status; // UNPAID, PARTIALLY_PAID, PAID
+    private InvoiceStatus status = InvoiceStatus.UNPAID;; // UNPAID, PARTIALLY_PAID, PAID
 
     @OneToMany(mappedBy = "invoice")
     private List<DebtPayment> debtPayments;

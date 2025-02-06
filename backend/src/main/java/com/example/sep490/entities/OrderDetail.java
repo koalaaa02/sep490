@@ -1,5 +1,6 @@
 package com.example.sep490.entities;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.sep490.entities.compositeKeys.OrderDetailId;
@@ -39,9 +40,9 @@ public class OrderDetail  extends Auditable{//lưu chi tiết đơn hàng
     @ManyToOne
     @MapsId("skuId") // Ánh xạ skuId từ khóa chính
     @JoinColumn(name = "sku_id", nullable = false) // Đảm bảo không null ở cấp CSDL
-    private ProductSku productSku;
+    private ProductSKU productSku;
     
 
     private int quantity;
-    private double price;
+    private BigDecimal price;
 }
