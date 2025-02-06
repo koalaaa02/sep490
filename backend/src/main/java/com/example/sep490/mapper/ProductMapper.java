@@ -8,7 +8,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-import com.example.sep490.dto.ProductDTO;
 import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entities.Product;
@@ -19,15 +18,12 @@ public interface ProductMapper {
     //ProductMapper INSTANCE = Mappers.getMapper(ProductMapper.class);
 
 	//@Mapping(source = "category.name", target = "categoryName")
-    ProductDTO toDTO(Product product);
     @Mapping(source = "id", target = "id")
     ProductResponse EntityToResponse(Product product);
     
     @Mapping(source = "id", target = "id")
     List<ProductResponse> EntitiesToResponses(List<Product> product);
-    
-    Product toEntity(ProductDTO productDTO);
-    
+        
     @Mapping(source = "id", target = "id")
     Product RequestToEntity(ProductRequest productRequest);
     

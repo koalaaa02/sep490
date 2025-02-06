@@ -1,6 +1,6 @@
 package com.example.sep490.dto;
 
-
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,11 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryRequest {
+public class ShopRequest {
 	private Long id;
-    private String name;
-    private boolean isParent;
-    private Long parentCategoryId; 
 
+    private String name; 
+
+    @NotNull
+    private Long managerId;
+    private String secretA; 
+    private String secretB; 
 }
-
+//*

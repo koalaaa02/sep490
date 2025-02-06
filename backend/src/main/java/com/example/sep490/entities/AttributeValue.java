@@ -33,5 +33,5 @@ public class AttributeValue  extends Auditable{//giá trị của thuộc tính 
 
     @ManyToOne
     @JoinColumn(name = "sku_id")
-    private ProductSku sku;
+    private ProductSKU sku;
 }

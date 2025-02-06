@@ -48,7 +48,7 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
 //    @JsonBackReference
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product")
-    private List<ProductSku> skus;
+    private List<ProductSKU> skus;
     
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)

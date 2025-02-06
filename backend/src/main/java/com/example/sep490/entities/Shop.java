@@ -36,4 +36,8 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false) 
     private User manager; // Một shop có một người quản lý
+    
+    private String secretA; 
+    private String secretB; 
+
 }

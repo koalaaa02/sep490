@@ -4,12 +4,18 @@ import java.util.List;
 
 import com.example.sep490.entities.Category;
 import com.example.sep490.entities.Product;
-import com.example.sep490.entities.ProductSku;
+import com.example.sep490.entities.ProductSKU;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductResponse {
     private Long id; 
     private String name;
@@ -18,6 +24,6 @@ public class ProductResponse {
     
     @JsonIgnoreProperties("products")
     private Category category;
-    private List<ProductSku> skus;
+    private List<ProductSKU> skus;
 }
 
