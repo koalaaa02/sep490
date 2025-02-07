@@ -3,13 +3,16 @@ package com.example.sep490.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.entities.DebtPayment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.sep490.entities.OrderDetail;
 import com.example.sep490.entities.compositeKeys.OrderDetailId;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, OrderDetailId>{
-    List<OrderDetail> findByIsDeleteFalse();
+    Page<OrderDetail> findByIsDeleteFalse(Pageable pageable);
     Optional<OrderDetail> findByIdAndIsDeleteFalse(OrderDetailId id);	
 }
 //public void deleteOrderDetail(Long orderId, Long skuId) {

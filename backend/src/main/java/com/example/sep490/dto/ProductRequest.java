@@ -1,5 +1,6 @@
 package com.example.sep490.dto;
 
+import com.example.sep490.entities.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class ProductRequest {
     private String name;
     private String description;
     private String specifications;
-    private Long categoryId; 
+    private Long categoryId;
+    private Long supplierId;
 }
 

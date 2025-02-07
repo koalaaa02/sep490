@@ -29,10 +29,18 @@ public class CategoryService {
 	@Autowired
 	private BasePagination pagination;
 	
-	public PageResponse<Category> getCategories(int page, int size, String sortBy,String direction) {
+//	public PageResponse<Category> getCategories(int page, int size, String sortBy,String direction) {
+//		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+//        Page<Category> categoryPage = categoryRepo.findAll(pageable);
+//        return pagination.createPageResponse(categoryPage);
+//	}
+
+	public PageResponse<Category> getCategories(int page, int size, String sortBy, String direction, String nameFilter) {
 		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Category> categoryPage = categoryRepo.findAll(pageable);
-        return pagination.createPageResponse(categoryPage);
+		Page<Category> categoryPage = (nameFilter == null || nameFilter.isBlank())
+				? categoryRepo.findByIsDeleteFalse(pageable)
+				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(nameFilter, pageable);
+		return pagination.createPageResponse(categoryPage);
 	}
 
 	public CategoryResponse getCategoryById(Long id) {
@@ -45,8 +53,7 @@ public class CategoryService {
 	}
 
 	public CategoryResponse createCategory(CategoryRequest categoryRequest) {
-		Optional<Category> optionalCategory= categoryRepo.findById(categoryRequest.getParentCategoryId());
-		Category parentCategory = optionalCategory.isPresent() ? optionalCategory.get(): null;
+		Category parentCategory = getParentCategory(categoryRequest.getParentCategoryId());
 
 		Category entity = categoryMapper.RequestToEntity(categoryRequest);
 		entity.setParentCategory(parentCategory);
@@ -54,11 +61,10 @@ public class CategoryService {
     }
 
 	public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
-		Optional<Category> optionalCategory= categoryRepo.findById(categoryRequest.getParentCategoryId());
-		Category parentCategory = optionalCategory.isPresent() ? optionalCategory.get(): null;
-                
-		Category category = categoryRepo.findById(categoryRequest.getId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+		Category category = categoryRepo.findById(id)
+				.orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+
+		Category parentCategory = getParentCategory(categoryRequest.getParentCategoryId());
 
 		Category entity = categoryMapper.RequestToEntity(categoryRequest);
 		entity.setParentCategory(parentCategory);
@@ -67,15 +73,17 @@ public class CategoryService {
 	    
 	}
 
-
 	public void deleteCategory(Long id) {
 	    Category updatedCategory = categoryRepo.findById(id)
 	        .map(existingCategory -> { 
-	            existingCategory.setDelete(false);
+	            existingCategory.setDelete(true);
 	            return categoryRepo.save(existingCategory);
 	        })
 	        .orElseThrow(() -> new RuntimeException("Category not found with id " + id));
 	}
-
+	private Category getParentCategory(Long parentCategoryId) {
+		return parentCategoryId == null ? null
+				: categoryRepo.findById(parentCategoryId).orElse(null);
+	}
     
 }

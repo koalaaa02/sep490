@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import com.example.sep490.entities.Invoice;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

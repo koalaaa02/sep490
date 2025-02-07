@@ -1,4 +1,5 @@
 package com.example.sep490.dto;
+import jakarta.annotation.Nullable;
 import org.hibernate.annotations.ColumnDefault;
 import com.example.sep490.entities.Shop;
 import com.example.sep490.entities.enums.UserType;
@@ -31,7 +32,8 @@ public class UserRequest {
     private String roles = "ROLE_CUSTOMER";
 
     private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
-    
-    private Shop shopId; 
+
+    @Nullable
+    private Long shopId;
 }
 //*
