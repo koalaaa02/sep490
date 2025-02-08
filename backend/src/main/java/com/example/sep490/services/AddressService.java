@@ -1,5 +1,6 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entities.*;
@@ -38,10 +39,24 @@ public class AddressService {
     @Autowired
     private ShopRepository shopRepo;
 
-    public PageResponse<Address> getAddresses(int page, int size, String sortBy, String direction) {
+    public PageResponse<AddressResponse> getAddresses(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Address> AddressPage = addressRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(AddressPage);
+        Page<Address> addressPage = addressRepo.findByIsDeleteFalse(pageable);
+
+        // Map each Address to AddressResponse
+        List<AddressResponse> addressResponses = addressPage.getContent().stream()
+                .map(addressMapper::EntityToResponse)
+                .toList();
+
+        return new PageResponse<>(
+                addressResponses,
+                addressPage.getNumber(),
+                addressPage.getSize(),
+                addressPage.getTotalElements(),
+                addressPage.getTotalPages(),
+                addressPage.isFirst(),
+                addressPage.isLast()
+        );
     }
 
     public AddressResponse getAddressById(Long id) {

@@ -3,8 +3,12 @@ package com.example.sep490.services.product;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.entities.Shop;
 import com.example.sep490.entities.Supplier;
+import com.example.sep490.repositories.ShopRepository;
 import com.example.sep490.repositories.SupplierRepository;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,7 +31,11 @@ public class SellerProductStrategy implements ProductStrategy {
 	@Autowired
 	private CategoryRepository categoryRepo;
 	@Autowired
+	private ShopRepository shopRepo;
+	@Autowired
 	private SupplierRepository supplierRepo;
+	@Autowired
+	private ObjectMapper objectMapper;
 	@Autowired
     private ProductMapper productMapper;
 
@@ -75,6 +83,8 @@ public class SellerProductStrategy implements ProductStrategy {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 		Supplier supplier = supplierRepo.findById(productRequest.getCategoryId())
 				.orElseThrow(() -> new RuntimeException("Supplier not found"));
+		Shop shop = shopRepo.findById(productRequest.getCategoryId())
+				.orElseThrow(() -> new RuntimeException("Shop not found"));
 
         Product product = Product.builder()
                 .name(productRequest.getName())
@@ -82,28 +92,39 @@ public class SellerProductStrategy implements ProductStrategy {
                 .specifications(productRequest.getSpecifications())
                 .category(category)
 				.supplier(supplier)
+				.shop(shop)
                 .build();
         return productRepo.save(product);
     }
 
 	@Override
-	public ProductResponse updateProduct(Long id, ProductRequest productDetails) {
-		Category category = categoryRepo.findById(productDetails.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+	public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
+		Category category = categoryRepo.findById(productRequest.getCategoryId())
+				.orElseThrow(() -> new RuntimeException("Category not found"));
+		Supplier supplier = supplierRepo.findById(productRequest.getCategoryId())
+				.orElseThrow(() -> new RuntimeException("Supplier not found"));
+		Shop shop = shopRepo.findById(productRequest.getCategoryId())
+				.orElseThrow(() -> new RuntimeException("Shop not found"));
 		
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
     		Optional<Product> product = productRepo.findByIdAndCreatedByAndIsDeleteFalse(id, user.getId());
-    		Product updateProduct = null;
             if(product.isPresent()) {
-            	updateProduct = product.get();  
-    	    } else {
+				Product updateProduct = product.get();
+				try {
+					objectMapper.updateValue(updateProduct, productRequest);
+				} catch (JsonMappingException e) {
+					throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+				}
+				updateProduct.setCategory(category);
+				updateProduct.setSupplier(supplier);
+				updateProduct.setShop(shop);
+				return productMapper.EntityToResponse(productRepo.save(updateProduct));
+			} else {
     	        throw new RuntimeException("Sản phẩm không tồn tại với ID: " + id);
     	    }
-            Product entity = productMapper.RequestToEntity(productDetails);
-            entity.setCategory(category);
-            return productMapper.EntityToResponse(productRepo.save(entity));
+
         }
 	    
 	    return null; 

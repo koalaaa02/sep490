@@ -1,6 +1,7 @@
 package com.example.sep490.dto;
 
 import com.example.sep490.entities.enums.ShopType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

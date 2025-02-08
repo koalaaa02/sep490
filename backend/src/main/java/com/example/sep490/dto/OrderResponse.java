@@ -8,6 +8,7 @@ import com.example.sep490.entities.Address;
 import com.example.sep490.entities.Shop;
 import com.example.sep490.entities.Transaction;
 import com.example.sep490.entities.User;
+import com.example.sep490.entities.enums.DeliveryMethod;
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.entities.enums.PaymentMethod;
 
@@ -35,6 +36,10 @@ public class OrderResponse {
     private List<OrderDetail> orderDetails;
 
     private PaymentMethod paymentMethod; // CARD, COD
+    private DeliveryMethod deliveryMethod;
+
+    @Nullable
+    private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
     
     private Transaction transaction;
 
@@ -42,6 +47,5 @@ public class OrderResponse {
 
     private Shop shop;
 
-    @Nullable
-    private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
+
 }

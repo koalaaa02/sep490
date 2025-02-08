@@ -45,6 +45,10 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "shop_id")
+    private Shop shop;
+
 //    @JsonBackReference
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product")

@@ -66,6 +66,10 @@ public class OrderDetailService {
         return orderDetailMapper.EntityToResponse(orderDetailRepo.save(entity));
     }
 
+    public void createOrderDetail(OrderDetail orderDetail) {
+        orderDetailRepo.save(orderDetail);
+    }
+
     public OrderDetailResponse updateOrderDetail(OrderDetailRequest orderDetailRequest) {
         Long orderId = orderDetailRequest.getOrderId();
         Long productSKUId = orderDetailRequest.getProductSkuId();

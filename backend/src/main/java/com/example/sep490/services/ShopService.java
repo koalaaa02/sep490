@@ -53,30 +53,40 @@ public class ShopService {
     }
 
     public ShopResponse createShop(ShopRequest shopRequest) {
-        User user = getUser(shopRequest.getManagerId());
-        Address address = getAddress(shopRequest.getAddressId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
+            User user = getUser(userInfo.getId());
+            Address address = getAddress(shopRequest.getAddressId());
+            if(user.getShop() != null) throw new RuntimeException("Bạn đã có shop " + user.getShop().getName());
 
-        Shop entity = shopMapper.RequestToEntity(shopRequest);
-        entity.setManager(user);
-        entity.setAddress(address);
-        return shopMapper.EntityToResponse(shopRepo.save(entity));
+            Shop entity = shopMapper.RequestToEntity(shopRequest);
+            entity.setManager(user);
+            entity.setAddress(address);
+            return shopMapper.EntityToResponse(shopRepo.save(entity));
+        }else throw new RuntimeException("");
+
     }
 
     public ShopResponse updateShop(Long id, ShopRequest shopRequest) {
-        Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
-                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
+                    .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        User user = getUser(shopRequest.getManagerId());
-        Address address = getAddress(shopRequest.getAddressId());
+            UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
+            User user = getUser(userInfo.getId());
+            Address address = getAddress(shopRequest.getAddressId());
+            try {
+                objectMapper.updateValue(address, shopRequest);
+            } catch (JsonMappingException e) {
+                throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+            }
+            shop.setManager(user);
+            shop.setAddress(address);
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        }else throw new RuntimeException("");
 
-        try {
-            objectMapper.updateValue(address, shopRequest);
-        } catch (JsonMappingException e) {
-            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
-        }
-        shop.setManager(user);
-        shop.setAddress(address);
-        return shopMapper.EntityToResponse(shopRepo.save(shop));
     }
 
     public void deleteShop(Long id) {

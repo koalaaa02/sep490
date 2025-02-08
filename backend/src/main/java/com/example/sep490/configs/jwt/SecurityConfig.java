@@ -61,11 +61,13 @@ public class SecurityConfig {
                                 "/api/shops/**",
                                 "/api/suppliers/**",
                                 "/api/transactions/**",
-                                "/api/users/**"
+                                "/api/users/**",
+                                "/api/cart/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/private/products/**",
-                                "/api/productskus/**"
+                                "/api/productskus/**",
+                                "/api/checkout/**"
                 		).authenticated()
                 )
                 .sessionManagement(session -> session

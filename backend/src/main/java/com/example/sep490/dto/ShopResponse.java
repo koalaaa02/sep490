@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.example.sep490.entities.Address;
 import com.example.sep490.entities.Order;
+import com.example.sep490.entities.Product;
 import com.example.sep490.entities.User;
 
 import com.example.sep490.entities.enums.ShopType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +29,9 @@ public class ShopResponse {
     private ShopType shopType;
     private List<Order> orders;
     private boolean isActive = true;
+    @JsonIgnoreProperties("shop")
     private User manager;
+    @JsonIgnoreProperties({"shop", "user"})
     private Address address;
-
+    private List<Product> products;
 }

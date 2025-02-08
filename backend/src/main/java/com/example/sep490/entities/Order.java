@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.sep490.entities.enums.DeliveryMethod;
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.entities.enums.PaymentMethod;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -25,6 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "`Order`")
@@ -54,7 +56,11 @@ public class Order  extends Auditable{//đơn hàng nè
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod; // CARD, COD
-    
+
+    @ColumnDefault("'GHN'")
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod; // GHN, TRUCK
+
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
 

@@ -54,16 +54,29 @@ public class OrderService {
         }
     }
 
-    public OrderResponse createOrder(OrderRequest orderRequest) {
+//    public OrderResponse createOrder(OrderRequest orderRequest) {
+//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
+//        Shop shop = getShop(orderRequest.getShopId());
+//        Address Address = getShippingAddres(orderRequest.getAddressId());
+//
+//        Order entity = orderMapper.RequestToEntity(orderRequest);
+//        entity.setTransaction(transaction);
+//        entity.setShop(shop);
+//        entity.setAddress(Address);
+//        return orderMapper.EntityToResponse(orderRepo.save(entity));
+//    }
+
+    public Order createOrder(OrderRequest orderRequest) {
         Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
-        Address Address = getShippingAddres(orderRequest.getAddressId());
-
+        Address address = getShippingAddres(orderRequest.getAddressId());
+        if(shop == null) throw new RuntimeException("Thiếu thông tin shop.");
+        if(address == null) throw new RuntimeException("Thiếu thông tin giao hàng.");
         Order entity = orderMapper.RequestToEntity(orderRequest);
         entity.setTransaction(transaction);
         entity.setShop(shop);
-        entity.setAddress(Address);
-        return orderMapper.EntityToResponse(orderRepo.save(entity));
+        entity.setAddress(address);
+        return orderRepo.save(entity);
     }
 
     public OrderResponse updateOrder(Long id, OrderRequest orderRequest) {
