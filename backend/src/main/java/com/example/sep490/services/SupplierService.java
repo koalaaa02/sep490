@@ -3,6 +3,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +24,8 @@ import com.example.sep490.utils.PageResponse;
 public class SupplierService {
     @Autowired
     private SupplierRepository supplierRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private SupplierMapper supplierMapper;
     @Autowired
@@ -49,13 +53,15 @@ public class SupplierService {
     }
 
     public SupplierResponse updateSupplier(Long id, SupplierRequest supplierRequest) {
-        Supplier Supplier = supplierRepo.findByIdAndIsDeleteFalse(id)
+        Supplier supplier = supplierRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        Supplier entity = supplierMapper.RequestToEntity(supplierRequest);
-        Supplier updatedSupplier = supplierRepo.save(entity);
-        return supplierMapper.EntityToResponse(updatedSupplier);
-
+        try {
+            objectMapper.updateValue(supplier, supplierRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        return supplierMapper.EntityToResponse(supplierRepo.save(supplier));
     }
 
     public void deleteSupplier(Long id) {

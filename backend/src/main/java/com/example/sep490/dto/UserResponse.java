@@ -1,6 +1,8 @@
 package com.example.sep490.dto;
 
 import java.util.List;
+
+import com.example.sep490.entities.Address;
 import com.example.sep490.entities.Invoice;
 import com.example.sep490.entities.Order;
 import com.example.sep490.entities.Shop;
@@ -30,9 +32,11 @@ public class UserResponse {
 
     private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
 
-    private List<Order> orders; 
+//    private List<Order> orders;
     
-    private List<Invoice> invoices; 
-    
+    private List<Invoice> invoices;
+
+    private List<Address> addresses;
+
     private Shop shop; 
 }

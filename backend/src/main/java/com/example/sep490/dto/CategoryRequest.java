@@ -1,6 +1,7 @@
 package com.example.sep490.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,9 @@ import lombok.NoArgsConstructor;
 public class CategoryRequest {
 	private Long id;
     private String name;
+
+    @JsonProperty("isParent")
     private boolean isParent;
     private Long parentCategoryId; 
-
 }
 

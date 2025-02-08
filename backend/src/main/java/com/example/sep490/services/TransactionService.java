@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,8 @@ import com.example.sep490.utils.PageResponse;
 public class TransactionService {
     @Autowired
     private TransactionRepository transactionRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private TransactionMapper transactionMapper;
     @Autowired
@@ -55,16 +59,18 @@ public class TransactionService {
     }
 
     public TransactionResponse updateTransaction(Long id, TransactionRequest transactionRequest) {
-        Transaction Transaction = transactionRepo.findByIdAndIsDeleteFalse(id)
+        Transaction transaction = transactionRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         Order order = getOrder(transactionRequest.getOrderId());
 
-        Transaction entity = transactionMapper.RequestToEntity(transactionRequest);
-        entity.setOrder(order);
-        Transaction updatedTransaction = transactionRepo.save(entity);
-        return transactionMapper.EntityToResponse(updatedTransaction);
-
+        try {
+            objectMapper.updateValue(transaction, transactionRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        transaction.setOrder(order);
+        return transactionMapper.EntityToResponse(transactionRepo.save(transaction));
     }
 
     public void deleteTransaction(Long id) {

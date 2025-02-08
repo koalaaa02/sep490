@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,8 @@ import com.example.sep490.utils.PageResponse;
 public class ProductService {
 	@Autowired
 	private ProductRepository productRepo;
+	@Autowired
+	private ObjectMapper objectMapper;
 	@Autowired
 	private ProductMapper productMapper;
 	@Autowired
@@ -59,18 +63,20 @@ public class ProductService {
 	}
 
 	public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
-		Product Product = productRepo.findByIdAndIsDeleteFalse(id)
+		Product product = productRepo.findByIdAndIsDeleteFalse(id)
 				.orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
 		Category category = getCategory(productRequest.getCategoryId());
 		Supplier supplier = getSupplier(productRequest.getSupplierId());
 
-		Product entity = productMapper.RequestToEntity(productRequest);
-		entity.setCategory(category);
-		entity.setSupplier(supplier);
-		Product updatedProduct = productRepo.save(entity);
-		return productMapper.EntityToResponse(updatedProduct);
-
+		try {
+			objectMapper.updateValue(product, productRequest);
+		} catch (JsonMappingException e) {
+			throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+		}
+		product.setCategory(category);
+		product.setSupplier(supplier);
+		return productMapper.EntityToResponse(productRepo.save(product));
 	}
 
 	public void deleteProduct(Long id) {

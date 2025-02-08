@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.dto.AuthRegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +31,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     
 	@PostMapping("/register")
-    public String addNewUser(@RequestBody User userInfo) {
+    public String addNewUser(@RequestBody AuthRegisterRequest userInfo) {
         return service.addUser(userInfo);
     }
 

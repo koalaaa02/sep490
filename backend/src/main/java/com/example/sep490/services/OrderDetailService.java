@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.example.sep490.entities.*;
 import com.example.sep490.entities.compositeKeys.OrderDetailId;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,8 @@ import com.example.sep490.utils.PageResponse;
 public class OrderDetailService {
     @Autowired
     private OrderDetailRepository orderDetailRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private OrderDetailMapper orderDetailMapper;
     @Autowired

@@ -1,13 +1,8 @@
 package com.example.sep490.entities;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import com.example.sep490.entities.enums.ShopType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,8 +31,22 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false) 
     private User manager; // Một shop có một người quản lý
-    
-    private String secretA; 
-    private String secretB; 
 
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    private String registrationCertificate;//link ảnh giấy đăng ký kinh doanh
+
+    private String secretA; 
+    private String secretB;
+
+    private String TIN;//mã số thuế
+    private String citizenIdentificationCard;//CCCD
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ShopType shopType;// doanh nghiệp, cá nhân
+
+    private boolean isActive = true; // shop đang active hay không
 }

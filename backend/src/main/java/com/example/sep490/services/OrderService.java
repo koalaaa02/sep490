@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +26,18 @@ public class OrderService {
     @Autowired
     private OrderRepository orderRepo;
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
     private OrderMapper orderMapper;
     @Autowired
     private BasePagination pagination;
 
     @Autowired
-    private UserRepository userRepo;
+    private TransactionRepository transactionRepo;
+    @Autowired
+    private AddressRepository AddressRepo;
     @Autowired
     private ShopRepository shopRepo;
-    @Autowired
-    private ShippingAddressRepository shippingAddressRepo;
 
     public PageResponse<Order> getOrders(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -51,31 +55,35 @@ public class OrderService {
     }
 
     public OrderResponse createOrder(OrderRequest orderRequest) {
-        User user = getUser(orderRequest.getUserId());
+        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
-        ShippingAddress shippingAddress = getShippingAddres(orderRequest.getShippingAddressId());
+        Address Address = getShippingAddres(orderRequest.getAddressId());
 
         Order entity = orderMapper.RequestToEntity(orderRequest);
-        entity.setUser(user);
+        entity.setTransaction(transaction);
         entity.setShop(shop);
-        entity.setShippingAddress(shippingAddress);
+        entity.setAddress(Address);
         return orderMapper.EntityToResponse(orderRepo.save(entity));
     }
 
     public OrderResponse updateOrder(Long id, OrderRequest orderRequest) {
-        Order Order = orderRepo.findByIdAndIsDeleteFalse(id)
+        Order order = orderRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        User user = getUser(orderRequest.getUserId());
+        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
-        ShippingAddress shippingAddress = getShippingAddres(orderRequest.getShippingAddressId());
+        Address Address = getShippingAddres(orderRequest.getAddressId());
 
-        Order entity = orderMapper.RequestToEntity(orderRequest);
-        entity.setUser(user);
-        entity.setShop(shop);
-        entity.setShippingAddress(shippingAddress);
-        Order updatedOrder = orderRepo.save(entity);
-        return orderMapper.EntityToResponse(updatedOrder);
+        try {
+            objectMapper.updateValue(order, orderRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        order.setTransaction(transaction);
+        order.setShop(shop);
+        order.setAddress(Address);
+        return orderMapper.EntityToResponse(orderRepo.save(order));
+
 
     }
 
@@ -92,17 +100,17 @@ public class OrderService {
         return id == null ? null
                 : orderRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
-    private User getUser(Long id) {
+    private Transaction getTransaction(Long id) {
         return id == null ? null
-                : userRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+                : transactionRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
     private Shop getShop(Long id) {
         return id == null ? null
                 : shopRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
-    private ShippingAddress getShippingAddres(Long id) {
+    private Address getShippingAddres(Long id) {
         return id == null ? null
-                : shippingAddressRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+                : AddressRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
 
 }

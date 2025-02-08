@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.sep490.entities.DebtPayment;
 
 public interface DebtPaymentRepository extends JpaRepository<DebtPayment, Long>{
-    Page<DebtPayment> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name, Pageable pageable);
     Page<DebtPayment> findByIsDeleteFalse(Pageable pageable);
 	Optional<DebtPayment> findByIdAndIsDeleteFalse(Long id);
 }

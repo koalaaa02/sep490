@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +22,8 @@ import com.example.sep490.utils.PageResponse;
 public class ProductSKUService {
     @Autowired
     private ProductSKURepository productSKURepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private ProductSKUMapper productSKUMapper;
     @Autowired
@@ -45,23 +49,26 @@ public class ProductSKUService {
 
     public ProductSKUResponse createProductSKU(ProductSKURequest productSKURequest) {
         Product product = getProduct(productSKURequest.getProductId());
-
+        if( product == null) throw new RuntimeException("Phân loại sản phẩm phải thuộc một sản phẩm có sẵn.");
         ProductSKU entity = productSKUMapper.RequestToEntity(productSKURequest);
         entity.setProduct(product);
         return productSKUMapper.EntityToResponse(productSKURepo.save(entity));
     }
 
     public ProductSKUResponse updateProductSKU(Long id, ProductSKURequest productSKURequest) {
-        ProductSKU ProductSKU = productSKURepo.findByIdAndIsDeleteFalse(id)
+        ProductSKU productSKU = productSKURepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         Product product = getProduct(productSKURequest.getProductId());
+        if( product == null) throw new RuntimeException("Phân loại sản phẩm phải thuộc một sản phẩm có sẵn.");
 
-        ProductSKU entity = productSKUMapper.RequestToEntity(productSKURequest);
-        entity.setProduct(product);
-        ProductSKU updatedProductSKU = productSKURepo.save(entity);
-        return productSKUMapper.EntityToResponse(updatedProductSKU);
-
+        try {
+            objectMapper.updateValue(productSKU, productSKURequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        productSKU.setProduct(product);
+        return productSKUMapper.EntityToResponse(productSKURepo.save(productSKU));
     }
 
     public void deleteProductSKU(Long id) {

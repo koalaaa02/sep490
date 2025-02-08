@@ -5,6 +5,8 @@ import java.util.Optional;
 import com.example.sep490.entities.Invoice;
 import com.example.sep490.repositories.DebtPaymentRepository;
 import com.example.sep490.repositories.InvoiceRepository;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +27,8 @@ import com.example.sep490.utils.PageResponse;
 public class DebtPaymentService {
     @Autowired
     private DebtPaymentRepository debtPaymentRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private DebtPaymentMapper debtPaymentMapper;
     @Autowired
@@ -57,15 +61,19 @@ public class DebtPaymentService {
     }
 
     public DebtPaymentResponse updateDebtPayment(Long id, DebtPaymentRequest debtPaymentRequest) {
-        DebtPayment DebtPayment = debtPaymentRepo.findByIdAndIsDeleteFalse(id)
+        DebtPayment debtPayment = debtPaymentRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("DebtPayment not found with id: " + id));
 
         Invoice invoice = getInvoice(debtPaymentRequest.getInvoiceId());
 
-        DebtPayment entity = debtPaymentMapper.RequestToEntity(debtPaymentRequest);
-        entity.setInvoice(invoice);
-        DebtPayment updatedDebtPayment = debtPaymentRepo.save(entity);
-        return debtPaymentMapper.EntityToResponse(updatedDebtPayment);
+        try {
+            objectMapper.updateValue(debtPayment, debtPaymentRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        debtPayment.setInvoice(invoice);
+        return debtPaymentMapper.EntityToResponse(debtPaymentRepo.save(debtPayment));
+
 
     }
 

@@ -1,15 +1,6 @@
-package com.example.sep490.entities;
+package com.example.sep490.dto;
 
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,19 +8,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShippingAddress  extends Auditable{//một user có nhiều địa chỉ giao hàng, 1 Order chỉ mang 1 địa chỉ giao hàng
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class AddressRequest {
+	private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
+    private Long shopId;
 
     private String recipientName;
     
@@ -44,5 +31,5 @@ public class ShippingAddress  extends Auditable{//một user có nhiều địa 
     private String ward;
     private String postalCode;
 
-    private boolean isDefault; // Đánh dấu địa chỉ mặc định
+    private boolean isDefault; 
 }

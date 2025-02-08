@@ -52,10 +52,20 @@ public class SecurityConfig {
                                 "/swagger-ui/*",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/addresses/**",
+                                "/api/debt-payments/**",
+                                "/api/categories/**",
+                                "/api/invoices/**",
+                                "/api/orders/**",
+                                "/api/shops/**",
+                                "/api/suppliers/**",
+                                "/api/transactions/**",
+                                "/api/users/**"
                         ).permitAll()
                         .requestMatchers(
-                        		"/api/private/products/**"
+                                "/api/private/products/**",
+                                "/api/productskus/**"
                 		).authenticated()
                 )
                 .sessionManagement(session -> session

@@ -37,14 +37,10 @@ public class Order  extends Auditable{//đơn hàng nè
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user; // Một đơn hàng thuộc về một customer
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user; // Một đơn hàng thuộc về một customer
 
-    @ManyToOne
-    @JoinColumn(name = "shop_id", nullable = false)
-    private Shop shop; // Một đơn hàng thuộc về một shop
-    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -63,9 +59,13 @@ public class Order  extends Auditable{//đơn hàng nè
     private Transaction transaction;
 
     @ManyToOne
-    @JoinColumn(name = "shipping_address_id")
-    private ShippingAddress shippingAddress; 
-    
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @ManyToOne
+    @JoinColumn(name = "shop_id", nullable = false)
+    private Shop shop; // Một đơn hàng thuộc về một shop
+
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
     

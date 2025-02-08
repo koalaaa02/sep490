@@ -1,5 +1,6 @@
 package com.example.sep490.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
@@ -46,13 +47,16 @@ public abstract class Auditable {//Class nào kế thừa nó sẽ mang thuộc 
     
     @Column(name = "deleted_by", nullable = true)
     private Long deletedBy;
-    
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "created_at", nullable = true)
     private LocalDateTime createdAt;
-    
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
-    
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "deleted_at", nullable = true)
     private LocalDateTime deletedAt;
 
@@ -68,6 +72,10 @@ public abstract class Auditable {//Class nào kế thừa nó sẽ mang thuộc 
     public void preUpdate() {
         this.updatedBy = getCurrentUserId();
         this.updatedAt = LocalDateTime.now();
+        if(this.isDelete){
+            this.deletedBy = getCurrentUserId();
+            this.deletedAt = LocalDateTime.now();
+        }
     }
 
     @PreRemove

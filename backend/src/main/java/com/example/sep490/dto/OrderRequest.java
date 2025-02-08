@@ -21,10 +21,6 @@ import lombok.NoArgsConstructor;
 public class OrderRequest {
 	private Long id;
 
-    private Long userId; 
-
-    private Long shopId; 
-    
     private OrderStatus status;
     
     private BigDecimal shippingFee;
@@ -33,10 +29,12 @@ public class OrderRequest {
         
 	@NotNull(message = "Phương thức thanh toán không được để trống.")
     private PaymentMethod paymentMethod; // CARD, COD
-    
-    private Transaction transaction;
 
-    private Long shippingAddressId; 
+    private Long shopId;
+
+    private Long transactionId;
+
+    private Long addressId;
     
     @Nullable
     private String deliveryCode;

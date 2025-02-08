@@ -32,7 +32,7 @@ public class CategoryController {
 	private CategoryService categoryService;
 	
 	@GetMapping("/")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> getCategorys(
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
@@ -44,34 +44,28 @@ public class CategoryController {
     }
 	
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> getCategorysById(@PathVariable Long id) {
     	return ResponseEntity.ok().body(categoryService.getCategoryById(id));
     }
     
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest category) {
     	return ResponseEntity.ok().body(categoryService.createCategory(category));
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
-    	try {
-            if (!id.equals(category.getId())) {
-                return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
-            }
-        	return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
-        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-        	return ResponseEntity.badRequest().body(e.getMessage());
+        if (!id.equals(category.getId())) {
+            return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
         }
-//        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa danh mục.");
+        return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
 		try {
         	categoryService.deleteCategory(id);
@@ -82,3 +76,19 @@ public class CategoryController {
         }
     }
 }
+
+
+//@PutMapping("/{id}")
+//@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+//public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
+//    try {
+//        if (!id.equals(category.getId())) {
+//            return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
+//        }
+//        return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
+//    } catch (RuntimeException e) {
+////            return ResponseEntity.notFound().build();
+//        return ResponseEntity.badRequest().body(e.getMessage());
+//    }
+////        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa danh mục.");
+//}

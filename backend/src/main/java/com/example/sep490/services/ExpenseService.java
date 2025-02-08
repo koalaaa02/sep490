@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,8 @@ import com.example.sep490.utils.PageResponse;
 public class ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private ExpenseMapper expenseMapper;
     @Autowired
@@ -50,12 +54,16 @@ public class ExpenseService {
     }
 
     public ExpenseResponse updateExpense(Long id, ExpenseRequest expenseRequest) {
-        Expense Expense = expenseRepo.findByIdAndIsDeleteFalse(id)
+        Expense expense = expenseRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        Expense entity = expenseMapper.RequestToEntity(expenseRequest);
-        Expense updatedExpense = expenseRepo.save(entity);
-        return expenseMapper.EntityToResponse(updatedExpense);
+        try {
+            objectMapper.updateValue(expense, expenseRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        return expenseMapper.EntityToResponse(expenseRepo.save(expense));
+
 
     }
 

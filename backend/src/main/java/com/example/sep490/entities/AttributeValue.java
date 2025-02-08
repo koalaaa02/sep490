@@ -15,23 +15,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class AttributeValue  extends Auditable{//giá trị của thuộc tính : Color: red, yellow
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String attributeValue;
-
-    @ManyToOne
-    @JoinColumn(name = "attribute_id")
-    private Attribute attribute;
-
-    @ManyToOne
-    @JoinColumn(name = "sku_id")
-    private ProductSKU sku;
-}
+//@Entity
+//@Data
+//@NoArgsConstructor
+//@AllArgsConstructor
+//@Builder
+//public class AttributeValue  extends Auditable{//giá trị của thuộc tính : Color: red, yellow
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    private Long id;
+//
+//    private String attributeValue;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "attribute_id")
+//    private Attribute attribute;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "sku_id")
+//    private ProductSKU sku;
+//}

@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +25,8 @@ import com.example.sep490.utils.PageResponse;
 public class InvoiceService {
     @Autowired
     private InvoiceRepository invoiceRepo;
+    @Autowired
+    private ObjectMapper objectMapper;
     @Autowired
     private InvoiceMapper invoiceMapper;
     @Autowired
@@ -55,15 +59,19 @@ public class InvoiceService {
     }
 
     public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceRequest) {
-        Invoice Invoice = invoiceRepo.findByIdAndIsDeleteFalse(id)
+        Invoice invoice = invoiceRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         User user = getUser(invoiceRequest.getAgentId());
 
-        Invoice entity = invoiceMapper.RequestToEntity(invoiceRequest);
-        entity.setAgent(user);
-        Invoice updatedInvoice = invoiceRepo.save(entity);
-        return invoiceMapper.EntityToResponse(updatedInvoice);
+        try {
+            objectMapper.updateValue(invoice, invoiceRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        invoice.setAgent(user);
+        return invoiceMapper.EntityToResponse(invoiceRepo.save(invoice));
+
 
     }
 

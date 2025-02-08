@@ -8,9 +8,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.sep490.entities.ShippingAddress;
+import com.example.sep490.entities.Address;
 
-public interface ShippingAddressRepository extends JpaRepository<ShippingAddress, Long>{
-    Page<ShippingAddress> findByIsDeleteFalse(Pageable pageable);
-	Optional<ShippingAddress> findByIdAndIsDeleteFalse(Long id);
+public interface AddressRepository extends JpaRepository<Address, Long>{
+    Page<Address> findByIsDeleteFalse(Pageable pageable);
+	Optional<Address> findByIdAndIsDeleteFalse(Long id);
 }

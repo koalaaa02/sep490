@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,12 +26,16 @@ public class ShopService {
     @Autowired
     private ShopRepository shopRepo;
     @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
     private ShopMapper shopMapper;
     @Autowired
     private BasePagination pagination;
 
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private AddressRepository addressRepo;
 
     public PageResponse<Shop> getShops(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -48,23 +54,29 @@ public class ShopService {
 
     public ShopResponse createShop(ShopRequest shopRequest) {
         User user = getUser(shopRequest.getManagerId());
+        Address address = getAddress(shopRequest.getAddressId());
 
         Shop entity = shopMapper.RequestToEntity(shopRequest);
         entity.setManager(user);
+        entity.setAddress(address);
         return shopMapper.EntityToResponse(shopRepo.save(entity));
     }
 
     public ShopResponse updateShop(Long id, ShopRequest shopRequest) {
-        Shop Shop = shopRepo.findByIdAndIsDeleteFalse(id)
+        Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         User user = getUser(shopRequest.getManagerId());
+        Address address = getAddress(shopRequest.getAddressId());
 
-        Shop entity = shopMapper.RequestToEntity(shopRequest);
-        entity.setManager(user);
-        Shop updatedShop = shopRepo.save(entity);
-        return shopMapper.EntityToResponse(updatedShop);
-
+        try {
+            objectMapper.updateValue(address, shopRequest);
+        } catch (JsonMappingException e) {
+            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+        }
+        shop.setManager(user);
+        shop.setAddress(address);
+        return shopMapper.EntityToResponse(shopRepo.save(shop));
     }
 
     public void deleteShop(Long id) {
@@ -83,6 +95,10 @@ public class ShopService {
     private User getUser(Long id) {
         return id == null ? null
                 : userRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+    private Address getAddress(Long id) {
+        return id == null ? null
+                : addressRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
 
 }

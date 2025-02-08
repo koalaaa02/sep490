@@ -3,6 +3,8 @@ package com.example.sep490.services.product;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.entities.Supplier;
+import com.example.sep490.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,6 +26,8 @@ public class SellerProductStrategy implements ProductStrategy {
 	private ProductRepository productRepo;
 	@Autowired
 	private CategoryRepository categoryRepo;
+	@Autowired
+	private SupplierRepository supplierRepo;
 	@Autowired
     private ProductMapper productMapper;
 
@@ -69,12 +73,15 @@ public class SellerProductStrategy implements ProductStrategy {
 	public Product createProduct(ProductRequest productRequest) {
 		Category category = categoryRepo.findById(productRequest.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+		Supplier supplier = supplierRepo.findById(productRequest.getCategoryId())
+				.orElseThrow(() -> new RuntimeException("Supplier not found"));
 
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
                 .specifications(productRequest.getSpecifications())
-                .category(category) 
+                .category(category)
+				.supplier(supplier)
                 .build();
         return productRepo.save(product);
     }
