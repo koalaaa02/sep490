@@ -5,6 +5,7 @@ import java.util.List;
 import com.example.sep490.entities.Category;
 import com.example.sep490.entities.Product;
 import com.example.sep490.entities.ProductSKU;
+import com.example.sep490.entities.Supplier;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -25,5 +26,6 @@ public class ProductResponse {
     @JsonIgnoreProperties("products")
     private Category category;
     private List<ProductSKU> skus;
+    private Supplier supplier;
 }
 

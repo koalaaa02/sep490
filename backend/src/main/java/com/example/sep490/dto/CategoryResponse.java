@@ -2,6 +2,7 @@ package com.example.sep490.dto;
 
 import java.util.List;
 
+import com.example.sep490.entities.Auditable;
 import com.example.sep490.entities.Category;
 import com.example.sep490.entities.Product;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -12,7 +13,7 @@ import lombok.Data;
 
 @Data
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class CategoryResponse {
+public class CategoryResponse extends Auditable {
 	private Long id;
     private String name;
     private boolean isParent;

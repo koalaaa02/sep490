@@ -3,6 +3,7 @@ package com.example.sep490.repositories;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.entities.Category;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -31,6 +32,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     
     @Query(value = "SELECT * FROM product WHERE name = :name", nativeQuery = true)
     Optional<Product> findByNames(@Param("name") String name);
+
+
+    Page<Product> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name, Pageable pageable);
+    Page<Product> findByIsDeleteFalse(Pageable pageable);
+    Optional<Product> findByIdAndIsDeleteFalse(Long id);
 }
 
 //By: Được sử dụng để nối với tên trường trong entity.

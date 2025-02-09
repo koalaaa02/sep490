@@ -1,6 +1,8 @@
 package com.example.sep490.dto;
 
+import com.example.sep490.entities.Shop;
 import com.example.sep490.entities.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,11 +14,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShippingAddressResponse {
+public class AddressResponse {
 	private Long id;
 
+    @JsonIgnoreProperties({"addresses","invoices","shop"})
     private User user;
-
+    @JsonIgnoreProperties({"address","products","manager","orders"})
+    private Shop shop;
     private String recipientName;
     
     @Pattern(regexp = "^(0[3|5|7|8|9])\\d{8}$", message = "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng (0912345678).")

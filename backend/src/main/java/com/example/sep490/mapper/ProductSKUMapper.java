@@ -18,6 +18,8 @@ public interface ProductSKUMapper {
     List<ProductSKUResponse> EntitiesToResponses(List<ProductSKU> productSKU);
     
     @Mapping(source = "id", target = "id")
+
+    @Mapping(source = "bulky", target = "isBulky")
     ProductSKU RequestToEntity(ProductSKURequest productSKURequest);
     
     @Mapping(source = "id", target = "id")

@@ -32,4 +32,17 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Lỗi hệ thống: " + ex.getMessage());
     }
+
+//    @ExceptionHandler(RuntimeException.class)
+//    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+//        return ResponseEntity.badRequest().body(ex.getMessage());
+//    }
+//
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<?> handleException(Exception ex) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Đã xảy ra lỗi trong hệ thống.");
+//    }
+
+
+
 }

@@ -34,8 +34,8 @@ public class ProductController {
     @Autowired
     private List<ProductStrategy> strategies;
     
-    @GetMapping("/")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @GetMapping({"/admin/","/seller/"})
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
     public ResponseEntity<?> getProductsSeller(Authentication authentication) {
     	String role = authentication.getAuthorities().toString();
         for (ProductStrategy strategy : strategies) {

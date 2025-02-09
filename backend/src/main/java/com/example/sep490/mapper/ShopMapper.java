@@ -18,6 +18,7 @@ public interface ShopMapper {
     List<ShopResponse> EntitiesToResponses(List<Shop> shop);
     
     @Mapping(source = "id", target = "id")
+    @Mapping(source = "active", target = "isActive")
     Shop RequestToEntity(ShopRequest shopRequest);
     
     @Mapping(source = "id", target = "id")

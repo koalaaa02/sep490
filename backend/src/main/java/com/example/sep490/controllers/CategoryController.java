@@ -1,5 +1,7 @@
 package com.example.sep490.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,51 +20,52 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.sep490.dto.CategoryRequest;
 import com.example.sep490.services.CategoryService;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
+    private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
+//logger.info("Fetching category with id: {}", id);
 
 	@Autowired
 	private CategoryService categoryService;
 	
 	@GetMapping("/")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> getCategorys(
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "ASC") String direction
+        @RequestParam(defaultValue = "ASC") String direction,
+        @RequestParam(required = false) String name
     ) {
-    	return ResponseEntity.ok(categoryService.getCategories(page, size, sortBy, direction));
+    	return ResponseEntity.ok(categoryService.getCategories(page, size, sortBy, direction, name));
     }
 	
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> getCategorysById(@PathVariable Long id) {
     	return ResponseEntity.ok().body(categoryService.getCategoryById(id));
     }
     
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest category) {
     	return ResponseEntity.ok().body(categoryService.createCategory(category));
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
-    	try {
-    		if(id != category.getId()) return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
-        	return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
-        } catch (RuntimeException e) {
-//            return ResponseEntity.notFound().build();
-        	return ResponseEntity.badRequest().body(e.getMessage());
+        if (!id.equals(category.getId())) {
+            return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
         }
-//        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa danh mục.");
+        return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
 		try {
         	categoryService.deleteCategory(id);
@@ -73,3 +76,19 @@ public class CategoryController {
         }
     }
 }
+
+
+//@PutMapping("/{id}")
+//@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+//public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
+//    try {
+//        if (!id.equals(category.getId())) {
+//            return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
+//        }
+//        return ResponseEntity.ok().body(categoryService.updateCategory(id, category));
+//    } catch (RuntimeException e) {
+////            return ResponseEntity.notFound().build();
+//        return ResponseEntity.badRequest().body(e.getMessage());
+//    }
+////        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa danh mục.");
+//}
