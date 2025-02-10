@@ -24,9 +24,10 @@ public class ShopController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
+            @RequestParam(defaultValue = "ASC") String direction,
+            @RequestParam(required = false) String name
     ) {
-        return ResponseEntity.ok(shopService.getShops(page, size, sortBy, direction));
+        return ResponseEntity.ok(shopService.getShops(page, size, sortBy, direction, name));
     }
 
     @GetMapping("/{id}")

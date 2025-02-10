@@ -55,7 +55,7 @@ public class Order  extends Auditable{//đơn hàng nè
     private List<OrderDetail> orderDetails;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod; // CARD, COD
+    private PaymentMethod paymentMethod; // CARD, COD, DEBT, DEAL
 
     @ColumnDefault("'GHN'")
     @Enumerated(EnumType.STRING)

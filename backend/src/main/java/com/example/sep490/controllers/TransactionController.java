@@ -27,7 +27,7 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> getTransactions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -38,19 +38,19 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return ResponseEntity.ok().body(transactionService.getTransactionById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transaction) {
         return ResponseEntity.ok().body(transactionService.createTransaction(transaction));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> updateTransaction(@PathVariable Long id, @RequestBody TransactionRequest transaction) {
         if (!id.equals(transaction.getId())) {
             return ResponseEntity.badRequest().body("Id và id trong giao dịch không trùng khớp.");
@@ -59,7 +59,7 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
         try {
             transactionService.deleteTransaction(id);

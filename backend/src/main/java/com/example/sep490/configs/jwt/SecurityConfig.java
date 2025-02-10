@@ -45,6 +45,8 @@ public class SecurityConfig {
                                 "/static/**",
                                 "/uploads/**",
                                 "/api/public/**",
+                                "/api/v1/payment/**",
+                                "/api/mail/**",
                                 "/api/debt-payments/**",
                                 "/api/auth/**",
                                 "/api/categories/**",
@@ -65,9 +67,11 @@ public class SecurityConfig {
                                 "/api/cart/**"
                         ).permitAll()
                         .requestMatchers(
+                                "/api/myprofile/**",
                                 "/api/private/products/**",
                                 "/api/productskus/**",
-                                "/api/checkout/**"
+                                "/api/checkout/**",
+                                "/api/expenses/**"
                 		).authenticated()
                 )
                 .sessionManagement(session -> session

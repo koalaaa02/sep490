@@ -61,10 +61,11 @@ public class UserService {
         return "user added to system ";
     }
 
-    public PageResponse<User> getUsers(int page, int size, String sortBy, String direction,String name) {
+    public PageResponse<UserResponse> getUsers(int page, int size, String sortBy, String direction,String name) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<User> userPage = userRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
-        return pagination.createPageResponse(userPage);
+        Page<UserResponse> userResponsePage = userPage.map(userMapper::EntityToResponse);
+        return pagination.createPageResponse(userResponsePage);
     }
 
     public UserResponse getUserById(Long id) {

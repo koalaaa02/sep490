@@ -2,6 +2,7 @@ package com.example.sep490.services;
 
 import java.util.Optional;
 
+import com.example.sep490.dto.publicdto.ProductResponsePublic;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -37,10 +38,22 @@ public class ProductService {
 	@Autowired
 	private SupplierRepository supplierRepo;
 
-	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
+//	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
+//		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+//		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
+//		return pagination.createPageResponse(productPage);
+//	}
+	public PageResponse<ProductResponsePublic> getProductsPublic(int page, int size, String sortBy, String direction) {
 		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
 		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
-		return pagination.createPageResponse(productPage);
+		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+		return pagination.createPageResponse(productResponsePage);
+	}
+	public PageResponse<ProductResponse> getProducts(int page, int size, String sortBy, String direction) {
+		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
 	}
 
 	public ProductResponse getProductById(Long id) {

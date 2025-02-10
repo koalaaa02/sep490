@@ -3,6 +3,7 @@ package com.example.sep490.services;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -42,21 +43,8 @@ public class AddressService {
     public PageResponse<AddressResponse> getAddresses(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Address> addressPage = addressRepo.findByIsDeleteFalse(pageable);
-
-        // Map each Address to AddressResponse
-        List<AddressResponse> addressResponses = addressPage.getContent().stream()
-                .map(addressMapper::EntityToResponse)
-                .toList();
-
-        return new PageResponse<>(
-                addressResponses,
-                addressPage.getNumber(),
-                addressPage.getSize(),
-                addressPage.getTotalElements(),
-                addressPage.getTotalPages(),
-                addressPage.isFirst(),
-                addressPage.isLast()
-        );
+        Page<AddressResponse> addressResponsePage = addressPage.map(addressMapper::EntityToResponse);
+        return pagination.createPageResponse(addressResponsePage);
     }
 
     public AddressResponse getAddressById(Long id) {

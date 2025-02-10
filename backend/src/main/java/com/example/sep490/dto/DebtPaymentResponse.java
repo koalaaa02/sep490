@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import com.example.sep490.entities.Invoice;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,7 +20,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DebtPaymentResponse {
     private Long id;
+    @JsonIgnoreProperties({ "debtPayments", "agent"})
     private Invoice invoice;
     private BigDecimal amountPaid;
+
+    @JsonFormat(pattern = "yyyy-MM-dd 'at' HH:mm:ss")
     private LocalDateTime paymentDate = LocalDateTime.now();
 }

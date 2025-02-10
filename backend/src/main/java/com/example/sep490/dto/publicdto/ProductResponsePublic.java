@@ -1,23 +1,21 @@
-package com.example.sep490.dto;
-
-import java.util.List;
+package com.example.sep490.dto.publicdto;
 
 import com.example.sep490.entities.Category;
-import com.example.sep490.entities.Product;
 import com.example.sep490.entities.ProductSKU;
 import com.example.sep490.entities.Supplier;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponse {
+public class ProductResponsePublic {
     private Long id; 
     private String name;
     private String description;

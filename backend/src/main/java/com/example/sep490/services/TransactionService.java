@@ -1,7 +1,9 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.dto.AddressResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,10 +37,11 @@ public class TransactionService {
     @Autowired
     private OrderRepository orderRepo;
 
-    public PageResponse<Transaction> getTransactions(int page, int size, String sortBy, String direction) {
+    public PageResponse<TransactionResponse> getTransactions(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Transaction> transactionPage = transactionRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(transactionPage);
+        Page<TransactionResponse> transactionResponsePage = transactionPage.map(transactionMapper::EntityToResponse);
+        return pagination.createPageResponse(transactionResponsePage);
     }
 
     public TransactionResponse getTransactionById(Long id) {

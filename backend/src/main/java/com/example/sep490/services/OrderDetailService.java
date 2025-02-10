@@ -37,10 +37,11 @@ public class OrderDetailService {
     @Autowired
     private ProductSKURepository productRepo;
 
-    public PageResponse<OrderDetail> getOrderDetails(int page, int size, String sortBy, String direction) {
+    public PageResponse<OrderDetailResponse> getOrderDetails(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<OrderDetail> orderDetailPage = orderDetailRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(orderDetailPage);
+        Page<OrderDetailResponse> orderDetailResponsePage = orderDetailPage.map(orderDetailMapper::EntityToResponse);
+        return pagination.createPageResponse(orderDetailResponsePage);
     }
 
     public OrderDetailResponse getOrderDetailById(Long orderId,Long productSKUId) {

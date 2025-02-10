@@ -2,6 +2,7 @@ package com.example.sep490.services;
 
 import java.util.Optional;
 
+import com.example.sep490.dto.publicdto.ShopResponsePublic;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -37,10 +38,22 @@ public class ShopService {
     @Autowired
     private AddressRepository addressRepo;
 
-    public PageResponse<Shop> getShops(int page, int size, String sortBy, String direction) {
+    public PageResponse<ShopResponsePublic> getShopsPublic(int page, int size, String sortBy, String direction, String name) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Shop> shopPage = shopRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(shopPage);
+        Page<Shop> shopPage =(name == null || name.isBlank())
+                ? shopRepo.findByIsDeleteFalse(pageable)
+                : shopRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
+        Page<ShopResponsePublic> shopResponsePage = shopPage.map(shopMapper::EntityToResponsePublic);
+        return pagination.createPageResponse(shopResponsePage);
+    }
+
+    public PageResponse<ShopResponse> getShops(int page, int size, String sortBy, String direction,String name) {
+        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+        Page<Shop> shopPage =(name == null || name.isBlank())
+                ? shopRepo.findByIsDeleteFalse(pageable)
+                : shopRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
+        Page<ShopResponse> shopResponsePage = shopPage.map(shopMapper::EntityToResponse);
+        return pagination.createPageResponse(shopResponsePage);
     }
 
     public ShopResponse getShopById(Long id) {

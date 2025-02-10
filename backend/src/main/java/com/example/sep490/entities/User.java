@@ -2,6 +2,8 @@ package com.example.sep490.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Builder;
 import org.hibernate.annotations.ColumnDefault;
@@ -31,6 +33,8 @@ public class User extends Auditable{ //thông tin tài khoản
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;
+
+    @JsonIgnore
     private String password;
     
     @Column(nullable = false)

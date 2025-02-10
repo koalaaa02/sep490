@@ -32,10 +32,11 @@ public class ExpenseService {
     @Autowired
     private BasePagination pagination;
 
-    public PageResponse<Expense> getExpenses(int page, int size, String sortBy, String direction) {
+    public PageResponse<ExpenseResponse> getExpenses(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Expense> expensePage = expenseRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(expensePage);
+        Page<ExpenseResponse> expenseResponsePage = expensePage.map(expenseMapper::EntityToResponse);
+        return pagination.createPageResponse(expenseResponsePage);
     }
 
     public ExpenseResponse getExpenseById(Long id) {

@@ -32,10 +32,11 @@ public class ProductSKUService {
     @Autowired
     private ProductRepository productRepo;
 
-    public PageResponse<ProductSKU> getProductSKUs(int page, int size, String sortBy, String direction) {
+    public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<ProductSKU> productSKUPage = productSKURepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(productSKUPage);
+        Page<ProductSKUResponse> productSKUResponsePage = productSKUPage.map(productSKUMapper::EntityToResponse);
+        return pagination.createPageResponse(productSKUResponsePage);
     }
 
     public ProductSKUResponse getProductSKUById(Long id) {

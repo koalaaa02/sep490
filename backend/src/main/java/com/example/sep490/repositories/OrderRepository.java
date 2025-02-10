@@ -12,5 +12,7 @@ import com.example.sep490.entities.Order;
 
 public interface OrderRepository extends JpaRepository<Order, Long>{
     Page<Order> findByIsDeleteFalse(Pageable pageable);
+    List<Order> findByCreatedByAndIsDeleteFalse(Long userId);
 	Optional<Order> findByIdAndIsDeleteFalse(Long id);
+
 }

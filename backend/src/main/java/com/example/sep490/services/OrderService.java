@@ -1,5 +1,6 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entities.*;
@@ -39,10 +40,11 @@ public class OrderService {
     @Autowired
     private ShopRepository shopRepo;
 
-    public PageResponse<Order> getOrders(int page, int size, String sortBy, String direction) {
+    public PageResponse<OrderResponse> getOrders(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Order> orderPage = orderRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(orderPage);
+        Page<OrderResponse> orderResponsePage = orderPage.map(orderMapper::EntityToResponse);
+        return pagination.createPageResponse(orderResponsePage);
     }
 
     public OrderResponse getOrderById(Long id) {
@@ -52,6 +54,12 @@ public class OrderService {
         } else {
             throw new RuntimeException("Danh mục không tồn tại với ID: " + id);
         }
+    }
+
+    public List<OrderResponse> getOrdersByCreatedBy(Long id) {
+        List<Order> orders = orderRepo.findByCreatedByAndIsDeleteFalse(id);
+        List<OrderResponse> orderResponses = orderMapper.EntitiesToResponses(orders);
+        return orderResponses;
     }
 
 //    public OrderResponse createOrder(OrderRequest orderRequest) {

@@ -31,10 +31,11 @@ public class SupplierService {
     @Autowired
     private BasePagination pagination;
 
-    public PageResponse<Supplier> getSuppliers(int page, int size, String sortBy, String direction) {
+    public PageResponse<SupplierResponse> getSuppliers(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Supplier> supplierPage = supplierRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(supplierPage);
+        Page<SupplierResponse> supplierResponsePage = supplierPage.map(supplierMapper::EntityToResponse);
+        return pagination.createPageResponse(supplierResponsePage);
     }
 
     public SupplierResponse getSupplierById(Long id) {

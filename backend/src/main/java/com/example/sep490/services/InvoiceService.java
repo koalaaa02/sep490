@@ -1,7 +1,9 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.dto.AddressResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,10 +37,11 @@ public class InvoiceService {
     @Autowired
     private UserRepository userRepo;
 
-    public PageResponse<Invoice> getInvoices(int page, int size, String sortBy, String direction) {
+    public PageResponse<InvoiceResponse> getInvoices(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<Invoice> invoicePage = invoiceRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(invoicePage);
+        Page<InvoiceResponse> invoiceResponsePage = invoicePage.map(invoiceMapper::EntityToResponse);
+        return pagination.createPageResponse(invoiceResponsePage);
     }
 
     public InvoiceResponse getInvoiceById(Long id) {
@@ -63,6 +66,7 @@ public class InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         User user = getUser(invoiceRequest.getAgentId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
 
         try {
             objectMapper.updateValue(invoice, invoiceRequest);

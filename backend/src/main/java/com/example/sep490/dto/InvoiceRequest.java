@@ -6,6 +6,7 @@ import java.util.List;
 import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.entities.enums.InvoiceStatus;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,4 @@ public class InvoiceRequest {
 
     private InvoiceStatus status = InvoiceStatus.UNPAID;; // UNPAID, PARTIALLY_PAID, PAID
 
-    private List<DebtPayment> debtPayments;
 }

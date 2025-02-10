@@ -19,7 +19,7 @@ public class DebtPaymentController {
     private DebtPaymentService debtPaymentService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
     public ResponseEntity<?> getDebtPayments(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -32,21 +32,21 @@ public class DebtPaymentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
     public ResponseEntity<?> getDebtPaymentById(@PathVariable Long id) {
         logger.info("Fetching debt payment with id: {}", id);
         return ResponseEntity.ok().body(debtPaymentService.getDebtPaymentById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
     public ResponseEntity<?> createDebtPayment(@RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Creating new debt payment: {}", debtPaymentRequest);
         return ResponseEntity.ok().body(debtPaymentService.createDebtPayment(debtPaymentRequest));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
     public ResponseEntity<?> updateDebtPayment(@PathVariable Long id, @RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Updating debt payment with id: {}", id);
         if (!id.equals(debtPaymentRequest.getId())) {
@@ -56,7 +56,7 @@ public class DebtPaymentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_FINANCE')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
     public ResponseEntity<?> deleteDebtPayment(@PathVariable Long id) {
         logger.info("Deleting debt payment with id: {}", id);
         try {

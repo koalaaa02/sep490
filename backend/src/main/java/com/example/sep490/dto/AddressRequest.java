@@ -25,10 +25,14 @@ public class AddressRequest {
     
     @Size(min = 3, max = 255, message = "Địa chỉ phải có độ dài từ 3 đến 255 ký tự.")
     private String address;
-    
+
+    private String provinceId;
+    private String districtId;
+    private String wardId;
     private String province;
     private String district;
     private String ward;
+
     private String postalCode;
 
     private boolean isDefault; 

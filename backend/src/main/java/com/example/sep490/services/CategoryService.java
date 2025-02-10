@@ -2,6 +2,7 @@ package com.example.sep490.services;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -43,12 +44,21 @@ public class CategoryService {
 //        return pagination.createPageResponse(categoryPage);
 //	}
 
-	public PageResponse<Category> getCategories(int page, int size, String sortBy, String direction, String nameFilter) {
+	public PageResponse<CategoryResponse> getCategories(int page, int size, String sortBy, String direction, String nameFilter) {
 		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
 		Page<Category> categoryPage = (nameFilter == null || nameFilter.isBlank())
 				? categoryRepo.findByIsDeleteFalse(pageable)
 				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(nameFilter, pageable);
-		return pagination.createPageResponse(categoryPage);
+		Page<CategoryResponse> categoryResponsePage = categoryPage.map(categoryMapper::EntityToResponse);
+		return pagination.createPageResponse(categoryResponsePage);
+	}
+
+	public List<CategoryResponse> getParentCategories(String nameFilter) {
+		List<Category> categories = (nameFilter == null || nameFilter.isBlank())
+				? categoryRepo.findByIsDeleteFalseAndIsParentTrue()
+				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalseAndIsParentTrue(nameFilter);
+		List<CategoryResponse> categoryResponse = categoryMapper.EntitiesToResponses(categories);
+		return categoryResponse;
 	}
 
 	public CategoryResponse getCategoryById(Long id) {
