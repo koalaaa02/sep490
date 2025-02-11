@@ -2,6 +2,7 @@ package com.example.sep490.dto;
 
 import java.math.BigDecimal;
 import com.example.sep490.entities.Product;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,6 @@ public class ProductSKUResponse {
     private String image;
     
     private boolean isBulky = false;  
-    
+    @JsonIgnoreProperties({ "skus","category","shop","supplier"})
     private Product product;
 }

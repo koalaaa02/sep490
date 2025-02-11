@@ -42,13 +42,15 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod method; // CARD, COD
-    
+
+    private String bankCode;
+
+    private String content; //nội dung chuyển khoản
+
     private String transactionId; // Mã giao dịch từ VNPAY/...
 
     @Column(nullable = false)
     private BigDecimal amount;  // số tiền
-    
-    private String message; //nội dung chuyển khoản
 
     private LocalDateTime paymentDate = LocalDateTime.now();
 
@@ -61,4 +63,10 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     private TransactionStatus status;
 
 }
-
+//String vnp_Amount ;
+//String vnp_BankCode ;
+//String vnp_BankTranNo ;
+//String vnp_CardType ;
+//String vnp_OrderInfo ;
+//String vnp_PayDate  ;
+//String vnp_TransactionNo ;

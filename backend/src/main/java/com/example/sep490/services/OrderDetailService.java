@@ -1,5 +1,6 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entities.*;
@@ -40,6 +41,13 @@ public class OrderDetailService {
     public PageResponse<OrderDetailResponse> getOrderDetails(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
         Page<OrderDetail> orderDetailPage = orderDetailRepo.findByIsDeleteFalse(pageable);
+        Page<OrderDetailResponse> orderDetailResponsePage = orderDetailPage.map(orderDetailMapper::EntityToResponse);
+        return pagination.createPageResponse(orderDetailResponsePage);
+    }
+
+    public PageResponse<OrderDetailResponse> getOrderDetailsByOrderId(int page, int size, String sortBy, String direction, Long id) {
+        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+        Page<OrderDetail> orderDetailPage = orderDetailRepo.findByOrderIdAndIsDeleteFalse(id,pageable);
         Page<OrderDetailResponse> orderDetailResponsePage = orderDetailPage.map(orderDetailMapper::EntityToResponse);
         return pagination.createPageResponse(orderDetailResponsePage);
     }

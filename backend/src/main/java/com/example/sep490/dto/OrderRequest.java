@@ -26,6 +26,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class OrderRequest {
 	private Long id;
 
+    @NotNull(message = "Trạng thái đơn hàng không được để trống.")
     private OrderStatus status;
     
     private BigDecimal shippingFee;

@@ -14,15 +14,21 @@ import com.example.sep490.repositories.AddressRepository;
 import com.example.sep490.repositories.ShopRepository;
 import com.example.sep490.repositories.UserRepository;
 import com.example.sep490.utils.BasePagination;
+import com.example.sep490.utils.CommonUtils;
+import com.example.sep490.utils.MailUtils;
 import com.example.sep490.utils.PageResponse;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.MessagingException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +46,17 @@ public class UserService {
     private UserMapper userMapper;
     @Autowired
     private BasePagination pagination;
+    @Autowired
+    private MailUtils mailUtils;
+    @Autowired
+    private CommonUtils commonUtils;
 
     @Autowired
     private ShopRepository shopRepo;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     public String addUser(AuthRegisterRequest userInfo) {
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
@@ -107,6 +118,54 @@ public class UserService {
                     return userRepo.save(existingUser);
                 })
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+    }
+
+
+    @Transactional
+    public String forgotPassword(@RequestBody String email) {
+        User user = userRepo.findByEmailAndIsDeleteFalse(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
+        String otp = commonUtils.generateOtp();
+        user.setResetToken(otp);
+        userRepo.save(user);
+        String subject = "Reset Your Password";
+        String content = "Xin chào " + user.getName() + ",\n\n"
+                + "Đây là mã OTP để đặt lại mật khẩu của bạn: " + otp + "\n\n"
+                + "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.";
+        try {
+            mailUtils.sendPlainTextEmail(fromEmail, user.getEmail(), subject, content);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email: " + e.getMessage());
+        }
+        return "Email đặt lại mật khẩu đã được gửi đến địa chỉ " + email;
+    }
+
+    @Transactional
+    public String changePassword(String email, String oldPassword, String newPassword, String confirmNewPassword) {
+        User user = userRepo.findByEmailAndIsDeleteFalse(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu cũ không chính xác.");
+        }
+        if(!newPassword.equals(confirmNewPassword)) throw new RuntimeException("Mật khẩu xác nhận không khớp.");
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+        return "Mật khẩu đã được thay đổi thành công.";
+    }
+
+    @Transactional
+    public String changeForgotPassword(String email, String resetToken, String newPassword, String confirmNewPassword) {
+        User user = userRepo.findByEmailAndIsDeleteFalse(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
+        if (user.getResetToken() == null || !user.getResetToken().equals(resetToken)) {
+            throw new RuntimeException("Mã reset không hợp lệ hoặc đã hết hạn.");
+        }
+        if(!newPassword.equals(confirmNewPassword)) throw new RuntimeException("Mật khẩu xác nhận không khớp.");
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        userRepo.save(user);
+
+        return "Mật khẩu của bạn đã được cập nhật thành công.";
     }
 
     private User getUser(Long id) {

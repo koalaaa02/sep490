@@ -28,8 +28,10 @@ public class TransactionResponse {
     private String transactionId; // Mã giao dịch từ VNPAY/...
 
     private BigDecimal amount;  // số tiền
-    
-    private String message; //nội dung chuyển khoản
+
+    private String bankCode;
+
+    private String content; //nội dung chuyển khoản
 
     private LocalDateTime paymentDate = LocalDateTime.now();
 

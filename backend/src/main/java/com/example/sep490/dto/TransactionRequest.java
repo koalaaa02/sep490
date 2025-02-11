@@ -30,8 +30,10 @@ public class TransactionRequest {
     @NotNull(message = "Số tiền không được để trống.")
     @DecimalMin(value = "0.00", message = "Số tiền phải >= 0.")
     private BigDecimal amount;  // số tiền
-    
-    private String message; //nội dung chuyển khoản
+
+    private String bankCode;
+
+    private String content; //nội dung chuyển khoản
 
     private LocalDateTime paymentDate = LocalDateTime.now();
 

@@ -1,5 +1,6 @@
 package com.example.sep490.entities;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,7 +51,13 @@ public class User extends Auditable{ //thông tin tài khoản
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Order> orders; // order customer mua
-    
+
+    // Token đặt lại mật khẩu hoặc mã OTP
+    private String resetToken;
+
+    // Thời gian hết hạn OTP
+    private LocalDateTime resetTokenExpiry;
+
     @OneToMany(mappedBy = "agent")
     private List<Invoice> invoices; // mỗi agent có thể nợ nhiều hóa đơn
 

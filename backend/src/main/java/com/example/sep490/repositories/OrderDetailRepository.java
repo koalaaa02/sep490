@@ -1,5 +1,6 @@
 package com.example.sep490.repositories;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,9 @@ import com.example.sep490.entities.compositeKeys.OrderDetailId;
 
 public interface OrderDetailRepository extends JpaRepository<OrderDetail, OrderDetailId>{
     Page<OrderDetail> findByIsDeleteFalse(Pageable pageable);
-    Optional<OrderDetail> findByIdAndIsDeleteFalse(OrderDetailId id);	
+    Optional<OrderDetail> findByIdAndIsDeleteFalse(OrderDetailId id);
+    Page<OrderDetail> findByOrderIdAndIsDeleteFalse(Long orderId,Pageable pageable);
+    List<OrderDetail> findByCreatedAtBetween(LocalDateTime from, LocalDateTime to);
 }
 //public void deleteOrderDetail(Long orderId, Long skuId) {
 //    orderDetailRepository.deleteById(new OrderDetailId(orderId, skuId));

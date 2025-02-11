@@ -1,11 +1,12 @@
 package com.example.sep490.entities.enums;
 
 public enum OrderStatus {
-    CANCELLED,
     PENDING,
+    CANCELLED,
     FINDINGTRUCK,
     ACCEPTED,
-    PACKED,
+    PACKAGING,
     DELIVERING,
-    DELIVERED
+    DELIVERED,
+    LOST
 }

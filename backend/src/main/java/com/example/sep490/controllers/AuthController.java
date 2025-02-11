@@ -1,6 +1,8 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.dto.AuthRegisterRequest;
+import com.example.sep490.dto.publicdto.ChangeForgotPasswordRequest;
+import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -65,5 +67,24 @@ public class AuthController {
             return "User ID: " + user.getPassword() + ", Email: " + user.getUsername();
         }
         return "No authenticated user";
+    }
+
+    public static class EmailDTO {
+        public String email;
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestBody EmailDTO email) {
+        return service.forgotPassword(email.email);
+    }
+
+    @PostMapping("/forgot-password/change")
+    public String changeForgotPassword(@RequestBody ChangeForgotPasswordRequest request) {
+        return service.changeForgotPassword(
+                request.getEmail(),
+                request.getResetToken(),
+                request.getNewPassword(),
+                request.getConfirmNewPassword()
+        );
     }
 }

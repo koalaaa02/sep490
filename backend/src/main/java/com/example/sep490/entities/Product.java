@@ -3,19 +3,12 @@ package com.example.sep490.entities;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.sep490.entities.enums.UnitType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -38,6 +31,10 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     private String description;
     @Size(min = 0, max = 1000, message = "Địa chỉ phải có độ dài từ 0 đến 1000 ký tự.")
     private String specifications;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UnitType unit;
 
 //    @JsonManagedReference
     @JsonIgnoreProperties("products")

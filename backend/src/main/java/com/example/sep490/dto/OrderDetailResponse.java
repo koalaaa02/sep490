@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import com.example.sep490.entities.Order;
 import com.example.sep490.entities.ProductSKU;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +18,11 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderDetailResponse {
 	@NotNull
+    @JsonIgnoreProperties({ "shop","orderDetails","address","transaction"})
     private Order order;
 
-    @NotNull 
-    private ProductSKU productSku;
+    @NotNull
+    private ProductSKUResponse productSku;
 
     private int quantity;
     private BigDecimal price;

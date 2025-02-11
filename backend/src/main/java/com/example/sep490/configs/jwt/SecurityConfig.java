@@ -68,6 +68,8 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/api/myprofile/**",
+                                "/api/statistics/**",
+                                "/api/financialReport/**",
                                 "/api/private/products/**",
                                 "/api/productskus/**",
                                 "/api/checkout/**",

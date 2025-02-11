@@ -52,7 +52,7 @@ public class OrderService {
         if (Order.isPresent()) {
             return orderMapper.EntityToResponse(Order.get());
         } else {
-            throw new RuntimeException("Danh mục không tồn tại với ID: " + id);
+            throw new RuntimeException("Đơn hàng không tồn tại với ID: " + id);
         }
     }
 
@@ -104,8 +104,14 @@ public class OrderService {
         order.setShop(shop);
         order.setAddress(Address);
         return orderMapper.EntityToResponse(orderRepo.save(order));
+    }
 
-
+    public OrderResponse updateOrderStatus(Long orderId,Long userId, OrderRequest orderRequest) {
+        Order order = orderRepo.findByIdAndIsDeleteFalse(orderId)
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
+        order.setStatus(orderRequest.getStatus());
+        Order updatedOrder = orderRepo.save(order);
+        return orderMapper.EntityToResponse(updatedOrder);
     }
 
     public void deleteOrder(Long id) {
