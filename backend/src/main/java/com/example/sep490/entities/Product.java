@@ -31,6 +31,8 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     private String description;
     @Size(min = 0, max = 1000, message = "Địa chỉ phải có độ dài từ 0 đến 1000 ký tự.")
     private String specifications;
+    @Size(min = 0, max = 1000, message = "Ảnh phải có độ dài từ 0 đến 1000 ký tự.")
+    private String images;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

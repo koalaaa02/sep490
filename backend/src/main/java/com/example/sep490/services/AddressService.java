@@ -6,11 +6,14 @@ import java.util.Optional;
 import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.AddressFilterDTO;
+import com.example.sep490.repositories.specifications.AddressSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,10 +42,14 @@ public class AddressService {
     private UserRepository userRepo;
     @Autowired
     private ShopRepository shopRepo;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<AddressResponse> getAddresses(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Address> addressPage = addressRepo.findByIsDeleteFalse(pageable);
+    public PageResponse<AddressResponse> getAddresses(AddressFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Address> spec = AddressSpecification.filterAddresses(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Address> addressPage = addressRepo.findAll(spec, pageable);
         Page<AddressResponse> addressResponsePage = addressPage.map(addressMapper::EntityToResponse);
         return pagination.createPageResponse(addressResponsePage);
     }

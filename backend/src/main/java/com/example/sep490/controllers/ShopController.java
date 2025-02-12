@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.ShopFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,8 @@ public class ShopController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getShops(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction,
-            @RequestParam(required = false) String name
-    ) {
-        return ResponseEntity.ok(shopService.getShops(page, size, sortBy, direction, name));
+    public ResponseEntity<?> getShops(ShopFilterDTO filter) {
+        return ResponseEntity.ok(shopService.getShops(filter));
     }
 
     @GetMapping("/{id}")

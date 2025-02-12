@@ -6,11 +6,15 @@ import java.util.Optional;
 import com.example.sep490.dto.AddressResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.ExpenseSpecification;
+import com.example.sep490.repositories.specifications.InvoiceFilterDTO;
+import com.example.sep490.repositories.specifications.InvoiceSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,10 +40,14 @@ public class InvoiceService {
 
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<InvoiceResponse> getInvoices(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Invoice> invoicePage = invoiceRepo.findByIsDeleteFalse(pageable);
+    public PageResponse<InvoiceResponse> getInvoices(InvoiceFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Invoice> spec = InvoiceSpecification.filterInvoices(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Invoice> invoicePage = invoiceRepo.findAll(spec, pageable);
         Page<InvoiceResponse> invoiceResponsePage = invoicePage.map(invoiceMapper::EntityToResponse);
         return pagination.createPageResponse(invoiceResponsePage);
     }

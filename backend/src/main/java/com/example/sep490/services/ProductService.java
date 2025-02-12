@@ -1,15 +1,19 @@
 package com.example.sep490.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.dto.publicdto.ProductResponsePublic;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.ProductFilterDTO;
+import com.example.sep490.repositories.specifications.ProductSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -37,21 +41,36 @@ public class ProductService {
 	private CategoryRepository categoryRepo;
 	@Autowired
 	private SupplierRepository supplierRepo;
+	@Autowired
+	private UserService userService;
+    @Autowired
+    private ProductRepository productRepository;
 
-//	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
+	//	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
 //		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
 //		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
 //		return pagination.createPageResponse(productPage);
 //	}
-	public PageResponse<ProductResponsePublic> getProductsPublic(int page, int size, String sortBy, String direction) {
-		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
+	public PageResponse<ProductResponsePublic> getProductsPublicByFilter(ProductFilterDTO filter) {
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
 		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
 		return pagination.createPageResponse(productResponsePage);
 	}
 	public PageResponse<ProductResponse> getProducts(int page, int size, String sortBy, String direction) {
+		User contextUser = userService.getContextUser();
 		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
+		Page<Product> productPage = productRepo.findByCreatedByAndIsDeleteFalse(contextUser.getId(), pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
+	}
+
+	public PageResponse<ProductResponse> getProductsByFilter(ProductFilterDTO filter) {
+		filter.setCreatedBy(userService.getContextUser().getId());
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}

@@ -32,7 +32,7 @@ public class CategoryController {
 	private CategoryService categoryService;
 	
 	@GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getCategorys(
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "10") int size,
@@ -44,19 +44,19 @@ public class CategoryController {
     }
 	
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getCategorysById(@PathVariable Long id) {
     	return ResponseEntity.ok().body(categoryService.getCategoryById(id));
     }
     
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest category) {
     	return ResponseEntity.ok().body(categoryService.createCategory(category));
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
         if (!id.equals(category.getId())) {
             return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
@@ -65,7 +65,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
 		try {
         	categoryService.deleteCategory(id);

@@ -33,7 +33,7 @@ public class ProductSKURequest {
     @Min(value = 0, message = "wholesalePrice không được là số âm.")
     private BigDecimal wholesalePrice;
     
-    private String image;
+    private String images;
     
     private boolean isBulky = false; 
     

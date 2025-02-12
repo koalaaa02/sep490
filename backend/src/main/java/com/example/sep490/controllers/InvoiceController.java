@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.InvoiceFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +22,28 @@ public class InvoiceController {
     private InvoiceService invoiceService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getInvoices(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
+    public ResponseEntity<?> getInvoices(InvoiceFilterDTO filter) {
         logger.info("Fetching invoices with pagination and filters");
-        return ResponseEntity.ok(invoiceService.getInvoices(page, size, sortBy, direction));
+        return ResponseEntity.ok(invoiceService.getInvoices(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
         logger.info("Fetching invoice with id: {}", id);
         return ResponseEntity.ok().body(invoiceService.getInvoiceById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> createInvoice(@RequestBody InvoiceRequest invoice) {
         logger.info("Creating a new invoice");
         return ResponseEntity.ok().body(invoiceService.createInvoice(invoice));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> updateInvoice(@PathVariable Long id, @RequestBody InvoiceRequest invoice) {
         logger.info("Updating invoice with id: {}", id);
         if (!Objects.equals(id, invoice.getId())) {
@@ -57,7 +53,7 @@ public class InvoiceController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> deleteInvoice(@PathVariable Long id) {
         logger.info("Deleting invoice with id: {}", id);
         try {

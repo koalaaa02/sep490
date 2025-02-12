@@ -24,6 +24,7 @@ public class ProductResponse {
     private String description;
     private String specifications;
     private UnitType unit;
+    private String images;
 
     @JsonIgnoreProperties({"products","parentCategory","subCategories"})
     private Category category;

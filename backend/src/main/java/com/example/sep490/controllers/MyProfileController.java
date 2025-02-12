@@ -4,6 +4,7 @@ import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import com.example.sep490.mapper.UserMapper;
+import com.example.sep490.repositories.specifications.OrderFilterDTO;
 import com.example.sep490.services.OrderDetailService;
 import com.example.sep490.services.OrderService;
 import com.example.sep490.services.UserService;
@@ -40,11 +41,11 @@ public class MyProfileController {
 
     @GetMapping("/orders")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> getMyOrders() {
+    public ResponseEntity<?> getMyOrders(OrderFilterDTO filter) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(orderService.getOrdersByCreatedBy(user.getId()));
+            return ResponseEntity.ok().body(orderService.getOrdersPublicFilter(filter));
         }
         return ResponseEntity.badRequest().body("No authenticated user");
     }

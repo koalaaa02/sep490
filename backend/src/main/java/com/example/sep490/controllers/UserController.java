@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.UserFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +20,25 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
-    public ResponseEntity<?> getUsers(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction,
-            @RequestParam(required = false) String username
-    ) {
-        return ResponseEntity.ok(userService.getUsers(page, size, sortBy, direction, username));
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<?> getUsers(UserFilterDTO filter) {
+        return ResponseEntity.ok(userService.getUsers(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> createUser(@RequestBody UserRequest user) {
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserRequest user) {
         if (!id.equals(user.getId())) {
             return ResponseEntity.badRequest().body("id và id trong thông tin người dùng không trùng khớp.");
@@ -52,7 +47,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);

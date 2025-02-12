@@ -1,5 +1,6 @@
 package com.example.sep490.services;
 
+import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRegisterRequest;
 import com.example.sep490.dto.UserRequest;
 import com.example.sep490.dto.UserResponse;
@@ -13,6 +14,8 @@ import com.example.sep490.repositories.UserRepository;
 import com.example.sep490.repositories.AddressRepository;
 import com.example.sep490.repositories.ShopRepository;
 import com.example.sep490.repositories.UserRepository;
+import com.example.sep490.repositories.specifications.UserFilterDTO;
+import com.example.sep490.repositories.specifications.UserSpecification;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.CommonUtils;
 import com.example.sep490.utils.MailUtils;
@@ -24,7 +27,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.MessagingException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,9 +78,11 @@ public class UserService {
         return "user added to system ";
     }
 
-    public PageResponse<UserResponse> getUsers(int page, int size, String sortBy, String direction,String name) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<User> userPage = userRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
+    public PageResponse<UserResponse> getUsers(UserFilterDTO filter) {
+        filter.setCreatedBy(getContextUser().getId());
+        Specification<User> spec = UserSpecification.filterUsers(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<User> userPage = userRepo.findAll(spec, pageable);
         Page<UserResponse> userResponsePage = userPage.map(userMapper::EntityToResponse);
         return pagination.createPageResponse(userResponsePage);
     }
@@ -176,4 +184,25 @@ public class UserService {
         return id == null ? null
                 : shopRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
+
+    public Shop getShopByContextUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            Shop shop = getShop(user.getId());
+            return shop;
+        }
+        return null;
+    }
+
+    public User getContextUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            User contextUser = getUser(user.getId());
+            if(contextUser == null) throw new RuntimeException("Không tìm thấy thông tin người đăng nhập.");
+            return contextUser;
+        }else throw new RuntimeException("Không tìm thấy thông tin người đăng nhập.");
+    }
+
 }

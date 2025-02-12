@@ -17,6 +17,8 @@ public class ProductRequest {
     private String description;
     private String specifications;
     private UnitType unit = UnitType.PCS;
+    private String images;
+
     private Long categoryId;
     private Long supplierId;
     private Long shopId;

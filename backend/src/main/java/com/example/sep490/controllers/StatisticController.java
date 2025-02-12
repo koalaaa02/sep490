@@ -1,16 +1,15 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.dto.ProductSKUResponse;
 import com.example.sep490.entities.ProductSKU;
 import com.example.sep490.services.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -43,14 +42,19 @@ public class StatisticController {
     @GetMapping("/product/sales")
     @PreAuthorize( "hasAuthority('ROLE_SELLER')")
     public ResponseEntity<Map<String, Integer>> getSalesStatistics(
-            @RequestParam LocalDateTime from,
-            @RequestParam LocalDateTime to) {
-        return ResponseEntity.ok(statisticsService.getProductSalesStatistics(from, to));
+            @RequestParam String from,
+            @RequestParam String to) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime fromDate = LocalDateTime.parse(from, formatter);
+        LocalDateTime toDate = LocalDateTime.parse(to, formatter);
+
+        return ResponseEntity.ok(statisticsService.getProductSalesStatistics(fromDate, toDate));
     }
 
     @GetMapping("/product/long-term")
     @PreAuthorize( "hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<List<ProductSKU>> getLongTermInventoryProducts(
+    public ResponseEntity<List<ProductSKUResponse>> getLongTermInventoryProducts(
             @RequestParam int daysThreshold) {
         return ResponseEntity.ok(statisticsService.getLongTermInventoryProducts(daysThreshold));
     }
@@ -61,6 +65,18 @@ public class StatisticController {
             @RequestParam int limit,
             @RequestParam(defaultValue = "true") boolean isMostSold) {
         return ResponseEntity.ok(statisticsService.getTopSellingProducts(limit, isMostSold));
+    }
+
+    @GetMapping("/product/NearlyOutOfStock")
+    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> getNearlyOutOfStockInventoryProducts(@RequestParam int limit) {
+        return ResponseEntity.ok(statisticsService.getNearlyOutOfStockInventoryProducts(limit));
+    }
+
+    @GetMapping("/product/OutOfStock")
+    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> getOutOfStockInventoryProducts() {
+        return ResponseEntity.ok(statisticsService.getOutOfStockInventoryProducts());
     }
 
 }

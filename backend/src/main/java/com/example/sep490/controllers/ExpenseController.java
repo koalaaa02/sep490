@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.ExpenseFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +23,9 @@ public class ExpenseController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getExpenses(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
+    public ResponseEntity<?> getExpenses(ExpenseFilterDTO filter) {
         logger.info("Fetching expenses with pagination and filters");
-        return ResponseEntity.ok(expenseService.getExpenses(page, size, sortBy, direction));
+        return ResponseEntity.ok(expenseService.getExpenses(filter));
     }
 
     @GetMapping("/{id}")

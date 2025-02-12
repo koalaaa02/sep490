@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.OrderFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,30 +28,25 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_USER')")
-    public ResponseEntity<?> getOrders(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        return ResponseEntity.ok(orderService.getOrders(page, size, sortBy, direction));
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> getOrders(OrderFilterDTO filter) {
+        return ResponseEntity.ok(orderService.getOrdersFilter(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok().body(orderService.getOrderById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest order) {
         return ResponseEntity.ok().body(orderService.createOrder(order));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderRequest order) {
         if (!id.equals(order.getId())) {
             return ResponseEntity.badRequest().body("id và id trong đơn hàng không trùng khớp.");
@@ -59,7 +55,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
         try {
             orderService.deleteOrder(id);

@@ -5,15 +5,17 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entities.DebtPayment;
+import com.example.sep490.entities.Product;
 import com.example.sep490.entities.enums.OrderStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.sep490.entities.Order;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-public interface OrderRepository extends JpaRepository<Order, Long>{
+public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
     Page<Order> findByIsDeleteFalse(Pageable pageable);
     List<Order> findByCreatedByAndIsDeleteFalse(Long userId);
 	Optional<Order> findByIdAndIsDeleteFalse(Long id);

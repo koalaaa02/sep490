@@ -35,7 +35,7 @@ public class ProductSKUResponse {
     @Min(value = 0, message = "wholesalePrice không được là số âm.")
     private BigDecimal wholesalePrice;
     
-    private String image;
+    private String images;
     
     private boolean isBulky = false;  
     @JsonIgnoreProperties({ "skus","category","shop","supplier"})

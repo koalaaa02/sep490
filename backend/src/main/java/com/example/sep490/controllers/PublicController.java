@@ -1,8 +1,10 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.dto.ProductResponse;
+import com.example.sep490.repositories.specifications.ProductFilterDTO;
 import com.example.sep490.services.CategoryService;
 import com.example.sep490.services.ShopService;
+import com.example.sep490.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,15 +24,12 @@ public class PublicController {
     private CategoryService categoryService;
     @Autowired
     private ShopService shopService;
+    @Autowired
+    private UserService userService;
 	
-	@GetMapping("/products")
-    public PageResponse<?> getProducts(
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        return productService.getProductsPublic(page, size, sortBy, direction);
+	@PostMapping("/products")
+    public PageResponse<?> getProducts(ProductFilterDTO filter) {
+        return productService.getProductsPublicByFilter(filter);
     }
 
     @GetMapping("/product/{id}")
@@ -66,5 +65,9 @@ public class PublicController {
     @GetMapping("/shops/{id}")
     public ResponseEntity<?> getShopById(@PathVariable Long id) {
         return ResponseEntity.ok(shopService.getShopById(id));
+    }
+    @GetMapping("/users/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(userService.getUserById(id));
     }
 }

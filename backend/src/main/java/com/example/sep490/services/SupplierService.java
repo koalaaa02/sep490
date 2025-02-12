@@ -3,11 +3,14 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.SupplierFilterDTO;
+import com.example.sep490.repositories.specifications.SupplierSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,10 +33,14 @@ public class SupplierService {
     private SupplierMapper supplierMapper;
     @Autowired
     private BasePagination pagination;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<SupplierResponse> getSuppliers(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Supplier> supplierPage = supplierRepo.findByIsDeleteFalse(pageable);
+    public PageResponse<SupplierResponse> getSuppliers(SupplierFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Supplier> spec = SupplierSpecification.filterSuppliers(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Supplier> supplierPage = supplierRepo.findAll(spec, pageable);
         Page<SupplierResponse> supplierResponsePage = supplierPage.map(supplierMapper::EntityToResponse);
         return pagination.createPageResponse(supplierResponsePage);
     }

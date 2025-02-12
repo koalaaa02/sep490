@@ -5,11 +5,14 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.OrderFilterDTO;
+import com.example.sep490.repositories.specifications.OrderSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,10 +42,25 @@ public class OrderService {
     private AddressRepository AddressRepo;
     @Autowired
     private ShopRepository shopRepo;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<OrderResponse> getOrders(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Order> orderPage = orderRepo.findByIsDeleteFalse(pageable);
+    public PageResponse<OrderResponse> getOrdersPublicFilter(OrderFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Order> spec = OrderSpecification.filterOrders(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Order> orderPage = orderRepo.findAll(spec, pageable);
+        Page<OrderResponse> orderResponsePage = orderPage.map(orderMapper::EntityToResponse);
+        return pagination.createPageResponse(orderResponsePage);
+    }
+
+    public PageResponse<OrderResponse> getOrdersFilter(OrderFilterDTO filter) {
+        Shop shop = userService.getShopByContextUser();
+        if(shop == null ) throw new RuntimeException("Không tìm thấy cửa hàng.");
+        filter.setShopId(shop.getId());
+        Specification<Order> spec = OrderSpecification.filterOrders(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Order> orderPage = orderRepo.findAll(spec, pageable);
         Page<OrderResponse> orderResponsePage = orderPage.map(orderMapper::EntityToResponse);
         return pagination.createPageResponse(orderResponsePage);
     }
@@ -56,11 +74,11 @@ public class OrderService {
         }
     }
 
-    public List<OrderResponse> getOrdersByCreatedBy(Long id) {
-        List<Order> orders = orderRepo.findByCreatedByAndIsDeleteFalse(id);
-        List<OrderResponse> orderResponses = orderMapper.EntitiesToResponses(orders);
-        return orderResponses;
-    }
+//    public List<OrderResponse> getOrdersByCreatedBy(Long id) {
+//        List<Order> orders = orderRepo.findByCreatedByAndIsDeleteFalse(id);
+//        List<OrderResponse> orderResponses = orderMapper.EntitiesToResponses(orders);
+//        return orderResponses;
+//    }
 
 //    public OrderResponse createOrder(OrderRequest orderRequest) {
 //        Transaction transaction = getTransaction(orderRequest.getTransactionId());

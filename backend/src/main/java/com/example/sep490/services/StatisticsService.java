@@ -1,8 +1,10 @@
 package com.example.sep490.services;
+import com.example.sep490.dto.ProductSKUResponse;
 import com.example.sep490.entities.Order;
 import com.example.sep490.entities.OrderDetail;
 import com.example.sep490.entities.ProductSKU;
 import com.example.sep490.entities.enums.OrderStatus;
+import com.example.sep490.mapper.ProductSKUMapper;
 import com.example.sep490.repositories.OrderDetailRepository;
 import com.example.sep490.repositories.OrderRepository;
 import com.example.sep490.repositories.ProductSKURepository;
@@ -24,6 +26,10 @@ public class StatisticsService {
     private OrderRepository orderRepository;
     @Autowired
     private ProductSKURepository productSKURepository;
+    @Autowired
+    private OrderDetailRepository orderDetailRepository; // Để lấy dữ liệu sản phẩm đã bán
+    @Autowired
+    private ProductSKUMapper productSKUMapper;
 
     // Lấy thống kê đơn hàng (gốc)
     public Map<String, Object> getOrderStatistics(Long sellerId) {
@@ -136,8 +142,7 @@ public class StatisticsService {
     }
 
 
-    @Autowired
-    private OrderDetailRepository orderDetailRepository; // Để lấy dữ liệu sản phẩm đã bán
+
 
     /**
      * Lấy danh sách số lượng tồn kho của tất cả sản phẩm.
@@ -146,7 +151,8 @@ public class StatisticsService {
         List<ProductSKU> skus = productSKURepository.findAll();
         Map<String, Integer> inventoryStats = new HashMap<>();
         for (ProductSKU sku : skus) {
-            inventoryStats.put(sku.getSkuCode(), sku.getStock());
+            String productName = sku.getProduct().getName();
+            inventoryStats.put(productName +"-"+sku.getSkuCode(), sku.getStock());
         }
         return inventoryStats;
     }
@@ -158,8 +164,9 @@ public class StatisticsService {
         List<OrderDetail> orderItems = orderDetailRepository.findByCreatedAtBetween(from, to);
         Map<String, Integer> salesStats = new HashMap<>();
         for (OrderDetail item : orderItems) {
+            String productName = item.getProductSku().getProduct().getName();
             String skuCode = item.getProductSku().getSkuCode();
-            salesStats.put(skuCode, salesStats.getOrDefault(skuCode, 0) + item.getQuantity());
+            salesStats.put(productName+"-" +skuCode, salesStats.getOrDefault(skuCode, 0) + item.getQuantity());
         }
         return salesStats;
     }
@@ -167,9 +174,29 @@ public class StatisticsService {
     /**
      * Lấy sản phẩm tồn kho lâu nhất.
      */
-    public List<ProductSKU> getLongTermInventoryProducts(int daysThreshold) {
+    public List<ProductSKUResponse> getLongTermInventoryProducts(int daysThreshold) {
         LocalDateTime thresholdDate = LocalDateTime.now().minusDays(daysThreshold);
-        return productSKURepository.findByUpdatedAtBefore(thresholdDate); // Cần đảm bảo có trường updatedDate.
+        List<ProductSKU> productSKUs = productSKURepository.findByUpdatedAtBefore(thresholdDate);
+        List<ProductSKUResponse> productSKUResponse = productSKUMapper.EntitiesToResponses(productSKUs);
+        return productSKUResponse;
+    }
+
+    /**
+     * Lấy sản phẩm gần hết số lượng
+     */
+    public List<ProductSKUResponse> getNearlyOutOfStockInventoryProducts(int stock) {
+        List<ProductSKU> productSKUs = productSKURepository.findByStockLessThanAndStockGreaterThan(stock,0);
+        List<ProductSKUResponse> productSKUResponse = productSKUMapper.EntitiesToResponses(productSKUs);
+        return productSKUResponse;
+    }
+
+    /**
+     * Lấy sản phẩm đã hết hàng.
+     */
+    public List<ProductSKUResponse> getOutOfStockInventoryProducts() {
+        List<ProductSKU> productSKUs = productSKURepository.findByStock(0);
+        List<ProductSKUResponse> productSKUResponse = productSKUMapper.EntitiesToResponses(productSKUs);
+        return productSKUResponse;
     }
 
     /**
@@ -177,7 +204,7 @@ public class StatisticsService {
      */
     public Map<String, Integer> getTopSellingProducts(int limit, boolean isMostSold) {
         List<Object[]> results = isMostSold
-                ? productSKURepository.findTopSellingProducts(limit)  // Query native
+                ? productSKURepository.findTopSellingProducts(limit)
                 : productSKURepository.findLeastSellingProducts(limit);
         Map<String, Integer> topProducts = new LinkedHashMap<>();
         for (Object[] result : results) {

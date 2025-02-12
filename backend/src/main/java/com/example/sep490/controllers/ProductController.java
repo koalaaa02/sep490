@@ -5,6 +5,7 @@ import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRequest;
 import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.entities.Product;
+import com.example.sep490.repositories.specifications.ProductFilterDTO;
 import com.example.sep490.services.JwtService;
 import com.example.sep490.services.ProductService;
 import com.example.sep490.services.UserService;
@@ -44,6 +45,12 @@ public class ProductController {
             }
         }
         return ResponseEntity.badRequest().body("bad request");
+    }
+
+    @PostMapping({"/seller/filter"})
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> getProductsFilter(@RequestBody ProductFilterDTO filter) {
+        return ResponseEntity.ok().body(productService.getProductsByFilter(filter));
     }
     
     @GetMapping("/{id}")

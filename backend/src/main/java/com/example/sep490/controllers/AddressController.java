@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.AddressFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,9 @@ public class AddressController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> getAddresses(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
+    public ResponseEntity<?> getAddresses(AddressFilterDTO filter) {
         logger.info("Fetching addresses with pagination, sort, and filter options.");
-        return ResponseEntity.ok(addressService.getAddresses(page, size, sortBy, direction));
+        return ResponseEntity.ok(addressService.getAddresses(filter));
     }
 
     @GetMapping("/{id}")
@@ -38,14 +34,14 @@ public class AddressController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> createAddress(@RequestBody AddressRequest address) {
         logger.info("Creating new address.");
         return ResponseEntity.ok().body(addressService.createAddress(address));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> updateAddress(@PathVariable Long id, @RequestBody AddressRequest address) {
         logger.info("Updating address with id: {}", id);
         if (!id.equals(address.getId())) {
@@ -55,7 +51,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
     public ResponseEntity<?> deleteAddress(@PathVariable Long id) {
         logger.info("Deleting address with id: {}", id);
         try {

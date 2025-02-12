@@ -5,11 +5,14 @@ import java.util.Optional;
 import com.example.sep490.dto.publicdto.ShopResponsePublic;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.ShopFilterDTO;
+import com.example.sep490.repositories.specifications.ShopSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -37,6 +40,8 @@ public class ShopService {
     private UserRepository userRepo;
     @Autowired
     private AddressRepository addressRepo;
+    @Autowired
+    private UserService userService;
 
     public PageResponse<ShopResponsePublic> getShopsPublic(int page, int size, String sortBy, String direction, String name) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -47,11 +52,11 @@ public class ShopService {
         return pagination.createPageResponse(shopResponsePage);
     }
 
-    public PageResponse<ShopResponse> getShops(int page, int size, String sortBy, String direction,String name) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Shop> shopPage =(name == null || name.isBlank())
-                ? shopRepo.findByIsDeleteFalse(pageable)
-                : shopRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
+    public PageResponse<ShopResponse> getShops(ShopFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Shop> spec = ShopSpecification.filterShops(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Shop> shopPage = shopRepo.findAll(spec, pageable);
         Page<ShopResponse> shopResponsePage = shopPage.map(shopMapper::EntityToResponse);
         return pagination.createPageResponse(shopResponsePage);
     }

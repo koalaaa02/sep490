@@ -21,6 +21,10 @@ public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>{
 
     List<ProductSKU> findByUpdatedAtBefore(LocalDateTime thresholdDate);
 
+//    cal statistic
+    List<ProductSKU> findByStockLessThanAndStockGreaterThan(int maxstock, int minstock);
+    List<ProductSKU> findByStock(int stock);
+
     @Query(value = "SELECT sku.skuCode, SUM(oi.quantity) as total_sold " +
             "FROM orderdetail oi INNER JOIN productsku sku ON oi.sku_id = sku.id " +
             "GROUP BY sku.skuCode ORDER BY total_sold DESC LIMIT :limit", nativeQuery = true)
