@@ -39,7 +39,8 @@ public class Category extends Auditable{//danh mục sản phẩm
     private Long id;
 
     private String name;
-    
+    private String images;
+
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean isParent = false;

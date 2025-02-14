@@ -1,5 +1,7 @@
 package com.example.sep490.utils;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -9,20 +11,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-
+@Component
 public class FileUtils {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads"; // Thư mục lưu file
+    private static final String UPLOAD_DIR_PRODUCT = "uploads/products"; // Thư mục lưu file
+    private static final String UPLOAD_DIR_AVATAR = "uploads/avatars"; // Thư mục lưu file
+    private static final String UPLOAD_DIR_CATEGORY = "uploads/categories"; // Thư mục lưu file
+
     private static final List<String> ALLOWED_EXTENSIONS = Arrays.asList("jpg", "jpeg", "png", "pdf");
     private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-    static {
-        // Tạo thư mục nếu chưa có
-        File uploadDir = new File(UPLOAD_DIR);
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
-        }
-    }
+//    static {
+//        // Tạo thư mục nếu chưa có
+//        File uploadDir = new File(UPLOAD_DIR);
+//        if (!uploadDir.exists()) {
+//            uploadDir.mkdirs();
+//        }
+//    }
 
     /**
      * Upload file với validate
@@ -35,25 +41,22 @@ public class FileUtils {
         if (file.isEmpty()) {
             throw new IllegalArgumentException("File không được rỗng");
         }
-
         // Kiểm tra dung lượng file
         if (file.getSize() > MAX_FILE_SIZE) {
             throw new IllegalArgumentException("File vượt quá dung lượng tối đa 5MB");
         }
-
         // Kiểm tra định dạng file
         String originalFilename = file.getOriginalFilename();
         String fileExtension = getFileExtension(originalFilename);
         if (!ALLOWED_EXTENSIONS.contains(fileExtension)) {
             throw new IllegalArgumentException("Chỉ chấp nhận file: " + ALLOWED_EXTENSIONS);
         }
-
         // Lưu file
         String newFileName = System.currentTimeMillis() + "_" + originalFilename;
-        Path filePath = Paths.get(UPLOAD_DIR, newFileName);
+        Path filePath = Paths.get(UPLOAD_DIR_PRODUCT, newFileName);
         Files.copy(file.getInputStream(), filePath);
 
-        return newFileName;
+        return UPLOAD_DIR_PRODUCT + "/" + newFileName;
     }
 
     /**

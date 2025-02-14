@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.dto.ProductResponse;
-import com.example.sep490.entities.Invoice;
-import com.example.sep490.entities.Product;
+import com.example.sep490.entities.*;
 import com.example.sep490.entities.enums.InvoiceStatus;
 import com.example.sep490.repositories.DebtPaymentRepository;
 import com.example.sep490.repositories.InvoiceRepository;
+import com.example.sep490.repositories.TransactionRepository;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.DebtPaymentRequest;
 import com.example.sep490.dto.DebtPaymentResponse;
-import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.mapper.DebtPaymentMapper;
 import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.utils.BasePagination;
@@ -42,6 +41,8 @@ public class DebtPaymentService {
 
     @Autowired
     private InvoiceRepository invoiceRepo;
+    @Autowired
+    private TransactionRepository transactionRepo;
 
     public PageResponse<DebtPaymentResponse> getDebtPayments(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -62,12 +63,14 @@ public class DebtPaymentService {
     @Transactional
     public DebtPaymentResponse createDebtPayment(DebtPaymentRequest debtPaymentRequest) {
         Invoice invoice = getInvoice(debtPaymentRequest.getInvoiceId());
+//        Transaction transaction = getTransaction(debtPaymentRequest.getTransactionId());
         if (invoice == null) {
             throw new IllegalArgumentException("Không tìm thấy hóa đơn của khoản trả góp này.");
         }
 
         DebtPayment entity = debtPaymentMapper.RequestToEntity(debtPaymentRequest);
         entity.setInvoice(invoice);
+//        entity.setTransaction(transaction);
         //update entity
         entity = debtPaymentRepo.save(entity);
         //invoice + paidAmount
@@ -87,9 +90,8 @@ public class DebtPaymentService {
                 .orElseThrow(() -> new RuntimeException("DebtPayment not found with id: " + id));
 
         Invoice invoice = getInvoice(debtPaymentRequest.getInvoiceId());
-        if (invoice == null) {
-            throw new IllegalArgumentException("Không tìm thấy hóa đơn của khoản trả góp này.");
-        }
+        if (invoice == null)throw new IllegalArgumentException("Không tìm thấy hóa đơn của khoản trả góp này.");
+//        Transaction transaction = getTransaction(debtPaymentRequest.getTransactionId());
 
         try {
             objectMapper.updateValue(debtPayment, debtPaymentRequest);
@@ -97,6 +99,7 @@ public class DebtPaymentService {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
         debtPayment.setInvoice(invoice);
+//        debtPayment.setTransaction(transaction);
         debtPayment = debtPaymentRepo.save(debtPayment);
 
         // update amount and status invoice
@@ -129,6 +132,10 @@ public class DebtPaymentService {
     private DebtPayment getDebtPayment(Long id) {
         return id == null ? null
                 : debtPaymentRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+    private Transaction getTransaction(Long id) {
+        return id == null ? null
+                : transactionRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
 
     public boolean isGreaterThanOrEqual(BigDecimal a, BigDecimal b) {

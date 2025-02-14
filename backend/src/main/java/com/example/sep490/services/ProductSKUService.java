@@ -1,12 +1,16 @@
 package com.example.sep490.services;
 
+import java.io.IOException;
 import java.util.Optional;
 
+import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,7 @@ import com.example.sep490.mapper.ProductSKUMapper;
 import com.example.sep490.entities.ProductSKU;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ProductSKUService {
@@ -31,6 +36,8 @@ public class ProductSKUService {
 
     @Autowired
     private ProductRepository productRepo;
+    @Value("${env.backendBaseURL}")
+    private String baseURL;
 
     public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -70,6 +77,20 @@ public class ProductSKUService {
         }
         productSKU.setProduct(product);
         return productSKUMapper.EntityToResponse(productSKURepo.save(productSKU));
+    }
+
+    public ProductSKUResponse uploadImage(Long id, MultipartFile image) {
+        ProductSKU productSKU = productSKURepo.findByIdAndIsDeleteFalse(id)
+                .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
+        try {
+            String imageURL = FileUtils.uploadFile(image);
+            productSKU.setImages(baseURL + "/" + imageURL);
+            return productSKUMapper.EntityToResponse(productSKURepo.save(productSKU));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public void deleteProductSKU(Long id) {

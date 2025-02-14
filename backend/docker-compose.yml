@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql/mysql-server:8.0
+    restart: always
+#    volumes:
+#      - /home/user/Desktop/db:/var/lib/mysql
+    ports:
+      - "3336:3306"  # Chạy MySQL trên port 3336 của máy host
+    environment:
+      MYSQL_DATABASE: sep490v1
+      MYSQL_ROOT_PASSWORD: Dtvuvu1522002
+      MYSQL_ROOT_HOST: "%"  # Cho phép remote access
+    networks:
+      - mynetwork
+
+  springboot-app:
+    container_name: backend
+    image: sep490
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mysqldb
+    ports:
+      - "8088:8088"
+    environment:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: Dtvuvu1522002
+      MYSQL_PORT: 3306  # Cổng của MySQL trong container (không phải 3336)
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

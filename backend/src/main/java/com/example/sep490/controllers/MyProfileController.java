@@ -3,6 +3,7 @@ package com.example.sep490.controllers;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
+import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.mapper.UserMapper;
 import com.example.sep490.repositories.specifications.OrderFilterDTO;
 import com.example.sep490.services.OrderDetailService;
@@ -88,6 +89,15 @@ public class MyProfileController {
             );
         }
         return ResponseEntity.badRequest().body("No authenticated user");
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status) {
+        orderService.changeStatusOrder(id, status);
+        return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 
     @PostMapping("/change-password")

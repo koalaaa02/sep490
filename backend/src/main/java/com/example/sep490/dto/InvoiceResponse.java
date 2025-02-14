@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.sep490.entities.DebtPayment;
+import com.example.sep490.entities.Order;
 import com.example.sep490.entities.User;
 import com.example.sep490.entities.enums.InvoiceStatus;
 
@@ -22,6 +23,8 @@ public class InvoiceResponse {
 
     @JsonIgnoreProperties({ "invoices", "addresses", "shop"})
     private User agent; // người Đại lý/customer nợ
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
+    private Order order;
 
     private BigDecimal totalAmount; //tổng nợ phải trả
     

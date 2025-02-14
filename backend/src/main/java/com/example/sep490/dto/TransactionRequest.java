@@ -2,6 +2,8 @@ package com.example.sep490.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.entities.enums.PaymentMethod;
 import com.example.sep490.entities.enums.TransactionStatus;
 import com.example.sep490.entities.enums.TransactionType;
@@ -21,6 +23,7 @@ public class TransactionRequest {
 	private Long id;
 
     private Long orderId;
+    private Long debtPaymentId;
 
 	@NotNull(message = "Phương thức thanh toán không được để trống.")
     private PaymentMethod method; // CARD, COD

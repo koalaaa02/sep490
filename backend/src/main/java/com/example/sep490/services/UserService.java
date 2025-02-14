@@ -97,10 +97,10 @@ public class UserService {
     }
 
     public UserResponse createUser(UserRequest userRequest) {
-        Shop shop = getShop(userRequest.getShopId());
+//        Shop shop = getShop(userRequest.getShopId());
 
         User entity = userMapper.RequestToEntity(userRequest);
-        entity.setShop(shop);
+//        entity.setShop(shop);
         return userMapper.EntityToResponse(userRepo.save(entity));
     }
 
@@ -108,14 +108,14 @@ public class UserService {
         User user = userRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        Shop shop = getShop(userRequest.getShopId());
+//        Shop shop = getShop(userRequest.getShopId());
 
         try {
             objectMapper.updateValue(user, userRequest);
         } catch (JsonMappingException e) {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
-        user.setShop(shop);
+//        user.setShop(shop);
         return userMapper.EntityToResponse(userRepo.save(user));
     }
 

@@ -30,6 +30,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CheckoutService {
 
+    private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.10"); // 10%
+    private static final BigDecimal PAYMENT_GATEWAY_FEE = new BigDecimal("0.02"); // 2%
+
     private final CartService cartService;
     private final OrderService orderService;
     private final OrderDetailService orderDetailService;
@@ -48,6 +51,8 @@ public class CheckoutService {
             throw new RuntimeException("Bạn chưa chọn sản phẩm cuả shop nào.");
         }
 
+
+
         // Lấy giỏ hàng từ cookie
         Cart cart = cartService.getCartFromCookies(request);
 
@@ -64,6 +69,7 @@ public class CheckoutService {
         // Tìm shop
         Shop shop = getShop(shopId);
         if(shop == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop không tồn tại.");
+        if(shop.isClose() || !shop.isActive())  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Shop hiện tại đang đóng cửa, vui lòng quay lại sau.");
 
         // Xác nhận tất cả sản phẩm đều thuộc cùng shop
         if (!shopCart.getShopId().equals(shopId)) {
@@ -100,6 +106,14 @@ public class CheckoutService {
         }
         //update totalAmount
         orderRequest.setTotalAmount(totalAmount.add(orderRequest.getShippingFee()));
+
+        BigDecimal commissionFee = orderRequest.getTotalAmount().multiply(COMMISSION_RATE);
+        BigDecimal paymentFee = orderRequest.getTotalAmount().multiply(PAYMENT_GATEWAY_FEE);
+        BigDecimal totalFee = commissionFee.add(paymentFee);
+
+        orderRequest.setCommissionFee(commissionFee);
+        orderRequest.setPaymentFee(paymentFee);
+        orderRequest.setTotalPlatformFee(totalFee);
 
         // Tạo Order mới
 //        Order newOrder = Order.builder()

@@ -41,6 +41,8 @@ public class InvoiceService {
     @Autowired
     private UserRepository userRepo;
     @Autowired
+    private OrderRepository orderRepo;
+    @Autowired
     private UserService userService;
 
     public PageResponse<InvoiceResponse> getInvoices(InvoiceFilterDTO filter) {
@@ -63,9 +65,13 @@ public class InvoiceService {
 
     public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
         User user = getUser(invoiceRequest.getAgentId());
+        Order order = getOrder(invoiceRequest.getOrderId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
+        if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
 
         Invoice entity = invoiceMapper.RequestToEntity(invoiceRequest);
         entity.setAgent(user);
+        entity.setOrder(order);
         return invoiceMapper.EntityToResponse(invoiceRepo.save(entity));
     }
 
@@ -74,7 +80,9 @@ public class InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
         User user = getUser(invoiceRequest.getAgentId());
+        Order order = getOrder(invoiceRequest.getOrderId());
         if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
+        if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
 
         try {
             objectMapper.updateValue(invoice, invoiceRequest);
@@ -82,6 +90,7 @@ public class InvoiceService {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
         invoice.setAgent(user);
+        invoice.setOrder(order);
         return invoiceMapper.EntityToResponse(invoiceRepo.save(invoice));
 
 
@@ -99,6 +108,10 @@ public class InvoiceService {
     private Invoice getInvoice(Long id) {
         return id == null ? null
                 : invoiceRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+    private Order getOrder(Long id) {
+        return id == null ? null
+                : orderRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
     private User getUser(Long id) {
         return id == null ? null

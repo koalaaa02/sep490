@@ -1,9 +1,11 @@
 package com.example.sep490.services;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entities.*;
+import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.repositories.*;
 import com.example.sep490.repositories.specifications.OrderFilterDTO;
 import com.example.sep490.repositories.specifications.OrderSpecification;
@@ -93,13 +95,13 @@ public class OrderService {
 //    }
 
     public Order createOrder(OrderRequest orderRequest) {
-        Transaction transaction = getTransaction(orderRequest.getTransactionId());
+//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address address = getShippingAddres(orderRequest.getAddressId());
         if(shop == null) throw new RuntimeException("Thiếu thông tin shop.");
         if(address == null) throw new RuntimeException("Thiếu thông tin giao hàng.");
         Order entity = orderMapper.RequestToEntity(orderRequest);
-        entity.setTransaction(transaction);
+//        entity.setTransaction(transaction);
         entity.setShop(shop);
         entity.setAddress(address);
         return orderRepo.save(entity);
@@ -107,9 +109,9 @@ public class OrderService {
 
     public OrderResponse updateOrder(Long id, OrderRequest orderRequest) {
         Order order = orderRepo.findByIdAndIsDeleteFalse(id)
-                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
 
-        Transaction transaction = getTransaction(orderRequest.getTransactionId());
+//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address Address = getShippingAddres(orderRequest.getAddressId());
 
@@ -118,7 +120,7 @@ public class OrderService {
         } catch (JsonMappingException e) {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
-        order.setTransaction(transaction);
+//        order.setTransaction(transaction);
         order.setShop(shop);
         order.setAddress(Address);
         return orderMapper.EntityToResponse(orderRepo.save(order));
@@ -132,13 +134,23 @@ public class OrderService {
         return orderMapper.EntityToResponse(updatedOrder);
     }
 
+    public void changeStatusOrder(Long id, OrderStatus orderStatus) {
+        Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)
+                .map(existingOrder -> {
+                    existingOrder.setStatus(orderStatus);
+                    existingOrder.setShippedDate(LocalDateTime.now());
+                    return orderRepo.save(existingOrder);
+                })
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
+    }
+
     public void deleteOrder(Long id) {
         Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)
                 .map(existingOrder -> {
                     existingOrder.setDelete(true);
                     return orderRepo.save(existingOrder);
                 })
-                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
     }
 
     private Order getOrder(Long id) {

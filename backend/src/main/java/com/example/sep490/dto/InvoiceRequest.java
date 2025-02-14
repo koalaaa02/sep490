@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import com.example.sep490.entities.DebtPayment;
+import com.example.sep490.entities.Order;
 import com.example.sep490.entities.enums.InvoiceStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,7 +23,8 @@ public class InvoiceRequest {
 	private Long id;
 
     private Long agentId; // người Đại lý nợ
-    
+    private Long orderId;
+
     @NotNull(message = "Số tiền không được để trống.")
     @DecimalMin(value = "0.00", message = "Số tiền phải >= 0.")
     private BigDecimal totalAmount; //tổng nợ phải trả

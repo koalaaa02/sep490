@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderDetailResponse {
 	@NotNull
-    @JsonIgnoreProperties({ "shop","orderDetails","address","transaction"})
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
     private Order order;
 
     @NotNull

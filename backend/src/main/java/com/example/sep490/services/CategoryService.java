@@ -1,13 +1,16 @@
 package com.example.sep490.services;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +27,7 @@ import com.example.sep490.entities.Category;
 import com.example.sep490.repositories.CategoryRepository;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -37,6 +41,8 @@ public class CategoryService {
 	private CategoryMapper categoryMapper;
 	@Autowired
 	private BasePagination pagination;
+	@Value("${env.backendBaseURL}")
+	private String baseURL;
 	
 //	public PageResponse<Category> getCategories(int page, int size, String sortBy,String direction) {
 //		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -94,6 +100,20 @@ public class CategoryService {
 	    
 	}
 
+	public CategoryResponse uploadImage(Long id, MultipartFile image) {
+		Category category = categoryRepo.findByIdAndIsDeleteFalse(id)
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
+		try {
+			String imageURL = FileUtils.uploadFile(image);
+			category.setImages(baseURL + "/" + imageURL);
+			return categoryMapper.EntityToResponse(categoryRepo.save(category));
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e.getMessage());
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+	
 	public void deleteCategory(Long id) {
 	    Category updatedCategory = categoryRepo.findById(id)
 	        .map(existingCategory -> { 

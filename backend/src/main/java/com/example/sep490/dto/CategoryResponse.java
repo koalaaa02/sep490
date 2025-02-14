@@ -17,7 +17,8 @@ public class CategoryResponse extends Auditable {
 	private Long id;
     private String name;
     private boolean isParent;
-    
+    private String images;
+
     @JsonIgnoreProperties({"subCategories", "products"})
     private Category parentCategory; 
     

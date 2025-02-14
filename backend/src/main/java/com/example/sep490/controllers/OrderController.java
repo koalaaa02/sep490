@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.repositories.specifications.OrderFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,16 @@ public class OrderController {
             return ResponseEntity.badRequest().body("id và id trong đơn hàng không trùng khớp.");
         }
         return ResponseEntity.ok().body(orderService.updateOrder(id, order));
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus status) {
+
+        orderService.changeStatusOrder(id, status);
+        return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 
     @DeleteMapping("/{id}")

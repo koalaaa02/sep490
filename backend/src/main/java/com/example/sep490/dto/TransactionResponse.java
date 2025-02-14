@@ -3,6 +3,7 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.entities.Order;
 import com.example.sep490.entities.enums.PaymentMethod;
 import com.example.sep490.entities.enums.TransactionStatus;
@@ -20,8 +21,10 @@ import lombok.NoArgsConstructor;
 public class TransactionResponse {
 	private Long id;
 
-    @JsonIgnoreProperties({ "transaction","orderDetails","address", "shop"})
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
     private Order order;
+    @JsonIgnoreProperties({ "transaction","invoice"})
+    private DebtPayment debtPayment;
 
     private PaymentMethod method; // CARD, COD
     

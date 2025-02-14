@@ -1,13 +1,10 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.OrderDetail;
-import com.example.sep490.entities.Address;
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.Transaction;
-import com.example.sep490.entities.User;
+import com.example.sep490.entities.*;
 import com.example.sep490.entities.enums.DeliveryMethod;
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.entities.enums.PaymentMethod;
@@ -33,6 +30,10 @@ public class OrderResponse {
     private DeliveryMethod deliveryMethod;
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
+    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
+    private BigDecimal commissionFee;  // Phí hoa hồng sàn
+    private BigDecimal paymentFee;     // Phí thanh toán
+    private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
 
     @JsonIgnoreProperties( { "order", "productSku" })
     private List<OrderDetail> orderDetails;
@@ -42,4 +43,8 @@ public class OrderResponse {
     private Address address;
     @JsonIgnoreProperties( { "orders","manager","address","products" })
     private Shop shop;
+    @JsonIgnoreProperties( { "order","agent","debtPayments"})
+    private Invoice invoice;
+
+
 }

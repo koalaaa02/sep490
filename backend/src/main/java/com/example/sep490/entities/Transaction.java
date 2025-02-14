@@ -40,6 +40,10 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @JoinColumn(name = "order_id", nullable = true)
     private Order order;
 
+    @OneToOne
+    @JoinColumn(name = "debtPayment_id", nullable = true)
+    private DebtPayment debtPayment;
+
     @Enumerated(EnumType.STRING)
     private PaymentMethod method; // CARD, COD
 

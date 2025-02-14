@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class CategoryRequest {
 	private Long id;
     private String name;
+    private String images;
 
     @JsonProperty("isParent")
     private boolean isParent;

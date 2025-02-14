@@ -64,6 +64,9 @@ public class Order  extends Auditable{//đơn hàng nè
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
 
+    @OneToOne(mappedBy = "order")
+    private Invoice invoice;
+
     @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
@@ -74,6 +77,10 @@ public class Order  extends Auditable{//đơn hàng nè
 
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
-    
-    
+
+    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
+
+    private BigDecimal commissionFee;  // Phí hoa hồng sàn
+    private BigDecimal paymentFee;     // Phí thanh toán
+    private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
 }

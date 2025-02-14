@@ -33,7 +33,7 @@ public class UserRequest {
 
     private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
 
-    @Nullable
-    private Long shopId;
+//    @Nullable
+//    private Long shopId;
 }
 //*
