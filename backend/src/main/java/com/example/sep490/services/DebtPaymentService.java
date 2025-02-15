@@ -1,10 +1,15 @@
 package com.example.sep490.services;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
-import com.example.sep490.entities.Invoice;
+import com.example.sep490.dto.ProductResponse;
+import com.example.sep490.entities.*;
+import com.example.sep490.entities.enums.InvoiceStatus;
 import com.example.sep490.repositories.DebtPaymentRepository;
 import com.example.sep490.repositories.InvoiceRepository;
+import com.example.sep490.repositories.TransactionRepository;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +22,11 @@ import org.springframework.stereotype.Service;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.DebtPaymentRequest;
 import com.example.sep490.dto.DebtPaymentResponse;
-import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.mapper.DebtPaymentMapper;
 import com.example.sep490.entities.DebtPayment;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DebtPaymentService {
@@ -36,11 +41,14 @@ public class DebtPaymentService {
 
     @Autowired
     private InvoiceRepository invoiceRepo;
+    @Autowired
+    private TransactionRepository transactionRepo;
 
-    public PageResponse<DebtPayment> getDebtPayments(int page, int size, String sortBy, String direction) {
+    public PageResponse<DebtPaymentResponse> getDebtPayments(int page, int size, String sortBy, String direction) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<DebtPayment> debtPaymentPage = debtPaymentRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(debtPaymentPage);
+        Page<DebtPayment> debtPaymentdPage = debtPaymentRepo.findByIsDeleteFalse(pageable);
+        Page<DebtPaymentResponse> DebtPaymentdResponsePage = debtPaymentdPage.map(debtPaymentMapper::EntityToResponse);
+        return pagination.createPageResponse(DebtPaymentdResponsePage);
     }
 
     public DebtPaymentResponse getDebtPaymentById(Long id) {
@@ -52,19 +60,38 @@ public class DebtPaymentService {
         }
     }
 
+    @Transactional
     public DebtPaymentResponse createDebtPayment(DebtPaymentRequest debtPaymentRequest) {
         Invoice invoice = getInvoice(debtPaymentRequest.getInvoiceId());
+//        Transaction transaction = getTransaction(debtPaymentRequest.getTransactionId());
+        if (invoice == null) {
+            throw new IllegalArgumentException("Không tìm thấy hóa đơn của khoản trả góp này.");
+        }
 
         DebtPayment entity = debtPaymentMapper.RequestToEntity(debtPaymentRequest);
         entity.setInvoice(invoice);
-        return debtPaymentMapper.EntityToResponse(debtPaymentRepo.save(entity));
+//        entity.setTransaction(transaction);
+        //update entity
+        entity = debtPaymentRepo.save(entity);
+        //invoice + paidAmount
+        invoice.setPaidAmount(invoice.getPaidAmount().add(entity.getAmountPaid()));
+        //update status invoice
+        if( isGreaterThanOrEqual(invoice.getPaidAmount(),invoice.getTotalAmount()) )
+            invoice.setStatus(InvoiceStatus.PAID);
+        else invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+        invoiceRepo.save(invoice);
+
+        return debtPaymentMapper.EntityToResponse(entity);
     }
 
+    @Transactional
     public DebtPaymentResponse updateDebtPayment(Long id, DebtPaymentRequest debtPaymentRequest) {
         DebtPayment debtPayment = debtPaymentRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("DebtPayment not found with id: " + id));
 
         Invoice invoice = getInvoice(debtPaymentRequest.getInvoiceId());
+        if (invoice == null)throw new IllegalArgumentException("Không tìm thấy hóa đơn của khoản trả góp này.");
+//        Transaction transaction = getTransaction(debtPaymentRequest.getTransactionId());
 
         try {
             objectMapper.updateValue(debtPayment, debtPaymentRequest);
@@ -72,9 +99,21 @@ public class DebtPaymentService {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
         debtPayment.setInvoice(invoice);
-        return debtPaymentMapper.EntityToResponse(debtPaymentRepo.save(debtPayment));
+//        debtPayment.setTransaction(transaction);
+        debtPayment = debtPaymentRepo.save(debtPayment);
 
+        // update amount and status invoice
+        BigDecimal totalPaidAmount = invoice.getDebtPayments()
+                .stream()
+                .map(DebtPayment::getAmountPaid)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        invoice.setPaidAmount(totalPaidAmount);
+        if( isGreaterThanOrEqual(invoice.getPaidAmount(),invoice.getTotalAmount()))
+            invoice.setStatus(InvoiceStatus.PAID);
+        else invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+        invoiceRepo.save(invoice);
 
+        return debtPaymentMapper.EntityToResponse(debtPayment);
     }
 
     public void deleteDebtPayment(Long id) {
@@ -93,6 +132,17 @@ public class DebtPaymentService {
     private DebtPayment getDebtPayment(Long id) {
         return id == null ? null
                 : debtPaymentRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+    private Transaction getTransaction(Long id) {
+        return id == null ? null
+                : transactionRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+
+    public boolean isGreaterThanOrEqual(BigDecimal a, BigDecimal b) {
+        if (a == null || b == null) {
+            throw new IllegalArgumentException("BigDecimal values cannot be null");
+        }
+        return a.compareTo(b) >= 0;
     }
 
 }

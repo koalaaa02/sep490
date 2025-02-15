@@ -1,14 +1,22 @@
 package com.example.sep490.services;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.dto.publicdto.ProductResponsePublic;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.ProductFilterDTO;
+import com.example.sep490.repositories.specifications.ProductSpecification;
+import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,6 +28,7 @@ import com.example.sep490.mapper.ProductMapper;
 import com.example.sep490.entities.Product;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ProductService {
@@ -36,11 +45,39 @@ public class ProductService {
 	private CategoryRepository categoryRepo;
 	@Autowired
 	private SupplierRepository supplierRepo;
-
-	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
+	@Autowired
+	private UserService userService;
+    @Autowired
+    private ProductRepository productRepository;
+	@Value("${env.backendBaseURL}")
+	private String baseURL;
+	//	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
+//		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
+//		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
+//		return pagination.createPageResponse(productPage);
+//	}
+	public PageResponse<ProductResponsePublic> getProductsPublicByFilter(ProductFilterDTO filter) {
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
+		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+		return pagination.createPageResponse(productResponsePage);
+	}
+	public PageResponse<ProductResponse> getProducts(int page, int size, String sortBy, String direction) {
+		User contextUser = userService.getContextUser();
 		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
-		return pagination.createPageResponse(productPage);
+		Page<Product> productPage = productRepo.findByCreatedByAndIsDeleteFalse(contextUser.getId(), pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
+	}
+
+	public PageResponse<ProductResponse> getProductsByFilter(ProductFilterDTO filter) {
+		filter.setCreatedBy(userService.getContextUser().getId());
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
 	}
 
 	public ProductResponse getProductById(Long id) {
@@ -48,7 +85,7 @@ public class ProductService {
 		if (Product.isPresent()) {
 			return productMapper.EntityToResponse(Product.get());
 		} else {
-			throw new RuntimeException("Danh mục không tồn tại với ID: " + id);
+			throw new RuntimeException("Sản phẩm không tồn tại với ID: " + id);
 		}
 	}
 
@@ -64,7 +101,7 @@ public class ProductService {
 
 	public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
 		Product product = productRepo.findByIdAndIsDeleteFalse(id)
-				.orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 
 		Category category = getCategory(productRequest.getCategoryId());
 		Supplier supplier = getSupplier(productRequest.getSupplierId());
@@ -79,13 +116,27 @@ public class ProductService {
 		return productMapper.EntityToResponse(productRepo.save(product));
 	}
 
+	public ProductResponse uploadImage(Long id, MultipartFile image) {
+		Product product = productRepo.findByIdAndIsDeleteFalse(id)
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
+		try {
+			String imageURL = FileUtils.uploadFile(image);
+			product.setImages(baseURL + "/" + imageURL);
+			return productMapper.EntityToResponse(productRepo.save(product));
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e.getMessage());
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
+		}
+	}
+
 	public void deleteProduct(Long id) {
 		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
 				.map(existingProduct -> {
 					existingProduct.setDelete(true);
 					return productRepo.save(existingProduct);
 				})
-				.orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 	}
 
 	private Product getProduct(Long id) {

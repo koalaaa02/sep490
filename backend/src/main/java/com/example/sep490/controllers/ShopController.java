@@ -1,5 +1,7 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.entities.enums.OrderStatus;
+import com.example.sep490.repositories.specifications.ShopFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.services.ShopService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/shops")
@@ -20,13 +23,8 @@ public class ShopController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getShops(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        return ResponseEntity.ok(shopService.getShops(page, size, sortBy, direction));
+    public ResponseEntity<?> getShops(ShopFilterDTO filter) {
+        return ResponseEntity.ok(shopService.getShops(filter));
     }
 
     @GetMapping("/{id}")
@@ -48,6 +46,25 @@ public class ShopController {
             return ResponseEntity.badRequest().body("id và id trong cửa hàng không trùng khớp.");
         }
         return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
+    }
+
+    @PutMapping("/{id}/close")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<String> updateCloseShop(@PathVariable Long id) {
+        shopService.changeCloseShop(id);
+        return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
+    }
+
+    @PutMapping("/{id}/active")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    public ResponseEntity<String> updateActiveShop(@PathVariable Long id) {
+        shopService.changeActiveShop(id);
+        return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
+    }
+
+    @PostMapping(value = "/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadRegistrationCertificateImages(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
     }
 
     @DeleteMapping("/{id}")

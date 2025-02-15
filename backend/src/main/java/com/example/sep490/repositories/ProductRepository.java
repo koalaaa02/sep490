@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import com.example.sep490.entities.Product;
 
 @Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
     int countByname(String name);
     List<Product> findByNameLike(String name);
@@ -25,7 +26,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     //tìm bản ghi của mình
 //    @EntityGraph(attributePaths = {"category"})
     List<Product> findByCreatedByAndIsDeleteFalse(Long userId);
-    
+    Page<Product> findByCreatedByAndIsDeleteFalse(Long userId, Pageable pageable);
+
     //tìm theo id và là của mình
     Optional<Product> findByIdAndCreatedByAndIsDeleteFalse(Long id, Long createdBy);
 

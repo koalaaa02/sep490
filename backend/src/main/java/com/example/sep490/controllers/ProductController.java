@@ -3,12 +3,16 @@ package com.example.sep490.controllers;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRequest;
+import com.example.sep490.dto.CategoryRequest;
 import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.entities.Product;
+import com.example.sep490.repositories.ProductRepository;
+import com.example.sep490.repositories.specifications.ProductFilterDTO;
 import com.example.sep490.services.JwtService;
 import com.example.sep490.services.ProductService;
 import com.example.sep490.services.UserService;
 import com.example.sep490.strategy.ProductStrategy;
+import com.example.sep490.utils.FileUtils;
 import com.example.sep490.utils.PageResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +25,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -33,57 +39,90 @@ public class ProductController {
 
     @Autowired
     private List<ProductStrategy> strategies;
-    
-    @GetMapping({"/admin/","/seller/"})
+    private ProductRepository productRepository;
+
+//    @GetMapping({"/admin/","/seller/"})
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+//    public ResponseEntity<?> getProductsSeller(Authentication authentication) {
+//    	String role = authentication.getAuthorities().toString();
+//        for (ProductStrategy strategy : strategies) {
+//            if (strategy.supports(role)) {
+//                return ResponseEntity.ok(strategy.getAllProducts());
+//            }
+//        }
+//        return ResponseEntity.badRequest().body("bad request");
+//    }
+
+    @PostMapping({"/seller/filter"})
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getProductsSeller(Authentication authentication) {
-    	String role = authentication.getAuthorities().toString();
-        for (ProductStrategy strategy : strategies) {
-            if (strategy.supports(role)) {
-                return ResponseEntity.ok(strategy.getAllProducts());
-            }
-        }
-        return ResponseEntity.badRequest().body("bad request");
+    public ResponseEntity<?> getProductsFilter(@RequestBody ProductFilterDTO filter) {
+        return ResponseEntity.ok().body(productService.getProductsByFilter(filter));
     }
     
+//    @GetMapping("/{id}")
+//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    public ResponseEntity<?> getProductsSellerById(@PathVariable Long id, Authentication authentication) {
+//    	String role = authentication.getAuthorities().toString();
+//        for (ProductStrategy strategy : strategies) {
+//            if (strategy.supports(role)) {
+//                return ResponseEntity.ok(strategy.getProductById(id));
+//            }
+//        }
+//        return ResponseEntity.badRequest().body("bad request");
+//    }
+//    
+//    @PostMapping
+//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
+//    	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+//        for (ProductStrategy strategy : strategies) {
+//            if (strategy.supports(role)) {
+//                return ResponseEntity.ok(strategy.createProduct(product));
+//            }
+//        }
+//        return ResponseEntity.badRequest().body("Lỗi trong quá trình tạo sản phẩm.");
+//    }
+    
+//    @PutMapping("/{id}")
+//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    public ResponseEntity<?> updateProduct(@PathVariable Long id, ProductRequest productDetails) {
+//    	try {
+//    		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+//            for (ProductStrategy strategy : strategies) {
+//                if (strategy.supports(role)) {
+//                    return ResponseEntity.ok(strategy.updateProduct(id, productDetails));
+//                }
+//            }
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa sản phẩm.");
+//    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getProductsSellerById(@PathVariable Long id, Authentication authentication) {
-    	String role = authentication.getAuthorities().toString();
-        for (ProductStrategy strategy : strategies) {
-            if (strategy.supports(role)) {
-                return ResponseEntity.ok(strategy.getProductById(id));
-            }
-        }
-        return ResponseEntity.badRequest().body("bad request");
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> getProductsById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(productService.getProductById(id));
     }
-    
+
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
-    	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-        for (ProductStrategy strategy : strategies) {
-            if (strategy.supports(role)) {
-                return ResponseEntity.ok(strategy.createProduct(product));
-            }
-        }
-        return ResponseEntity.badRequest().body("Lỗi trong quá trình tạo sản phẩm.");
+        return ResponseEntity.ok().body(productService.createProduct(product));
     }
-    
+
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, ProductRequest productDetails) {
-    	try {
-    		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-            for (ProductStrategy strategy : strategies) {
-                if (strategy.supports(role)) {
-                    return ResponseEntity.ok(strategy.updateProduct(id, productDetails));
-                }
-            }
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductRequest product) {
+        if (!id.equals(product.getId())) {
+            return ResponseEntity.badRequest().body("id và id của sản phẩm không trùng khớp.");
         }
-        return ResponseEntity.badRequest().body("Lỗi trong quá trình sửa sản phẩm.");
+        return ResponseEntity.ok().body(productService.updateProduct(id, product));
+    }
+
+    @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(productService.uploadImage(id, file)) ;
     }
 
     @DeleteMapping("/{id}")

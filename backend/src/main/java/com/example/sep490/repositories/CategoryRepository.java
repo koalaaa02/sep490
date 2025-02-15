@@ -11,6 +11,10 @@ import com.example.sep490.entities.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Long>{
     Page<Category> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name, Pageable pageable);
+    List<Category> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name);
     Page<Category> findByIsDeleteFalse(Pageable pageable);
-	Optional<Category> findByIdAndIsDeleteFalse(Long id);
+    List<Category> findByIsDeleteFalse();
+    List<Category> findByIsDeleteFalseAndIsParentTrue();
+    List<Category> findByNameContainingIgnoreCaseAndIsDeleteFalseAndIsParentTrue(String name);
+    Optional<Category> findByIdAndIsDeleteFalse(Long id);
 }

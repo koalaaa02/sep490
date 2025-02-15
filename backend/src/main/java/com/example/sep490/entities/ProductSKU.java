@@ -59,7 +59,7 @@ public class ProductSKU  extends Auditable{//SKU (Stock Keeping Unit) or phân l
     @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0.0")
     private BigDecimal wholesalePrice;
     
-    private String image;
+    private String images;
     
     @Column(nullable = false)
     @ColumnDefault("false")

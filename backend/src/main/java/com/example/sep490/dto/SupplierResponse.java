@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.sep490.entities.Product;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -28,5 +29,6 @@ public class SupplierResponse {
 
     private String address;
 
+    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
     private List<Product> products; 
 }

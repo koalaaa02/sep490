@@ -4,11 +4,14 @@ import java.util.Optional;
 
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.ExpenseFilterDTO;
+import com.example.sep490.repositories.specifications.ExpenseSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,11 +34,16 @@ public class ExpenseService {
     private ExpenseMapper expenseMapper;
     @Autowired
     private BasePagination pagination;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<Expense> getExpenses(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Expense> expensePage = expenseRepo.findByIsDeleteFalse(pageable);
-        return pagination.createPageResponse(expensePage);
+    public PageResponse<ExpenseResponse> getExpenses(ExpenseFilterDTO filter) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        Specification<Expense> spec = ExpenseSpecification.filterExpenses(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Expense> expensePage = expenseRepo.findAll(spec, pageable);
+        Page<ExpenseResponse> expenseResponsePage = expensePage.map(expenseMapper::EntityToResponse);
+        return pagination.createPageResponse(expenseResponsePage);
     }
 
     public ExpenseResponse getExpenseById(Long id) {

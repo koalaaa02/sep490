@@ -1,6 +1,7 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.sep490.entities.Transaction;
@@ -26,6 +27,7 @@ import org.hibernate.annotations.ColumnDefault;
 public class OrderRequest {
 	private Long id;
 
+    @NotNull(message = "Trạng thái đơn hàng không được để trống.")
     private OrderStatus status;
     
     private BigDecimal shippingFee;
@@ -39,7 +41,7 @@ public class OrderRequest {
 
     private Long shopId;
 
-    private Long transactionId;
+//    private Long transactionId;
 
     private Long addressId;
     
@@ -48,4 +50,8 @@ public class OrderRequest {
 
     @NotNull(message = "Bạn chưa chọn sản phẩm nào để tạo đơn.")
     private List<Long> productIds;
+
+    private BigDecimal commissionFee;  // Phí hoa hồng sàn
+    private BigDecimal paymentFee;     // Phí thanh toán
+    private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
 }

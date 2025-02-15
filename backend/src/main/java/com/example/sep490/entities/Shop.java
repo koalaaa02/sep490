@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -40,7 +42,7 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     @OneToMany(mappedBy = "shop")
     private List<Product> products;
 
-    private String registrationCertificate;//link ảnh giấy đăng ký kinh doanh
+    private String registrationCertificateImages;//link ảnh giấy đăng ký kinh doanh
 
     private String secretA; 
     private String secretB;
@@ -53,4 +55,8 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     private ShopType shopType;// doanh nghiệp, cá nhân
 
     private boolean isActive = true; // shop đang active hay không
+    private boolean isClose = false; // shop đang mở bán hay không
+
+    private BigDecimal totalFeeDueAmount = BigDecimal.ZERO; // Tổng tiền còn nợ
+    private LocalDateTime lastPaymentDate; // Ngày thanh toán phí gần nhất
 }

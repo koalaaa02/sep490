@@ -2,6 +2,7 @@ package com.example.sep490.dto;
 
 import java.math.BigDecimal;
 import com.example.sep490.entities.Product;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -34,9 +35,9 @@ public class ProductSKUResponse {
     @Min(value = 0, message = "wholesalePrice không được là số âm.")
     private BigDecimal wholesalePrice;
     
-    private String image;
+    private String images;
     
     private boolean isBulky = false;  
-    
+    @JsonIgnoreProperties({ "skus","category","shop","supplier"})
     private Product product;
 }

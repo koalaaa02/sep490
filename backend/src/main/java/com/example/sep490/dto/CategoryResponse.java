@@ -17,14 +17,15 @@ public class CategoryResponse extends Auditable {
 	private Long id;
     private String name;
     private boolean isParent;
-    
-    @JsonIgnoreProperties("subCategories")
+    private String images;
+
+    @JsonIgnoreProperties({"subCategories", "products"})
     private Category parentCategory; 
     
-    @JsonIgnoreProperties("subCategories")
+    @JsonIgnoreProperties({"subCategories","products"})
     private List<Category> subCategories; 
     
-    @JsonIgnoreProperties("category")
+    @JsonIgnoreProperties({"category","shop","skus","supplier"})
     private List<Product> products;
 }
 //@JsonIgnoreProperties("category")

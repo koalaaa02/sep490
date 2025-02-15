@@ -2,6 +2,7 @@ package com.example.sep490.mapper;
 
 import java.util.List;
 
+import com.example.sep490.dto.publicdto.CategoryResponsePublic;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,6 +14,9 @@ import com.example.sep490.entities.Category;
 public interface CategoryMapper {
     @Mapping(source = "id", target = "id")
     CategoryResponse EntityToResponse(Category category);
+
+    @Mapping(source = "id", target = "id")
+    CategoryResponsePublic EntityToResponsePublic(Category category);
     
     @Mapping(source = "id", target = "id")
     List<CategoryResponse> EntitiesToResponses(List<Category> category);

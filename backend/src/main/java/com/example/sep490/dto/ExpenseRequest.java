@@ -23,7 +23,7 @@ public class ExpenseRequest {
     private ExpenseType expenseType;
 
 	@NotNull(message = "Số tiền không được để trống.")
-    @DecimalMin(value = "0.00", message = "Số tiền phải >= 0.")
+    @DecimalMin(value = "1.00", message = "Số tiền phải >= 0.")
     private BigDecimal amount;
 
     private String description;

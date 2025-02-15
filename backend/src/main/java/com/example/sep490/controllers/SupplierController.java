@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.SupplierFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,15 +29,9 @@ public class SupplierController {
 
     @GetMapping("/")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getSuppliers(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        logger.info("Fetching suppliers with filters - page: {}, size: {}, sortBy: {}, direction: {}",
-                page, size, sortBy, direction);
-        return ResponseEntity.ok(supplierService.getSuppliers(page, size, sortBy, direction));
+    public ResponseEntity<?> getSuppliers(SupplierFilterDTO filter) {
+        logger.info("Fetching suppliers with filters");
+        return ResponseEntity.ok(supplierService.getSuppliers(filter));
     }
 
     @GetMapping("/{id}")

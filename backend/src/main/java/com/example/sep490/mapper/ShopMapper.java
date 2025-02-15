@@ -2,6 +2,7 @@ package com.example.sep490.mapper;
 
 import java.util.List;
 
+import com.example.sep490.dto.publicdto.ShopResponsePublic;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,7 +14,10 @@ import com.example.sep490.entities.Shop;
 public interface ShopMapper {
     @Mapping(source = "id", target = "id")
     ShopResponse EntityToResponse(Shop shop);
-    
+
+    @Mapping(source = "id", target = "id")
+    ShopResponsePublic EntityToResponsePublic(Shop shop);
+
     @Mapping(source = "id", target = "id")
     List<ShopResponse> EntitiesToResponses(List<Shop> shop);
     
