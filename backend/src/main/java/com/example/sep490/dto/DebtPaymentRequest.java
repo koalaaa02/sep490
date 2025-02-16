@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 public class DebtPaymentRequest {
     private Long id;
 
+
+    // Relationship
     private Long invoiceId;
 //    private Long transactionId;
 

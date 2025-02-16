@@ -15,6 +15,7 @@ import com.example.sep490.strategy.ProductStrategy;
 import com.example.sep490.utils.FileUtils;
 import com.example.sep490.utils.PageResponse;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +32,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/private/products")
+@RequestMapping("/api/products")
 public class ProductController {
 
     @Autowired
@@ -53,9 +54,9 @@ public class ProductController {
 //        return ResponseEntity.badRequest().body("bad request");
 //    }
 
-    @PostMapping({"/seller/filter"})
+    @GetMapping({"/"})
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getProductsFilter(@RequestBody ProductFilterDTO filter) {
+    public ResponseEntity<?> getProductsFilter(@Valid ProductFilterDTO filter) {
         return ResponseEntity.ok().body(productService.getProductsByFilter(filter));
     }
     
@@ -100,20 +101,20 @@ public class ProductController {
 //    }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
     public ResponseEntity<?> getProductsById(@PathVariable Long id) {
         return ResponseEntity.ok().body(productService.getProductById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok().body(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductRequest product) {
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    public ResponseEntity<?> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest product) {
         if (!id.equals(product.getId())) {
             return ResponseEntity.badRequest().body("id và id của sản phẩm không trùng khớp.");
         }
@@ -121,6 +122,7 @@ public class ProductController {
     }
 
     @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
     public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(productService.uploadImage(id, file)) ;
     }

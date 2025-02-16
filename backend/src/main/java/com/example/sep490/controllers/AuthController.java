@@ -4,6 +4,7 @@ import com.example.sep490.dto.AuthRegisterRequest;
 import com.example.sep490.dto.publicdto.ChangeForgotPasswordRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,6 +23,9 @@ import com.example.sep490.entities.User;
 import com.example.sep490.services.JwtService;
 import com.example.sep490.services.UserService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -38,15 +42,17 @@ public class AuthController {
     }
 
     @PostMapping("/authenticate")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getUsername());
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", jwtService.generateToken(authRequest.getUsername()));
+            response.put("roles", user.getRoles());
+            return ResponseEntity.ok(response);
         } else {
             throw new UsernameNotFoundException("invalid user request !");
         }
-
-
     }
     
     @GetMapping("/me")

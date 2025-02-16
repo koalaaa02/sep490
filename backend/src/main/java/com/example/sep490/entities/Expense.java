@@ -32,6 +32,7 @@ public class Expense  extends Auditable{//Quản lí số tiền chi tiêu
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String description;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -40,5 +41,5 @@ public class Expense  extends Auditable{//Quản lí số tiền chi tiêu
     @Column(nullable = false)
     private BigDecimal amount;
 
-    private String description;
+    // Relationship
 }

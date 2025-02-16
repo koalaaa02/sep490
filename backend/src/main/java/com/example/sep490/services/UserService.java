@@ -184,12 +184,16 @@ public class UserService {
         return id == null ? null
                 : shopRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
+    private Shop getShopByManagerId(Long id) {
+        return id == null ? null
+                : shopRepo.findByManagerId(id).orElse(null);
+    }
 
     public Shop getShopByContextUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            Shop shop = getShop(user.getId());
+            Shop shop = getShopByManagerId(user.getId());
             return shop;
         }
         return null;

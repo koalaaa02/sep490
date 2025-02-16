@@ -1,6 +1,7 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.repositories.specifications.UserFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class UserController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getUsers(UserFilterDTO filter) {
+    public ResponseEntity<?> getUsers(@Valid UserFilterDTO filter) {
         return ResponseEntity.ok(userService.getUsers(filter));
     }
 
@@ -33,13 +34,13 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> createUser(@RequestBody UserRequest user) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest user) {
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserRequest user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest user) {
         if (!id.equals(user.getId())) {
             return ResponseEntity.badRequest().body("id và id trong thông tin người dùng không trùng khớp.");
         }

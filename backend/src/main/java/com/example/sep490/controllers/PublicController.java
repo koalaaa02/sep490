@@ -5,6 +5,7 @@ import com.example.sep490.repositories.specifications.ProductFilterDTO;
 import com.example.sep490.services.CategoryService;
 import com.example.sep490.services.ShopService;
 import com.example.sep490.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,8 +28,8 @@ public class PublicController {
     @Autowired
     private UserService userService;
 	
-	@PostMapping("/products")
-    public PageResponse<?> getProducts(ProductFilterDTO filter) {
+	@GetMapping("/products")
+    public PageResponse<?> getProducts(@Valid ProductFilterDTO filter) {
         return productService.getProductsPublicByFilter(filter);
     }
 

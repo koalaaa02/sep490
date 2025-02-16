@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +41,14 @@ public class ProductSKUController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> createProductSKU(@RequestBody ProductSKURequest address) {
+    public ResponseEntity<?> createProductSKU(@Valid @RequestBody ProductSKURequest address) {
         logger.info("Creating new address.");
         return ResponseEntity.ok().body(productSKUService.createProductSKU(address));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateProductSKU(@PathVariable Long id, @RequestBody ProductSKURequest address) {
+    public ResponseEntity<?> updateProductSKU(@PathVariable Long id,@Valid @RequestBody ProductSKURequest address) {
         logger.info("Updating address with id: {}", id);
         if (!id.equals(address.getId())) {
             return ResponseEntity.badRequest().body("id và id trong phân loại sản phẩm không trùng khớp.");

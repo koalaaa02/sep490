@@ -28,12 +28,8 @@ public class Address  extends Auditable{//một user có nhiều địa chỉ gi
     private Long id;
 
     private String recipientName;
-    
     @Pattern(regexp = "^(0[3|5|7|8|9])\\d{8}$", message = "Số điện thoại không hợp lệ. Vui lòng nhập đúng định dạng (0912345678).")
     private String phone;
-    
-    @Size(min = 3, max = 255, message = "Địa chỉ phải có độ dài từ 3 đến 255 ký tự.")
-    private String address;
 
     private String provinceId;
     private String districtId;
@@ -42,10 +38,12 @@ public class Address  extends Auditable{//một user có nhiều địa chỉ gi
     private String province;
     private String district;
     private String ward;
-
     private String postalCode;
-
     private boolean isDefault; // Đánh dấu địa chỉ mặc định
+
+    //relationship
+    @Size(min = 3, max = 255, message = "Địa chỉ phải có độ dài từ 3 đến 255 ký tự.")
+    private String address;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

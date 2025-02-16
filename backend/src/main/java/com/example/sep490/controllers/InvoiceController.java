@@ -1,6 +1,7 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.repositories.specifications.InvoiceFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class InvoiceController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> getInvoices(InvoiceFilterDTO filter) {
+    public ResponseEntity<?> getInvoices(@Valid InvoiceFilterDTO filter) {
         logger.info("Fetching invoices with pagination and filters");
         return ResponseEntity.ok(invoiceService.getInvoices(filter));
     }
@@ -37,14 +38,14 @@ public class InvoiceController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> createInvoice(@RequestBody InvoiceRequest invoice) {
+    public ResponseEntity<?> createInvoice(@Valid @RequestBody InvoiceRequest invoice) {
         logger.info("Creating a new invoice");
         return ResponseEntity.ok().body(invoiceService.createInvoice(invoice));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> updateInvoice(@PathVariable Long id, @RequestBody InvoiceRequest invoice) {
+    public ResponseEntity<?> updateInvoice(@PathVariable Long id,@Valid @RequestBody InvoiceRequest invoice) {
         logger.info("Updating invoice with id: {}", id);
         if (!Objects.equals(id, invoice.getId())) {
             return ResponseEntity.badRequest().body("ID trong URL và ID trong hóa đơn không trùng khớp.");

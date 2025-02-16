@@ -46,4 +46,6 @@ public class TransactionRequest {
 	@NotNull(message = "Status được để trống.")
     private TransactionStatus status;
 
+
+    // Relationship
 }

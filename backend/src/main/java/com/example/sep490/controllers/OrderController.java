@@ -2,6 +2,7 @@ package com.example.sep490.controllers;
 
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.repositories.specifications.OrderFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +15,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.validation.annotation.Validated;
 import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.services.OrderService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/orders")
+@Validated
 public class OrderController {
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
@@ -29,8 +32,8 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getOrders(OrderFilterDTO filter) {
+    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
+    public ResponseEntity<?> getOrders(@Valid OrderFilterDTO filter) {
         return ResponseEntity.ok(orderService.getOrdersFilter(filter));
     }
 
@@ -42,26 +45,26 @@ public class OrderController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequest order) {
+    public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequest order) {
         return ResponseEntity.ok().body(orderService.createOrder(order));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody OrderRequest order) {
+    public ResponseEntity<?> updateOrder(@PathVariable Long id,@Valid @RequestBody OrderRequest order) {
         if (!id.equals(order.getId())) {
             return ResponseEntity.badRequest().body("id và id trong đơn hàng không trùng khớp.");
         }
         return ResponseEntity.ok().body(orderService.updateOrder(id, order));
     }
 
-    @PutMapping("/{id}/status")
+    @PutMapping("/status")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<String> updateOrderStatus(
-            @PathVariable Long id,
-            @RequestParam OrderStatus status) {
+            @RequestBody List<Long> ids,
+            @RequestBody OrderStatus status) {
 
-        orderService.changeStatusOrder(id, status);
+        orderService.changeStatusOrders(ids, status);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 

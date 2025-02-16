@@ -46,21 +46,26 @@ public class Order  extends Auditable{//đơn hàng nè
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-    
     private BigDecimal shippingFee;
-
     private BigDecimal totalAmount;
-        
-    @OneToMany(mappedBy = "order")
-    private List<OrderDetail> orderDetails;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod; // CARD, COD, DEBT, DEAL
+    private PaymentMethod paymentMethod; // CARD, COD, DEBT // chỉ đơn có địa chỉ cùng tỉnh vs shop mới được nợ
 
     @ColumnDefault("'GHN'")
     @Enumerated(EnumType.STRING)
-    private DeliveryMethod deliveryMethod; // GHN, TRUCK
+    private DeliveryMethod deliveryMethod; // GHN, SELF_DELIVERY // chỉ đơn có địa chỉ cùng tỉnh vs shop mới được SELF_DELIVERY
 
+    @Nullable
+    private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
+    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
+
+    private BigDecimal commissionFee;  // Phí hoa hồng sàn
+    private BigDecimal paymentFee;     // Phí thanh toán
+    private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
+
+
+    // Relationship
     @OneToOne(mappedBy = "order")
     private Transaction transaction;
 
@@ -75,12 +80,6 @@ public class Order  extends Auditable{//đơn hàng nè
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop; // Một đơn hàng thuộc về một shop
 
-    @Nullable
-    private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
-
-    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
-
-    private BigDecimal commissionFee;  // Phí hoa hồng sàn
-    private BigDecimal paymentFee;     // Phí thanh toán
-    private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
+    @OneToMany(mappedBy = "order")
+    private List<OrderDetail> orderDetails;
 }

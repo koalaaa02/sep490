@@ -1,5 +1,6 @@
 package com.example.sep490.controllers;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +41,14 @@ public class DebtPaymentController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
-    public ResponseEntity<?> createDebtPayment(@RequestBody DebtPaymentRequest debtPaymentRequest) {
+    public ResponseEntity<?> createDebtPayment(@Valid @RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Creating new debt payment: {}", debtPaymentRequest);
         return ResponseEntity.ok().body(debtPaymentService.createDebtPayment(debtPaymentRequest));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER','ROLE_CUSTOMER')")
-    public ResponseEntity<?> updateDebtPayment(@PathVariable Long id, @RequestBody DebtPaymentRequest debtPaymentRequest) {
+    public ResponseEntity<?> updateDebtPayment(@PathVariable Long id,@Valid @RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Updating debt payment with id: {}", id);
         if (!id.equals(debtPaymentRequest.getId())) {
             return ResponseEntity.badRequest().body("ID trong URL và trong nội dung không khớp.");

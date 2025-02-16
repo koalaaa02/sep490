@@ -27,7 +27,6 @@ public class User extends Auditable{ //thông tin tài khoản
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
     private String name;
     
     @Column(nullable = false, unique = true)
@@ -51,13 +50,11 @@ public class User extends Auditable{ //thông tin tài khoản
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Order> orders; // order customer mua
+    private String resetToken;// Token đặt lại mật khẩu hoặc mã OTP
+    private LocalDateTime resetTokenExpiry;// Thời gian hết hạn OTP
 
-    // Token đặt lại mật khẩu hoặc mã OTP
-    private String resetToken;
 
-    // Thời gian hết hạn OTP
-    private LocalDateTime resetTokenExpiry;
-
+    // Relationship
     @OneToMany(mappedBy = "agent")
     private List<Invoice> invoices; // mỗi agent có thể nợ nhiều hóa đơn
 

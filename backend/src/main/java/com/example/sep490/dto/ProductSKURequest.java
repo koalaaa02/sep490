@@ -35,7 +35,8 @@ public class ProductSKURequest {
     
     private String images;
     
-    private boolean isBulky = false; 
-    
+    private boolean isBulky = false;
+
+    // Relationship
     private Long productId;
 }

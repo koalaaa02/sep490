@@ -17,5 +17,5 @@ public interface ShopRepository extends JpaRepository<Shop, Long>, JpaSpecificat
     Page<Shop> findByIsDeleteFalse(Pageable pageable);
     Page<Shop> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name, Pageable pageable);
     Optional<Shop> findByIdAndIsDeleteFalse(Long id);
-
+    Optional<Shop> findByManagerId(Long userId);
 }

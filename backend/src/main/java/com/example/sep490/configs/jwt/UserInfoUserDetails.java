@@ -15,12 +15,14 @@ public class UserInfoUserDetails implements UserDetails {
 	private Long id;
     private String name;
     private String password;
+    private String roles;
     private List<GrantedAuthority> authorities;
 
     public UserInfoUserDetails(User userInfo) {
     	id=userInfo.getId();
         name=userInfo.getName();
         password=userInfo.getPassword();
+        roles=userInfo.getRoles();
         authorities= Arrays.stream(userInfo.getRoles().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
@@ -33,6 +35,9 @@ public class UserInfoUserDetails implements UserDetails {
 
     public Long getId(){
         return id;
+    }
+    public String getRoles(){
+        return roles;
     }
     
     @Override

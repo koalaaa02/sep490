@@ -3,31 +3,70 @@ package com.example.sep490.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.messaging.handler.annotation.support.MethodArgumentTypeMismatchException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.validation.ConstraintViolationException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("Dữ liệu không hợp lệ: " + ex.getMessage());
+//    //Lỗi validation ở tham số của method
+//    @ExceptionHandler(ConstraintViolationException.class)
+//    public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
+//        return ResponseEntity
+//                .status(HttpStatus.BAD_REQUEST)
+//                .body("Dữ liệu không hợp lệ: " + ex.getMessage());
+//    }
+//
+//    //Lỗi validation ở DTO với @Valid
+//    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+//    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
+//        return ResponseEntity
+//                .status(HttpStatus.BAD_REQUEST)
+//                .body("Dữ liệu đầu vào không hợp lệ: " + ex.getMessage());
+//    }
+//
+//    //Kiểu dữ liệu không thể convert (Enum, số, v.v.)
+//    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+//    public ResponseEntity<Map<String, String>> handleEnumParseError(MethodArgumentTypeMismatchException ex) {
+//        Map<String, String> errorResponse = new HashMap<>();
+//        errorResponse.put("error", "Invalid value for " + ex.getMethodParameter().getParameterName());
+//        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+//    }
+//
+    // Xử lý lỗi từ @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidationException(MethodArgumentNotValidException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body("Dữ liệu đầu vào không hợp lệ: " + ex.getMessage());
+    @ExceptionHandler(BindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleBindException(BindException ex) {
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return ResponseEntity.badRequest().body(errors);
     }
+
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneralException(Exception ex) {
+    public ResponseEntity<?> handleGeneralException(Exception ex) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Lỗi hệ thống: " + ex.getMessage());

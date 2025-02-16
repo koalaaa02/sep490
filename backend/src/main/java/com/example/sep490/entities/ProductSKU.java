@@ -35,7 +35,6 @@ public class ProductSKU  extends Auditable{//SKU (Stock Keeping Unit) or phân l
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String skuCode;
     
     @Column(nullable = false)
@@ -64,7 +63,8 @@ public class ProductSKU  extends Auditable{//SKU (Stock Keeping Unit) or phân l
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean isBulky = false;  //đánh dấu hàng cồng kềnh
-    
+
+    // Relationship
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

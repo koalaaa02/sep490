@@ -1,11 +1,13 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.repositories.specifications.SupplierFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +23,7 @@ import com.example.sep490.services.SupplierService;
 
 @RestController
 @RequestMapping("/api/suppliers")
+@Validated
 public class SupplierController {
     private static final Logger logger = LoggerFactory.getLogger(SupplierController.class);
 
@@ -29,7 +32,7 @@ public class SupplierController {
 
     @GetMapping("/")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getSuppliers(SupplierFilterDTO filter) {
+    public ResponseEntity<?> getSuppliers(@Valid SupplierFilterDTO filter) {
         logger.info("Fetching suppliers with filters");
         return ResponseEntity.ok(supplierService.getSuppliers(filter));
     }
@@ -43,14 +46,14 @@ public class SupplierController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> createSupplier(@RequestBody SupplierRequest supplier) {
+    public ResponseEntity<?> createSupplier(@Valid @RequestBody SupplierRequest supplier) {
         logger.info("Creating new supplier: {}", supplier);
         return ResponseEntity.ok().body(supplierService.createSupplier(supplier));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> updateSupplier(@PathVariable Long id, @RequestBody SupplierRequest supplier) {
+    public ResponseEntity<?> updateSupplier(@PathVariable Long id,@Valid @RequestBody SupplierRequest supplier) {
         logger.info("Updating supplier with id: {}", id);
         if (!id.equals(supplier.getId())) {
             return ResponseEntity.badRequest().body("id và id trong nhà cung cấp không trùng khớp.");

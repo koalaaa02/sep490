@@ -1,5 +1,7 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.CategoryFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +28,8 @@ public class CategoryController {
 	
 	@GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> getCategorys(
-        @RequestParam(defaultValue = "1") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "id") String sortBy,
-        @RequestParam(defaultValue = "ASC") String direction,
-        @RequestParam(required = false) String name
-    ) {
-    	return ResponseEntity.ok(categoryService.getCategories(page, size, sortBy, direction, name));
+    public ResponseEntity<?> getCategories(@Valid CategoryFilterDTO filter) {
+    	return ResponseEntity.ok(categoryService.getCategories(filter));
     }
 	
     @GetMapping("/{id}")
@@ -44,13 +40,13 @@ public class CategoryController {
     
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> createCategory(@RequestBody CategoryRequest category) {
+    public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryRequest category) {
     	return ResponseEntity.ok().body(categoryService.createCategory(category));
     }
     
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
+    public ResponseEntity<?> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequest category) {
         if (!id.equals(category.getId())) {
             return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
         }

@@ -27,4 +27,6 @@ public class ExpenseRequest {
     private BigDecimal amount;
 
     private String description;
+
+    // Relationship
 }

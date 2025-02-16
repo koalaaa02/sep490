@@ -76,6 +76,15 @@ public class OrderService {
         }
     }
 
+    public OrderResponse getOrderByIdCustomer(Long id) {
+        Optional<Order> Order = orderRepo.findByOrderIdAndUserId(id,userService.getContextUser().getId());
+        if (Order.isPresent()) {
+            return orderMapper.EntityToResponse(Order.get());
+        } else {
+            throw new RuntimeException("Đơn hàng không tồn tại với ID: " + id);
+        }
+    }
+
 //    public List<OrderResponse> getOrdersByCreatedBy(Long id) {
 //        List<Order> orders = orderRepo.findByCreatedByAndIsDeleteFalse(id);
 //        List<OrderResponse> orderResponses = orderMapper.EntitiesToResponses(orders);
@@ -126,23 +135,33 @@ public class OrderService {
         return orderMapper.EntityToResponse(orderRepo.save(order));
     }
 
-    public OrderResponse updateOrderStatus(Long orderId,Long userId, OrderRequest orderRequest) {
+    public OrderResponse changeOrderStatusCustomer(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepo.findByIdAndIsDeleteFalse(orderId)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
-        order.setStatus(orderRequest.getStatus());
+        order.setStatus(orderStatus);
         Order updatedOrder = orderRepo.save(order);
         return orderMapper.EntityToResponse(updatedOrder);
     }
 
-    public void changeStatusOrder(Long id, OrderStatus orderStatus) {
-        Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)
-                .map(existingOrder -> {
-                    existingOrder.setStatus(orderStatus);
-                    existingOrder.setShippedDate(LocalDateTime.now());
-                    return orderRepo.save(existingOrder);
+    public void changeStatusOrders(List<Long> orderIds, OrderStatus orderStatus) {
+        List<Order> orders = orderRepo.findAllById(orderIds)
+                .stream()
+                .filter(order -> !order.isDelete()) // Lọc bỏ các đơn hàng đã bị xóa
+                .peek(order -> {
+                    order.setStatus(orderStatus);
+                    if(orderStatus.equals(OrderStatus.DELIVERED)) {
+                        order.setShippedDate(LocalDateTime.now());
+                    }
                 })
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
+                .toList();
+
+        if (orders.isEmpty()) {
+            throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với danh sách ID đã cung cấp");
+        }
+
+        orderRepo.saveAll(orders);
     }
+
 
     public void deleteOrder(Long id) {
         Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)

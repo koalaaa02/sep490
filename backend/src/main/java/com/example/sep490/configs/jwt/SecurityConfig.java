@@ -30,6 +30,7 @@ public class SecurityConfig {
     @Autowired
     private CustomAuthenticationEntryPoint authenticationEntryPoint; // Inject entry point
 
+
     @Bean
     public UserDetailsService userDetailsService() {
         // Replace with your UserDetailsService implementation
@@ -47,16 +48,24 @@ public class SecurityConfig {
                                 "/api/public/**",
                                 "/api/v1/payment/**",
                                 "/api/mail/**",
-                                "/api/debt-payments/**",
                                 "/api/auth/**",
-                                "/api/categories/**",
                                 "/api/files/**",
                                 "/swagger-ui/*",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
+                                "/api/cart/**",
+                                "/html/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/myprofile/**",
+                                "/api/statistics/**",
+                                "/api/financialReport/**",
+                                "/api/products/**",
+                                "/api/productskus/**",
+                                "/api/checkout/**",
+                                "/api/expenses/**",
                                 "/api/addresses/**",
-                                "/api/debt-payments/**",
                                 "/api/categories/**",
                                 "/api/invoices/**",
                                 "/api/orders/**",
@@ -64,16 +73,8 @@ public class SecurityConfig {
                                 "/api/suppliers/**",
                                 "/api/transactions/**",
                                 "/api/users/**",
-                                "/api/cart/**"
-                        ).permitAll()
-                        .requestMatchers(
-                                "/api/myprofile/**",
-                                "/api/statistics/**",
-                                "/api/financialReport/**",
-                                "/api/private/products/**",
-                                "/api/productskus/**",
-                                "/api/checkout/**",
-                                "/api/expenses/**"
+                                "/api/debt-payments/**",
+                                "/api/categories/**"
                 		).authenticated()
                 )
                 .sessionManagement(session -> session
@@ -82,6 +83,7 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint) // Add entry point here
+                        //.accessDeniedHandler(customAccessDeniedHandler) // Bắt lỗi 403
                 )
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -42,6 +42,7 @@ public class Supplier  extends Auditable{//nhà cung câps sản phẩm
 
     private String address;
 
+    // Relationship
     @JsonIgnoreProperties("supplier")
     @OneToMany(mappedBy = "supplier")
     private List<Product> products; // Mỗi nhà cung cấp có thể cung cấp nhiều sản phẩm

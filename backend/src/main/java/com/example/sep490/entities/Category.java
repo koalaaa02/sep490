@@ -45,7 +45,7 @@ public class Category extends Auditable{//danh mục sản phẩm
     @ColumnDefault("false")
     private boolean isParent = false;
 
- // Quan hệ cha - con trong Category
+    // Relationship
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = true)
     private Category parentCategory; // Danh mục cha

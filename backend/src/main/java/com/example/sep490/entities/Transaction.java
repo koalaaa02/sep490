@@ -36,26 +36,14 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "order_id", nullable = true)
-    private Order order;
-
-    @OneToOne
-    @JoinColumn(name = "debtPayment_id", nullable = true)
-    private DebtPayment debtPayment;
-
     @Enumerated(EnumType.STRING)
-    private PaymentMethod method; // CARD, COD
-
+    private PaymentMethod method; // VNPAY
     private String bankCode;
-
     private String content; //nội dung chuyển khoản
-
     private String transactionId; // Mã giao dịch từ VNPAY/...
 
     @Column(nullable = false)
     private BigDecimal amount;  // số tiền
-
     private LocalDateTime paymentDate = LocalDateTime.now();
 
     @Enumerated(EnumType.STRING)
@@ -66,6 +54,14 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @Column(nullable = false)
     private TransactionStatus status;
 
+    // Relationship
+    @OneToOne
+    @JoinColumn(name = "order_id", nullable = true)
+    private Order order;
+
+    @OneToOne
+    @JoinColumn(name = "debtPayment_id", nullable = true)
+    private DebtPayment debtPayment;
 }
 //String vnp_Amount ;
 //String vnp_BankCode ;

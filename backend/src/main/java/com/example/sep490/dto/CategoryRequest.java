@@ -18,6 +18,8 @@ public class CategoryRequest {
 
     @JsonProperty("isParent")
     private boolean isParent;
+
+    // Relationship
     private Long parentCategoryId; 
 }
 

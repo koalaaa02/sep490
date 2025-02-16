@@ -33,6 +33,8 @@ public class UserRequest {
 
     private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
 
+
+    // Relationship
 //    @Nullable
 //    private Long shopId;
 }

@@ -38,6 +38,7 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @Column(nullable = false)
     private UnitType unit;
 
+    // Relationship
 //    @JsonManagedReference
     @JsonIgnoreProperties("products")
     @ManyToOne(fetch = FetchType.EAGER) // @ManyToOne(fetch = FetchType.LAZY)

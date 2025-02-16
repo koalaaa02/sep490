@@ -35,5 +35,7 @@ public class AddressRequest {
 
     private String postalCode;
 
-    private boolean isDefault; 
+    private boolean isDefault;
+
+    // Relationship
 }

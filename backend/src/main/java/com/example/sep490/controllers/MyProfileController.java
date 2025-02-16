@@ -53,25 +53,25 @@ public class MyProfileController {
 
     @GetMapping("/orders/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> getMyOrderByOrderId(@PathVariable Long id) {
+    public ResponseEntity<?> getOrderByIdCustomer(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(orderService.getOrderById(id));
+            return ResponseEntity.ok().body(orderService.getOrderByIdCustomer(id));
         }
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 
-    @PutMapping("/orders/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
-    public ResponseEntity<?> setStatusOrder(@PathVariable Long id, OrderRequest orderRequest) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(orderService.updateOrderStatus(id,user.getId(),orderRequest));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
+//    @PutMapping("/orders/{id}")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+//    public ResponseEntity<?> setStatusOrder(@PathVariable Long id, OrderRequest orderRequest) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+//            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+//            return ResponseEntity.ok().body(orderService.updateOrderStatus(id,user.getId(),orderRequest));
+//        }
+//        return ResponseEntity.badRequest().body("No authenticated user");
+//    }
 
     @GetMapping("/orderdetails/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
@@ -96,7 +96,7 @@ public class MyProfileController {
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam OrderStatus status) {
-        orderService.changeStatusOrder(id, status);
+        orderService.changeOrderStatusCustomer(id, status);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 

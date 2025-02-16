@@ -2,6 +2,7 @@ package com.example.sep490.controllers;
 
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.repositories.specifications.ShopFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class ShopController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getShops(ShopFilterDTO filter) {
+    public ResponseEntity<?> getShops(@Valid ShopFilterDTO filter) {
         return ResponseEntity.ok(shopService.getShops(filter));
     }
 
@@ -35,13 +36,13 @@ public class ShopController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> createShop(@RequestBody ShopRequest shopRequest) {
+    public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateShop(@PathVariable Long id, @RequestBody ShopRequest shopRequest) {
+    public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
         if (!id.equals(shopRequest.getId())) {
             return ResponseEntity.badRequest().body("id và id trong cửa hàng không trùng khớp.");
         }

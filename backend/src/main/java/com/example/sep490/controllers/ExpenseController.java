@@ -1,6 +1,7 @@
 package com.example.sep490.controllers;
 
 import com.example.sep490.repositories.specifications.ExpenseFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class ExpenseController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getExpenses(ExpenseFilterDTO filter) {
+    public ResponseEntity<?> getExpenses(@Valid ExpenseFilterDTO filter) {
         logger.info("Fetching expenses with pagination and filters");
         return ResponseEntity.ok(expenseService.getExpenses(filter));
     }
@@ -37,14 +38,14 @@ public class ExpenseController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> createExpense(@RequestBody ExpenseRequest expense) {
+    public ResponseEntity<?> createExpense(@Valid @RequestBody ExpenseRequest expense) {
         logger.info("Creating a new expense");
         return ResponseEntity.ok().body(expenseService.createExpense(expense));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateExpense(@PathVariable Long id, @RequestBody ExpenseRequest expense) {
+    public ResponseEntity<?> updateExpense(@PathVariable Long id,@Valid @RequestBody ExpenseRequest expense) {
         logger.info("Updating expense with id: {}", id);
         if (!Objects.equals(id, expense.getId())) {
             return ResponseEntity.badRequest().body("ID trong URL và ID trong hóa đơn không trùng khớp.");

@@ -22,6 +22,8 @@ import lombok.NoArgsConstructor;
 public class InvoiceRequest {
 	private Long id;
 
+
+    // Relationship
     private Long agentId; // người Đại lý nợ
     private Long orderId;
 

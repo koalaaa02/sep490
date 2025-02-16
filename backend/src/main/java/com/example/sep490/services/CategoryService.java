@@ -6,6 +6,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.repositories.specifications.CategoryFilterDTO;
+import com.example.sep490.repositories.specifications.CategorySpecification;
 import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +44,8 @@ public class CategoryService {
 	private CategoryMapper categoryMapper;
 	@Autowired
 	private BasePagination pagination;
+	@Autowired
+	private UserService userService;
 	@Value("${env.backendBaseURL}")
 	private String baseURL;
 	
@@ -50,11 +55,11 @@ public class CategoryService {
 //        return pagination.createPageResponse(categoryPage);
 //	}
 
-	public PageResponse<CategoryResponse> getCategories(int page, int size, String sortBy, String direction, String nameFilter) {
-		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-		Page<Category> categoryPage = (nameFilter == null || nameFilter.isBlank())
-				? categoryRepo.findByIsDeleteFalse(pageable)
-				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(nameFilter, pageable);
+	public PageResponse<CategoryResponse> getCategories(CategoryFilterDTO filter) {
+		filter.setCreatedBy(userService.getContextUser().getId());
+		Specification<Category> spec = CategorySpecification.filterCategoryes(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Category> categoryPage = categoryRepo.findAll(spec, pageable);
 		Page<CategoryResponse> categoryResponsePage = categoryPage.map(categoryMapper::EntityToResponse);
 		return pagination.createPageResponse(categoryResponsePage);
 	}

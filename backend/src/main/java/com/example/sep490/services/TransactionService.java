@@ -6,11 +6,14 @@ import java.util.Optional;
 import com.example.sep490.dto.AddressResponse;
 import com.example.sep490.entities.*;
 import com.example.sep490.repositories.*;
+import com.example.sep490.repositories.specifications.TransactionFilterDTO;
+import com.example.sep490.repositories.specifications.TransactionSpecification;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,10 +39,16 @@ public class TransactionService {
 
     @Autowired
     private OrderRepository orderRepo;
+    @Autowired
+    private UserService userService;
 
-    public PageResponse<TransactionResponse> getTransactions(int page, int size, String sortBy, String direction) {
-        Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<Transaction> transactionPage = transactionRepo.findByIsDeleteFalse(pageable);
+    public PageResponse<TransactionResponse> getTransactions(TransactionFilterDTO filter) {
+        Shop shop = userService.getShopByContextUser();
+        if(shop == null ) throw new RuntimeException("Không tìm thấy cửa hàng.");
+        filter.setShopId(shop.getId());
+        Specification<Transaction> spec = TransactionSpecification.filterTransactiones(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);
         Page<TransactionResponse> transactionResponsePage = transactionPage.map(transactionMapper::EntityToResponse);
         return pagination.createPageResponse(transactionResponsePage);
     }

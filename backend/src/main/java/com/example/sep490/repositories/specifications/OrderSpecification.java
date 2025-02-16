@@ -15,9 +15,6 @@ public class OrderSpecification {
             if (filter.getId() != null) {
                 predicates.add(cb.equal(root.get("id"), filter.getId() ));
             }
-            if (filter.getStatus() != null) {
-                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
-            }
             if (filter.getShopId() != null) {
                 predicates.add(cb.equal(root.get("shop").get("id"), filter.getShopId()));
             }
@@ -26,6 +23,16 @@ public class OrderSpecification {
             }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy()));
+            }
+
+            if (filter.getDeliveryMethod() != null) {
+                predicates.add(cb.equal(root.get("deliveryMethod"), filter.getDeliveryMethod()));
+            }
+            if (filter.getPaymentMethod() != null) {
+                predicates.add(cb.equal(root.get("paymentMethod"), filter.getPaymentMethod()));
+            }
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
 
             predicates.add(cb.equal(root.get("isDelete"),false));

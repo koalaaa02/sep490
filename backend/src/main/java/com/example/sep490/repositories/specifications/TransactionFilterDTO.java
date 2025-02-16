@@ -1,18 +1,15 @@
 package com.example.sep490.repositories.specifications;
 
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.enums.DeliveryMethod;
-import com.example.sep490.entities.enums.OrderStatus;
-import com.example.sep490.entities.enums.PaymentMethod;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class OrderFilterDTO {
+public class TransactionFilterDTO {
     @Schema(defaultValue = "1")
     private int page = 1;
     @Schema(defaultValue = "10")
@@ -22,13 +19,15 @@ public class OrderFilterDTO {
     @Schema(defaultValue = "ASC")
     private String direction = "ASC";
 
-    private Long Id;
-    private String deliveryCode;
+    @Schema(description = "Filter from this date (format: yyyy-MM-dd HH:mm:ss)")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime fromDate;
+    @Schema(description = "Filter until this date (format: yyyy-MM-dd HH:mm:ss)")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime toDate;
+
     private Long shopId;
     private Long createdBy;
 
-    private DeliveryMethod deliveryMethod;
-    private PaymentMethod paymentMethod;
-    @Schema(defaultValue = "PENDING")
-    private OrderStatus status;}
+}
 

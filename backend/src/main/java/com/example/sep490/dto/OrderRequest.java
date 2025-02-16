@@ -39,6 +39,8 @@ public class OrderRequest {
 
     private DeliveryMethod deliveryMethod = DeliveryMethod.GHN;
 
+
+    // Relationship
     private Long shopId;
 
 //    private Long transactionId;

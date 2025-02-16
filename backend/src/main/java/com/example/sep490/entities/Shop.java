@@ -20,28 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Builder
 public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó được cập nhật role seller)
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name; // Tên shop
-
-    @OneToMany(mappedBy = "shop")
-    private List<Order> orders; // Một shop có thể có nhiều đơn hàng
-
-    @OneToOne
-    @JoinColumn(name = "user_id", nullable = false) 
-    private User manager; // Một shop có một người quản lý
-
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private Address address;
-
-    @JsonIgnoreProperties("shop")
-    @OneToMany(mappedBy = "shop")
-    private List<Product> products;
-
     private String registrationCertificateImages;//link ảnh giấy đăng ký kinh doanh
 
     private String secretA; 
@@ -59,4 +41,20 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO; // Tổng tiền còn nợ
     private LocalDateTime lastPaymentDate; // Ngày thanh toán phí gần nhất
+
+    // Relationship
+    @OneToMany(mappedBy = "shop")
+    private List<Order> orders; // Một shop có thể có nhiều đơn hàng
+
+    @OneToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User manager; // Một shop có một người quản lý
+
+    @ManyToOne
+    @JoinColumn(name = "address_id")
+    private Address address;
+
+    @JsonIgnoreProperties("shop")
+    @OneToMany(mappedBy = "shop")
+    private List<Product> products;
 }

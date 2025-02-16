@@ -29,7 +29,11 @@ import lombok.NoArgsConstructor;
 public class OrderDetail  extends Auditable{//lưu chi tiết đơn hàng
 	@EmbeddedId
     private OrderDetailId id;
+    private int quantity;
+    private BigDecimal price;
 
+
+    // Relationship
 	@NotNull
     @ManyToOne
     @MapsId("orderId") // Ánh xạ orderId từ khóa chính
@@ -41,8 +45,4 @@ public class OrderDetail  extends Auditable{//lưu chi tiết đơn hàng
     @MapsId("skuId") // Ánh xạ skuId từ khóa chính
     @JoinColumn(name = "sku_id", nullable = false) // Đảm bảo không null ở cấp CSDL
     private ProductSKU productSku;
-    
-
-    private int quantity;
-    private BigDecimal price;
 }

@@ -36,5 +36,7 @@ public class ShopRequest {
 
     private String secretA;
     private String secretB;
+
+    // Relationship
 }
 //*

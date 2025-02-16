@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OrderDetailRequest {
+    //compositkey
 	@NotNull
     private Long orderId;
-
     @NotNull 
     private Long productSkuId;
+
     private int quantity;
-    
     @NotNull(message = "Số tiền không được để trống.")
     @DecimalMin(value = "0.00", message = "Số tiền phải >= 0.")
     private BigDecimal price;

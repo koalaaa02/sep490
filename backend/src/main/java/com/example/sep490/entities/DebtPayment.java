@@ -21,14 +21,14 @@ public class DebtPayment  extends Auditable{//lịch sử trả nợ cho Invoice
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private BigDecimal amountPaid;
+    private LocalDateTime paymentDate = LocalDateTime.now();
 
+    // Relationship
     @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
     @OneToOne(mappedBy = "debtPayment")
     private Transaction transaction;
-
-    private BigDecimal amountPaid;
-    private LocalDateTime paymentDate = LocalDateTime.now();
 }

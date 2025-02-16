@@ -2,6 +2,7 @@ package com.example.sep490.repositories.specifications;
 
 import com.example.sep490.entities.Shop;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,11 +20,17 @@ public class ProductFilterDTO {
     @Schema(defaultValue = "ASC")
     private String direction = "ASC";
 
+
     private String name;
-    private Long categoryId;
+    @Schema(description = "Category ID (null nếu không lọc)", nullable = true)
+    private Long categoryId = null;
+    @Schema(defaultValue = "null")
     private Long shopId;
+    @Schema(defaultValue = "null")
     private Long createdBy;
+    @Schema(defaultValue = "null")
     private BigDecimal minPrice;
+    @Schema(defaultValue = "null")
     private BigDecimal maxPrice;
 }
 

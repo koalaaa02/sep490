@@ -1,5 +1,7 @@
 package com.example.sep490.controllers;
 
+import com.example.sep490.repositories.specifications.TransactionFilterDTO;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,8 @@ public class TransactionController {
 
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> getTransactions(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
-    ) {
-        return ResponseEntity.ok(transactionService.getTransactions(page, size, sortBy, direction));
+    public ResponseEntity<?> getTransactions(@Valid TransactionFilterDTO filter) {
+        return ResponseEntity.ok(transactionService.getTransactions(filter));
     }
 
     @GetMapping("/{id}")
@@ -45,13 +42,13 @@ public class TransactionController {
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> createTransaction(@RequestBody TransactionRequest transaction) {
+    public ResponseEntity<?> createTransaction(@Valid @RequestBody TransactionRequest transaction) {
         return ResponseEntity.ok().body(transactionService.createTransaction(transaction));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
-    public ResponseEntity<?> updateTransaction(@PathVariable Long id, @RequestBody TransactionRequest transaction) {
+    public ResponseEntity<?> updateTransaction(@PathVariable Long id,@Valid @RequestBody TransactionRequest transaction) {
         if (!id.equals(transaction.getId())) {
             return ResponseEntity.badRequest().body("Id và id trong giao dịch không trùng khớp.");
         }

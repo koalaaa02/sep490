@@ -22,6 +22,12 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     List<Order> findByCreatedByAndIsDeleteFalse(Long userId);
 	Optional<Order> findByIdAndIsDeleteFalse(Long id);
     List<Order> findByShopIdAndIsDeleteFalse(Long shopId);
+    @Query("SELECT o FROM Order o WHERE o.address.createdBy = :userId")
+    List<Order> findOrdersByUserId(@Param("userId") Long userId);//List<Order> findByAddress_CreatedBy(Long userId);
+
+    @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.address.createdBy = :userId")
+    Optional<Order> findByOrderIdAndUserId(@Param("orderId") Long orderId, @Param("userId") Long userId);//Optional<Order> findByIdAndAddress_CreatedBy(Long orderId, Long userId);
+
 
     //order statistic
     @Query("SELECT MONTH(o.createdAt) as month, COUNT(o) as totalOrders " +
