@@ -3,10 +3,7 @@ package com.example.sep490.mapper;
 import java.util.List;
 
 import com.example.sep490.dto.publicdto.ProductResponsePublic;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import com.example.sep490.dto.ProductRequest;

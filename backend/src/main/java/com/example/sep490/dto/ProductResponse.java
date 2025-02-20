@@ -1,11 +1,9 @@
 package com.example.sep490.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.Category;
-import com.example.sep490.entities.Product;
-import com.example.sep490.entities.ProductSKU;
-import com.example.sep490.entities.Supplier;
+import com.example.sep490.entities.*;
 import com.example.sep490.entities.enums.UnitType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -32,5 +30,14 @@ public class ProductResponse {
     private List<ProductSKU> skus;
     @JsonIgnoreProperties({"products"})
     private Supplier supplier;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }
 

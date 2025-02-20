@@ -1,6 +1,7 @@
 package com.example.sep490.repositories.specifications;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class TransactionFilterDTO {
     private LocalDateTime toDate;
 
     private Long shopId;
-    private Long createdBy;
 
+    @JsonIgnore
+    private Long createdBy;
 }
 

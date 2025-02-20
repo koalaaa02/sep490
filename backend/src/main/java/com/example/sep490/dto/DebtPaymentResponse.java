@@ -3,6 +3,7 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.example.sep490.entities.Auditable;
 import com.example.sep490.entities.Invoice;
 
 import com.example.sep490.entities.Transaction;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DebtPaymentResponse {
+public class DebtPaymentResponse{
     private Long id;
     @JsonIgnoreProperties({ "debtPayments", "agent"})
     private Invoice invoice;
@@ -29,4 +30,13 @@ public class DebtPaymentResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd 'at' HH:mm:ss")
     private LocalDateTime paymentDate = LocalDateTime.now();
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

@@ -1,5 +1,6 @@
 package com.example.sep490.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.sep490.entities.Auditable;
@@ -27,5 +28,14 @@ public class CategoryResponse extends Auditable {
     
     @JsonIgnoreProperties({"category","shop","skus","supplier"})
     private List<Product> products;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }
 //@JsonIgnoreProperties("category")

@@ -19,7 +19,7 @@ public class OrderSpecification {
                 predicates.add(cb.equal(root.get("shop").get("id"), filter.getShopId()));
             }
             if (filter.getDeliveryCode() != null) {
-                predicates.add(cb.equal(root.get("shop"), filter.getDeliveryCode()));
+                predicates.add(cb.equal(root.get("deliveryCode"), filter.getDeliveryCode()));
             }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy()));

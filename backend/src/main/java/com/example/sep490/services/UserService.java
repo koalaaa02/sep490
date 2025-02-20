@@ -209,4 +209,8 @@ public class UserService {
         }else throw new RuntimeException("Không tìm thấy thông tin người đăng nhập.");
     }
 
+    public User getUserByUserName(String username) {
+        return userRepo.findByName(username).orElse(null);
+    }
+
 }

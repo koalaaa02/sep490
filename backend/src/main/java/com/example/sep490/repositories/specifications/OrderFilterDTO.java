@@ -30,5 +30,6 @@ public class OrderFilterDTO {
     private DeliveryMethod deliveryMethod;
     private PaymentMethod paymentMethod;
     @Schema(defaultValue = "PENDING")
-    private OrderStatus status;}
+    private OrderStatus status;
+}
 

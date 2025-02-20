@@ -45,6 +45,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/static/**",
                                 "/uploads/**",
+                                "/api/chat/**",
+                                "/ws/**",
                                 "/api/public/**",
                                 "/api/v1/payment/**",
                                 "/api/mail/**",
@@ -59,6 +61,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .requestMatchers(
                                 "/api/myprofile/**",
+                                "/websocket/**",
                                 "/api/statistics/**",
                                 "/api/financialReport/**",
                                 "/api/products/**",

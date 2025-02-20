@@ -47,4 +47,11 @@ public class OrderResponse {
     private Invoice invoice;
 
 
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

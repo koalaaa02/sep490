@@ -54,6 +54,15 @@ public class InvoiceService {
         return pagination.createPageResponse(invoiceResponsePage);
     }
 
+    public PageResponse<InvoiceResponse> getInvoicesByUserId(InvoiceFilterDTO filter) {
+        filter.setAgentId(userService.getContextUser().getId());
+        Specification<Invoice> spec = InvoiceSpecification.filterInvoices(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Invoice> invoicePage = invoiceRepo.findAll(spec, pageable);
+        Page<InvoiceResponse> invoiceResponsePage = invoicePage.map(invoiceMapper::EntityToResponse);
+        return pagination.createPageResponse(invoiceResponsePage);
+    }
+
     public InvoiceResponse getInvoiceById(Long id) {
         Optional<Invoice> Invoice = invoiceRepo.findByIdAndIsDeleteFalse(id);
         if (Invoice.isPresent()) {

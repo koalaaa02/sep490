@@ -1,6 +1,9 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import com.example.sep490.entities.Auditable;
 import com.example.sep490.entities.Product;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Max;
@@ -14,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductSKUResponse {
+public class ProductSKUResponse{
 	private Long id;
 
     private String skuCode;
@@ -40,4 +43,13 @@ public class ProductSKUResponse {
     private boolean isBulky = false;  
     @JsonIgnoreProperties({ "skus","category","shop","supplier"})
     private Product product;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

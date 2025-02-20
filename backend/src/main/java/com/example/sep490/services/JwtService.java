@@ -7,14 +7,16 @@ import io.jsonwebtoken.io.Decoder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -72,5 +74,21 @@ public class JwtService {
     private Key getSignKey() {
         byte[] keyBytes= Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public Authentication authenticateToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            String username = claims.getSubject();
+            List<String> roles = claims.get("roles", List.class);
+
+            List<SimpleGrantedAuthority> authorities = (roles != null) ?
+                    roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()) :
+                    Collections.emptyList();
+
+            return new UsernamePasswordAuthenticationToken(username, null, authorities);
+        } catch (Exception e) {
+            return null; // Trả về null nếu token không hợp lệ
+        }
     }
 }

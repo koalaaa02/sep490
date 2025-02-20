@@ -54,25 +54,18 @@ public class AuthController {
             throw new UsernameNotFoundException("invalid user request !");
         }
     }
-    
-    @GetMapping("/me")
-    public String getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            return "Username: " + userDetails.getUsername() + ", Roles: " + userDetails.getAuthorities();
-        }
-        return "No authenticated user";
-    }
-    
-    @GetMapping("/me1")
-    public String getCurrentUser1() {
+
+    @GetMapping("/refreshtoken")
+    public ResponseEntity<?> refreshToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return "User ID: " + user.getPassword() + ", Email: " + user.getUsername();
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", jwtService.generateToken(user.getUsername()));
+            response.put("roles", user.getRoles());
+            return ResponseEntity.ok(response);
         }
-        return "No authenticated user";
+        return ResponseEntity.badRequest().body("invalid user request !");
     }
 
     public static class EmailDTO {
@@ -93,4 +86,26 @@ public class AuthController {
                 request.getConfirmNewPassword()
         );
     }
+
+
+
+    //    @GetMapping("/me")
+//    public String getCurrentUser() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+//            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+//            return "Username: " + userDetails.getUsername() + ", Roles: " + userDetails.getAuthorities();
+//        }
+//        return "No authenticated user";
+//    }
+//
+//    @GetMapping("/me1")
+//    public String getCurrentUser1() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+//            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+//            return "User ID: " + user.getPassword() + ", Email: " + user.getUsername();
+//        }
+//        return "No authenticated user";
+//    }
 }

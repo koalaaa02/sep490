@@ -5,7 +5,9 @@ import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import com.example.sep490.entities.enums.OrderStatus;
 import com.example.sep490.mapper.UserMapper;
+import com.example.sep490.repositories.specifications.InvoiceFilterDTO;
 import com.example.sep490.repositories.specifications.OrderFilterDTO;
+import com.example.sep490.services.InvoiceService;
 import com.example.sep490.services.OrderDetailService;
 import com.example.sep490.services.OrderService;
 import com.example.sep490.services.UserService;
@@ -24,6 +26,8 @@ public class MyProfileController {
     private UserService userService;
     @Autowired
     private OrderService orderService;
+    @Autowired
+    private InvoiceService invoiceService;
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -62,6 +66,27 @@ public class MyProfileController {
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 
+    @GetMapping("/invoices")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    public ResponseEntity<?> getMyInvoices(InvoiceFilterDTO filter) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            return ResponseEntity.ok().body(invoiceService.getInvoicesByUserId(filter));
+        }
+        return ResponseEntity.badRequest().body("No authenticated user");
+    }
+
+    @GetMapping("/invoices/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            return ResponseEntity.ok().body(invoiceService.getInvoiceById(id));
+        }
+        return ResponseEntity.badRequest().body("No authenticated user");
+    }
 //    @PutMapping("/orders/{id}")
 //    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
 //    public ResponseEntity<?> setStatusOrder(@PathVariable Long id, OrderRequest orderRequest) {

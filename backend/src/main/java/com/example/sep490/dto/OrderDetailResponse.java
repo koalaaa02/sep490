@@ -1,7 +1,9 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import com.example.sep490.entities.Auditable;
 import com.example.sep490.entities.Order;
 import com.example.sep490.entities.ProductSKU;
 
@@ -23,7 +25,15 @@ public class OrderDetailResponse {
 
     @NotNull
     private ProductSKUResponse productSku;
-
     private int quantity;
     private BigDecimal price;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

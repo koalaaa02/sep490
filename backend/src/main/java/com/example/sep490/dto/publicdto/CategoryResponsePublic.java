@@ -1,6 +1,5 @@
 package com.example.sep490.dto.publicdto;
 
-import com.example.sep490.entities.Auditable;
 import com.example.sep490.entities.Category;
 import com.example.sep490.entities.Product;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Data
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class CategoryResponsePublic extends Auditable {
+public class CategoryResponsePublic {
 	private Long id;
     private String name;
     private boolean isParent;

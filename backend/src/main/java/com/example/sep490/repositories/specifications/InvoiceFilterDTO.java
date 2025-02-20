@@ -2,6 +2,7 @@ package com.example.sep490.repositories.specifications;
 
 import com.example.sep490.entities.enums.InvoiceStatus;
 import com.example.sep490.entities.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class InvoiceFilterDTO {
     @Schema(defaultValue = "UNPAID")
     private InvoiceStatus status;
     private Long agentId;
+    @JsonIgnore
     private Long createdBy;
 
 }

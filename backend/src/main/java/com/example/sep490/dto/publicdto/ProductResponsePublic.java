@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponsePublic {
+public class ProductResponsePublic{
     private Long id; 
     private String name;
     private String description;

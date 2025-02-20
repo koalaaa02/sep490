@@ -1,5 +1,6 @@
 package com.example.sep490.repositories.specifications;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class ShopFilterDTO {
 
     @Schema(defaultValue = "true")
     private boolean isActive;
+    @JsonIgnore
     private Long createdBy;
-
 }
 
