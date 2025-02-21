@@ -6,15 +6,15 @@ import org.mapstruct.Mapper;
 
 import com.example.sep490.dto.OrderDetailRequest;
 import com.example.sep490.dto.OrderDetailResponse;
-import com.example.sep490.entities.OrderDetail;
+import com.example.sep490.entity.OrderDetail;
 
 @Mapper(componentModel = "spring")
 public interface OrderDetailMapper {
     OrderDetailResponse EntityToResponse(OrderDetail orderDetail);
     
-    List<OrderDetailResponse> EntitiesToResponses(List<OrderDetail> orderDetail);
+    List<OrderDetailResponse> entityToResponses(List<OrderDetail> orderDetail);
     
     OrderDetail RequestToEntity(OrderDetailRequest orderDetailRequest);
     
-    List<OrderDetail> RequestsToEntities(List<OrderDetailRequest> orderDetailRequest);
+    List<OrderDetail> RequestsToentity(List<OrderDetailRequest> orderDetailRequest);
 }

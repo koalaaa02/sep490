@@ -3,8 +3,8 @@ package com.example.sep490.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.*;
-import com.example.sep490.entities.enums.UnitType;
+import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.UnitType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;

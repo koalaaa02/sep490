@@ -1,7 +1,7 @@
 package com.example.sep490.utils;
 
 
-import com.example.sep490.entities.enums.PaymentType;
+import com.example.sep490.entity.enums.PaymentType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import javax.crypto.Mac;

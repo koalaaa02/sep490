@@ -1,8 +1,8 @@
 package com.example.sep490.dto;
 import jakarta.annotation.Nullable;
 import org.hibernate.annotations.ColumnDefault;
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.enums.UserType;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.enums.UserType;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;

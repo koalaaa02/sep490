@@ -1,7 +1,7 @@
 package com.example.sep490.dto.websocket;
 
-import com.example.sep490.entities.enums.MessageStatus;
-import com.example.sep490.entities.enums.MessageType;
+import com.example.sep490.entity.enums.MessageStatus;
+import com.example.sep490.entity.enums.MessageType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

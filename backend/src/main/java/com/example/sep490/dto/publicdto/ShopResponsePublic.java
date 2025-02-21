@@ -1,8 +1,8 @@
 package com.example.sep490.dto.publicdto;
 
-import com.example.sep490.entities.Address;
-import com.example.sep490.entities.Product;
-import com.example.sep490.entities.enums.ShopType;
+import com.example.sep490.entity.Address;
+import com.example.sep490.entity.Product;
+import com.example.sep490.entity.enums.ShopType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

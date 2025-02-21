@@ -3,8 +3,8 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.enums.ExpenseType;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.enums.ExpenseType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

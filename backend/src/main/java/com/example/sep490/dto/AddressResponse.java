@@ -1,8 +1,8 @@
 package com.example.sep490.dto;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.User;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Pattern;

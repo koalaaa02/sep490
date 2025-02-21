@@ -1,7 +1,7 @@
 package com.example.sep490.configs.jwt;
 
-import com.example.sep490.entities.User;
-import com.example.sep490.repositories.UserRepository;
+import com.example.sep490.entity.User;
+import com.example.sep490.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

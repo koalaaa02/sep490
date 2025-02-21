@@ -3,12 +3,12 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.DebtPayment;
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.enums.PaymentMethod;
-import com.example.sep490.entities.enums.TransactionStatus;
-import com.example.sep490.entities.enums.TransactionType;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.DebtPayment;
+import com.example.sep490.entity.Order;
+import com.example.sep490.entity.enums.PaymentMethod;
+import com.example.sep490.entity.enums.TransactionStatus;
+import com.example.sep490.entity.enums.TransactionType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

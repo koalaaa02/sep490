@@ -6,7 +6,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.example.sep490.entities.Product;
+import com.example.sep490.entity.Product;
 
 @Configuration
 public class ModelMapperConfig {

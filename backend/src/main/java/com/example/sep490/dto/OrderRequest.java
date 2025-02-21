@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.Transaction;
-import com.example.sep490.entities.enums.DeliveryMethod;
-import com.example.sep490.entities.enums.OrderStatus;
-import com.example.sep490.entities.enums.PaymentMethod;
+import com.example.sep490.entity.Transaction;
+import com.example.sep490.entity.enums.DeliveryMethod;
+import com.example.sep490.entity.enums.OrderStatus;
+import com.example.sep490.entity.enums.PaymentMethod;
 
 import jakarta.annotation.Nullable;
 
@@ -38,6 +38,7 @@ public class OrderRequest {
     private PaymentMethod paymentMethod; // CARD, COD
 
     private DeliveryMethod deliveryMethod = DeliveryMethod.GHN;
+    private boolean isPaid = false;
 
 
     // Relationship

@@ -1,7 +1,7 @@
 package com.example.sep490.configs.websocket;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetailsService;
-import com.example.sep490.services.JwtService;
+import com.example.sep490.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;

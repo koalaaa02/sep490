@@ -1,7 +1,7 @@
 package com.example.sep490.dto.publicdto;
 
-import com.example.sep490.entities.Category;
-import com.example.sep490.entities.Product;
+import com.example.sep490.entity.Category;
+import com.example.sep490.entity.Product;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;

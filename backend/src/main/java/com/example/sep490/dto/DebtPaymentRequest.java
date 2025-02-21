@@ -3,7 +3,7 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Transaction;
+import com.example.sep490.entity.Transaction;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

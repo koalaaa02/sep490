@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.UserRequest;
 import com.example.sep490.dto.UserResponse;
-import com.example.sep490.entities.User;
+import com.example.sep490.entity.User;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -15,12 +15,12 @@ public interface UserMapper {
     UserResponse EntityToResponse(User user);
     
     @Mapping(source = "id", target = "id")
-    List<UserResponse> EntitiesToResponses(List<User> user);
+    List<UserResponse> entityToResponses(List<User> user);
     
     @Mapping(source = "id", target = "id")
     @Mapping(source = "active", target = "isActive")
     User RequestToEntity(UserRequest userRequest);
     
     @Mapping(source = "id", target = "id")
-    List<User> RequestsToEntities(List<UserRequest> userRequest);
+    List<User> RequestsToentity(List<UserRequest> userRequest);
 }

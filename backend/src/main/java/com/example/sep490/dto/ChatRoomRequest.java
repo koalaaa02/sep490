@@ -1,10 +1,10 @@
 package com.example.sep490.dto;
 
 
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.User;
-import com.example.sep490.entities.enums.MessageStatus;
-import com.example.sep490.entities.enums.MessageType;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.User;
+import com.example.sep490.entity.enums.MessageStatus;
+import com.example.sep490.entity.enums.MessageType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

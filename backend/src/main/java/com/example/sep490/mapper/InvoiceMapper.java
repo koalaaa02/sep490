@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.InvoiceRequest;
 import com.example.sep490.dto.InvoiceResponse;
-import com.example.sep490.entities.Invoice;
+import com.example.sep490.entity.Invoice;
 
 @Mapper(componentModel = "spring")
 public interface InvoiceMapper {
@@ -15,11 +15,11 @@ public interface InvoiceMapper {
     InvoiceResponse EntityToResponse(Invoice invoice);
     
     @Mapping(source = "id", target = "id")
-    List<InvoiceResponse> EntitiesToResponses(List<Invoice> invoice);
+    List<InvoiceResponse> entityToResponses(List<Invoice> invoice);
     
     @Mapping(source = "id", target = "id")
     Invoice RequestToEntity(InvoiceRequest invoiceRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Invoice> RequestsToEntities(List<InvoiceRequest> invoiceRequest);
+    List<Invoice> RequestsToentity(List<InvoiceRequest> invoiceRequest);
 }

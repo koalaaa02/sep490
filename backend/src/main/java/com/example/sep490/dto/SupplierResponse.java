@@ -3,8 +3,8 @@ package com.example.sep490.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.Product;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Product;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;

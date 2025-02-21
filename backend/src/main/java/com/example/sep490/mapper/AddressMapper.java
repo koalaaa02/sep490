@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.AddressRequest;
 import com.example.sep490.dto.AddressResponse;
-import com.example.sep490.entities.Address;
+import com.example.sep490.entity.Address;
 
 @Mapper(componentModel = "spring")
 public interface AddressMapper {
@@ -16,11 +16,11 @@ public interface AddressMapper {
     AddressResponse EntityToResponse(Address address);
 
     @Mapping(source = "id", target = "id")
-    List<AddressResponse> EntitiesToResponses(List<Address> address);
+    List<AddressResponse> entityToResponses(List<Address> address);
     
     @Mapping(source = "id", target = "id")
     Address RequestToEntity(AddressRequest addressRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Address> RequestsToEntities(List<AddressRequest> addressRequest);
+    List<Address> RequestsToentity(List<AddressRequest> addressRequest);
 }

@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.dto.ShopResponse;
-import com.example.sep490.entities.Shop;
+import com.example.sep490.entity.Shop;
 
 @Mapper(componentModel = "spring")
 public interface ShopMapper {
@@ -19,12 +19,13 @@ public interface ShopMapper {
     ShopResponsePublic EntityToResponsePublic(Shop shop);
 
     @Mapping(source = "id", target = "id")
-    List<ShopResponse> EntitiesToResponses(List<Shop> shop);
+    List<ShopResponse> entityToResponses(List<Shop> shop);
     
     @Mapping(source = "id", target = "id")
     @Mapping(source = "active", target = "isActive")
+    @Mapping(source = "close", target = "isClose")
     Shop RequestToEntity(ShopRequest shopRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Shop> RequestsToEntities(List<ShopRequest> shopRequest);
+    List<Shop> RequestsToentity(List<ShopRequest> shopRequest);
 }

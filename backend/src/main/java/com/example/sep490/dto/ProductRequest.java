@@ -1,7 +1,7 @@
 package com.example.sep490.dto;
 
-import com.example.sep490.entities.Supplier;
-import com.example.sep490.entities.enums.UnitType;
+import com.example.sep490.entity.Supplier;
+import com.example.sep490.entity.enums.UnitType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

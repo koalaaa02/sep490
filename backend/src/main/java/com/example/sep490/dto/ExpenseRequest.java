@@ -2,7 +2,7 @@ package com.example.sep490.dto;
 
 import java.math.BigDecimal;
 
-import com.example.sep490.entities.enums.ExpenseType;
+import com.example.sep490.entity.enums.ExpenseType;
 
 
 import jakarta.validation.constraints.DecimalMin;

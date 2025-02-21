@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.SupplierRequest;
 import com.example.sep490.dto.SupplierResponse;
-import com.example.sep490.entities.Supplier;
+import com.example.sep490.entity.Supplier;
 
 @Mapper(componentModel = "spring")
 public interface SupplierMapper {
@@ -15,11 +15,11 @@ public interface SupplierMapper {
     SupplierResponse EntityToResponse(Supplier supplier);
     
     @Mapping(source = "id", target = "id")
-    List<SupplierResponse> EntitiesToResponses(List<Supplier> supplier);
+    List<SupplierResponse> entityToResponses(List<Supplier> supplier);
     
     @Mapping(source = "id", target = "id")
     Supplier RequestToEntity(SupplierRequest supplierRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Supplier> RequestsToEntities(List<SupplierRequest> supplierRequest);
+    List<Supplier> RequestsToentity(List<SupplierRequest> supplierRequest);
 }

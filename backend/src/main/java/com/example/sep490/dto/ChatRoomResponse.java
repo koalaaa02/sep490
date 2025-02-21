@@ -1,11 +1,11 @@
 package com.example.sep490.dto;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.ChatRoom;
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.User;
-import com.example.sep490.entities.enums.MessageStatus;
-import com.example.sep490.entities.enums.MessageType;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.ChatRoom;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.User;
+import com.example.sep490.entity.enums.MessageStatus;
+import com.example.sep490.entity.enums.MessageType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

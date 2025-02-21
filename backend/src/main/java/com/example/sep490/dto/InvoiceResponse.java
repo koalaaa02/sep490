@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.DebtPayment;
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.User;
-import com.example.sep490.entities.enums.InvoiceStatus;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.DebtPayment;
+import com.example.sep490.entity.Order;
+import com.example.sep490.entity.User;
+import com.example.sep490.entity.enums.InvoiceStatus;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;

@@ -3,9 +3,9 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.ProductSKU;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Order;
+import com.example.sep490.entity.ProductSKU;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;

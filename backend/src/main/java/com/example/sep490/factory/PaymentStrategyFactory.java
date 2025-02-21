@@ -1,20 +1,22 @@
 package com.example.sep490.factory;
 
-import com.example.sep490.entities.enums.PaymentType;
-import com.example.sep490.entities.enums.TransactionType;
-import com.example.sep490.services.payment.InvoicePaymentStrategy;
-import com.example.sep490.services.payment.OrderPaymentStrategy;
-import com.example.sep490.services.payment.PlatformFeePaymentStrategy;
+import com.example.sep490.entity.enums.PaymentType;
+
+import com.example.sep490.strategy.InvoicePaymentStrategy;
+import com.example.sep490.strategy.OrderPaymentStrategy;
 import com.example.sep490.strategy.PaymentStrategy;
-import lombok.RequiredArgsConstructor;
+import com.example.sep490.strategy.PlatformFeePaymentStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class PaymentStrategyFactory {
-    private final OrderPaymentStrategy orderPaymentStrategy;
-    private final PlatformFeePaymentStrategy platformFeePaymentStrategy;
-    private final InvoicePaymentStrategy invoicePaymentStrategy;
+    @Autowired
+    private OrderPaymentStrategy orderPaymentStrategy;
+    @Autowired
+    private PlatformFeePaymentStrategy platformFeePaymentStrategy;
+    @Autowired
+    private InvoicePaymentStrategy invoicePaymentStrategy;
 
     public PaymentStrategy getPaymentStrategy(PaymentType type) {
         switch (type) {

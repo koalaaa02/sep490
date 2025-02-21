@@ -3,10 +3,10 @@ package com.example.sep490.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Auditable;
-import com.example.sep490.entities.Invoice;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Invoice;
 
-import com.example.sep490.entities.Transaction;
+import com.example.sep490.entity.Transaction;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.DecimalMin;
