@@ -15,6 +15,12 @@ public class RabbitMQConfig {
 
     public static final String MESSAGE_QUEUE = "messageQueue";
     public static final String ORDER_QUEUE = "orderQueue";
+    public static final String MAIL_QUEUE = "mailQueue";
+
+    public static final String MESSAGE_ROUTING_KEY = "message.routing.key";
+    public static final String ORDER_ROUTING_KEY = "order.routing.key";
+    public static final String MAIL_ROUTING_KEY = "mail.routing.key";
+
     public static final String EXCHANGE = "notificationExchange";
 
     @Bean
@@ -28,20 +34,30 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue mailQueue() {return new Queue(MAIL_QUEUE, true);}
+
+    @Bean
     public TopicExchange exchange() {
         return new TopicExchange(EXCHANGE);
     }
 
     @Bean
     public Binding bindingMessageQueue(Queue messageQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(messageQueue).to(exchange).with("message.routing.key");
+        return BindingBuilder.bind(messageQueue).to(exchange).with(MESSAGE_ROUTING_KEY);
     }
 
     @Bean
     public Binding bindingOrderQueue(Queue orderQueue, TopicExchange exchange) {
-        return BindingBuilder.bind(orderQueue).to(exchange).with("order.routing.key");
+        return BindingBuilder.bind(orderQueue).to(exchange).with(ORDER_ROUTING_KEY);
     }
 
+    @Bean
+    public Binding bindingMailQueue(Queue mailQueue, TopicExchange exchange) {
+        return BindingBuilder.bind(mailQueue).to(exchange).with(MAIL_ROUTING_KEY);
+    }
+
+
+    //======== serialize khi truyền message ========
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();

@@ -61,6 +61,7 @@ public class UserService {
     private ShopRepository shopRepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Value("${spring.mail.username}")
     private String fromEmail;
 

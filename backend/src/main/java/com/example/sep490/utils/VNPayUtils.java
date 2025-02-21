@@ -1,12 +1,14 @@
 package com.example.sep490.utils;
 
 
+import com.example.sep490.entities.enums.PaymentType;
 import jakarta.servlet.http.HttpServletRequest;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -67,5 +69,12 @@ public class VNPayUtils {
                                 URLEncoder.encode(entry.getValue()
                                         , StandardCharsets.US_ASCII))
                 .collect(Collectors.joining("&"));
+    }
+
+
+    public static String generateOrderInfo(PaymentType type, Object... params) {
+        return type + "_" + Arrays.stream(params)
+                .map(Object::toString)
+                .collect(Collectors.joining("_"));
     }
 }
