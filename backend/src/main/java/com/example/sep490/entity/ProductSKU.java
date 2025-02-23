@@ -3,6 +3,7 @@ package com.example.sep490.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -10,14 +11,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -26,6 +19,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "tbl_productsku")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

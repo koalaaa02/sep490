@@ -13,6 +13,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "tbl_debt_payment")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

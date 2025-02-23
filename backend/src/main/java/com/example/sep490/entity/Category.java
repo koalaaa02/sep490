@@ -29,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
+@Table(name = "tbl_category")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

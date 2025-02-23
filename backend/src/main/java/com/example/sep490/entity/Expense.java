@@ -22,7 +22,7 @@ import com.example.sep490.entity.enums.ExpenseType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name = "expenses")
+@Table(name = "tbl_expense")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -17,9 +17,9 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findByDealerAndShop(@Param("buyerId") Long buyerId, @Param("shopId") Long shopId);
 
     @Query(value = """
-        SELECT cr.* FROM chat_rooms cr
+        SELECT cr.* FROM tbl_chat_room cr
         LEFT JOIN (SELECT chat_room_id, MAX(timestamp) AS last_msg_time
-              FROM chat_messages
+              FROM tbl_chat_message
               GROUP BY chat_room_id) cm
         ON cr.id = cm.chat_room_id
         WHERE cr.shop_id = :shopId
@@ -28,9 +28,9 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     List<ChatRoom> findAllByShopIdOrderByLastMessage(@Param("shopId") Long shopId);
 
     @Query(value = """
-        SELECT cr.* FROM chat_rooms cr
+        SELECT cr.* FROM tbl_chat_room cr
         LEFT JOIN (SELECT chat_room_id, MAX(timestamp) AS last_msg_time
-              FROM chat_messages
+              FROM tbl_chat_message
               GROUP BY chat_room_id) cm
         ON cr.id = cm.chat_room_id
         WHERE cr.dealer_id = :dealerId

@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "tbl_chat_message")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "chat_messages")
 public class ChatMessage extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

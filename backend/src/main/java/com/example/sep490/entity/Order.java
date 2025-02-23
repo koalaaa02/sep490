@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
-@Table(name = "`Order`")
+@Table(name = "tbl_order")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

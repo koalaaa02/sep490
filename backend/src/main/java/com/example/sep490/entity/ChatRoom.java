@@ -7,11 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "tbl_chat_room")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "chat_rooms")
 public class ChatRoom extends Auditable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

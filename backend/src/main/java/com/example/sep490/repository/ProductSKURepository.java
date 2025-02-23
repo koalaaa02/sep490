@@ -15,7 +15,7 @@ import org.springframework.data.repository.query.Param;
 public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>{
     Page<ProductSKU> findByIsDeleteFalse(Pageable pageable);
 	Optional<ProductSKU> findByIdAndIsDeleteFalse(Long id);
-    @Query(value = "SELECT stock FROM productsku WHERE id = :productSKUId", nativeQuery = true)
+    @Query(value = "SELECT stock FROM tbl_productsku WHERE id = :productSKUId", nativeQuery = true)
     Integer getAvailableQuantity(@Param("productSKUId") Long productSKUId);
 
     List<ProductSKU> findByUpdatedAtBefore(LocalDateTime thresholdDate);
@@ -25,12 +25,12 @@ public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>{
     List<ProductSKU> findByStock(int stock);
 
     @Query(value = "SELECT sku.skuCode, SUM(oi.quantity) as total_sold " +
-            "FROM orderdetail oi INNER JOIN productsku sku ON oi.sku_id = sku.id " +
+            "FROM tbl_order_detail oi INNER JOIN tbl_productsku sku ON oi.sku_id = sku.id " +
             "GROUP BY sku.skuCode ORDER BY total_sold DESC LIMIT :limit", nativeQuery = true)
     List<Object[]> findTopSellingProducts(@Param("limit") int limit);
 
     @Query(value = "SELECT sku.skuCode, SUM(oi.quantity) as total_sold " +
-            "FROM orderdetail oi INNER JOIN productsku sku ON oi.sku_id = sku.id " +
+            "FROM tbl_order_detail oi INNER JOIN tbl_productsku sku ON oi.sku_id = sku.id " +
             "GROUP BY sku.skuCode ORDER BY total_sold ASC LIMIT :limit", nativeQuery = true)
     List<Object[]> findLeastSellingProducts(@Param("limit") int limit);
 

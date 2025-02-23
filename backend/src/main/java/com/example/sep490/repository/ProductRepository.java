@@ -30,7 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
     Optional<Product> findByIdAndCreatedByAndIsDeleteFalse(Long id, Long createdBy);
 
     
-    @Query(value = "SELECT * FROM product WHERE name = :name", nativeQuery = true)
+    @Query(value = "SELECT * FROM tbl_product WHERE name = :name", nativeQuery = true)
     Optional<Product> findByNames(@Param("name") String name);
 
 
