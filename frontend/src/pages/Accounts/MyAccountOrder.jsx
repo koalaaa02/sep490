@@ -9,6 +9,7 @@ import tiles from "../../images/tiles.png";
 import wood from "../../images/wood.jpg";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 
 const MyAccountOrder = () => {
   // loading
@@ -19,75 +20,70 @@ const MyAccountOrder = () => {
     }, 1500);
   }, []);
 
-  const products = [
+  const [expandedRows, setExpandedRows] = useState({});
+
+  const toggleRow = (index) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
+
+  const orders = [
     {
       id: "1",
-      name: "Haldiram's Nagpur Aloo Bhujia",
-      weight: "400g",
-      img: cement,
+      name: "Xây nhà",
       date: "March 5, 2025",
-      quantity: 1,
       status: "Processing",
-      price: "$15.00",
       badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Xi măng",
+          quantity: 10,
+          price: 90000,
+          src: cement,
+          alt: "cement",
+        },
+        {
+          id: 2,
+          name: "Cát",
+          quantity: 10,
+          price: 15000,
+          src: sand,
+          alt: "sand",
+        },
+      ],
+      price: 10 * 90000 + 10 * 15000,
     },
     {
       id: "2",
-      name: "Nutri Choise Biscuit",
-      weight: "2 Pkt",
-      img: bricks,
-      date: "July 9, 2025",
-      quantity: 2,
-      status: "Completed",
-      price: "$45.00",
-      badgeClass: "bg-success",
-    },
-    {
-      id: "3",
-      name: "Cadbury Dairy Milk 5 Star Bites",
-      weight: "202 g",
-      img: sand,
-      date: "Oct 03, 2025",
-      quantity: 4,
-      status: "Completed",
-      price: "$99.00",
-      badgeClass: "bg-success",
-    },
-    {
-      id: "4",
-      name: "Onion Flavour Potato",
-      weight: "100 g",
-      img: steel,
+      name: "Làm sân",
       date: "March 5, 2025",
-      quantity: 1,
-      status: "Completed",
-      price: "$12.00",
-      badgeClass: "bg-success",
-    },
-    {
-      id: "5",
-      name: "Salted Instant Popcorn",
-      weight: "500 g",
-      img: tiles,
-      date: "July 9, 2025",
-      quantity: 2,
-      status: "Cancel",
-      price: "$6.00",
-      badgeClass: "bg-danger",
-    },
-    {
-      id: "6",
-      name: "Blueberry Greek Yogurt",
-      weight: "500 g",
-      img: wood,
-      date: "Oct 03, 2025",
-      quantity: 4,
-      status: "Completed",
-      price: "$18.00",
-      badgeClass: "bg-success",
+      status: "Processing",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Xi măng",
+          quantity: 10,
+          price: 90000,
+          src: cement,
+          alt: "cement",
+        },
+        {
+          id: 2,
+          name: "Cát",
+          quantity: 10,
+          price: 15000,
+          src: sand,
+          alt: "sand",
+        },
+      ],
+      price: 10 * 90000 + 10 * 15000,
     },
   ];
-  
+
   return (
     <div>
       <>
@@ -199,74 +195,116 @@ const MyAccountOrder = () => {
                       <div className="p-6 p-lg-10">
                         {/* heading */}
                         <h2 className="mb-6">Your Orders</h2>
-                        <div className="table-responsive border-0">
+                        <div className="table-responsive border">
                           {/* Table */}
                           <table className="table mb-0 text-nowrap">
-                            {/* Table Head */}
                             <thead className="table-light">
                               <tr>
-                                <th className="border-0">&nbsp;</th>
-                                <th className="border-0">Product</th>
-                                <th className="border-0">Order</th>
+                                <th className="border-0">#</th>
+                                <th className="border-0">Name</th>
                                 <th className="border-0">Date</th>
-                                <th className="border-0">Items</th>
                                 <th className="border-0">Status</th>
                                 <th className="border-0">Amount</th>
                                 <th className="border-0" />
                               </tr>
                             </thead>
                             <tbody>
-                              {products.map((product, index) => (
-                                <tr key={index}>
-                                  <td className="align-middle border-top-0 w-0">
-                                    <Link to="#">
-                                      <img
-                                        src={product.img}
-                                        alt="Ecommerce"
-                                        className="icon-shape icon-xl"
-                                      />
-                                    </Link>
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    <Link
-                                      to="#"
-                                      className="fw-semi-bold text-inherit"
-                                    >
-                                      <h6 className="mb-0">{product.name}</h6>
-                                    </Link>
-                                    <span>
-                                      <small className="text-muted">
-                                        {product.weight}
-                                      </small>
-                                    </span>
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    <Link to="#" className="text-inherit">
-                                      {product.id}
-                                    </Link>
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    {product.date}
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    {product.quantity}
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    <span
-                                      className={`badge ${product.badgeClass}`}
-                                    >
-                                      {product.status}
-                                    </span>
-                                  </td>
-                                  <td className="align-middle border-top-0">
-                                    {product.price}
-                                  </td>
-                                  <td className="text-muted align-middle border-top-0">
-                                    <Link to="#" className="text-inherit">
-                                      <i className="feather-icon icon-eye" />
-                                    </Link>
-                                  </td>
-                                </tr>
+                              {orders.map((order, index) => (
+                                <>
+                                  <tr key={index}>
+                                    <td className="align-middle border-top-0">
+                                      <button
+                                        className="btn btn-link p-0"
+                                        onClick={() => toggleRow(index)}
+                                      >
+                                        {expandedRows[index] ? (
+                                          <FiChevronUp size="16" />
+                                        ) : (
+                                          <FiChevronDown size="16" />
+                                        )}
+                                      </button>
+                                    </td>
+                                    <td className="align-middle border-top-0">
+                                      <Link
+                                        to="#"
+                                        className="fw-semi-bold text-inherit"
+                                      >
+                                        <h6 className="mb-0">{order.name}</h6>
+                                      </Link>
+                                    </td>
+                                    <td className="align-middle border-top-0">
+                                      {order.date}
+                                    </td>
+                                    <td className="align-middle border-top-0">
+                                      <span
+                                        className={`badge ${order.badgeClass}`}
+                                      >
+                                        {order.status}
+                                      </span>
+                                    </td>
+                                    <td className="align-middle border-top-0">
+                                      {order.price.toLocaleString()} VNĐ
+                                    </td>
+                                    <td className="text-muted align-middle border-top-0">
+                                      <Link to="#" className="text-inherit">
+                                        <i className="feather-icon icon-eye" />
+                                      </Link>
+                                    </td>
+                                  </tr>
+                                  {expandedRows[index] && (
+                                    <tr>
+                                      <td colSpan="6" className="border-top-0">
+                                        <div className="p-1">
+                                          <strong>Orders:</strong>
+                                          <table className="table table-bordered mt-2">
+                                            <thead className="table-light">
+                                              <tr>
+                                                <th>#</th>
+                                                <th>Product Name</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Total</th>
+                                              </tr>
+                                            </thead>
+                                            <tbody>
+                                              {order.products.map((product) => (
+                                                <tr key={product.id}>
+                                                  <td>
+                                                    {" "}
+                                                    <Link to="#!">
+                                                      <img
+                                                        src={product.src}
+                                                        alt={product.alt}
+                                                        className="mb-3 img-fluid"
+                                                        style={{
+                                                          width: "50px",
+                                                          height: "50px",
+                                                        }}
+                                                      />
+                                                    </Link>
+                                                  </td>
+                                                  <td>{product.name}</td>
+                                                  <td>{product.quantity}</td>
+                                                  <td>
+                                                    {product.price.toLocaleString()}{" "}
+                                                    VNĐ
+                                                  </td>
+                                                  <td>
+                                                    {(
+                                                      product.quantity *
+                                                      product.price
+                                                    ).toLocaleString()}{" "}
+                                                    VNĐ
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  )}
+                                </>
                               ))}
                             </tbody>
                           </table>
