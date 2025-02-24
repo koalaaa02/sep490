@@ -14,7 +14,7 @@ public class FinancialReportController {
     private FinancialReportService financialReportService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getFinancialReport(@RequestParam("month") int month, @RequestParam("year") int year) {
         FinancialReportResponse report = financialReportService.generateReport(month, year);
         return ResponseEntity.ok().body(report);

@@ -1,15 +1,14 @@
 package com.example.sep490.controller;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
+import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.mapper.UserMapper;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
-import com.example.sep490.service.InvoiceService;
-import com.example.sep490.service.OrderDetailService;
-import com.example.sep490.service.OrderService;
-import com.example.sep490.service.UserService;
+import com.example.sep490.service.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/myprofile")
@@ -31,9 +31,11 @@ public class MyProfileController {
     private UserMapper userMapper;
     @Autowired
     private OrderDetailService orderDetailService;
+    @Autowired
+    private ShopService shopService;
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -44,7 +46,7 @@ public class MyProfileController {
     }
 
     @GetMapping("/orders")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyOrders(OrderFilterDTO filter) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -55,7 +57,7 @@ public class MyProfileController {
     }
 
     @GetMapping("/orders/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getOrderByIdCustomer(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -66,7 +68,7 @@ public class MyProfileController {
     }
 
     @GetMapping("/invoices")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyInvoices(InvoiceFilterDTO filter) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -77,7 +79,7 @@ public class MyProfileController {
     }
 
     @GetMapping("/invoices/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -87,7 +89,7 @@ public class MyProfileController {
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 //    @PutMapping("/orders/{id}")
-//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
 //    public ResponseEntity<?> setStatusOrder(@PathVariable Long id, OrderRequest orderRequest) {
 //        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 //        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -98,7 +100,7 @@ public class MyProfileController {
 //    }
 
     @GetMapping("/orderdetails/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyOrderDetailsByOrderId(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -116,7 +118,7 @@ public class MyProfileController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam OrderStatus status) {
@@ -125,7 +127,7 @@ public class MyProfileController {
     }
 
     @PostMapping("/change-password")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public String changePassword(@RequestBody ChangePasswordRequest request) {
         // Lấy email người dùng từ authentication context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -134,5 +136,11 @@ public class MyProfileController {
             return userService.changePassword(user.getUsername(), request.getOldPassword(), request.getNewPassword(), request.getConfirmNewPassword());
         }
         throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
+    }
+
+    @PostMapping(value = "/shop/create")
+    @PreAuthorize("hasAnyAuthority('ROLE_DEALER')")
+    public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
+        return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }
 }

@@ -24,7 +24,6 @@ public class OrderSpecification {
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy()));
             }
-
             if (filter.getDeliveryMethod() != null) {
                 predicates.add(cb.equal(root.get("deliveryMethod"), filter.getDeliveryMethod()));
             }
@@ -34,6 +33,7 @@ public class OrderSpecification {
             if (filter.getStatus() != null) {
                 predicates.add(cb.equal(root.get("status"), filter.getStatus()));
             }
+            predicates.add(cb.equal(root.get("paid"),filter.isPaid()));
 
             predicates.add(cb.equal(root.get("isDelete"),false));
             return cb.and(predicates.toArray(new Predicate[0]));

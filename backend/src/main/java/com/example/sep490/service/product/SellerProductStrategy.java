@@ -40,7 +40,7 @@ public class SellerProductStrategy implements ProductStrategy {
 
     @Override
     public boolean supports(String role) {
-        return role.contains("ROLE_SELLER");
+        return role.contains("ROLE_PROVIDER");
     }
 
     @Override

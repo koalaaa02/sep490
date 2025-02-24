@@ -6,6 +6,7 @@ import com.example.sep490.dto.cart.ItemCart;
 import com.example.sep490.dto.cart.ShopCart;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.compositeKeys.OrderDetailId;
+import com.example.sep490.entity.enums.DeliveryMethod;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.repository.AddressRepository;
 import com.example.sep490.repository.ProductRepository;
@@ -93,9 +94,15 @@ public class CheckoutService {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Phân loại "+ proSKU.getSkuCode() +" chỉ còn "+proSKU.getStock()+" sản phẩm.");
                 }
                 //Check isBulky
-                if(proSKU.isBulky() && !shop.getAddress().getProvince().equals(address.getProvince())) {
-                    throw new RuntimeException("Rất tiếc, hiện tại chúng tôi chưa thể vận chuyển ngoài tỉnh.");
-                }else if(proSKU.isBulky() && shop.getAddress().getProvince().equals(address.getProvince())){
+//                if(proSKU.isBulky() && !shop.getAddress().getProvinceId().equals(address.getProvinceId())) {
+//                    throw new RuntimeException("Rất tiếc, hiện tại chúng tôi chưa thể vận chuyển ngoài tỉnh.");
+//                }else if(proSKU.isBulky() && shop.getAddress().getProvinceId().equals(address.getProvinceId())){
+//                    orderRequest.setStatus(OrderStatus.FINDINGTRUCK);
+//                };
+
+                if(proSKU.isBulky() && orderRequest.getDeliveryMethod().equals(DeliveryMethod.GHN)) {
+                    throw new RuntimeException("Rất tiếc, giỏ hàng chứa mặt hàng cồng kềnh, vui lòng chọn phương thức vận chuyển SELF DELIVERY.");
+                }else{
                     orderRequest.setStatus(OrderStatus.FINDINGTRUCK);
                 };
 
@@ -151,6 +158,15 @@ public class CheckoutService {
         // 6. Cập nhật giỏ hàng (xóa các sản phẩm đã đặt hàng)
         productIds.forEach(productId -> cartService.removeFromCart(shopId, productId, request, response));
     }
+
+
+    private void updateCart(List<Long> productIds){
+
+    }
+    private void updateQuantity(){
+
+    }
+
     private Shop getShop(Long id) {
         return id == null ? null
                 : shopRepo.findByIdAndIsDeleteFalse(id).orElse(null);

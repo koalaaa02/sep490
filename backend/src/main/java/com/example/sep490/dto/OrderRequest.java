@@ -38,7 +38,7 @@ public class OrderRequest {
     private PaymentMethod paymentMethod; // CARD, COD
 
     private DeliveryMethod deliveryMethod = DeliveryMethod.GHN;
-    private boolean isPaid = false;
+    private boolean paid = false;
 
 
     // Relationship

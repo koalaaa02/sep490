@@ -27,11 +27,11 @@ public class UserRequest {
     
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean isActive = true;
+    private boolean active = true;
     
-    private String roles = "ROLE_CUSTOMER";
+    private String roles = "ROLE_DEALER";
 
-    private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
+    private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 
 
     // Relationship

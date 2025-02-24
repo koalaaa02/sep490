@@ -44,7 +44,7 @@ public class Category extends Auditable{//danh mục sản phẩm
 
     @Column(nullable = false)
     @ColumnDefault("false")
-    private boolean isParent = false;
+    private boolean parent = false;
 
     // Relationship
     @ManyToOne

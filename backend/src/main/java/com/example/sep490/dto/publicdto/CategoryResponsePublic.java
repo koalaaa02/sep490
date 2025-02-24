@@ -14,7 +14,7 @@ import java.util.List;
 public class CategoryResponsePublic {
 	private Long id;
     private String name;
-    private boolean isParent;
+    private boolean parent;
     
     @JsonIgnoreProperties({"subCategories", "products"})
     private Category parentCategory; 

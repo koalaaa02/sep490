@@ -29,7 +29,7 @@ public class ProductController {
     private ProductRepository productRepository;
 
 //    @GetMapping({"/admin/","/seller/"})
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
 //    public ResponseEntity<?> getProductsSeller(Authentication authentication) {
 //    	String role = authentication.getAuthorities().toString();
 //        for (ProductStrategy strategy : strategies) {
@@ -41,13 +41,13 @@ public class ProductController {
 //    }
 
     @GetMapping({"/"})
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getProductsFilter(@Valid ProductFilterDTO filter) {
         return ResponseEntity.ok().body(productService.getProductsByFilter(filter));
     }
     
 //    @GetMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
 //    public ResponseEntity<?> getProductsSellerById(@PathVariable Long id, Authentication authentication) {
 //    	String role = authentication.getAuthorities().toString();
 //        for (ProductStrategy strategy : strategies) {
@@ -59,7 +59,7 @@ public class ProductController {
 //    }
 //    
 //    @PostMapping
-//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
 //    public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
 //    	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
 //        for (ProductStrategy strategy : strategies) {
@@ -71,7 +71,7 @@ public class ProductController {
 //    }
     
 //    @PutMapping("/{id}")
-//    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+//    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
 //    public ResponseEntity<?> updateProduct(@PathVariable Long id, ProductRequest productDetails) {
 //    	try {
 //    		String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
@@ -87,19 +87,19 @@ public class ProductController {
 //    }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getProductsById(@PathVariable Long id) {
         return ResponseEntity.ok().body(productService.getProductById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> createProduct(@Valid @RequestBody ProductRequest product) {
         return ResponseEntity.ok().body(productService.createProduct(product));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest product) {
         if (!id.equals(product.getId())) {
             return ResponseEntity.badRequest().body("id và id của sản phẩm không trùng khớp.");
@@ -108,13 +108,13 @@ public class ProductController {
     }
 
     @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(productService.uploadImage(id, file)) ;
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
     	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
         for (ProductStrategy strategy : strategies) {

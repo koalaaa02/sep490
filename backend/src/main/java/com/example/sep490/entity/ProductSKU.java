@@ -56,7 +56,7 @@ public class ProductSKU  extends Auditable{//SKU (Stock Keeping Unit) or phân l
     
     @Column(nullable = false)
     @ColumnDefault("false")
-    private boolean isBulky = false;  //đánh dấu hàng cồng kềnh
+    private boolean bulky = false;  //đánh dấu hàng cồng kềnh
 
     // Relationship
     @ManyToOne

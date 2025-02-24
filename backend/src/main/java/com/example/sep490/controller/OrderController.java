@@ -32,25 +32,25 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getOrders(@Valid OrderFilterDTO filter) {
         return ResponseEntity.ok(orderService.getOrdersFilter(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         return ResponseEntity.ok().body(orderService.getOrderById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> createOrder(@Valid @RequestBody OrderRequest order) {
         return ResponseEntity.ok().body(orderService.createOrder(order));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> updateOrder(@PathVariable Long id,@Valid @RequestBody OrderRequest order) {
         if (!id.equals(order.getId())) {
             return ResponseEntity.badRequest().body("id và id trong đơn hàng không trùng khớp.");
@@ -59,7 +59,7 @@ public class OrderController {
     }
 
     @PutMapping("/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER')")
     public ResponseEntity<String> updateOrderStatus(
             @RequestBody List<Long> ids,
             @RequestBody OrderStatus status) {
@@ -69,7 +69,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
         try {
             orderService.deleteOrder(id);

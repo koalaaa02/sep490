@@ -62,9 +62,9 @@ public class UserService {
 		        .name(userInfo.getName())
                 .email(userInfo.getEmail())
 		        .password(userInfo.getPassword())
-                .roles("ROLE_CUSTOMER")
-                .isActive(true)
-                .userType(UserType.ROLE_CUSTOMER)
+                .roles("ROLE_DEALER")
+                .active(true)
+                .userType(UserType.ROLE_DEALER)
 		        .build();
         userRepo.save(newUser);
         return "user added to system ";

@@ -3,9 +3,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -35,9 +33,6 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod method; // VNPAY
     private String bankCode;
     private String content; //nội dung chuyển khoản
     private String transactionId; // Mã giao dịch từ VNPAY/...
@@ -48,7 +43,11 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TransactionType transactionType;
+    private PaymentProvider paymentProvider;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentType paymentType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

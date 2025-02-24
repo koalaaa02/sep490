@@ -5,10 +5,7 @@ import com.example.sep490.dto.TransactionRequest;
 import com.example.sep490.dto.publicdto.PaymentResponse;
 import com.example.sep490.dto.publicdto.PaymentResultResponse;
 import com.example.sep490.entity.Order;
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.PaymentType;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 import com.example.sep490.repository.OrderRepository;
 import com.example.sep490.service.TransactionService;
 import com.example.sep490.utils.VNPayUtils;
@@ -62,11 +59,12 @@ public class OrderPaymentStrategy implements PaymentStrategy {
 
         TransactionRequest newTransaction = TransactionRequest.builder()
                 .amount(BigDecimal.ONE)
-                .method(PaymentMethod.VNPAY)
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)
                 .paymentDate(LocalDateTime.now())
+                .paymentProvider(PaymentProvider.VNPAY)
+                .paymentType(PaymentType.ORDER)
                 .status(TransactionStatus.SUCCESS)
                 .build();
 
@@ -85,7 +83,6 @@ public class OrderPaymentStrategy implements PaymentStrategy {
         orderRepo.save(order);
 
         newTransaction.setOrderId(orderId);
-        newTransaction.setTransactionType(TransactionType.ORDERPAYMENT);
 
         //Lưu transaction
         transactionService.createTransaction(newTransaction);

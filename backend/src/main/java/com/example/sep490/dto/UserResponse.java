@@ -25,9 +25,9 @@ public class UserResponse {
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;
-    private boolean isActive = true;
-    private String roles = "ROLE_CUSTOMER";
-    private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
+    private boolean active = true;
+    private String roles = "ROLE_DEALER";
+    private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 
 //    private List<Order> orders;
     @JsonIgnoreProperties({"debtPayments","agent"})

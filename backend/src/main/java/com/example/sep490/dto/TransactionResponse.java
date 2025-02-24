@@ -6,10 +6,9 @@ import java.time.LocalDateTime;
 import com.example.sep490.entity.Auditable;
 import com.example.sep490.entity.DebtPayment;
 import com.example.sep490.entity.Order;
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,13 +25,13 @@ public class TransactionResponse{
     private Order order;
     @JsonIgnoreProperties({ "transaction","invoice"})
     private DebtPayment debtPayment;
-    private PaymentMethod method; // CARD, COD
     private String transactionId; // Mã giao dịch từ VNPAY/...
     private BigDecimal amount;  // số tiền
     private String bankCode;
     private String content; //nội dung chuyển khoản
     private LocalDateTime paymentDate = LocalDateTime.now();
-    private TransactionType transactionType;
+    private PaymentProvider paymentProvider;
+    private PaymentType paymentType;
     private TransactionStatus status;
 
 

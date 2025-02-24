@@ -60,8 +60,8 @@ public class CategoryService {
 
 	public List<CategoryResponse> getParentCategories(String nameFilter) {
 		List<Category> categories = (nameFilter == null || nameFilter.isBlank())
-				? categoryRepo.findByIsDeleteFalseAndIsParentTrue()
-				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalseAndIsParentTrue(nameFilter);
+				? categoryRepo.findByIsDeleteFalseAndParentTrue()
+				: categoryRepo.findByNameContainingIgnoreCaseAndIsDeleteFalseAndParentTrue(nameFilter);
 		List<CategoryResponse> categoryResponse = categoryMapper.entityToResponses(categories);
 		return categoryResponse;
 	}

@@ -15,7 +15,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSp
     List<Category> findByNameContainingIgnoreCaseAndIsDeleteFalse(String name);
     Page<Category> findByIsDeleteFalse(Pageable pageable);
     List<Category> findByIsDeleteFalse();
-    List<Category> findByIsDeleteFalseAndIsParentTrue();
-    List<Category> findByNameContainingIgnoreCaseAndIsDeleteFalseAndIsParentTrue(String name);
+    List<Category> findByIsDeleteFalseAndParentTrue();
+    List<Category> findByNameContainingIgnoreCaseAndIsDeleteFalseAndParentTrue(String name);
     Optional<Category> findByIdAndIsDeleteFalse(Long id);
 }

@@ -7,10 +7,7 @@ import com.example.sep490.dto.TransactionRequest;
 import com.example.sep490.dto.publicdto.PaymentResponse;
 import com.example.sep490.dto.publicdto.PaymentResultResponse;
 import com.example.sep490.entity.Invoice;
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.PaymentType;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 import com.example.sep490.repository.InvoiceRepository;
 import com.example.sep490.service.DebtPaymentService;
 import com.example.sep490.service.TransactionService;
@@ -67,11 +64,12 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
 
         TransactionRequest newTransaction = TransactionRequest.builder()
                 .amount(BigDecimal.ONE)
-                .method(PaymentMethod.VNPAY)
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)
                 .paymentDate(LocalDateTime.now())
+                .paymentProvider(PaymentProvider.VNPAY)
+                .paymentType(PaymentType.INVOICE)
                 .status(TransactionStatus.SUCCESS)
                 .build();
 
@@ -93,7 +91,6 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
                 .build();
         DebtPaymentResponse debtPayment = debtPaymentService.createDebtPayment(newDebtPaymentRequest);
         newTransaction.setDebtPaymentId(debtPayment.getId());
-        newTransaction.setTransactionType(TransactionType.DEBTPAYMENT);
 
         //Lưu transaction
         transactionService.createTransaction(newTransaction);

@@ -42,7 +42,7 @@ public class AddressResponse{
 
     private String postalCode;
 
-    private boolean isDefault;
+    private boolean defaultAddress;
 
     private boolean isDelete;
     private Long createdBy;

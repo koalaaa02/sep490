@@ -37,8 +37,8 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     @Column(nullable = false)
     private ShopType shopType;// doanh nghiệp, cá nhân
 
-    private boolean isActive = true; // shop đang active hay không
-    private boolean isClose = false; // shop đang mở bán hay không
+    private boolean active = true; // shop đang active hay không
+    private boolean close = false; // shop đang mở bán hay không
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO; // Tổng tiền còn nợ
     private LocalDateTime lastPaymentDate; // Ngày thanh toán phí gần nhất

@@ -3,6 +3,7 @@ package com.example.sep490.repository.specifications;
 import com.example.sep490.entity.enums.DeliveryMethod;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.entity.enums.PaymentMethod;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,11 +23,15 @@ public class OrderFilterDTO {
     private Long Id;
     private String deliveryCode;
     private Long shopId;
-    private Long createdBy;
 
     private DeliveryMethod deliveryMethod;
     private PaymentMethod paymentMethod;
     @Schema(defaultValue = "PENDING")
     private OrderStatus status;
+    @Schema(defaultValue = "false")
+    private boolean paid;
+
+    @JsonIgnore
+    private Long createdBy;
 }
 

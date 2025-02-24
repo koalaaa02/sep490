@@ -18,7 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER','ROLE_CUSTOMER')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER','ROLE_DEALER')")
 public class ChatMessageController {
 
     @Autowired

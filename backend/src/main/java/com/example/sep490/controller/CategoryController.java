@@ -50,6 +50,7 @@ public class CategoryController {
     }
 
     @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(categoryService.uploadImage(id, file)) ;
     }
@@ -69,7 +70,7 @@ public class CategoryController {
 
 
 //@PutMapping("/{id}")
-//@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_SELLER')")
+//@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_PROVIDER')")
 //public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest category) {
 //    try {
 //        if (!id.equals(category.getId())) {

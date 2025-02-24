@@ -4,10 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.example.sep490.entity.DebtPayment;
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -25,9 +26,6 @@ public class TransactionRequest {
     private Long orderId;
     private Long debtPaymentId;
 
-	@NotNull(message = "Phương thức thanh toán không được để trống.")
-    private PaymentMethod method; // CARD, COD
-    
     private String transactionId; // Mã giao dịch từ VNPAY/...
 
     @NotNull(message = "Số tiền không được để trống.")
@@ -40,8 +38,11 @@ public class TransactionRequest {
 
     private LocalDateTime paymentDate = LocalDateTime.now();
 
-	@NotNull(message = "Loại thanh toán không được để trống.")
-    private TransactionType transactionType;
+    @NotNull(message = "Đơn vị thanh toán không được để trống.")
+    private PaymentProvider paymentProvider;
+
+    @NotNull(message = "Loại thanh toán không được để trống.")
+    private PaymentType paymentType;
 
 	@NotNull(message = "Status được để trống.")
     private TransactionStatus status;

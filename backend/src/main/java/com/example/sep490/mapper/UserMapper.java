@@ -18,7 +18,6 @@ public interface UserMapper {
     List<UserResponse> entityToResponses(List<User> user);
     
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "active", target = "isActive")
     User RequestToEntity(UserRequest userRequest);
     
     @Mapping(source = "id", target = "id")

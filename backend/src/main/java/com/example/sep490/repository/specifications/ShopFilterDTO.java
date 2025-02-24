@@ -18,7 +18,7 @@ public class ShopFilterDTO {
     private String direction = "ASC";
 
     @Schema(defaultValue = "true")
-    private boolean isActive;
+    private boolean active;
     @JsonIgnore
     private Long createdBy;
 }

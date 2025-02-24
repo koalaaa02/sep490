@@ -22,7 +22,6 @@ public interface CategoryMapper {
     List<CategoryResponse> entityToResponses(List<Category> category);
     
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "parent", target = "isParent")
     Category RequestToEntity(CategoryRequest categoryRequest);
     
     @Mapping(source = "id", target = "id")

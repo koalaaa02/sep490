@@ -31,14 +31,14 @@ public class OrderResponse {
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
     private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
-    private boolean isPaid;
+    private boolean paid;
 
     private BigDecimal commissionFee;  // Phí hoa hồng sàn
     private BigDecimal paymentFee;     // Phí thanh toán
     private BigDecimal totalPlatformFee; // Tổng phí sàn cho đơn hàng
 
-    @JsonIgnoreProperties( { "order", "productSku" })
-    private List<OrderDetail> orderDetails;
+    @JsonIgnoreProperties( { "order" })
+    private List<OrderDetailResponse> orderDetails;
     @JsonIgnoreProperties( { "order" })
     private Transaction transaction;
     @JsonIgnoreProperties( { "user","shop" })

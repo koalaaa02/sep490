@@ -24,7 +24,7 @@ public class ShopResponsePublic{
     private String TIN;
     private String citizenIdentificationCard;
     private ShopType shopType;
-    private boolean isActive = true;
+    private boolean active = true;
 
     @JsonIgnoreProperties({"shop", "user"})
     private Address address;

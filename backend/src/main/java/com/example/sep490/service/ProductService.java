@@ -36,7 +36,6 @@ public class ProductService {
 	private ProductMapper productMapper;
 	@Autowired
 	private BasePagination pagination;
-
 	@Autowired
 	private CategoryRepository categoryRepo;
 	@Autowired
@@ -47,6 +46,7 @@ public class ProductService {
     private ProductRepository productRepository;
 	@Value("${env.backendBaseURL}")
 	private String baseURL;
+
 	//	public PageResponse<Product> getProducts(int page, int size, String sortBy, String direction) {
 //		Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
 //		Page<Product> productPage = productRepo.findByIsDeleteFalse(pageable);
@@ -86,10 +86,14 @@ public class ProductService {
 	}
 
 	public ProductResponse createProduct(ProductRequest productRequest) {
+		Shop shop = userService.getShopByContextUser();
 		Category category = getCategory(productRequest.getCategoryId());
 		Supplier supplier = getSupplier(productRequest.getSupplierId());
+		if(category == null) throw new RuntimeException("Bạn chưa chọn danh mục.");
+		if(supplier == null) throw new RuntimeException("Bạn chưa chọn nhà cung cấp.");
 
 		Product entity = productMapper.RequestToEntity(productRequest);
+		entity.setShop(shop);
 		entity.setCategory(category);
 		entity.setSupplier(supplier);
 		return productMapper.EntityToResponse(productRepo.save(entity));
@@ -99,14 +103,18 @@ public class ProductService {
 		Product product = productRepo.findByIdAndIsDeleteFalse(id)
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 
+		Shop shop = userService.getShopByContextUser();
 		Category category = getCategory(productRequest.getCategoryId());
 		Supplier supplier = getSupplier(productRequest.getSupplierId());
+		if(category == null) throw new RuntimeException("Bạn chưa chọn danh mục.");
+		if(supplier == null) throw new RuntimeException("Bạn chưa chọn nhà cung cấp.");
 
 		try {
 			objectMapper.updateValue(product, productRequest);
 		} catch (JsonMappingException e) {
 			throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
 		}
+		product.setShop(shop);
 		product.setCategory(category);
 		product.setSupplier(supplier);
 		return productMapper.EntityToResponse(productRepo.save(product));

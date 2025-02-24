@@ -18,7 +18,6 @@ public interface OrderMapper {
     List<OrderResponse> entityToResponses(List<Order> order);
     
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "paid", target = "isPaid")
     Order RequestToEntity(OrderRequest orderRequest);
     
     @Mapping(source = "id", target = "id")

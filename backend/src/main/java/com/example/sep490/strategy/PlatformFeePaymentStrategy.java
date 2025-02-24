@@ -5,10 +5,7 @@ import com.example.sep490.dto.TransactionRequest;
 import com.example.sep490.dto.publicdto.PaymentResponse;
 import com.example.sep490.dto.publicdto.PaymentResultResponse;
 import com.example.sep490.entity.Shop;
-import com.example.sep490.entity.enums.PaymentMethod;
-import com.example.sep490.entity.enums.PaymentType;
-import com.example.sep490.entity.enums.TransactionStatus;
-import com.example.sep490.entity.enums.TransactionType;
+import com.example.sep490.entity.enums.*;
 import com.example.sep490.repository.ShopRepository;
 import com.example.sep490.service.TransactionService;
 import com.example.sep490.utils.VNPayUtils;
@@ -57,11 +54,12 @@ public class PlatformFeePaymentStrategy implements PaymentStrategy {
 
         TransactionRequest newTransaction = TransactionRequest.builder()
                 .amount(BigDecimal.ONE)
-                .method(PaymentMethod.VNPAY)
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)
                 .paymentDate(LocalDateTime.now())
+                .paymentProvider(PaymentProvider.VNPAY)
+                .paymentType(PaymentType.PLATFORM_FEE)
                 .status(TransactionStatus.SUCCESS)
                 .build();
 
@@ -75,7 +73,6 @@ public class PlatformFeePaymentStrategy implements PaymentStrategy {
         }
         Long shopId = Long.parseLong(parts[1]);
         Shop shop = shopRepo.findByIdAndIsDeleteFalse(shopId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy shop."));
-        newTransaction.setTransactionType(TransactionType.PLATFORMFEE);
 
         //Lưu transaction
         transactionService.createTransaction(newTransaction);

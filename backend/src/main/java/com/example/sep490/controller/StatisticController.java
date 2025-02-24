@@ -20,26 +20,26 @@ public class StatisticController {
     private StatisticsService statisticsService;
 
     @GetMapping("/order")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public Map<String, Object> getOrderStatistics(@RequestParam Long sellerId) {
         return statisticsService.getOrderStatistics(sellerId);
     }
 
     @GetMapping("/order/period")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<Map<String, Integer>> getOrderStatisticsPeriod(@RequestParam Long sellerId, @RequestParam(value = "month",required = false, defaultValue = "0") int month,@RequestParam(value = "year",required = false) int year ) {
         return ResponseEntity.ok().body(statisticsService.getOrderStatisticsByPeriod(sellerId,month, year));
     }
 
 
     @GetMapping("/product/inventory")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<Map<String, Integer>> getInventoryStatistics() {
         return ResponseEntity.ok(statisticsService.getProductInventoryStatistics());
     }
 
     @GetMapping("/product/sales")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<Map<String, Integer>> getSalesStatistics(
             @RequestParam String from,
             @RequestParam String to) {
@@ -52,14 +52,14 @@ public class StatisticController {
     }
 
     @GetMapping("/product/long-term")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<List<ProductSKUResponse>> getLongTermInventoryProducts(
             @RequestParam int daysThreshold) {
         return ResponseEntity.ok(statisticsService.getLongTermInventoryProducts(daysThreshold));
     }
 
     @GetMapping("/product/top-selling")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<Map<String, Integer>> getTopSellingProducts(
             @RequestParam int limit,
             @RequestParam(defaultValue = "true") boolean isMostSold) {
@@ -67,13 +67,13 @@ public class StatisticController {
     }
 
     @GetMapping("/product/NearlyOutOfStock")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getNearlyOutOfStockInventoryProducts(@RequestParam int limit) {
         return ResponseEntity.ok(statisticsService.getNearlyOutOfStockInventoryProducts(limit));
     }
 
     @GetMapping("/product/OutOfStock")
-    @PreAuthorize( "hasAuthority('ROLE_SELLER')")
+    @PreAuthorize( "hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getOutOfStockInventoryProducts() {
         return ResponseEntity.ok(statisticsService.getOutOfStockInventoryProducts());
     }

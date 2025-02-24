@@ -40,14 +40,14 @@ public class User extends Auditable{ //thông tin tài khoản
     
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean isActive = true;
+    private boolean active = true;
     
-    @ColumnDefault("'ROLE_CUSTOMER'")
+    @ColumnDefault("'ROLE_DEALER'")
     private String roles;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'ROLE_CUSTOMER'")
-    private UserType userType; // CUSTOMER, SELLER, AGENT
+    @ColumnDefault("'ROLE_DEALER'")
+    private UserType userType; // DEALER, PROVIDER, AGENT
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Order> orders; // order customer mua

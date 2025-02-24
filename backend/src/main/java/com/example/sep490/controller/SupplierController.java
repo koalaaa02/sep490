@@ -30,28 +30,28 @@ public class SupplierController {
     private SupplierService supplierService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getSuppliers(@Valid SupplierFilterDTO filter) {
         logger.info("Fetching suppliers with filters");
         return ResponseEntity.ok(supplierService.getSuppliers(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> getSupplierById(@PathVariable Long id) {
         logger.info("Fetching supplier with id: {}", id);
         return ResponseEntity.ok().body(supplierService.getSupplierById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> createSupplier(@Valid @RequestBody SupplierRequest supplier) {
         logger.info("Creating new supplier: {}", supplier);
         return ResponseEntity.ok().body(supplierService.createSupplier(supplier));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> updateSupplier(@PathVariable Long id,@Valid @RequestBody SupplierRequest supplier) {
         logger.info("Updating supplier with id: {}", id);
         if (!id.equals(supplier.getId())) {
@@ -61,7 +61,7 @@ public class SupplierController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_SELLER')")
+    @PreAuthorize("hasAuthority('ROLE_PROVIDER')")
     public ResponseEntity<?> deleteSupplier(@PathVariable Long id) {
         logger.info("Deleting supplier with id: {}", id);
         try {

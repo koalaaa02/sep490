@@ -1,6 +1,7 @@
 package com.example.sep490.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,10 +17,9 @@ public class CategoryRequest {
     private String name;
     private String images;
 
-    @JsonProperty("isParent")
-    private boolean isParent;
+    private boolean parent;
 
     // Relationship
-    private Long parentCategoryId; 
+    private Long parentCategoryId;
 }
 

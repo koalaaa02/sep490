@@ -28,8 +28,8 @@ public class ShopRequest {
     private String citizenIdentificationCard;
     @NotNull(message = "Status được để trống.")
     private ShopType shopType;
-    private boolean isActive = true;
-    private boolean isClose = false;
+    private boolean active = true;
+    private boolean close = false;
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO;
     private LocalDateTime lastPaymentDate;

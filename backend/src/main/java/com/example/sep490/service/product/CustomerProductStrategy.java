@@ -10,7 +10,7 @@ import com.example.sep490.strategy.ProductStrategy;
 public class CustomerProductStrategy implements ProductStrategy {
     @Override
     public boolean supports(String role) {
-        return role.contains("CUSTOMER");
+        return role.contains("DEALER");
     }
     @Override
     public String processOrder(Long id) {

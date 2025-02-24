@@ -21,28 +21,28 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getAddresses(@Valid AddressFilterDTO filter) {
         logger.info("Fetching addresses with pagination, sort, and filter options.");
         return ResponseEntity.ok(addressService.getAddresses(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getAddressById(@PathVariable Long id) {
         logger.info("Fetching address with id: {}", id);
         return ResponseEntity.ok().body(addressService.getAddressById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> createAddress(@Valid @RequestBody AddressRequest address) {
         logger.info("Creating new address.");
         return ResponseEntity.ok().body(addressService.createAddress(address));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> updateAddress(@PathVariable Long id,@Valid @RequestBody AddressRequest address) {
         logger.info("Updating address with id: {}", id);
         if (!id.equals(address.getId())) {
@@ -52,7 +52,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER', 'ROLE_CUSTOMER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> deleteAddress(@PathVariable Long id) {
         logger.info("Deleting address with id: {}", id);
         try {

@@ -24,7 +24,8 @@ public class OrderDetailResponse {
     private Order order;
 
     @NotNull
-    private ProductSKUResponse productSku;
+    @JsonIgnoreProperties({ "product"})
+    private ProductSKU productSku;
     private int quantity;
     private BigDecimal price;
 

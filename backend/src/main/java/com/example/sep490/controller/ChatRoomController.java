@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/chat/rooms")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER','ROLE_CUSTOMER')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER','ROLE_DEALER')")
 public class ChatRoomController {
     @Autowired
     private ChatRoomService chatRoomService;

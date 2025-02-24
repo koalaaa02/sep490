@@ -35,7 +35,7 @@ public class Address  extends Auditable{//một user có nhiều địa chỉ gi
     private String district;
     private String ward;
     private String postalCode;
-    private boolean isDefault; // Đánh dấu địa chỉ mặc định
+    private boolean defaultAddress; // Đánh dấu địa chỉ mặc định
 
     //relationship
     @Size(min = 3, max = 255, message = "Địa chỉ phải có độ dài từ 3 đến 255 ký tự.")

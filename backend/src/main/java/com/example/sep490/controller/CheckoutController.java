@@ -25,7 +25,7 @@ public class CheckoutController {
      * @return ResponseEntity indicating the success or failure of the checkout process.
      */
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
+    @PreAuthorize("hasAuthority('ROLE_DEALER')")
     public ResponseEntity<String> checkout(
             @RequestBody OrderRequest orderRequest,
             HttpServletRequest request,

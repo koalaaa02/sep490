@@ -27,8 +27,8 @@ public class ShopResponse {
     private String citizenIdentificationCard;
     private ShopType shopType;
 
-    private boolean isActive = true;
-    private boolean isClose = false;
+    private boolean active = true;
+    private boolean close = false;
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO;
     private LocalDateTime lastPaymentDate;

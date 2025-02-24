@@ -21,7 +21,7 @@ public class UserSpecification {
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy() ));
             }
-            predicates.add(cb.equal(root.get("isActive"), filter.isActive() ));
+            predicates.add(cb.equal(root.get("active"), filter.isActive() ));
             predicates.add(cb.equal(root.get("isDelete"),false));
             return cb.and(predicates.toArray(new Predicate[0]));
         };

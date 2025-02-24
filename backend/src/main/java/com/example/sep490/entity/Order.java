@@ -59,7 +59,7 @@ public class Order  extends Auditable{//đơn hàng nè
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
     private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
-    private boolean isPaid; // Đơn hàng này đã thanh toán hết chưa
+    private boolean paid; // Đơn hàng này đã thanh toán hết chưa
 
     private BigDecimal commissionFee;  // Phí hoa hồng sàn
     private BigDecimal paymentFee;     // Phí thanh toán

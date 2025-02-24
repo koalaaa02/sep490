@@ -22,25 +22,25 @@ public class ShopController {
     private ShopService shopService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getShops(@Valid ShopFilterDTO filter) {
         return ResponseEntity.ok(shopService.getShops(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getShopById(@PathVariable Long id) {
         return ResponseEntity.ok().body(shopService.getShopById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
         if (!id.equals(shopRequest.getId())) {
             return ResponseEntity.badRequest().body("id và id trong cửa hàng không trùng khớp.");
@@ -49,14 +49,14 @@ public class ShopController {
     }
 
     @PutMapping("/{id}/close")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<String> updateCloseShop(@PathVariable Long id) {
         shopService.changeCloseShop(id);
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
     }
 
     @PutMapping("/{id}/active")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<String> updateActiveShop(@PathVariable Long id) {
         shopService.changeActiveShop(id);
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
@@ -68,7 +68,7 @@ public class ShopController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_SELLER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> deleteShop(@PathVariable Long id) {
         try {
             shopService.deleteShop(id);

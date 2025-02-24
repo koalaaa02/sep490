@@ -20,7 +20,7 @@ public class UserFilterDTO {
     private String name;
     private String email;
     @Schema(defaultValue = "true")
-    private boolean isActive;
+    private boolean active;
 
     @JsonIgnore
     private Long createdBy;
