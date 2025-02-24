@@ -1,4 +1,4 @@
-package com.example.sep490.controller;
+package com.example.sep490.controller.provider;
 
 import com.example.sep490.dto.ProductSKUResponse;
 import com.example.sep490.service.StatisticsService;

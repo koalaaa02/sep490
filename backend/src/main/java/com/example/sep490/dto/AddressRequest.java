@@ -1,6 +1,7 @@
 package com.example.sep490.dto;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,7 @@ public class AddressRequest {
 
     private String postalCode;
 
+    @Schema(defaultValue = "false")
     private boolean defaultAddresss;
 
     // Relationship

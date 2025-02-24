@@ -16,23 +16,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/myprofile")
 public class MyProfileController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private OrderService orderService;
-    @Autowired
-    private InvoiceService invoiceService;
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private OrderDetailService orderDetailService;
-    @Autowired
-    private ShopService shopService;
+
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
@@ -43,87 +33,6 @@ public class MyProfileController {
             return ResponseEntity.ok().body(userService.getUserById(user.getId()));
         }
         return ResponseEntity.badRequest().body("No authenticated user");
-    }
-
-    @GetMapping("/orders")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getMyOrders(OrderFilterDTO filter) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(orderService.getOrdersPublicFilter(filter));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
-
-    @GetMapping("/orders/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getOrderByIdCustomer(@PathVariable Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(orderService.getOrderByIdCustomer(id));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
-
-    @GetMapping("/invoices")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getMyInvoices(InvoiceFilterDTO filter) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(invoiceService.getInvoicesByUserId(filter));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
-
-    @GetMapping("/invoices/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(invoiceService.getInvoiceById(id));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
-//    @PutMapping("/orders/{id}")
-//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-//    public ResponseEntity<?> setStatusOrder(@PathVariable Long id, OrderRequest orderRequest) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-//            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-//            return ResponseEntity.ok().body(orderService.updateOrderStatus(id,user.getId(),orderRequest));
-//        }
-//        return ResponseEntity.badRequest().body("No authenticated user");
-//    }
-
-    @GetMapping("/orderdetails/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getMyOrderDetailsByOrderId(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction,
-            @PathVariable Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(
-                    orderDetailService.getOrderDetailsByOrderId(page, size, sortBy, direction,id)
-            );
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
-    }
-
-    @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<String> updateOrderStatus(
-            @PathVariable Long id,
-            @RequestParam OrderStatus status) {
-        orderService.changeOrderStatusCustomer(id, status);
-        return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 
     @PostMapping("/change-password")
@@ -138,9 +47,5 @@ public class MyProfileController {
         throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
     }
 
-    @PostMapping(value = "/shop/create")
-    @PreAuthorize("hasAnyAuthority('ROLE_DEALER')")
-    public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
-        return ResponseEntity.ok().body(shopService.createShop(shopRequest));
-    }
+
 }

@@ -1,4 +1,4 @@
-package com.example.sep490.controller;
+package com.example.sep490.controller.admin;
 
 import com.example.sep490.repository.specifications.ShopFilterDTO;
 import jakarta.validation.Valid;
@@ -48,12 +48,7 @@ public class ShopController {
         return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
     }
 
-    @PutMapping("/{id}/close")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
-    public ResponseEntity<String> updateCloseShop(@PathVariable Long id) {
-        shopService.changeCloseShop(id);
-        return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
-    }
+
 
     @PutMapping("/{id}/active")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
@@ -62,10 +57,7 @@ public class ShopController {
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
     }
 
-    @PostMapping(value = "/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
-    public ResponseEntity<?> uploadRegistrationCertificateImages(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
-    }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")

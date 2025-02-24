@@ -2,6 +2,7 @@ package com.example.sep490.dto;
 
 import com.example.sep490.entity.enums.ShopType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,9 @@ public class ShopRequest {
     private String citizenIdentificationCard;
     @NotNull(message = "Status được để trống.")
     private ShopType shopType;
+    @Schema(defaultValue = "true")
     private boolean active = true;
+    @Schema(defaultValue = "false")
     private boolean close = false;
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO;

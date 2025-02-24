@@ -23,10 +23,10 @@ public class PaymentController {
             , @RequestParam("paymentProvider") PaymentProvider paymentProvider
             , @RequestParam("paymentType") PaymentType paymentType
             , @RequestParam("amount") long amount
-            , @RequestParam("bankCode") String bankCode
-            , @RequestParam("orderId") Long orderId) {
+            , @RequestParam(value = "bankCode", required = false) String bankCode
+            , @RequestParam("referenceId") Long referenceId) {
         PaymentMethod paymentMethod = paymentFactory.getPaymentMethod(paymentProvider);
-        return ResponseEntity.ok(paymentMethod.pay(request, paymentType, bankCode, amount, orderId));
+        return ResponseEntity.ok(paymentMethod.pay(request, paymentType, bankCode, amount, referenceId));
     }
 
     @GetMapping("/vn-pay-callback")//ResponseObject<PaymentDTO.VNPayResponse>

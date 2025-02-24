@@ -41,9 +41,14 @@ public class OrderPaymentStrategy implements PaymentStrategy {
         Order order = orderRepo.findByIdAndIsDeleteFalse(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng."));
         vnpParamsMap.put("vnp_TmnCode", order.getShop().getSecretA());
-        vnpParamsMap.put("secretKey", order.getShop().getSecretB());
 
-        return generateResponse(vnpParamsMap);
+        String queryUrl = VNPayUtils.getPaymentURL(vnpParamsMap, true);
+        String hashData = VNPayUtils.getPaymentURL(vnpParamsMap, false);
+        String vnpSecureHash = VNPayUtils.hmacSHA512(order.getShop().getSecretB(), hashData);
+        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+        return PaymentResponse.builder().code("ok").message("success").paymentUrl(paymentUrl).build();
+//        return generateResponse(vnpParamsMap);
     }
 
     @Transactional

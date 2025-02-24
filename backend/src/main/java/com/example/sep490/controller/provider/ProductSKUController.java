@@ -1,4 +1,4 @@
-package com.example.sep490.controller;
+package com.example.sep490.controller.provider;
 
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
