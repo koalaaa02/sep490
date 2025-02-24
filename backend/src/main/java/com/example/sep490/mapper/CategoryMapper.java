@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.CategoryRequest;
 import com.example.sep490.dto.CategoryResponse;
-import com.example.sep490.entities.Category;
+import com.example.sep490.entity.Category;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
@@ -19,14 +19,13 @@ public interface CategoryMapper {
     CategoryResponsePublic EntityToResponsePublic(Category category);
     
     @Mapping(source = "id", target = "id")
-    List<CategoryResponse> EntitiesToResponses(List<Category> category);
+    List<CategoryResponse> entityToResponses(List<Category> category);
     
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "parent", target = "isParent")
     Category RequestToEntity(CategoryRequest categoryRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Category> RequestsToEntities(List<CategoryRequest> categoryRequest);
+    List<Category> RequestsToentity(List<CategoryRequest> categoryRequest);
 }
 
 

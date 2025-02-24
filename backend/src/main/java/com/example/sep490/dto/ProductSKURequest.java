@@ -1,6 +1,8 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -34,8 +36,10 @@ public class ProductSKURequest {
     private BigDecimal wholesalePrice;
     
     private String images;
-    
-    private boolean isBulky = false; 
-    
+
+    @Schema(defaultValue = "false")
+    private boolean bulky = false;
+
+    // Relationship
     private Long productId;
 }

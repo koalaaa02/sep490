@@ -23,4 +23,6 @@ public class SupplierRequest {
     private String phone;
 
     private String address;
+
+    // Relationship
 }

@@ -1,10 +1,8 @@
 package com.example.sep490.dto.publicdto;
 
-import com.example.sep490.entities.Address;
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.Product;
-import com.example.sep490.entities.User;
-import com.example.sep490.entities.enums.ShopType;
+import com.example.sep490.entity.Address;
+import com.example.sep490.entity.Product;
+import com.example.sep490.entity.enums.ShopType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShopResponsePublic {
+public class ShopResponsePublic{
 	private Long id;
     private String name;
     private String secretA;
@@ -26,7 +24,7 @@ public class ShopResponsePublic {
     private String TIN;
     private String citizenIdentificationCard;
     private ShopType shopType;
-    private boolean isActive = true;
+    private boolean active = true;
 
     @JsonIgnoreProperties({"shop", "user"})
     private Address address;

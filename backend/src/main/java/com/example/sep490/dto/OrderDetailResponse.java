@@ -1,9 +1,11 @@
 package com.example.sep490.dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.ProductSKU;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Order;
+import com.example.sep490.entity.ProductSKU;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
@@ -22,8 +24,17 @@ public class OrderDetailResponse {
     private Order order;
 
     @NotNull
-    private ProductSKUResponse productSku;
-
+    @JsonIgnoreProperties({ "product"})
+    private ProductSKU productSku;
     private int quantity;
     private BigDecimal price;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

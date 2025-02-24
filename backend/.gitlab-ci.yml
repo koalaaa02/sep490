@@ -1,0 +1,62 @@
+image: docker:latest # Sử dụng Docker để chạy các lệnh
+
+services:
+  - docker:dind # Chạy Docker-in-Docker
+
+variables:
+  IMAGE_NAME: vuvu15202/sep490ecommerce
+  CONTAINER_NAME: sep490api
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "" # Bỏ TLS để tránh lỗi kết nối Docker daemon
+
+stages:
+  - build
+#   - test
+  - docker
+  - deploy
+
+maven-build:
+  image: maven:3.8.1-openjdk-17-slim
+  stage: build
+  script: "mvn clean package -DskipTests"
+  artifacts:
+    paths:
+      - target/*.jar
+  only:
+    - develop
+
+# maven-test:
+#   image: maven:3.8.1-openjdk-17-slim
+#   stage: test
+#   script: "mvn test"
+#   artifacts:
+#     paths:
+#       - target/*.jar
+
+docker-build:
+  image: docker:latest
+  stage: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375 # Kết nối với Docker daemon
+  script:
+    - docker login -u $USERNAME_DOCKER -p $PASSWORD_DOCKER
+    - docker build -t $IMAGE_NAME:1.0 .
+    - docker push $IMAGE_NAME:1.0
+  only:
+    - develop
+
+deploy-vps:
+  image: alpine:latest  # Dùng Alpine Linux để có sẵn `apk`
+  stage: deploy
+  before_script:
+    - apk add --no-cache openssh sshpass  # Cài đặt sshpass và ssh client
+  script:
+    # - apk add --no-cache openssh # Cài đặt SSH client nếu không có sẵn
+    - sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "
+        docker pull $IMAGE_NAME:1.0 && 
+        docker stop $CONTAINER_NAME || true && 
+        docker rm $CONTAINER_NAME || true && 
+        docker run -d --name $CONTAINER_NAME -p 8088:8088 -e SPRING_PROFILES_ACTIVE=staging $IMAGE_NAME:1.0
+      "
+  only:
+    - develop

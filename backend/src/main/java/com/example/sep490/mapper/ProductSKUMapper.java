@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.ProductSKURequest;
 import com.example.sep490.dto.ProductSKUResponse;
-import com.example.sep490.entities.ProductSKU;
+import com.example.sep490.entity.ProductSKU;
 
 @Mapper(componentModel = "spring")
 public interface ProductSKUMapper {
@@ -15,13 +15,11 @@ public interface ProductSKUMapper {
     ProductSKUResponse EntityToResponse(ProductSKU productSKU);
     
     @Mapping(source = "id", target = "id")
-    List<ProductSKUResponse> EntitiesToResponses(List<ProductSKU> productSKU);
+    List<ProductSKUResponse> entityToResponses(List<ProductSKU> productSKU);
     
     @Mapping(source = "id", target = "id")
-
-    @Mapping(source = "bulky", target = "isBulky")
     ProductSKU RequestToEntity(ProductSKURequest productSKURequest);
     
     @Mapping(source = "id", target = "id")
-    List<ProductSKU> RequestsToEntities(List<ProductSKURequest> productSKURequest);
+    List<ProductSKU> RequestsToentity(List<ProductSKURequest> productSKURequest);
 }

@@ -1,8 +1,8 @@
 package com.example.sep490.dto;
 import jakarta.annotation.Nullable;
 import org.hibernate.annotations.ColumnDefault;
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.enums.UserType;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.enums.UserType;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -27,12 +27,14 @@ public class UserRequest {
     
     @Column(nullable = false)
     @ColumnDefault("true")
-    private boolean isActive = true;
+    private boolean active = true;
     
-    private String roles = "ROLE_CUSTOMER";
+    private String roles = "ROLE_DEALER";
 
-    private UserType userType = UserType.ROLE_CUSTOMER; // CUSTOMER, SELLER, AGENT
+    private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 
+
+    // Relationship
 //    @Nullable
 //    private Long shopId;
 }

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-Time Notifications</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>Real-Time Notifications</h1>
+<h2>Messages</h2>
+<div id="messages"></div>
+
+<input type="text" id="message" placeholder="Enter your message">
+<button onclick="sendMessage()">Send</button>
+
+<script>
+    let stompClient = null;
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsImlhdCI6MTc0MDA0NzA1NiwiZXhwIjoxNzQwMDUwNjU2fQ.9zSqiLNYEHnr70Zqv3e2cMGA2MowvxlV_a9pYtj6QOQ"; // Thay bằng token thực tế
+
+    function connect() {
+        const socket = new SockJS(`http://localhost:8088/ws?token=${token}`);
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect(
+            {}, 
+            function (frame) {
+                console.log('Connected: ' + frame);
+
+                const chatRoomId = 1; // ID phòng chat
+                stompClient.subscribe(`/topic/chat/${chatRoomId}`, function (message) {
+                    console.log(JSON.parse(message.body))
+                    showMessage(JSON.parse(message.body));
+                });
+            },
+            function (error) {
+                console.error('WebSocket connection error: ' + error);
+            }
+        );
+    }
+    
+
+    function sendMessage() {
+        const chatRoomId = 1;
+        const messageContent = document.getElementById('message').value;
+
+        if (stompClient && stompClient.connected) {
+            const message = {
+                chatRoomId: chatRoomId,
+                content: messageContent,
+                messageType: "TEXT"
+            };
+
+            stompClient.send('/websocket/send', {}, JSON.stringify(message));
+            console.log('Message sent:', message);
+        } else {
+            console.error('WebSocket connection is not established.');
+        }
+    }
+
+    function showMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('p');
+        messageElement.textContent = `${message.senderId}: ${message.content}`;
+        messagesDiv.appendChild(messageElement);
+    }
+
+    connect();
+</script>
+
+
+</body>
+</html>

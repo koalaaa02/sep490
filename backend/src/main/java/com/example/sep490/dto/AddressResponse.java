@@ -1,7 +1,9 @@
 package com.example.sep490.dto;
 
-import com.example.sep490.entities.Shop;
-import com.example.sep490.entities.User;
+import com.example.sep490.entity.Auditable;
+import com.example.sep490.entity.Shop;
+import com.example.sep490.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -10,11 +12,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddressResponse {
+public class AddressResponse{
 	private Long id;
 
     @JsonIgnoreProperties({"addresses","invoices","shop"})
@@ -38,5 +42,13 @@ public class AddressResponse {
 
     private String postalCode;
 
-    private boolean isDefault; 
+    private boolean defaultAddress;
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

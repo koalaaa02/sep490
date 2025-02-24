@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.dto.OrderResponse;
-import com.example.sep490.entities.Order;
+import com.example.sep490.entity.Order;
 
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
@@ -15,11 +15,11 @@ public interface OrderMapper {
     OrderResponse EntityToResponse(Order order);
     
     @Mapping(source = "id", target = "id")
-    List<OrderResponse> EntitiesToResponses(List<Order> order);
+    List<OrderResponse> entityToResponses(List<Order> order);
     
     @Mapping(source = "id", target = "id")
     Order RequestToEntity(OrderRequest orderRequest);
     
     @Mapping(source = "id", target = "id")
-    List<Order> RequestsToEntities(List<OrderRequest> orderRequest);
+    List<Order> RequestsToentity(List<OrderRequest> orderRequest);
 }

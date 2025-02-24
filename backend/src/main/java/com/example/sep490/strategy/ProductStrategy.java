@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.dto.ProductResponse;
-import com.example.sep490.entities.Product;
+import com.example.sep490.entity.Product;
 
 public interface ProductStrategy {
     boolean supports(String role);

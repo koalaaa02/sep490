@@ -4,12 +4,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.example.sep490.entities.Address;
-import com.example.sep490.entities.Order;
-import com.example.sep490.entities.Product;
-import com.example.sep490.entities.User;
+import com.example.sep490.entity.*;
 
-import com.example.sep490.entities.enums.ShopType;
+import com.example.sep490.entity.enums.ShopType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
@@ -30,8 +27,8 @@ public class ShopResponse {
     private String citizenIdentificationCard;
     private ShopType shopType;
 
-    private boolean isActive = true;
-    private boolean isClose = false;
+    private boolean active = true;
+    private boolean close = false;
 
     private BigDecimal totalFeeDueAmount = BigDecimal.ZERO;
     private LocalDateTime lastPaymentDate;
@@ -44,4 +41,13 @@ public class ShopResponse {
     private Address address;
     @JsonIgnoreProperties({"shop", "category","supplier","skus"})
     private List<Product> products;
+
+
+    private boolean isDelete;
+    private Long createdBy;
+    private Long updatedBy;
+    private Long deletedBy;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 }

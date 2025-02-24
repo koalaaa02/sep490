@@ -1,7 +1,7 @@
 package com.example.sep490.dto;
 
-import com.example.sep490.entities.Supplier;
-import com.example.sep490.entities.enums.UnitType;
+import com.example.sep490.entity.Supplier;
+import com.example.sep490.entity.enums.UnitType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +19,7 @@ public class ProductRequest {
     private UnitType unit = UnitType.PCS;
     private String images;
 
+    // Relationship
     private Long categoryId;
     private Long supplierId;
     private Long shopId;
