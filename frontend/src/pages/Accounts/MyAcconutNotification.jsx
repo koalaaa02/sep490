@@ -14,9 +14,9 @@ const MyAcconutNotification = () => {
 
   return (
     <div>
-       <>
-            <ScrollToTop/>
-            </>
+      <>
+        <ScrollToTop />
+      </>
       <>
         {/* section */}
         <section>
@@ -27,7 +27,7 @@ const MyAcconutNotification = () => {
               {/* col */}
               <div className="col-12">
                 {/* text */}
-                <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
                   <h3 className="fs-5 mb-0">Account Setting</h3>
                   {/* btn */}
@@ -50,33 +50,33 @@ const MyAcconutNotification = () => {
                     {/* nav item */}
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/MyAccountOrder"
                       >
                         <i className="fas fa-shopping-bag me-2" />
-                        Your Orders
+                        Đơn đặt hàng của bạn
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAccountSetting">
+                      <Link className="nav-link" to="/MyAccountSetting">
                         <i className="fas fa-cog me-2" />
-                        Settings
+                        Cài đặt
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAccountAddress">
+                      <Link className="nav-link" to="/MyAccountAddress">
                         <i className="fas fa-map-marker-alt me-2" />
-                        Address
+                        Địa chỉ
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAcconutPaymentMethod">
+                      <Link className="nav-link" to="/MyAcconutPaymentMethod">
                         <i className="fas fa-credit-card me-2" />
-                        Payment Method
+                        Phương thức thanh toán
                       </Link>
                     </li>
                     {/* nav item */}
@@ -86,7 +86,7 @@ const MyAcconutNotification = () => {
                         to="/MyAcconutNotification"
                       >
                         <i className="fas fa-bell me-2" />
-                        Notification
+                        Thông báo
                       </Link>
                     </li>
                     {/* nav item */}
@@ -354,35 +354,35 @@ const MyAcconutNotification = () => {
                   href="/MyAccountOrder"
                 >
                   <i className="fas fa-shopping-bag me-2" />
-                  Your Orders
+                  Đơn đặt hàng của bạn
                 </a>
               </li>
               {/* nav item */}
               <li className="nav-item">
                 <a className="nav-link " href="/MyAccountSetting">
                   <i className="fas fa-cog me-2" />
-                  Settings
+                  Cài đặt
                 </a>
               </li>
               {/* nav item */}
               <li className="nav-item">
                 <a className="nav-link" href="/MyAccountAddress">
                   <i className="fas fa-map-marker-alt me-2" />
-                  Address
+                  Địa chỉ
                 </a>
               </li>
               {/* nav item */}
               <li className="nav-item">
                 <a className="nav-link" href="/MyAcconutPaymentMethod">
                   <i className="fas fa-credit-card me-2" />
-                  Payment Method
+                  Phương thức thanh toán
                 </a>
               </li>
               {/* nav item */}
               <li className="nav-item">
                 <a className="nav-link" href="/MyAcconutNotification">
                   <i className="fas fa-bell me-2" />
-                  Notification
+                  Thông báo
                 </a>
               </li>
             </ul>

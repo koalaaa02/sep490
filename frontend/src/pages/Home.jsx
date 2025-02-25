@@ -372,7 +372,7 @@ const Home = () => {
                     className="row justify-content-center  g-4"
                     style={{ textAlign: "center" }}
                   >
-                    <div className="col-md-3 col-sm-6 fade-zoom ">
+                    <div className="col-md-3 col-sm-12 fade-zoom ">
                       <Zoom>
                         <div className="shadow-effect">
                           <div className="wt-icon-box-wraper center p-a25 p-b50 m-b30 bdr-1 bdr-gray bdr-solid corner-radius step-icon-box bg-white v-icon-effect">

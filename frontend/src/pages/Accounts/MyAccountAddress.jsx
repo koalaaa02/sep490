@@ -14,9 +14,9 @@ const MyAccountAddress = () => {
 
   return (
     <div>
-       <>
-            <ScrollToTop/>
-            </>
+      <>
+        <ScrollToTop />
+      </>
       <>
         <div>
           {/* section */}
@@ -27,7 +27,7 @@ const MyAccountAddress = () => {
               <div className="row">
                 {/* col */}
                 <div className="col-12">
-                  <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                  <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
                     <h3 className="fs-5 mb-0">Account Setting</h3>
                     <button
@@ -48,21 +48,20 @@ const MyAccountAddress = () => {
                     <ul className="nav flex-column nav-pills nav-pills-dark">
                       {/* nav item */}
                       <li className="nav-item">
-                        {/* nav link */}
                         <Link
-                          className="nav-link "
+                          className="nav-link"
                           aria-current="page"
                           to="/MyAccountOrder"
                         >
                           <i className="fas fa-shopping-bag me-2" />
-                          Your Orders
+                          Đơn đặt hàng của bạn
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/MyAccountSetting">
+                        <Link className="nav-link" to="/MyAccountSetting">
                           <i className="fas fa-cog me-2" />
-                          Settings
+                          Cài đặt
                         </Link>
                       </li>
                       {/* nav item */}
@@ -72,21 +71,21 @@ const MyAccountAddress = () => {
                           to="/MyAccountAddress"
                         >
                           <i className="fas fa-map-marker-alt me-2" />
-                          Address
+                          Địa chỉ
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutPaymentMethod">
                           <i className="fas fa-credit-card me-2" />
-                          Payment Method
+                          Phương thức thanh toán
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutNotification">
                           <i className="fas fa-bell me-2" />
-                          Notification
+                          Thông báo
                         </Link>
                       </li>
                       {/* nav item */}
@@ -95,7 +94,7 @@ const MyAccountAddress = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/Grocery-react/">
+                        <Link className="nav-link " to="/">
                           <i className="fas fa-sign-out-alt me-2" />
                           Log out
                         </Link>
@@ -519,7 +518,7 @@ const MyAccountAddress = () => {
                 <ul className="nav flex-column nav-pills nav-pills-dark">
                   {/* nav item */}
                   <li className="nav-item">
-                    <a className="nav-link " href="/Grocery-react/">
+                    <a className="nav-link " href="/">
                       <i className="fas fa-sign-out-alt me-2" />
                       Log out
                     </a>

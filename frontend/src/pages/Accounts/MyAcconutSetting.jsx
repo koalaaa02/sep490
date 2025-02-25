@@ -2,21 +2,55 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
+import { useSelector } from "react-redux";
+import { BASE_URL } from "../../Utils/config";
 
 const MyAcconutSetting = () => {
-  // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
+
+  const token = useSelector((state) => state.auth.token);
+
   useEffect(() => {
-    setTimeout(() => {
-      setLoaderStatus(false);
-    }, 1500);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/myprofile/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const textData = await response.text();
+        console.log("Data:", textData);
+        console.log("Text Data Length:", textData.length);
+        const dataJoson = JSON.parse(textData); 
+        console.log("Parsed Data:", dataJoson);
+        setUserData(textData);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoaderStatus(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
+
+  // console.log(userData);
 
   return (
     <div>
-       <>
-            <ScrollToTop/>
-            </>
+      <>
+        <ScrollToTop />
+      </>
       <>
         <div>
           {/* section */}
@@ -27,9 +61,9 @@ const MyAcconutSetting = () => {
               <div className="row">
                 {/* col */}
                 <div className="col-12">
-                  <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                  <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
-                    <h3 className="fs-5 mb-0">Account Setting</h3>
+                    <h3 className="fs-5 mb-0">Cài đặt tài khoản</h3>
                     {/* btn */}
                     <button
                       className="btn btn-outline-gray-400 text-muted d-md-none"
@@ -54,7 +88,7 @@ const MyAcconutSetting = () => {
                           to="/MyAccountOrder"
                         >
                           <i className="fas fa-shopping-bag me-2" />
-                          Your Orders
+                          Đơn đặt hàng của bạn
                         </Link>
                       </li>
                       {/* nav item */}
@@ -64,28 +98,28 @@ const MyAcconutSetting = () => {
                           to="/MyAccountSetting"
                         >
                           <i className="fas fa-cog me-2" />
-                          Settings
+                          Cài đặt
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAccountAddress">
                           <i className="fas fa-map-marker-alt me-2" />
-                          Address
+                          Địa chỉ
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutPaymentMethod">
                           <i className="fas fa-credit-card me-2" />
-                          Payment Method
+                          Phương thức thanh toán
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutNotification">
                           <i className="fas fa-bell me-2" />
-                          Notification
+                          Thông báo
                         </Link>
                       </li>
                       {/* nav item */}
@@ -94,7 +128,7 @@ const MyAcconutSetting = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/Grocery-react/">
+                        <Link className="nav-link " to="/">
                           <i className="fas fa-sign-out-alt me-2" />
                           Log out
                         </Link>
@@ -123,18 +157,18 @@ const MyAcconutSetting = () => {
                         <div className="p-6 p-lg-10">
                           <div className="mb-6">
                             {/* heading */}
-                            <h2 className="mb-0">Account Setting</h2>
+                            <h2 className="mb-0">Cài đặt tài khoản</h2>
                           </div>
                           <div>
                             {/* heading */}
-                            <h5 className="mb-4">Account details</h5>
+                            <h5 className="mb-4">Thông tin cá nhân</h5>
                             <div className="row">
                               <div className="col-lg-5">
                                 {/* form */}
                                 <form>
                                   {/* input */}
                                   <div className="mb-3">
-                                    <label className="form-label">Name</label>
+                                    <label className="form-label">Tên</label>
                                     <input
                                       type="text"
                                       className="form-control"
@@ -152,7 +186,9 @@ const MyAcconutSetting = () => {
                                   </div>
                                   {/* input */}
                                   <div className="mb-5">
-                                    <label className="form-label">Phone</label>
+                                    <label className="form-label">
+                                      Số điện thoại
+                                    </label>
                                     <input
                                       type="text"
                                       className="form-control"
@@ -162,7 +198,7 @@ const MyAcconutSetting = () => {
                                   {/* button */}
                                   <div className="mb-3">
                                     <button className="btn btn-warning">
-                                      Save Details
+                                      Lưu
                                     </button>
                                   </div>
                                 </form>
@@ -172,12 +208,12 @@ const MyAcconutSetting = () => {
                           <hr className="my-10" />
                           <div className="pe-lg-14">
                             {/* heading */}
-                            <h5 className="mb-4">Password</h5>
+                            <h5 className="mb-4">Mật khẩu</h5>
                             <form className=" row row-cols-1 row-cols-lg-2">
                               {/* input */}
                               <div className="mb-3 col">
                                 <label className="form-label">
-                                  New Password
+                                  Mật khẩu cũ
                                 </label>
                                 <input
                                   type="password"
@@ -188,7 +224,7 @@ const MyAcconutSetting = () => {
                               {/* input */}
                               <div className="mb-3 col">
                                 <label className="form-label">
-                                  Current Password
+                                  Mật khẩu mới
                                 </label>
                                 <input
                                   type="password"
@@ -199,11 +235,14 @@ const MyAcconutSetting = () => {
                               {/* input */}
                               <div className="col-12">
                                 <p className="mb-4">
-                                  Can’t remember your current password?
-                                  <Link to="#"> Reset your password.</Link>
+                                  Không thể nhớ mật khẩu hiện tại của bạn?
+                                  <Link to="/MyAccountForgetPassword">
+                                    {" "}
+                                    Đặt lại mật khẩu của bạn.
+                                  </Link>
                                 </p>
                                 <Link to="#" className="btn btn-warning">
-                                  Save Password
+                                  Lưu mật khẩu
                                 </Link>
                               </div>
                             </form>
@@ -211,18 +250,17 @@ const MyAcconutSetting = () => {
                           <hr className="my-10" />
                           <div>
                             {/* heading */}
-                            <h5 className="mb-4">Delete Account</h5>
+                            <h5 className="mb-4">Xóa tài khoản</h5>
                             <p className="mb-2">
-                              Would you like to delete your account?
+                              Bạn có muốn xóa tài khoản của mình không?
                             </p>
                             <p className="mb-5">
-                              This account contain 12 orders, Deleting your
-                              account will remove all the order details
-                              associated with it.
+                              Xóa tài khoản sẽ xóa tất cả các chi tiết đặt hàng
+                              liên kết với nó.
                             </p>
                             {/* btn */}
                             <Link to="#" className="btn btn-outline-danger">
-                              I want to delete my account
+                              Tôi muốn xóa tài khoản của mình
                             </Link>
                           </div>
                         </div>
@@ -301,7 +339,7 @@ const MyAcconutSetting = () => {
                 <ul className="nav flex-column nav-pills nav-pills-dark">
                   {/* nav item */}
                   <li className="nav-item">
-                    <a className="nav-link " href="/Grocery-react/">
+                    <a className="nav-link " href="/">
                       <i className="fas fa-sign-out-alt me-2" />
                       Log out
                     </a>
