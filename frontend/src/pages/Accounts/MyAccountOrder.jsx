@@ -10,8 +10,19 @@ import wood from "../../images/wood.jpg";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAccountOrder = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+      dispatch(logout());
+      navigate("/");
+      window.location.reload();
+    };
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -53,8 +64,16 @@ const MyAccountOrder = () => {
           src: sand,
           alt: "sand",
         },
+        {
+          id: 3,
+          name: "Gạch",
+          quantity: 10,
+          price: 15000,
+          src: bricks,
+          alt: "bricks",
+        },
       ],
-      price: 10 * 90000 + 10 * 15000,
+      price: 10 * 90000 + 10 * 15000 + 10 * 15000,
     },
     {
       id: "2",
@@ -65,19 +84,27 @@ const MyAccountOrder = () => {
       products: [
         {
           id: 1,
-          name: "Xi măng",
+          name: "Thép",
           quantity: 10,
           price: 90000,
-          src: cement,
-          alt: "cement",
+          src: steel,
+          alt: "steel",
         },
         {
           id: 2,
-          name: "Cát",
+          name: "gạch ốp",
           quantity: 10,
           price: 15000,
-          src: sand,
-          alt: "sand",
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
         },
       ],
       price: 10 * 90000 + 10 * 15000,
@@ -96,22 +123,10 @@ const MyAccountOrder = () => {
             {/* row */}
             <div className="row">
               {/* col */}
-
-              {/* <div> */}
               <div className="col-12">
-                <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
-                  <h3 className="fs-5 mb-0">Account Setting</h3>
-                  {/* button */}
-                  <button
-                    className="btn btn-outline-gray-400 text-muted d-md-none"
-                    type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasAccount"
-                    aria-controls="offcanvasAccount"
-                  >
-                    <i className="fas fa-bars"></i>
-                  </button>
+                  <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
               {/* col */}
@@ -127,35 +142,35 @@ const MyAccountOrder = () => {
                         to="/MyAccountOrder"
                       >
                         <i className="fas fa-shopping-bag me-2" />
-                        Your Orders
+                        Đơn đặt hàng của bạn
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
                       <Link className="nav-link" to="/MyAccountSetting">
                         <i className="fas fa-cog me-2" />
-                        Settings
+                        Cài đặt
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
                       <Link className="nav-link" to="/MyAccountAddress">
                         <i className="fas fa-map-marker-alt me-2" />
-                        Address
+                        Địa chỉ
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
                       <Link className="nav-link" to="/MyAcconutPaymentMethod">
                         <i className="fas fa-credit-card me-2" />
-                        Payment Method
+                        Phương thức thanh toán
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
                       <Link className="nav-link" to="/MyAcconutNotification">
                         <i className="fas fa-bell me-2" />
-                        Notification
+                        Thông báo
                       </Link>
                     </li>
                     {/* nav item */}
@@ -164,15 +179,14 @@ const MyAccountOrder = () => {
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/Grocery-react/">
+                      <button className="nav-link " onClick={handleLogOut}>
                         <i className="fas fa-sign-out-alt me-2" />
-                        Log out
-                      </Link>
+                        Đăng Xuất
+                      </button>
                     </li>
                   </ul>
                 </div>
               </div>
-              {/* </div> */}
 
               <div className="col-lg-9 col-md-8 col-12">
                 <div>
@@ -192,19 +206,19 @@ const MyAccountOrder = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="p-6 p-lg-10">
+                      <div className="p-lg-10">
                         {/* heading */}
-                        <h2 className="mb-6">Your Orders</h2>
+                        <h2 className="mb-6">Đơn đặt hàng của bạn</h2>
                         <div className="table-responsive border">
                           {/* Table */}
                           <table className="table mb-0 text-nowrap">
                             <thead className="table-light">
                               <tr>
                                 <th className="border-0">#</th>
-                                <th className="border-0">Name</th>
-                                <th className="border-0">Date</th>
-                                <th className="border-0">Status</th>
-                                <th className="border-0">Amount</th>
+                                <th className="border-0">Tên đơn hàng</th>
+                                <th className="border-0">Ngày tháng</th>
+                                <th className="border-0">Trạng thái</th>
+                                <th className="border-0">Thành tiền</th>
                                 <th className="border-0" />
                               </tr>
                             </thead>
@@ -255,15 +269,15 @@ const MyAccountOrder = () => {
                                     <tr>
                                       <td colSpan="6" className="border-top-0">
                                         <div className="p-1">
-                                          <strong>Orders:</strong>
+                                          <strong>Chi tiết đơn hàng:</strong>
                                           <table className="table table-bordered mt-2">
                                             <thead className="table-light">
                                               <tr>
-                                                <th>#</th>
-                                                <th>Product Name</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
-                                                <th>Total</th>
+                                                <th>Ảnh</th>
+                                                <th>Tên sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Giá</th>
+                                                <th>Tổng</th>
                                               </tr>
                                             </thead>
                                             <tbody>
@@ -317,85 +331,6 @@ const MyAccountOrder = () => {
             </div>
           </div>
         </section>
-      </>
-      <>
-        {/* modal */}
-        <div
-          className="offcanvas offcanvas-start"
-          tabIndex={-1}
-          id="offcanvasAccount"
-          aria-labelledby="offcanvasAccountLabel"
-        >
-          {/* offcanvas header */}
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasAccountLabel">
-              My Account
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            />
-          </div>
-          {/* offcanvas body */}
-          <div className="offcanvas-body">
-            <ul className="nav flex-column nav-pills nav-pills-dark">
-              {/* nav item */}
-              <li className="nav-item">
-                <a
-                  className="nav-link active"
-                  aria-current="page"
-                  href="/MyAccountOrder"
-                >
-                  <i className="fas fa-shopping-bag me-2" />
-                  Your Orders
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link " href="/MyAccountSetting">
-                  <i className="fas fa-cog me-2" />
-                  Settings
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAccountAddress">
-                  <i className="fas fa-map-marker-alt me-2" />
-                  Address
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAcconutPaymentMethod">
-                  <i className="fas fa-credit-card me-2" />
-                  Payment Method
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAcconutNotification">
-                  <i className="fas fa-bell me-2" />
-                  Notification
-                </a>
-              </li>
-            </ul>
-            <hr className="my-6" />
-            <div>
-              {/* nav  */}
-              <ul className="nav flex-column nav-pills nav-pills-dark">
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link " href="/Grocery-react/">
-                    <i className="fas fa-sign-out-alt me-2" />
-                    Log out
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </>
     </div>
   );

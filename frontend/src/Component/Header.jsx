@@ -1,128 +1,58 @@
 import React, { useState } from "react";
 import Grocerylogo from "../images/Logo.png";
-import productimage1 from "../images/product-img-1.jpg";
-import productimage2 from "../images/product-img-2.jpg";
-import productimage3 from "../images/product-img-3.jpg";
-import productimage4 from "../images/product-img-4.jpg";
-import productimage5 from "../images/product-img-5.jpg";
+import productimage1 from "../images/cement.jpg";
+import productimage2 from "../images/tiles.png";
+import productimage3 from "../images/sand.jpg";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logout } from "../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
-
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
+  const role = useSelector((state) => state.auth.roles);
+  const token = useSelector((state) => state.auth.token);
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    navigate("/");
+    window.location.reload();
+  };
+
+  const cartItems = [
+    {
+      id: 1,
+      name: "Xi măng",
+      image: productimage1,
+      price: "350.000",
+      unit: "10 bao",
+    },
+    {
+      id: 2,
+      name: "Đá ốp",
+      image: productimage2,
+      price: "250.000",
+      oldPrice: "350.000",
+      unit: "10 viên",
+    },
+    {
+      id: 3,
+      name: "Cát",
+      image: productimage3,
+      price: "250.000",
+      unit: "20 bao",
+    },
+  ];
 
   return (
     <div>
-      <>
-        <div className="border-bottom pb-5">
-          <div className="bg-light py-1">
-            <div className="container">
-              <div className="row">
-                <div
-                  className="col-md-10 col-12 d-flex "
-                  style={{ alignItems: "center" }}
-                >
-                  <span> Super Value Deals - Save more with coupons</span>
-                </div>
-                <div
-                  className="col-md-2 col-xxl-1 text-end d-none d-lg-block"
-                  style={{ marginLeft: "20px" }}
-                >
-                  <div className="list-inline">
-                    <div className="list-inline-item">
-                      <Link
-                        to="/ShopWishList"
-                        className="text-muted position-relative"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-heart"
-                        >
-                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                          5
-                          <span className="visually-hidden">
-                            unread messages
-                          </span>
-                        </span>
-                      </Link>
-                    </div>
-                    <div className="list-inline-item">
-                      <Link
-                        to="#!"
-                        className="text-muted"
-                        data-bs-toggle="modal"
-                        data-bs-target="#userModal"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-user"
-                        >
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx={12} cy={7} r={4} />
-                        </svg>
-                      </Link>
-                    </div>
-                    <div className="list-inline-item">
-                      <Link
-                        className="text-muted position-relative "
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasRight"
-                        to="#offcanvasExample"
-                        role="button"
-                        aria-controls="offcanvasRight"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="feather feather-shopping-bag"
-                        >
-                          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                          <line x1={3} y1={6} x2={21} y2={6} />
-                          <path d="M16 10a4 4 0 0 1-8 0" />
-                        </svg>
-                        <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                          1
-                          <span className="visually-hidden">
-                            unread messages
-                          </span>
-                        </span>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
       <>
         <div className="container  displaydesign">
           <div className="row g-4">
@@ -132,103 +62,18 @@ const Header = () => {
                 style={{ width: "100%" }}
                 list="datalistOptions"
                 id="exampleDataList"
-                placeholder="Type to search..."
+                placeholder="Tìm kiếm..."
               />
-            </div>
-            <div
-              className="col-4 col-sm-4 col-lg-3 py-2 d-flex"
-              style={{ justifyContent: "center" }}
-            >
-              <div className="list-inline">
-                <div className="list-inline-item">
-                  <Link
-                    to="/ShopWishList"
-                    className="text-muted position-relative"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={20}
-                      height={20}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="feather feather-heart"
-                    >
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                      5<span className="visually-hidden">unread messages</span>
-                    </span>
-                  </Link>
-                </div>
-                <div className="list-inline-item">
-                  <Link
-                    to="#!"
-                    className="text-muted"
-                    data-bs-toggle="modal"
-                    data-bs-target="#userModal"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={20}
-                      height={20}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="feather feather-user"
-                    >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx={12} cy={7} r={4} />
-                    </svg>
-                  </Link>
-                </div>
-                <div className="list-inline-item">
-                  <Link
-                    className="text-muted position-relative "
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasRight"
-                    to="#offcanvasExample"
-                    role="button"
-                    aria-controls="offcanvasRight"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width={20}
-                      height={20}
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="feather feather-shopping-bag"
-                    >
-                      <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-                      <line x1={3} y1={6} x2={21} y2={6} />
-                      <path d="M16 10a4 4 0 0 1-8 0" />
-                    </svg>
-                    <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                      1<span className="visually-hidden">unread messages</span>
-                    </span>
-                  </Link>
-                </div>
-              </div>
             </div>
           </div>
         </div>
       </>
       <nav className="navbar navbar-expand-lg navbar-light sticky-top">
         <div className="container">
-          <Link className="navbar-brand" to="/Grocery-react/">
+          <Link className="navbar-brand" to="/">
             <img
               src={Grocerylogo}
-              style={{ width: 100, marginBottom: 10, marginLeft: "-15px", }}
+              style={{ width: 100, marginBottom: 10, marginLeft: "-15px" }}
               alt="eCommerce HTML Template"
             />
           </Link>
@@ -236,7 +81,7 @@ const Header = () => {
             className="form-control responsivesearch "
             list="datalistOptions"
             id="exampleDataList"
-            placeholder="Type to search..."
+            placeholder="Tìm kiếm..."
             fdprocessedid="9icrif"
             style={{ width: "35%" }}
           />
@@ -264,6 +109,11 @@ const Header = () => {
             <ul className="navbar-nav mr-auto mt-2 mt-lg-0 float-md-right"></ul>
             <ul className="navbar-nav navbar-light">
               <li className="nav-item">
+                <Link className="nav-link" to="/">
+                  Trang chủ
+                </Link>
+              </li>
+              <li className="nav-item">
                 <li className="nav-item dmenu dropdown">
                   <Link
                     className="nav-link dropdown-toggle"
@@ -274,74 +124,50 @@ const Header = () => {
                     aria-haspopup="true"
                     aria-expanded="false"
                   >
-                    <span class="me-1">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="feather feather-grid"
-                      >
-                        <rect x="3" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="3" width="7" height="7"></rect>
-                        <rect x="14" y="14" width="7" height="7"></rect>
-                        <rect x="3" y="14" width="7" height="7"></rect>
-                      </svg>
-                    </span>{" "}
-                    All Categories
+                    Tất cả danh mục
                   </Link>
                   <div
                     className="dropdown-menu sm-menu"
                     aria-labelledby="navbarDropdown"
                   >
                     <Link className="dropdown-item" to="/Shop">
-                      Cement
+                      Xi măng
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Bricks
+                      Gạch
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Sand
+                      Cát
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Steel
+                      Thép
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Tiles
+                      Gạch lát
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Wood
+                      Gỗ
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Glass
+                      Kính
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Paint
+                      Sơn
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Plumbing
+                      Ống nước
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Electrical
+                      Điện
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Roofing
+                      Mái
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Insulation
+                      Cách nhiệt
                     </Link>
                   </div>
                 </li>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/Grocery-react/">
-                  Home
-                </Link>
               </li>
               <li className="nav-item dmenu dropdown">
                 <Link
@@ -353,29 +179,23 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  About
+                  Thông tin
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
                   <Link class="dropdown-item" to="/Blog">
-                    Blog
+                    Bài viết
                   </Link>
-                  {/* <Link className="dropdown-item" to="pages/blog-single.html">
-                    Blog Single
-                  </Link> */}
                   <Link className="dropdown-item" to="/BlogCategory">
-                    Blog Category
+                    Bài viết danh mục
                   </Link>
                   <Link className="dropdown-item" to="/AboutUs">
-                    About us
+                    Thông tin về chúng tôi
                   </Link>
-                  {/* <Link className="dropdown-item" to="pages/404error.html">
-                    404 Error
-                  </Link> */}
                   <Link className="dropdown-item" to="/Contact">
-                    Contact
+                    Liên hệ
                   </Link>
                 </div>
               </li>
@@ -390,24 +210,19 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Shop
+                  Sản phẩm
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
-                  <Link className="dropdown-item" to="/Shop">
-                    Shop
-                  </Link>
                   <Link className="dropdown-item" to="/ShopWishList">
-                    Shop Wishlist
+                    Danh sách yêu thích
                   </Link>
                   <Link className="dropdown-item" to="/ShopCart">
-                    Shop Cart
+                    Giỏ hàng
                   </Link>
-                  <Link className="dropdown-item" to="/ShopCheckOut">
-                    Shop Checkout
-                  </Link>
+                  <Link className="dropdown-item" to="/ShopCheckOut"></Link>
                 </div>
               </li>
 
@@ -421,17 +236,14 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Stores
+                  Cửa hàng
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
                   <Link className="dropdown-item" to="/StoreList">
-                    Store List
-                  </Link>
-                  <Link className="dropdown-item" to="/SingleShop">
-                    Single Store
+                    Danh sách cửa hàng
                   </Link>
                 </div>
               </li>
@@ -445,7 +257,7 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Account
+                  Tài khoản
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
@@ -453,133 +265,107 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      <Link className="dropdown-item" to="/MyAccountSignIn">
-                        Sign in
-                      </Link>
-                      <Link className="dropdown-item" to="/MyAccountSignUp">
-                        Signup
-                      </Link>
-                      <Link
-                        className="dropdown-item"
-                        to="/MyAccountForgetPassword"
-                      >
-                        Forgot Password
-                      </Link>
-                      <Link className="dropdown-item" to="/MyAccountOrder">
-                        Orders
-                      </Link>
-                      <Link className="dropdown-item" to="/MyAccountSetting">
-                        Settings
-                      </Link>
-                      <Link className="dropdown-item" to="/MyAccountAddress">
-                        Address
-                      </Link>
-                      <Link
-                        className="dropdown-item"
-                        to="/MyAcconutPaymentMethod"
-                      >
-                        Payment Method
-                      </Link>
-                      <Link
-                        className="dropdown-item"
-                        to="/MyAcconutNotification"
-                      >
-                        Notification
-                      </Link>
+                      {role && token ? (
+                        <>
+                          <div className="dropdown-item disabled text-dark">
+                            Xin chào{" "}
+                            {role === "ROLE_DEALER"
+                              ? "Dealer"
+                              : role === "ROLE_SELLER"
+                              ? "Seller"
+                              : role === "ROLE_PROVIDER"
+                              ? "Provider"
+                              : "User"}
+                          </div>
+                          <Link className="dropdown-item" to="/MyAccountOrder">
+                            Đơn hàng
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAccountSetting"
+                          >
+                            Cài đặt
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAccountAddress"
+                          >
+                            Địa chỉ
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAcconutPaymentMethod"
+                          >
+                            Phương thức thanh toán
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAcconutNotification"
+                          >
+                            Thông báo
+                          </Link>
+                          <button
+                            className="dropdown-item"
+                            onClick={handleLogOut}
+                          >
+                            Đăng xuất
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <Link className="dropdown-item" to="/MyAccountSignIn">
+                            Đăng nhập
+                          </Link>
+                          <Link className="dropdown-item" to="/MyAccountSignUp">
+                            Đăng ký
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAccountForgetPassword"
+                          >
+                            Quên mật khẩu
+                          </Link>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
               </li>
-              {/* <li className="nav-item">
-                <Link className="nav-link" to="">
-                  Contact us
+              <li className="nav-item dmenu dropdown ml-3">
+                <Link
+                  className="text-muted position-relative"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#offcanvasRight"
+                  to="#offcanvasExample"
+                  role="button"
+                  aria-controls="offcanvasRight"
+                >
+                  <svg
+                    width={20}
+                    height={20}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="feather feather-shopping-bag mt-2"
+                  >
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1={3} y1={6} x2={21} y2={6} />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                    {cartItems.length}
+                  </span>
                 </Link>
-              </li> */}
+              </li>
             </ul>
           </div>
-          {/* <div className="col-md-2 col-xxl-1 text-end d-none d-lg-block">
-            
-          </div> */}
         </div>
       </nav>
       <>
         <div>
-          {/* Modal */}
-          <div
-            className="modal fade"
-            id="userModal"
-            tabIndex={-1}
-            aria-labelledby="userModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content p-4">
-                <div className="modal-header border-0">
-                  <h5 className="modal-title fs-3 fw-bold" id="userModalLabel">
-                    Sign Up
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  />
-                </div>
-                <div className="modal-body">
-                  <form>
-                    <div className="mb-3">
-                      <label htmlFor="fullName" className="form-label">
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        id="fullName"
-                        placeholder="Enter Your Name"
-                        required
-                      />
-                    </div>
-                    <div className="mb-3">
-                      <label htmlFor="email" className="form-label">
-                        Email address
-                      </label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        placeholder="Enter Email address"
-                        required
-                      />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="password" className="form-label">
-                        Password
-                      </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        id="password"
-                        placeholder="Enter Password"
-                        required
-                      />
-                      <small className="form-text">
-                        By Signup, you agree to our{" "}
-                        <Link to="#!">Terms of Service</Link> &amp;{" "}
-                        <Link to="#!">Privacy Policy</Link>
-                      </small>
-                    </div>
-                    <button type="submit" className="btn btn-primary">
-                      Sign Up
-                    </button>
-                  </form>
-                </div>
-                <div className="modal-footer border-0 justify-content-center">
-                  Already have an account?{" "}
-                  <Link to="/MyAccountSignIn">Sign in</Link>
-                </div>
-              </div>
-            </div>
-          </div>
           {/* Shop Cart */}
           <div
             className="offcanvas offcanvas-end"
@@ -588,12 +374,9 @@ const Header = () => {
             aria-labelledby="offcanvasRightLabel"
           >
             <div className="offcanvas-header border-bottom">
-              <div className="text-start">
-                <h5 id="offcanvasRightLabel" className="mb-0 fs-4">
-                  Shop Cart
-                </h5>
-                <small>Location in 382480</small>
-              </div>
+              <h5 id="offcanvasRightLabel" className="mb-0 fs-4">
+                Giỏ hàng
+              </h5>
               <button
                 type="button"
                 className="btn-close text-reset"
@@ -603,510 +386,88 @@ const Header = () => {
             </div>
             <div className="offcanvas-body">
               <div className="alert alert-danger" role="alert">
-                You’ve got FREE delivery. Start checkout now!
+                Bạn đã có giao hàng miễn phí. Bắt đầu kiểm tra ngay bây giờ!
               </div>
-              <div>
-                <div className="py-3">
-                  <ul className="list-group list-group-flush">
-                    <li className="list-group-item py-3 px-0 border-top">
-                      <div className="row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={productimage1}
-                            alt="Ecommerce"
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-5">
-                          <h6 className="mb-0">Organic Banana</h6>
-                          <span>
-                            <small className="text-muted">.98 / lb</small>
-                          </span>
-                          <div className="mt-2 small">
-                            {" "}
-                            <Link to="#!" className="text-decoration-none">
-                              {" "}
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
-                              </span>
-                              Remove
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group  flex-nowrap justify-content-center  ">
-                            <input
-                              type="button"
-                              defaultValue="-"
-                              className="button-minus form-control  text-center flex-xl-none w-xl-30 w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                            <input
-                              type="number"
-                              step={1}
-                              max={10}
-                              defaultValue={1}
-                              name="quantity"
-                              className="quantity-field form-control text-center flex-xl-none w-xl-30 w-xxl-10 px-0 "
-                            />
-                            <input
-                              type="button"
-                              defaultValue="+"
-                              className="button-plus form-control  text-center flex-xl-none w-xl-30  w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-2 text-end">
-                          <span className="fw-bold">$35.00</span>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item py-3 px-0">
-                      <div className="row row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={productimage2}
-                            alt="Ecommerce"
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-5">
-                          <h6 className="mb-0">Fresh Garlic, 250g</h6>
-                          <span>
-                            <small className="text-muted">250g</small>
-                          </span>
-                          <div className="mt-2 small">
-                            {" "}
-                            <Link to="#!" className="text-decoration-none">
-                              {" "}
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
-                              </span>
-                              Remove
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group  flex-nowrap justify-content-center  ">
-                            <input
-                              type="button"
-                              defaultValue="-"
-                              className="button-minus form-control  text-center flex-xl-none w-xl-30 w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                            <input
-                              type="number"
-                              step={1}
-                              max={10}
-                              defaultValue={1}
-                              name="quantity"
-                              className="quantity-field form-control text-center flex-xl-none w-xl-30 w-xxl-10 px-0 "
-                            />
-                            <input
-                              type="button"
-                              defaultValue="+"
-                              className="button-plus form-control  text-center flex-xl-none w-xl-30  w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-2 text-end">
-                          <span className="fw-bold">$20.97</span>
-                          <span className="text-decoration-line-through text-muted small">
-                            $26.97
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item py-3 px-0">
-                      <div className="row row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={productimage3}
-                            alt="Ecommerce"
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-5">
-                          <h6 className="mb-0">Fresh Onion, 1kg</h6>
-                          <span>
-                            <small className="text-muted">1 kg</small>
-                          </span>
-                          <div className="mt-2 small">
-                            {" "}
-                            <Link to="#!" className="text-decoration-none">
-                              {" "}
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
-                              </span>
-                              Remove
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group  flex-nowrap justify-content-center  ">
-                            <input
-                              type="button"
-                              defaultValue="-"
-                              className="button-minus form-control  text-center flex-xl-none w-xl-30 w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                            <input
-                              type="number"
-                              step={1}
-                              max={10}
-                              defaultValue={1}
-                              name="quantity"
-                              className="quantity-field form-control text-center flex-xl-none w-xl-30 w-xxl-10 px-0 "
-                            />
-                            <input
-                              type="button"
-                              defaultValue="+"
-                              className="button-plus form-control  text-center flex-xl-none w-xl-30  w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-2 text-end">
-                          <span className="fw-bold">$25.00</span>
-                          <span className="text-decoration-line-through text-muted small">
-                            $45.00
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item py-3 px-0">
-                      <div className="row row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={productimage4}
-                            alt="Ecommerce"
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-5">
-                          <h6 className="mb-0">Fresh Ginger</h6>
-                          <span>
-                            <small className="text-muted">250g</small>
-                          </span>
-                          <div className="mt-2 small">
-                            {" "}
-                            <Link to="#!" className="text-decoration-none">
-                              {" "}
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
-                              </span>
-                              Remove
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group  flex-nowrap justify-content-center  ">
-                            <input
-                              type="button"
-                              defaultValue="-"
-                              className="button-minus form-control  text-center flex-xl-none w-xl-30 w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                            <input
-                              type="number"
-                              step={1}
-                              max={10}
-                              defaultValue={1}
-                              name="quantity"
-                              className="quantity-field form-control text-center flex-xl-none w-xl-30 w-xxl-10 px-0 "
-                            />
-                            <input
-                              type="button"
-                              defaultValue="+"
-                              className="button-plus form-control  text-center flex-xl-none w-xl-30  w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-2 text-end">
-                          <span className="fw-bold">$39.87</span>
-                          <span className="text-decoration-line-through text-muted small">
-                            $45.00
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                    <li className="list-group-item py-3 px-0 border-bottom">
-                      <div className="row row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={productimage5}
-                            alt="Ecommerce"
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-5">
-                          <h6 className="mb-0">
-                            Apple Royal Gala, 4 Pieces Box
-                          </h6>
-                          <span>
-                            <small className="text-muted">4 Apple</small>
-                          </span>
-                          <div className="mt-2 small">
-                            {" "}
-                            <Link to="#!" className="text-decoration-none">
-                              {" "}
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
-                              </span>
-                              Remove
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group  flex-nowrap justify-content-center  ">
-                            <input
-                              type="button"
-                              defaultValue="-"
-                              className="button-minus form-control  text-center flex-xl-none w-xl-30 w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                            <input
-                              type="number"
-                              step={1}
-                              max={10}
-                              defaultValue={1}
-                              name="quantity"
-                              className="quantity-field form-control text-center flex-xl-none w-xl-30 w-xxl-10 px-0 "
-                            />
-                            <input
-                              type="button"
-                              defaultValue="+"
-                              className="button-plus form-control  text-center flex-xl-none w-xl-30  w-xxl-10 px-0  "
-                              data-field="quantity"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-2 text-end">
-                          <span className="fw-bold">$39.87</span>
-                          <span className="text-decoration-line-through text-muted small">
-                            $45.00
-                          </span>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-                <div className="d-grid">
-                  <button
-                    className="btn btn-primary btn-lg d-flex justify-content-between align-items-center"
-                    type="submit"
+              <ul className="list-group list-group-flush">
+                {cartItems.map((item) => (
+                  <li
+                    key={item.id}
+                    className="list-group-item py-3 px-0 border-top"
                   >
-                    {" "}
-                    Go to Checkout <span className="fw-bold">$120.00</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Modal */}
-          <div
-            className="modal fade"
-            id="locationModal"
-            tabIndex={-1}
-            aria-labelledby="locationModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog modal-sm modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-body p-6">
-                  <div className="d-flex justify-content-between align-items-start ">
-                    <div>
-                      <h5 className="mb-1" id="locationModalLabel">
-                        Choose your Delivery Location
-                      </h5>
-                      <p className="mb-0 small">
-                        Enter your address and we will specify the offer you
-                        area.{" "}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="modal"
-                      aria-label="Close"
-                    />
-                  </div>
-                  <div className="my-5">
-                    <input
-                      type="search"
-                      className="form-control"
-                      placeholder="Search your area"
-                    />
-                  </div>
-                  <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h6 className="mb-0">Select Location</h6>
-                    <Link
-                      to="#"
-                      className="btn btn-outline-gray-400 text-muted btn-sm"
-                    >
-                      Clear All
-                    </Link>
-                  </div>
-                  <div>
-                    <div data-simplebar style={{ height: 300 }}>
-                      <div className="list-group list-group-flush">
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action active"
-                        >
-                          <span>Alabama</span>
-                          <span>Min:$20</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Alaska</span>
-                          <span>Min:$30</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Arizona</span>
-                          <span>Min:$50</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>California</span>
-                          <span>Min:$29</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Colorado</span>
-                          <span>Min:$80</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Florida</span>
-                          <span>Min:$90</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Arizona</span>
-                          <span>Min:$50</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>California</span>
-                          <span>Min:$29</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Colorado</span>
-                          <span>Min:$80</span>
-                        </Link>
-                        <Link
-                          to="#"
-                          className="list-group-item d-flex justify-content-between align-items-center px-2 py-3 list-group-item-action"
-                        >
-                          <span>Florida</span>
-                          <span>Min:$90</span>
-                        </Link>
+                    <div className="row align-items-center">
+                      <div className="col-2">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="img-fluid"
+                        />
+                      </div>
+                      <div className="col-4">
+                        <h6 className="mb-0">{item.name}</h6>
+                        <small className="text-muted">{item.unit}</small>
+                        <div className="mt-2 small">
+                          <Link to="#!" className="text-decoration-none">
+                            <span className="me-1">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width={16}
+                                height={16}
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="feather feather-trash-2"
+                              >
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                <line x1={10} y1={11} x2={10} y2={17} />
+                                <line x1={14} y1={11} x2={14} y2={17} />
+                              </svg>
+                            </span>
+                            Remove
+                          </Link>
+                        </div>
+                      </div>
+                      <div className="col-3">
+                        <div className="input-group flex-nowrap justify-content-center">
+                          <button className="button-minus form-control text-center">
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            step={1}
+                            max={10}
+                            defaultValue={1}
+                            className="quantity-field form-control text-center"
+                          />
+                          <button className="button-plus form-control text-center">
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <div className="col-3 text-end">
+                        <span className="fw-bold">{item.price} VNĐ</span>
+                        {item.oldPrice && (
+                          <span className="text-decoration-line-through text-muted small">
+                            {" "}
+                            {item.oldPrice}VNĐ
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </div>
-                </div>
+                  </li>
+                ))}
+              </ul>
+              <div className="d-grid mt-1">
+                <button
+                  className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
+                  type="submit"
+                >
+                  {" "}
+                  Thanh toán <span className="fw-bold">1.200.000 VNĐ</span>
+                </button>
               </div>
             </div>
           </div>

@@ -13,16 +13,106 @@ import plumbing from "../images/plumbing.jpg";
 import electrical from "../images/electrical.jpg";
 
 const products = [
-  { id: 1, name: "Cement", category: "Building Materials", price: 50, originalPrice: 60, rating: 4.5, reviews: 120, image: cement },
-  { id: 2, name: "Bricks", category: "Building Materials", price: 10, originalPrice: 15, rating: 4.3, reviews: 98, image: bricks },
-  { id: 3, name: "Sand", category: "Building Materials", price: 30, originalPrice: 40, rating: 4.2, reviews: 85, image: sand },
-  { id: 4, name: "Steel", category: "Building Materials", price: 100, originalPrice: 120, rating: 4.7, reviews: 150, image: steel },
-  { id: 5, name: "Tiles", category: "Building Materials", price: 80, originalPrice: 95, rating: 4.6, reviews: 110, image: tiles },
-  { id: 6, name: "Wood", category: "Building Materials", price: 90, originalPrice: 105, rating: 4.4, reviews: 100, image: wood },
-  { id: 7, name: "Glass", category: "Building Materials", price: 70, originalPrice: 85, rating: 4.3, reviews: 95, image: glass },
-  { id: 8, name: "Paint", category: "Building Materials", price: 60, originalPrice: 75, rating: 4.5, reviews: 125, image: paint },
-  { id: 9, name: "Plumbing", category: "Building Materials", price: 55, originalPrice: 65, rating: 4.2, reviews: 90, image: plumbing },
-  { id: 10, name: "Electrical", category: "Building Materials", price: 65, originalPrice: 80, rating: 4.6, reviews: 130, image: electrical },
+  {
+    id: 1,
+    name: "Xi măng",
+    category: "Vật liệu xây dựng",
+    price: "50.000",
+    originalPrice: "60.000",
+    rating: 4.5,
+    reviews: 120,
+    image: cement,
+  },
+  {
+    id: 2,
+    name: "Gạch",
+    category: "Vật liệu xây dựng",
+    price: "10.000",
+    originalPrice: "15.000",
+    rating: 4.3,
+    reviews: 98,
+    image: bricks,
+  },
+  {
+    id: 3,
+    name: "Cát",
+    category: "Vật liệu xây dựng",
+    price: "30.000",
+    originalPrice: "40.000",
+    rating: 4.2,
+    reviews: 85,
+    image: sand,
+  },
+  {
+    id: 4,
+    name: "Thép",
+    category: "Vật liệu xây dựng",
+    price: "100.000",
+    originalPrice: "120.000",
+    rating: 4.7,
+    reviews: 150,
+    image: steel,
+  },
+  {
+    id: 5,
+    name: "Gạch lát",
+    category: "Vật liệu xây dựng",
+    price: "80.000",
+    originalPrice: "95.000",
+    rating: 4.6,
+    reviews: 110,
+    image: tiles,
+  },
+  {
+    id: 6,
+    name: "Gỗ",
+    category: "Vật liệu xây dựng",
+    price: "90.000",
+    originalPrice: "150.000",
+    rating: 4.4,
+    reviews: 100,
+    image: wood,
+  },
+  {
+    id: 7,
+    name: "Kính",
+    category: "Vật liệu xây dựng",
+    price: "70.000",
+    originalPrice: "85.000",
+    rating: 4.3,
+    reviews: 95,
+    image: glass,
+  },
+  {
+    id: 8,
+    name: "Sơn",
+    category: "Vật liệu xây dựng",
+    price: "60.000",
+    originalPrice: "75.000",
+    rating: 4.5,
+    reviews: 125,
+    image: paint,
+  },
+  {
+    id: 9,
+    name: "Ống nước",
+    category: "Vật liệu xây dựng",
+    price: "55.000",
+    originalPrice: "65.000",
+    rating: 4.2,
+    reviews: 90,
+    image: plumbing,
+  },
+  {
+    id: 10,
+    name: "Điện",
+    category: "Vật liệu xây dựng",
+    price: "70.000",
+    originalPrice: "80.000",
+    rating: 4.6,
+    reviews: 130,
+    image: electrical,
+  },
 ];
 
 const ProductItem = () => {
@@ -45,7 +135,7 @@ const ProductItem = () => {
             <div className="col-12 mb-6">
               <div className="section-head text-center">
                 <h3 className="h3style" data-title="Popular Products">
-                  Popular Products
+                  Sản phẩm phổ biến
                 </h3>
                 <div className="wt-separator bg-primarys"></div>
                 <div className="wt-separator2 bg-primarys"></div>
@@ -118,9 +208,9 @@ const ProductItem = () => {
                     </div>
                     <div className="d-flex justify-content-between align-items-center mt-3">
                       <div>
-                        <span className="text-dark">${product.price}</span>
-                        <span className="text-decoration-line-through text-muted">
-                          ${product.originalPrice}
+                        <span className="text-dark">{product.price} VNĐ</span>
+                        <span className="text-decoration-line-through text-muted ml-1">
+                          {product.originalPrice}
                         </span>
                       </div>
                       <div>

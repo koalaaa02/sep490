@@ -2,21 +2,109 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
+import { useSelector } from "react-redux";
+import { BASE_URL } from "../../Utils/config";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAcconutSetting = () => {
-  // loading
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    navigate("/");
+    window.location.reload();
+  };
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+  const token = useSelector((state) => state.auth.token);
+
   useEffect(() => {
-    setTimeout(() => {
-      setLoaderStatus(false);
-    }, 1500);
-  }, []);
+    const fetchData = async () => {
+      if (!token) {
+        navigate("/MyAccountSignIn");
+        return;
+      }
+      try {
+        const response = await fetch(`${BASE_URL}/api/myprofile/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP Error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setUserData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoaderStatus(false);
+      }
+    };
+
+    fetchData();
+  }, [token]);
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+
+    if (newPassword !== confirmNewPassword) {
+      setError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/myprofile/change-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            oldPassword,
+            newPassword,
+            confirmNewPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Mật khẩu đã được thay đổi thành công.");
+      } else {
+        setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      setError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+      );
+    }
+  };
 
   return (
     <div>
-       <>
-            <ScrollToTop/>
-            </>
+      <>
+        <ScrollToTop />
+      </>
       <>
         <div>
           {/* section */}
@@ -27,19 +115,9 @@ const MyAcconutSetting = () => {
               <div className="row">
                 {/* col */}
                 <div className="col-12">
-                  <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                  <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
-                    <h3 className="fs-5 mb-0">Account Setting</h3>
-                    {/* btn */}
-                    <button
-                      className="btn btn-outline-gray-400 text-muted d-md-none"
-                      type="button"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasAccount"
-                      aria-controls="offcanvasAccount"
-                    >
-                      <i className="fas fa-bars"></i>
-                    </button>
+                    <h3 className="fs-5 mb-0">Tài khoản</h3>
                   </div>
                 </div>
                 {/* col */}
@@ -54,7 +132,7 @@ const MyAcconutSetting = () => {
                           to="/MyAccountOrder"
                         >
                           <i className="fas fa-shopping-bag me-2" />
-                          Your Orders
+                          Đơn đặt hàng của bạn
                         </Link>
                       </li>
                       {/* nav item */}
@@ -64,28 +142,28 @@ const MyAcconutSetting = () => {
                           to="/MyAccountSetting"
                         >
                           <i className="fas fa-cog me-2" />
-                          Settings
+                          Cài đặt
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAccountAddress">
                           <i className="fas fa-map-marker-alt me-2" />
-                          Address
+                          Địa chỉ
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutPaymentMethod">
                           <i className="fas fa-credit-card me-2" />
-                          Payment Method
+                          Phương thức thanh toán
                         </Link>
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
                         <Link className="nav-link" to="/MyAcconutNotification">
                           <i className="fas fa-bell me-2" />
-                          Notification
+                          Thông báo
                         </Link>
                       </li>
                       {/* nav item */}
@@ -94,10 +172,10 @@ const MyAcconutSetting = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/Grocery-react/">
+                        <button className="nav-link " onClick={handleLogOut}>
                           <i className="fas fa-sign-out-alt me-2" />
-                          Log out
-                        </Link>
+                          Đăng Xuất
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -123,22 +201,28 @@ const MyAcconutSetting = () => {
                         <div className="p-6 p-lg-10">
                           <div className="mb-6">
                             {/* heading */}
-                            <h2 className="mb-0">Account Setting</h2>
+                            <h2 className="mb-0">Cài đặt tài khoản</h2>
                           </div>
                           <div>
                             {/* heading */}
-                            <h5 className="mb-4">Account details</h5>
+                            <h5 className="mb-4">Thông tin cá nhân</h5>
+                            {message && (
+                              <div className="alert alert-success">
+                                {message}
+                              </div>
+                            )}
                             <div className="row">
                               <div className="col-lg-5">
                                 {/* form */}
                                 <form>
                                   {/* input */}
                                   <div className="mb-3">
-                                    <label className="form-label">Name</label>
+                                    <label className="form-label">Tên</label>
                                     <input
                                       type="text"
                                       className="form-control"
-                                      placeholder="Nigam Mishra"
+                                      placeholder={userData.name}
+                                      disabled
                                     />
                                   </div>
                                   {/* input */}
@@ -147,82 +231,83 @@ const MyAcconutSetting = () => {
                                     <input
                                       type="email"
                                       className="form-control"
-                                      placeholder="example@gmail.com"
+                                      placeholder={userData.email}
+                                      disabled
                                     />
-                                  </div>
-                                  {/* input */}
-                                  <div className="mb-5">
-                                    <label className="form-label">Phone</label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      placeholder="Phone number"
-                                    />
-                                  </div>
-                                  {/* button */}
-                                  <div className="mb-3">
-                                    <button className="btn btn-warning">
-                                      Save Details
-                                    </button>
                                   </div>
                                 </form>
                               </div>
                             </div>
                           </div>
-                          <hr className="my-10" />
+                          <hr className="my-5" />
                           <div className="pe-lg-14">
                             {/* heading */}
-                            <h5 className="mb-4">Password</h5>
-                            <form className=" row row-cols-1 row-cols-lg-2">
-                              {/* input */}
-                              <div className="mb-3 col">
+                            <h5 className="mb-4">Mật khẩu</h5>
+                            <form onSubmit={handleChangePassword}>
+                              <div className="mb-3">
                                 <label className="form-label">
-                                  New Password
+                                  Mật khẩu hiện tại
                                 </label>
                                 <input
                                   type="password"
                                   className="form-control"
-                                  placeholder="**********"
+                                  placeholder="Nhập mật khẩu hiện tại"
+                                  required
+                                  value={oldPassword}
+                                  onChange={(e) =>
+                                    setOldPassword(e.target.value)
+                                  }
                                 />
                               </div>
-                              {/* input */}
-                              <div className="mb-3 col">
+                              <div className="mb-3">
                                 <label className="form-label">
-                                  Current Password
+                                  Mật khẩu mới
                                 </label>
                                 <input
                                   type="password"
                                   className="form-control"
-                                  placeholder="**********"
+                                  placeholder="Nhập mật khẩu mới"
+                                  required
+                                  value={newPassword}
+                                  onChange={(e) =>
+                                    setNewPassword(e.target.value)
+                                  }
                                 />
                               </div>
-                              {/* input */}
-                              <div className="col-12">
-                                <p className="mb-4">
-                                  Can’t remember your current password?
-                                  <Link to="#"> Reset your password.</Link>
-                                </p>
-                                <Link to="#" className="btn btn-warning">
-                                  Save Password
-                                </Link>
+                              <div className="mb-3">
+                                <label className="form-label">
+                                  Xác nhận mật khẩu mới
+                                </label>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  placeholder="Nhập lại mật khẩu mới"
+                                  required
+                                  value={confirmNewPassword}
+                                  onChange={(e) =>
+                                    setConfirmNewPassword(e.target.value)
+                                  }
+                                />
                               </div>
+                              <button type="submit" className="btn btn-warning">
+                                Đổi mật khẩu
+                              </button>
                             </form>
                           </div>
-                          <hr className="my-10" />
+                          <hr className="my-5" />
                           <div>
                             {/* heading */}
-                            <h5 className="mb-4">Delete Account</h5>
+                            <h5 className="mb-4">Xóa tài khoản</h5>
                             <p className="mb-2">
-                              Would you like to delete your account?
+                              Bạn có muốn xóa tài khoản của mình không?
                             </p>
                             <p className="mb-5">
-                              This account contain 12 orders, Deleting your
-                              account will remove all the order details
-                              associated with it.
+                              Xóa tài khoản sẽ xóa tất cả các chi tiết đặt hàng
+                              liên kết với nó.
                             </p>
                             {/* btn */}
                             <Link to="#" className="btn btn-outline-danger">
-                              I want to delete my account
+                              Tôi muốn xóa tài khoản của mình
                             </Link>
                           </div>
                         </div>
@@ -233,83 +318,6 @@ const MyAcconutSetting = () => {
               </div>
             </div>
           </section>
-          {/* modal */}
-          <div
-            className="offcanvas offcanvas-start"
-            tabIndex={-1}
-            id="offcanvasAccount"
-            aria-labelledby="offcanvasAccountLabel"
-          >
-            {/* offcanvas header */}
-            <div className="offcanvas-header">
-              <h5 className="offcanvas-title" id="offcanvasAccountLabel">
-                My Account
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              />
-            </div>
-            {/* offcanvas body */}
-            <div className="offcanvas-body">
-              <ul className="nav flex-column nav-pills nav-pills-dark">
-                {/* nav item */}
-                <li className="nav-item">
-                  <a
-                    className="nav-link active"
-                    aria-current="page"
-                    href="/MyAccountOrder"
-                  >
-                    <i className="fas fa-shopping-bag me-2" />
-                    Your Orders
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link " href="/MyAccountSetting">
-                    <i className="fas fa-cog me-2" />
-                    Settings
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAccountAddress">
-                    <i className="fas fa-map-marker-alt me-2" />
-                    Address
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAcconutPaymentMethod">
-                    <i className="fas fa-credit-card me-2" />
-                    Payment Method
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAcconutNotification">
-                    <i className="fas fa-bell me-2" />
-                    Notification
-                  </a>
-                </li>
-              </ul>
-              <hr className="my-6" />
-              <div>
-                {/* nav  */}
-                <ul className="nav flex-column nav-pills nav-pills-dark">
-                  {/* nav item */}
-                  <li className="nav-item">
-                    <a className="nav-link " href="/Grocery-react/">
-                      <i className="fas fa-sign-out-alt me-2" />
-                      Log out
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
         </div>
       </>
     </div>

@@ -38,18 +38,18 @@ function Dropdown() {
   }, []);
 
   const materials = [
-    { src: cement, alt: "cement", label: "Cement" },
-    { src: bricks, alt: "bricks", label: "Bricks" },
-    { src: sand, alt: "sand", label: "Sand" },
-    { src: steel, alt: "steel", label: "Steel" },
-    { src: tiles, alt: "tiles", label: "Tiles" },
-    { src: wood, alt: "wood", label: "Wood" },
-    { src: glass, alt: "glass", label: "Glass" },
-    { src: paint, alt: "paint", label: "Paint" },
-    { src: plumbing, alt: "plumbing", label: "Plumbing" },
-    { src: electrical, alt: "electrical", label: "Electrical" },
-    { src: roofing, alt: "roofing", label: "Roofing" },
-    { src: insulation, alt: "insulation", label: "Insulation" },
+    { src: cement, alt: "cement", label: "Xi măng" },
+    { src: bricks, alt: "bricks", label: "Gạch" },
+    { src: sand, alt: "sand", label: "Cát" },
+    { src: steel, alt: "steel", label: "Thép" },
+    { src: tiles, alt: "tiles", label: "Gạch lát" },
+    { src: wood, alt: "wood", label: "Gỗ" },
+    { src: glass, alt: "glass", label: "Kính" },
+    { src: paint, alt: "paint", label: "Sơn" },
+    { src: plumbing, alt: "plumbing", label: "Ống nước" },
+    { src: electrical, alt: "electrical", label: "Điện" },
+    { src: roofing, alt: "roofing", label: "Mái" },
+    { src: insulation, alt: "insulation", label: "Cách nhiệt" },
   ];
 
   return (
@@ -79,13 +79,13 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Stores</h5>
+                    <h5 className="mb-3">Cửa hàng</h5>
                     <div className="my-4">
                       {/* input */}
                       <input
                         type="search"
                         className="form-control"
-                        placeholder="Search by store"
+                        placeholder="Tìm kiếm cửa hàng..."
                       />
                     </div>
                     {/* form check */}
@@ -338,7 +338,7 @@ function Dropdown() {
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
                   <div className=" card-body p-9">
-                    <h1 className="mb-0">Cement</h1>
+                    <h1 className="mb-0">Xi măng</h1>
                   </div>
                 </div>
                 {/* list icon */}
@@ -346,7 +346,7 @@ function Dropdown() {
                   <div>
                     <p className="mb-3 mb-md-0">
                       {" "}
-                      <span className="text-dark">24 </span> Products found{" "}
+                      <span className="text-dark">24 </span> sản phẩm{" "}
                     </p>
                   </div>
                   {/* icon */}
@@ -366,7 +366,7 @@ function Dropdown() {
                         className="form-select"
                         aria-label="Default select example"
                       >
-                        <option selected>Show: 50</option>
+                        <option selected>50</option>
                         <option value={10}>10</option>
                         <option value={20}>20</option>
                         <option value={30}>30</option>
@@ -378,11 +378,20 @@ function Dropdown() {
                         className="form-select"
                         aria-label="Default select example"
                       >
-                        <option selected>Sort by: Featured</option>
-                        <option value="Low to High">Price: Low to High</option>
-                        <option value="High to Low"> Price: High to Low</option>
-                        <option value="Release Date"> Release Date</option>
-                        <option value="Avg. Rating"> Avg. Rating</option>
+                        <option selected> Sắp xếp theo: Nổi bật </option>
+                        <option value="Low to High">
+                          {" "}
+                          Giá: Từ thấp đến cao{" "}
+                        </option>
+                        <option value="High to Low">
+                          {" "}
+                          Giá: Từ cao đến thấp{" "}
+                        </option>
+                        <option value="Release Date"> Ngày phát hành </option>
+                        <option value="Avg. Rating">
+                          {" "}
+                          Đánh giá trung bình{" "}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -405,7 +414,7 @@ function Dropdown() {
                                 src={material.src}
                                 alt={material.alt}
                                 className="mb-3 img-fluid"
-                                style={{width: "100px", height: "100px"}}
+                                style={{ width: "100px", height: "100px" }}
                               />
                             </Link>
                             {/* Action Buttons */}
@@ -457,7 +466,7 @@ function Dropdown() {
                               to="#!"
                               className="text-inherit text-decoration-none"
                             >
-                              {material.label} VIP
+                              {material.label}
                             </Link>
                           </h2>
                           <div>

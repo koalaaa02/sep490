@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAcconutNotification = () => {
   // loading
@@ -12,11 +15,20 @@ const MyAcconutNotification = () => {
     }, 1500);
   }, []);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    navigate("/");
+    window.location.reload();
+  };
+
   return (
     <div>
-       <>
-            <ScrollToTop/>
-            </>
+      <>
+        <ScrollToTop />
+      </>
       <>
         {/* section */}
         <section>
@@ -27,19 +39,9 @@ const MyAcconutNotification = () => {
               {/* col */}
               <div className="col-12">
                 {/* text */}
-                <div className="p-6 d-flex justify-content-between align-items-center d-md-none">
+                <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
-                  <h3 className="fs-5 mb-0">Account Setting</h3>
-                  {/* btn */}
-                  <button
-                    className="btn btn-outline-gray-400 text-muted d-md-none"
-                    type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasAccount"
-                    aria-controls="offcanvasAccount"
-                  >
-                    <i className="fas fa-bars"></i>
-                  </button>
+                  <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
               {/* col */}
@@ -50,33 +52,33 @@ const MyAcconutNotification = () => {
                     {/* nav item */}
                     <li className="nav-item">
                       <Link
-                        className="nav-link "
+                        className="nav-link"
                         aria-current="page"
                         to="/MyAccountOrder"
                       >
                         <i className="fas fa-shopping-bag me-2" />
-                        Your Orders
+                        Đơn đặt hàng của bạn
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAccountSetting">
+                      <Link className="nav-link" to="/MyAccountSetting">
                         <i className="fas fa-cog me-2" />
-                        Settings
+                        Cài đặt
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAccountAddress">
+                      <Link className="nav-link" to="/MyAccountAddress">
                         <i className="fas fa-map-marker-alt me-2" />
-                        Address
+                        Địa chỉ
                       </Link>
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/MyAcconutPaymentMethod">
+                      <Link className="nav-link" to="/MyAcconutPaymentMethod">
                         <i className="fas fa-credit-card me-2" />
-                        Payment Method
+                        Phương thức thanh toán
                       </Link>
                     </li>
                     {/* nav item */}
@@ -86,7 +88,7 @@ const MyAcconutNotification = () => {
                         to="/MyAcconutNotification"
                       >
                         <i className="fas fa-bell me-2" />
-                        Notification
+                        Thông báo
                       </Link>
                     </li>
                     {/* nav item */}
@@ -95,10 +97,10 @@ const MyAcconutNotification = () => {
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="../index.html">
+                      <button className="nav-link " onClick={handleLogOut}>
                         <i className="fas fa-sign-out-alt me-2" />
-                        Log out
-                      </Link>
+                        Đăng Xuất
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -322,85 +324,6 @@ const MyAcconutNotification = () => {
             </div>
           </div>
         </section>
-      </>
-      <>
-        {/* modal */}
-        <div
-          className="offcanvas offcanvas-start"
-          tabIndex={-1}
-          id="offcanvasAccount"
-          aria-labelledby="offcanvasAccountLabel"
-        >
-          {/* offcanvas header */}
-          <div className="offcanvas-header">
-            <h5 className="offcanvas-title" id="offcanvasAccountLabel">
-              My Account
-            </h5>
-            <button
-              type="button"
-              className="btn-close"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            />
-          </div>
-          {/* offcanvas body */}
-          <div className="offcanvas-body">
-            <ul className="nav flex-column nav-pills nav-pills-dark">
-              {/* nav item */}
-              <li className="nav-item">
-                <a
-                  className="nav-link active"
-                  aria-current="page"
-                  href="/MyAccountOrder"
-                >
-                  <i className="fas fa-shopping-bag me-2" />
-                  Your Orders
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link " href="/MyAccountSetting">
-                  <i className="fas fa-cog me-2" />
-                  Settings
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAccountAddress">
-                  <i className="fas fa-map-marker-alt me-2" />
-                  Address
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAcconutPaymentMethod">
-                  <i className="fas fa-credit-card me-2" />
-                  Payment Method
-                </a>
-              </li>
-              {/* nav item */}
-              <li className="nav-item">
-                <a className="nav-link" href="/MyAcconutNotification">
-                  <i className="fas fa-bell me-2" />
-                  Notification
-                </a>
-              </li>
-            </ul>
-            <hr className="my-6" />
-            <div>
-              {/* nav  */}
-              <ul className="nav flex-column nav-pills nav-pills-dark">
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link " href="/Grocery-react/">
-                    <i className="fas fa-sign-out-alt me-2" />
-                    Log out
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
       </>
     </div>
   );
