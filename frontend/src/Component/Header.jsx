@@ -15,7 +15,8 @@ const Header = () => {
     setIsOpen(!isOpen);
   };
   const role = useSelector((state) => state.auth.roles);
-
+  const token = useSelector((state) => state.auth.token);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -264,7 +265,7 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      {role ? (
+                      {role && token ? (
                         <>
                           <div className="dropdown-item disabled text-dark">
                             Xin chào{" "}

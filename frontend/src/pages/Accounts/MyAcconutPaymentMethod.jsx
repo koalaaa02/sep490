@@ -46,7 +46,7 @@ const MyAcconutPaymentMethod = () => {
                 <div className="col-12">
                   <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
-                    <h3 className="fs-5 mb-0">Cài đặt tài khoản</h3>
+                    <h3 className="fs-5 mb-0">Tài khoản</h3>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
@@ -101,10 +101,10 @@ const MyAcconutPaymentMethod = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/">
+                        <button className="nav-link " onClick={handleLogOut}>
                           <i className="fas fa-sign-out-alt me-2" />
-                          Log out
-                        </Link>
+                          Đăng Xuất
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -302,83 +302,6 @@ const MyAcconutPaymentMethod = () => {
               </div>
             </div>
           </section>
-          {/* modal */}
-          <div
-            className="offcanvas offcanvas-start"
-            tabIndex={-1}
-            id="offcanvasAccount"
-            aria-labelledby="offcanvasAccountLabel"
-          >
-            {/* offcanvas header */}
-            <div className="offcanvas-header">
-              <h5 className="offcanvas-title" id="offcanvasAccountLabel">
-                My Account
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="offcanvas"
-                aria-label="Close"
-              />
-            </div>
-            {/* offcanvas body */}
-            <div className="offcanvas-body">
-              <ul className="nav flex-column nav-pills nav-pills-dark">
-                {/* nav item */}
-                <li className="nav-item">
-                  <a
-                    className="nav-link active"
-                    aria-current="page"
-                    href="/MyAccountOrder"
-                  >
-                    <i className="fas fa-shopping-bag me-2" />
-                    Your Orders
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link " href="/MyAccountSetting">
-                    <i className="fas fa-cog me-2" />
-                    Settings
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAccountAddress">
-                    <i className="fas fa-map-marker-alt me-2" />
-                    Address
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAcconutPaymentMethod">
-                    <i className="fas fa-credit-card me-2" />
-                    Payment Method
-                  </a>
-                </li>
-                {/* nav item */}
-                <li className="nav-item">
-                  <a className="nav-link" href="/MyAcconutNotification">
-                    <i className="fas fa-bell me-2" />
-                    Notification
-                  </a>
-                </li>
-              </ul>
-              <hr className="my-6" />
-              <div>
-                {/* nav  */}
-                <ul className="nav flex-column nav-pills nav-pills-dark">
-                  {/* nav item */}
-                  <li className="nav-item">
-                    <button className="nav-link " onClick={handleLogOut}>
-                      <i className="fas fa-sign-out-alt me-2" />
-                      Đăng Xuất
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
           {/* Payment Modal */}
           <div
             className="modal fade"
@@ -397,7 +320,7 @@ const MyAcconutPaymentMethod = () => {
                 {/* modal header */}
                 <div className="modal-header align-items-center d-flex">
                   <h5 className="modal-title" id="paymentModalLabel">
-                    Add New Payment Method
+                    Thêm phương thức thanh toán
                   </h5>
                   {/* button */}
                   <button
@@ -465,7 +388,7 @@ const MyAcconutPaymentMethod = () => {
                       {/* Name on card */}
                       <div className="mb-3 col-12 col-md-4">
                         <label htmlFor="nameoncard" className="form-label">
-                          Name on card
+                          Tên thẻ
                         </label>
                         <input
                           id="nameoncard"
@@ -478,26 +401,26 @@ const MyAcconutPaymentMethod = () => {
                       </div>
                       {/* Month */}
                       <div className="mb-3 col-12 col-md-4">
-                        <label className="form-label">Month</label>
+                        <label className="form-label">Tháng</label>
                         <select className="form-select">
                           <option value>Month</option>
-                          <option value="Jan">Jan</option>
-                          <option value="Feb">Feb</option>
-                          <option value="Mar">Mar</option>
-                          <option value="Apr">Apr</option>
-                          <option value="May">May</option>
-                          <option value="June">June</option>
-                          <option value="July">July</option>
-                          <option value="Aug">Aug</option>
-                          <option value="Sep">Sep</option>
-                          <option value="Oct">Oct</option>
-                          <option value="Nov">Nov</option>
-                          <option value="Dec">Dec</option>
+                          <option value="Jan">1</option>
+                          <option value="Feb">2</option>
+                          <option value="Mar">3</option>
+                          <option value="Apr">4</option>
+                          <option value="May">5</option>
+                          <option value="June">6</option>
+                          <option value="July">7</option>
+                          <option value="Aug">8</option>
+                          <option value="Sep">9</option>
+                          <option value="Oct">10</option>
+                          <option value="Nov">11</option>
+                          <option value="Dec">12</option>
                         </select>
                       </div>
                       {/* Year */}
                       <div className="mb-3 col-12 col-md-4">
-                        <label className="form-label">Year</label>
+                        <label className="form-label">Năm</label>
                         <select className="form-select">
                           <option value>Year</option>
                           <option value="August">2024</option>
@@ -510,7 +433,7 @@ const MyAcconutPaymentMethod = () => {
                       {/* Card number */}
                       <div className="mb-3 col-md-8 col-12">
                         <label htmlFor="cc-mask" className="form-label">
-                          Card Number
+                          Số thẻ
                         </label>
                         <input
                           type="text"
@@ -547,21 +470,17 @@ const MyAcconutPaymentMethod = () => {
                           className="btn btn-warning text-dark"
                           type="submit"
                         >
-                          Add New Card
+                          Thêm
                         </button>
                         <button
                           className="btn btn-outline-gray-400 text-muted"
                           type="button"
                           data-bs-dismiss="modal"
                         >
-                          Close
+                          Đóng
                         </button>
                       </div>
                     </form>
-                    <span>
-                      <strong>Note:</strong> that you can later Xóa your card at
-                      the account setting page.
-                    </span>
                   </div>
                 </div>
               </div>

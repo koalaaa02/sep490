@@ -41,7 +41,7 @@ const MyAcconutNotification = () => {
                 {/* text */}
                 <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
-                  <h3 className="fs-5 mb-0">Cài đặt tài khoản</h3>
+                  <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
               {/* col */}

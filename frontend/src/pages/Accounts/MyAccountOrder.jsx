@@ -10,8 +10,19 @@ import wood from "../../images/wood.jpg";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAccountOrder = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+      dispatch(logout());
+      navigate("/");
+      window.location.reload();
+    };
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -115,7 +126,7 @@ const MyAccountOrder = () => {
               <div className="col-12">
                 <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
-                  <h3 className="fs-5 mb-0">Account Setting</h3>               
+                  <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
               {/* col */}
@@ -168,10 +179,10 @@ const MyAccountOrder = () => {
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link " to="/">
+                      <button className="nav-link " onClick={handleLogOut}>
                         <i className="fas fa-sign-out-alt me-2" />
-                        Log out
-                      </Link>
+                        Đăng Xuất
+                      </button>
                     </li>
                   </ul>
                 </div>
@@ -204,10 +215,10 @@ const MyAccountOrder = () => {
                             <thead className="table-light">
                               <tr>
                                 <th className="border-0">#</th>
-                                <th className="border-0">Name</th>
-                                <th className="border-0">Date</th>
-                                <th className="border-0">Status</th>
-                                <th className="border-0">Amount</th>
+                                <th className="border-0">Tên đơn hàng</th>
+                                <th className="border-0">Ngày tháng</th>
+                                <th className="border-0">Trạng thái</th>
+                                <th className="border-0">Thành tiền</th>
                                 <th className="border-0" />
                               </tr>
                             </thead>
@@ -262,11 +273,11 @@ const MyAccountOrder = () => {
                                           <table className="table table-bordered mt-2">
                                             <thead className="table-light">
                                               <tr>
-                                                <th>#</th>
-                                                <th>Product Name</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
-                                                <th>Total</th>
+                                                <th>Ảnh</th>
+                                                <th>Tên sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Giá</th>
+                                                <th>Tổng</th>
                                               </tr>
                                             </thead>
                                             <tbody>
