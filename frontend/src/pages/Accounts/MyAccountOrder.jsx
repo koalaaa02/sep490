@@ -115,17 +115,7 @@ const MyAccountOrder = () => {
               <div className="col-12">
                 <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
-                  <h3 className="fs-5 mb-0">Account Setting</h3>
-                  {/* button */}
-                  <button
-                    className="btn btn-outline-gray-400 text-muted d-md-none"
-                    type="button"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasAccount"
-                    aria-controls="offcanvasAccount"
-                  >
-                    <i className="fas fa-bars"></i>
-                  </button>
+                  <h3 className="fs-5 mb-0">Account Setting</h3>               
                 </div>
               </div>
               {/* col */}

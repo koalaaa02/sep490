@@ -8,6 +8,9 @@ import paypal from "../../images/paypal.svg";
 import visa from "../../images/visa.svg";
 import discover from "../../images/discover.svg";
 import ScrollToTop from "../ScrollToTop";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAcconutPaymentMethod = () => {
   // loading
@@ -17,6 +20,15 @@ const MyAcconutPaymentMethod = () => {
       setLoaderStatus(false);
     }, 1500);
   }, []);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    navigate("/");
+    window.location.reload();
+  };
 
   return (
     <div>
@@ -34,17 +46,7 @@ const MyAcconutPaymentMethod = () => {
                 <div className="col-12">
                   <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
-                    <h3 className="fs-5 mb-0">Account Setting</h3>
-                    {/* button */}
-                    <button
-                      className="btn btn-outline-gray-400 text-muted d-md-none"
-                      type="button"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasAccount"
-                      aria-controls="offcanvasAccount"
-                    >
-                      <i className="fas fa-bars"></i>
-                    </button>
+                    <h3 className="fs-5 mb-0">Cài đặt tài khoản</h3>
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
@@ -78,7 +80,10 @@ const MyAcconutPaymentMethod = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link active" to="/MyAcconutPaymentMethod">
+                        <Link
+                          className="nav-link active"
+                          to="/MyAcconutPaymentMethod"
+                        >
                           <i className="fas fa-credit-card me-2" />
                           Phương thức thanh toán
                         </Link>
@@ -125,14 +130,14 @@ const MyAcconutPaymentMethod = () => {
                         <div className="p-6 p-lg-10">
                           {/* heading */}
                           <div className="d-flex justify-content-between mb-6 align-items-center">
-                            <h2 className="mb-0">Payment Methods</h2>
+                            <h2 className="mb-0">Phương thức thanh toán</h2>
                             <Link
                               to="#"
                               className="btn btn-outline-warning"
                               data-bs-toggle="modal"
                               data-bs-target="#paymentModal"
                             >
-                              Add Payment{" "}
+                              Thêm phương thức thanh toán{" "}
                             </Link>
                           </div>
                           <ul className="list-group list-group-flush">
@@ -156,7 +161,7 @@ const MyAcconutPaymentMethod = () => {
                                     to="#"
                                     className="btn btn-outline-gray-400 disabled btn-sm"
                                   >
-                                    Remove
+                                    Xóa
                                   </Link>
                                 </div>
                               </div>
@@ -186,7 +191,7 @@ const MyAcconutPaymentMethod = () => {
                                     to="#"
                                     className="btn btn-outline-gray-400 text-muted btn-sm"
                                   >
-                                    Remove
+                                    Xóa
                                   </Link>
                                 </div>
                               </div>
@@ -221,7 +226,7 @@ const MyAcconutPaymentMethod = () => {
                                     to="#"
                                     className="btn btn-outline-gray-400 text-muted btn-sm"
                                   >
-                                    Remove
+                                    Xóa
                                   </Link>
                                 </div>
                               </div>
@@ -252,7 +257,7 @@ const MyAcconutPaymentMethod = () => {
                                     to="#"
                                     className="btn btn-outline-gray-400 text-muted btn-sm"
                                   >
-                                    Remove
+                                    Xóa
                                   </Link>
                                 </div>
                               </div>
@@ -283,7 +288,7 @@ const MyAcconutPaymentMethod = () => {
                                     to="#"
                                     className="btn btn-outline-gray-400 text-muted btn-sm"
                                   >
-                                    Remove
+                                    Xóa
                                   </Link>
                                 </div>
                               </div>
@@ -365,10 +370,10 @@ const MyAcconutPaymentMethod = () => {
                 <ul className="nav flex-column nav-pills nav-pills-dark">
                   {/* nav item */}
                   <li className="nav-item">
-                    <a className="nav-link " href="/">
+                    <button className="nav-link " onClick={handleLogOut}>
                       <i className="fas fa-sign-out-alt me-2" />
-                      Log out
-                    </a>
+                      Đăng Xuất
+                    </button>
                   </li>
                 </ul>
               </div>
@@ -554,8 +559,8 @@ const MyAcconutPaymentMethod = () => {
                       </div>
                     </form>
                     <span>
-                      <strong>Note:</strong> that you can later remove your card
-                      at the account setting page.
+                      <strong>Note:</strong> that you can later Xóa your card at
+                      the account setting page.
                     </span>
                   </div>
                 </div>

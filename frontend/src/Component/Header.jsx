@@ -61,7 +61,7 @@ const Header = () => {
                 style={{ width: "100%" }}
                 list="datalistOptions"
                 id="exampleDataList"
-                placeholder="Type to search..."
+                placeholder="Tìm kiếm..."
               />
             </div>
           </div>
@@ -80,7 +80,7 @@ const Header = () => {
             className="form-control responsivesearch "
             list="datalistOptions"
             id="exampleDataList"
-            placeholder="Type to search..."
+            placeholder="Tìm kiếm..."
             fdprocessedid="9icrif"
             style={{ width: "35%" }}
           />
@@ -130,40 +130,40 @@ const Header = () => {
                     aria-labelledby="navbarDropdown"
                   >
                     <Link className="dropdown-item" to="/Shop">
-                      Cement
+                      Xi măng
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Bricks
+                      Gạch
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Sand
+                      Cát
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Steel
+                      Thép
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Tiles
+                      Gạch lát
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Wood
+                      Gỗ
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Glass
+                      Kính
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Paint
+                      Sơn
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Plumbing
+                      Ống nước
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Electrical
+                      Điện
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Roofing
+                      Mái
                     </Link>
                     <Link className="dropdown-item" to="/Shop">
-                      Insulation
+                      Cách nhiệt
                     </Link>
                   </div>
                 </li>
@@ -221,9 +221,7 @@ const Header = () => {
                   <Link className="dropdown-item" to="/ShopCart">
                     Giỏ hàng
                   </Link>
-                  <Link className="dropdown-item" to="/ShopCheckOut">
-                    
-                  </Link>
+                  <Link className="dropdown-item" to="/ShopCheckOut"></Link>
                 </div>
               </li>
 
@@ -274,6 +272,8 @@ const Header = () => {
                               ? "Dealer"
                               : role === "ROLE_SELLER"
                               ? "Seller"
+                              : role === "ROLE_PROVIDER"
+                              ? "Provider"
                               : "User"}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">

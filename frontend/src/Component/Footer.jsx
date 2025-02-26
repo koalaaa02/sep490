@@ -27,7 +27,7 @@ const Footer = () => {
                 </div>
                 <div className="dimc-protect">
                   <div className="col-lg-12 text-lg-start text-center mb-2 mb-lg-0">
-                    <h4>Đối tác thanh toán</h4>
+                    <h4>Phương thức thanh toán</h4>
                     <ul className="list-inline d-flex mb-0">
                       <li className="list-inline-item">
                         <Link to="#">

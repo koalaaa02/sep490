@@ -51,18 +51,18 @@ const Home = () => {
   }, []);
 
   const materials = [
-    { src: cement, alt: "cement", label: "Cement" },
-    { src: bricks, alt: "bricks", label: "Bricks" },
-    { src: sand, alt: "sand", label: "Sand" },
-    { src: steel, alt: "steel", label: "Steel" },
-    { src: tiles, alt: "tiles", label: "Tiles" },
-    { src: wood, alt: "wood", label: "Wood" },
-    { src: glass, alt: "glass", label: "Glass" },
-    { src: paint, alt: "paint", label: "Paint" },
-    { src: plumbing, alt: "plumbing", label: "Plumbing" },
-    { src: electrical, alt: "electrical", label: "Electrical" },
-    { src: roofing, alt: "roofing", label: "Roofing" },
-    { src: insulation, alt: "insulation", label: "Insulation" },
+    { src: cement, alt: "cement", label: "Xi măng" },
+    { src: bricks, alt: "bricks", label: "Gạch" },
+    { src: sand, alt: "sand", label: "Cát" },
+    { src: steel, alt: "steel", label: "Thép" },
+    { src: tiles, alt: "tiles", label: "Gạch lát" },
+    { src: wood, alt: "wood", label: "Gỗ" },
+    { src: glass, alt: "glass", label: "Kính" },
+    { src: paint, alt: "paint", label: "Sơn" },
+    { src: plumbing, alt: "plumbing", label: "Ống nước" },
+    { src: electrical, alt: "electrical", label: "Điện" },
+    { src: roofing, alt: "roofing", label: "Mái" },
+    { src: insulation, alt: "insulation", label: "Cách nhiệt" },
   ];
 
   // loading
@@ -123,17 +123,17 @@ const Home = () => {
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
                             <h2 className="text-dark display-6 fw-bold mt-4">
-                              High-Quality <br /> Construction Materials
+                              Vật liệu xây dựng <br /> chất lượng cao
                             </h2>
                             <p className="lead">
-                              Providing a wide range of construction materials
-                              at competitive prices with fast delivery.
+                              Cung cấp một loạt các vật liệu xây dựng với giá
+                              cạnh tranh với giao hàng nhanh.
                             </p>
                             <Link
                               to="#!"
                               className="btn mt-3 text-bg-warning border-0"
                             >
-                              Shop Now
+                              Mua ngay
                               <i className="feather-icon icon-arrow-right ms-1" />
                             </Link>
                           </div>
@@ -151,19 +151,19 @@ const Home = () => {
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
                             <h2 className="text-dark display-6 fw-bold mt-4">
-                              Bulk Discounts
+                              Giảm giá số lượng lớn
                               <br />
                             </h2>
                             <p className="lead text-white">
-                              Special discounts for large orders. Get
-                              high-quality construction materials at the best
-                              prices.
+                              Giảm giá đặc biệt cho các đơn đặt hàng lớn. Lấy
+                              Vật liệu xây dựng chất lượng cao ở mức tốt nhất
+                              Giá cả.
                             </p>
                             <Link
                               to="#!"
                               className="btn mt-3 text-bg-warning border-0"
                             >
-                              Shop Now
+                              Mua ngay
                               <i className="feather-icon icon-arrow-right ms-1" />
                             </Link>
                           </div>
@@ -218,8 +218,9 @@ const Home = () => {
                             />
                             <div className="banner-text">
                               <h3 className="mb-0 fw-bold text-white">
-                                10% Discount on <br />
-                                Bulk Cement Orders
+                                Giảm giá 10%
+                                <br />
+                                Đơn đặt hàng xi măng số lượng lớn
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -228,7 +229,7 @@ const Home = () => {
                                 to="#!"
                                 className="btn text-bg-warning border-0"
                               >
-                                Shop Now
+                                Mua ngay
                                 <i className="feather-icon icon-arrow-right ms-1" />
                               </Link>
                             </div>
@@ -252,8 +253,8 @@ const Home = () => {
                             <div className="banner-text">
                               {/* Banner Content */}
                               <h3 className="fw-bold mb-2 text-white">
-                                Premium Quality <br />
-                                Steel & Iron
+                                Chất lượng cao cấp <br />
+                                Thép & sắt
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -262,7 +263,7 @@ const Home = () => {
                                 to="#!"
                                 className="btn text-bg-warning border-0"
                               >
-                                Shop Now
+                                Mua ngay
                                 <i className="feather-icon icon-arrow-right ms-1" />
                               </Link>
                             </div>
@@ -285,8 +286,9 @@ const Home = () => {
                             {/* Banner Content */}
                             <div className="banner-text">
                               <h3 className="fs-2 fw-bold lh-1 mb-2 text-white">
-                                Fast & Reliable <br />
-                                Delivery Service
+                                Dịch vụ giao hàng
+                                <br />
+                                Nhanh chóng và đáng tin cậy
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -295,7 +297,7 @@ const Home = () => {
                                 to="#!"
                                 className="btn text-bg-warning border-0"
                               >
-                                Shop Now
+                                Mua ngay
                                 <i className="feather-icon icon-arrow-right ms-1" />
                               </Link>
                             </div>
@@ -321,7 +323,7 @@ const Home = () => {
                             className="h3style"
                             data-title="Shop Popular Categories"
                           >
-                            Popular Categories
+                            Danh mục phổ biến
                           </h3>
                           <div className="wt-separator bg-primarys"></div>
                           <div className="wt-separator2 bg-primarys"></div>
@@ -382,12 +384,11 @@ const Home = () => {
                               </div>
                             </div>
                             <div className="icon-content">
-                              <h3 className="h5 mb-3">Easy Returns</h3>
+                              <h3 className="h5 mb-3">Đổi trả dễ dàng</h3>
                               <p>
-                                Not satisfied with a product? Return it at the
-                                doorstep &amp; get a refund within hours. No
-                                questions asked
-                                <Link to="#!">policy</Link>.
+                                Không hài lòng với sản phẩm? Bạn có thể trả hàng
+                                ngay tại nhà và nhận lại tiền trong vòng vài
+                                giờ. Chính sách hoàn tiền không cần hỏi lý do.
                               </p>
                             </div>
                           </div>
@@ -404,11 +405,11 @@ const Home = () => {
                               </div>
                             </div>
                             <div className="icon-content">
-                              <h3 className="h5 mb-3">Wide Assortment</h3>
+                              <h3 className="h5 mb-3">Sản phẩm đa dạng</h3>
                               <p>
-                                Choose from 5000+ products across food, personal
-                                care, household, bakery, veg and non-veg &amp;
-                                other categories.
+                                Lựa chọn từ hơn 5000 sản phẩm vật liệu xây dựng,
+                                bao gồm xi măng, gạch, cát, thép, gỗ, kính và
+                                nhiều loại vật liệu khác.
                               </p>
                             </div>
                           </div>
@@ -426,12 +427,13 @@ const Home = () => {
                             </div>
                             <div className="icon-content">
                               <h3 className="h5 mb-3">
-                                Best Prices &amp; Offers
+                                Giá cả tốt nhất & Ưu đãi hấp dẫn
                               </h3>
                               <p>
-                                Cheaper prices than your local supermarket,
-                                great cashback offers to top it off. Get best
-                                pricess &amp; offers.
+                                Giá rẻ hơn so với siêu thị địa phương, cùng với
+                                nhiều ưu đãi hoàn tiền hấp dẫn. Hãy tận hưởng
+                                giá tốt nhất và các ưu đãi đặc biệt từ chúng
+                                tôi!
                               </p>
                             </div>
                           </div>
@@ -448,11 +450,11 @@ const Home = () => {
                               </div>
                             </div>
                             <div className="icon-content">
-                              <h3 className="h5 mb-3">10 minute grocery now</h3>
+                              <h3 className="h5 mb-3">Giao hàng nhanh chóng</h3>
                               <p>
-                                Get your order delivered to your doorstep at the
-                                earliest from FreshCart pickup
-                                <p> stores near you.</p>
+                                Nhận đơn hàng vật liệu xây dựng của bạn được
+                                giao tận nơi nhanh chóng. Mang đến cho bạn sự tiện
+                                lợi và nhanh chóng trong mỗi lần mua sắm!
                               </p>
                             </div>
                           </div>

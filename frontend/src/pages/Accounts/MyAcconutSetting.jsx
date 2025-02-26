@@ -4,11 +4,26 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../../Utils/config";
+import { useDispatch } from "react-redux";
+import { logout } from "../../Redux/slice/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const MyAcconutSetting = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogOut = () => {
+    dispatch(logout());
+    navigate("/");
+    window.location.reload();
+  };
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const token = useSelector((state) => state.auth.token);
 
@@ -28,12 +43,8 @@ const MyAcconutSetting = () => {
           throw new Error(`HTTP Error! Status: ${response.status}`);
         }
 
-        const textData = await response.text();
-        console.log("Data:", textData);
-        console.log("Text Data Length:", textData.length);
-        const dataJoson = JSON.parse(textData); 
-        console.log("Parsed Data:", dataJoson);
-        setUserData(textData);
+        const data = await response.json();
+        setUserData(data);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -44,7 +55,46 @@ const MyAcconutSetting = () => {
     fetchData();
   }, [token]);
 
-  // console.log(userData);
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setMessage("");
+    setError("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/myprofile/change-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Mật khẩu đã được thay đổi thành công.");
+      } else {
+        setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+      }
+    } catch (err) {
+      setError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+      );
+    }
+  };
 
   return (
     <div>
@@ -64,16 +114,6 @@ const MyAcconutSetting = () => {
                   <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
                     {/* heading */}
                     <h3 className="fs-5 mb-0">Cài đặt tài khoản</h3>
-                    {/* btn */}
-                    <button
-                      className="btn btn-outline-gray-400 text-muted d-md-none"
-                      type="button"
-                      data-bs-toggle="offcanvas"
-                      data-bs-target="#offcanvasAccount"
-                      aria-controls="offcanvasAccount"
-                    >
-                      <i className="fas fa-bars"></i>
-                    </button>
                   </div>
                 </div>
                 {/* col */}
@@ -128,10 +168,10 @@ const MyAcconutSetting = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link " to="/">
+                        <button className="nav-link " onClick={handleLogOut}>
                           <i className="fas fa-sign-out-alt me-2" />
-                          Log out
-                        </Link>
+                          Đăng Xuất
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -162,6 +202,11 @@ const MyAcconutSetting = () => {
                           <div>
                             {/* heading */}
                             <h5 className="mb-4">Thông tin cá nhân</h5>
+                            {message && (
+                              <div className="alert alert-success">
+                                {message}
+                              </div>
+                            )}
                             <div className="row">
                               <div className="col-lg-5">
                                 {/* form */}
@@ -172,7 +217,8 @@ const MyAcconutSetting = () => {
                                     <input
                                       type="text"
                                       className="form-control"
-                                      placeholder="Nigam Mishra"
+                                      placeholder={userData.name}
+                                      disabled
                                     />
                                   </div>
                                   {/* input */}
@@ -181,73 +227,70 @@ const MyAcconutSetting = () => {
                                     <input
                                       type="email"
                                       className="form-control"
-                                      placeholder="example@gmail.com"
+                                      placeholder={userData.email}
+                                      disabled
                                     />
-                                  </div>
-                                  {/* input */}
-                                  <div className="mb-5">
-                                    <label className="form-label">
-                                      Số điện thoại
-                                    </label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      placeholder="Phone number"
-                                    />
-                                  </div>
-                                  {/* button */}
-                                  <div className="mb-3">
-                                    <button className="btn btn-warning">
-                                      Lưu
-                                    </button>
                                   </div>
                                 </form>
                               </div>
                             </div>
                           </div>
-                          <hr className="my-10" />
+                          <hr className="my-5" />
                           <div className="pe-lg-14">
                             {/* heading */}
                             <h5 className="mb-4">Mật khẩu</h5>
-                            <form className=" row row-cols-1 row-cols-lg-2">
-                              {/* input */}
-                              <div className="mb-3 col">
+                            <form onSubmit={handleChangePassword}>
+                              <div className="mb-3">
                                 <label className="form-label">
-                                  Mật khẩu cũ
+                                  Mật khẩu hiện tại
                                 </label>
                                 <input
                                   type="password"
                                   className="form-control"
-                                  placeholder="**********"
+                                  placeholder="Nhập mật khẩu hiện tại"
+                                  required
+                                  value={currentPassword}
+                                  onChange={(e) =>
+                                    setCurrentPassword(e.target.value)
+                                  }
                                 />
                               </div>
-                              {/* input */}
-                              <div className="mb-3 col">
+                              <div className="mb-3">
                                 <label className="form-label">
                                   Mật khẩu mới
                                 </label>
                                 <input
                                   type="password"
                                   className="form-control"
-                                  placeholder="**********"
+                                  placeholder="Nhập mật khẩu mới"
+                                  required
+                                  value={newPassword}
+                                  onChange={(e) =>
+                                    setNewPassword(e.target.value)
+                                  }
                                 />
                               </div>
-                              {/* input */}
-                              <div className="col-12">
-                                <p className="mb-4">
-                                  Không thể nhớ mật khẩu hiện tại của bạn?
-                                  <Link to="/MyAccountForgetPassword">
-                                    {" "}
-                                    Đặt lại mật khẩu của bạn.
-                                  </Link>
-                                </p>
-                                <Link to="#" className="btn btn-warning">
-                                  Lưu mật khẩu
-                                </Link>
+                              <div className="mb-3">
+                                <label className="form-label">
+                                  Xác nhận mật khẩu mới
+                                </label>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  placeholder="Nhập lại mật khẩu mới"
+                                  required
+                                  value={confirmPassword}
+                                  onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                  }
+                                />
                               </div>
+                              <button type="submit" className="btn btn-warning">
+                                Đổi mật khẩu
+                              </button>
                             </form>
                           </div>
-                          <hr className="my-10" />
+                          <hr className="my-5" />
                           <div>
                             {/* heading */}
                             <h5 className="mb-4">Xóa tài khoản</h5>
