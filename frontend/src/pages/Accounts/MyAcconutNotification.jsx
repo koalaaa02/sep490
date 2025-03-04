@@ -21,7 +21,6 @@ const MyAcconutNotification = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
-    window.location.reload();
   };
 
   return (

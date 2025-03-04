@@ -1,56 +1,169 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import assortment from "../../images/assortment.jpg";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import cement from "../../images/cement.jpg";
-import bricks from "../../images/bricks.jpg";
-import sand from "../../images/sand.jpg";
-import steel from "../../images/steel.jpg";
-import tiles from "../../images/tiles.png";
-import wood from "../../images/wood.jpg";
-import glass from "../../images/glass.jpg";
-import paint from "../../images/paint.jpg";
-import plumbing from "../../images/plumbing.jpg";
-import electrical from "../../images/electrical.jpg";
-import roofing from "../../images/roofing.jpg";
-import insulation from "../../images/insulation.jpg";
 import Swal from "sweetalert2";
 import ScrollToTop from "../ScrollToTop";
+import { BASE_URL } from "../../Utils/config";
+import image1 from "../../images/glass.jpg";
 
 function Dropdown() {
-  const handleAddClick = () => {
-    Swal.fire({
-      icon: "success",
-      title: "Added to Cart",
-      text: "Product has been added to your cart!",
-      showConfirmButton: true,
-      timer: 3000,
-    });
-  };
-
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
-  useEffect(() => {
-    setTimeout(() => {
-      setLoaderStatus(false);
-    }, 1500);
-  }, []);
+  const [stores, setStores] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [product, setProduct] = useState([]);
+  const [selectedSku, setSelectedSku] = useState(null);
+  const { cateId } = useParams();
+  const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
 
-  const materials = [
-    { src: cement, alt: "cement", label: "Xi măng" },
-    { src: bricks, alt: "bricks", label: "Gạch" },
-    { src: sand, alt: "sand", label: "Cát" },
-    { src: steel, alt: "steel", label: "Thép" },
-    { src: tiles, alt: "tiles", label: "Gạch lát" },
-    { src: wood, alt: "wood", label: "Gỗ" },
-    { src: glass, alt: "glass", label: "Kính" },
-    { src: paint, alt: "paint", label: "Sơn" },
-    { src: plumbing, alt: "plumbing", label: "Ống nước" },
-    { src: electrical, alt: "electrical", label: "Điện" },
-    { src: roofing, alt: "roofing", label: "Mái" },
-    { src: insulation, alt: "insulation", label: "Cách nhiệt" },
+  const ratings = [
+    { id: "ratingFive", stars: 5 },
+    { id: "ratingFour", stars: 4 },
+    { id: "ratingThree", stars: 3 },
+    { id: "ratingTwo", stars: 2 },
+    { id: "ratingOne", stars: 1 },
   ];
+
+  useEffect(() => {
+    if (!cateId) return;  
+    const fetchData = async () => {
+      try {
+        setLoaderStatus(true);
+
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+        });
+
+        const [shopResponse, cateResponse] = await Promise.all([
+          fetch(`${BASE_URL}/api/public/shops?${params.toString()}`, {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch(`${BASE_URL}/api/public/categories/${cateId}`, {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
+
+        if (!shopResponse.ok || !cateResponse.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const shopData = await shopResponse.json();
+        const cateData = await cateResponse.json();
+        setStores(shopData.content || []);
+        setCategories(cateData || {});
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoaderStatus(false);
+      }
+    };
+
+    fetchData();
+  }, [cateId]);
+
+  const handleAddWishList = (product) => {
+    let wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    const existingProductIndex = wishList.findIndex(
+      (item) => item.id === product.id
+    );
+    if (existingProductIndex !== -1) {
+      wishList[existingProductIndex].quantity += 1;
+    } else {
+      wishList.push({ ...product, quantity: 1 });
+    }
+    localStorage.setItem("wishList", JSON.stringify(wishList));
+
+    setTimeout(() => {
+      Swal.fire({
+        icon: "info",
+        title: "Thêm vào danh sách yêu thích",
+        text: "Sản phẩm đã được thêm danh sách yêu thích bạn!",
+        showConfirmButton: true,
+        timer: 2000,
+      });
+    }, 100);
+  };
+
+  const handleAddCart = (productSKUId, quantity = 1) => {
+    if (!productSKUId || quantity <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Thông tin sản phẩm không hợp lệ!",
+      });
+      return;
+    }
+
+    const fetchAddCart = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/cart/add?shopId=${cateId}&productSKUId=${productSKUId}&quantity=${quantity}`,
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (response.ok) {
+          Swal.fire({
+            icon: "success",
+            title: "Thêm vào giỏ hàng",
+            text: "Sản phẩm đã được thêm vào giỏ hàng!",
+          });
+        } else {
+          throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Thêm vào giỏ hàng",
+          text: "Sản phẩm đã được thêm vào giỏ hàng của bạn!",
+          showConfirmButton: true,
+          timer: 2000,
+        });
+      } catch (error) {
+        console.error("Lỗi khi thêm vào giỏ hàng:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi",
+          text: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại sau.",
+        });
+      }
+    };
+
+    fetchAddCart();
+  };
+
+  const getProduct = (id) => {
+    const fetchProductById = async () => {
+      try {
+        const product = await fetch(`${BASE_URL}/api/public/product/${id}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!product.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const dataProduct = await product.json();
+        setProduct(dataProduct);
+        setSelectedSku(dataProduct?.skus?.[0]);
+      } catch (error) {
+        console.error("Error fetching product:", error);
+      }
+    };
+    fetchProductById();
+  };
 
   return (
     <div>
@@ -79,7 +192,7 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Cửa hàng</h5>
+                    <h5 className="mb-3">Danh sách cửa hàng</h5>
                     <div className="my-4">
                       {/* input */}
                       <input
@@ -88,224 +201,65 @@ function Dropdown() {
                         placeholder="Tìm kiếm cửa hàng..."
                       />
                     </div>
+                    {stores.length > 0 ? (
+                      stores.map((stores, index) => (
+                        <div className="form-check mb-2" key={index}>
+                          {/* input */}
+                          <Link
+                            to={"/SingleShop"}
+                            className="form-check-label"
+                            htmlFor="eGrocery"
+                          >
+                            {stores.shopType}
+                          </Link>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="dropdown-item">Đang tải...</p>
+                    )}
                     {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="eGrocery"
-                        defaultChecked
-                      />
-                      <label className="form-check-label" htmlFor="eGrocery">
-                        E-Grocery
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="DealShare"
-                      />
-                      <label className="form-check-label" htmlFor="DealShare">
-                        DealShare
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Dmart"
-                      />
-                      <label className="form-check-label" htmlFor="Dmart">
-                        DMart
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Blinkit"
-                      />
-                      <label className="form-check-label" htmlFor="Blinkit">
-                        Blinkit
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="BigBasket"
-                      />
-                      <label className="form-check-label" htmlFor="BigBasket">
-                        BigBasket
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="StoreFront"
-                      />
-                      <label className="form-check-label" htmlFor="StoreFront">
-                        StoreFront
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Spencers"
-                      />
-                      <label className="form-check-label" htmlFor="Spencers">
-                        Spencers
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="onlineGrocery"
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="onlineGrocery"
-                      >
-                        Online Grocery
-                      </label>
-                    </div>
                   </div>
                   <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Price</h5>
+                    <h5 className="mb-3">Giá thành</h5>
                     <div>
                       {/* range */}
                       <div id="priceRange" className="mb-3" />
-                      <small className="text-muted">Price:</small>{" "}
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder="Nhập số..."
+                      />
                       <span id="priceRange-value" className="small" />
                     </div>
                   </div>
                   {/* rating */}
                   <div className="py-4">
-                    <h5 className="mb-3">Rating</h5>
+                    <h5 className="mb-3">Đánh giá</h5>
                     <div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingFive"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingFive"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingFour"
-                          defaultChecked
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingFour"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingThree"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingThree"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingTwo"
-                        />
-                        <label className="form-check-label" htmlFor="ratingTwo">
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingOne"
-                        />
-                        <label className="form-check-label" htmlFor="ratingOne">
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
+                      {ratings.map((rating, index) => (
+                        <div className="form-check mb-2" key={index}>
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id={rating.id}
+                            defaultChecked={rating.stars === 5}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor={rating.id}
+                          >
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <i
+                                key={i}
+                                className={`bi ${
+                                  i < rating.stars ? "bi-star-fill" : "bi-star"
+                                } text-warning`}
+                              />
+                            ))}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div className="py-4">
@@ -338,7 +292,7 @@ function Dropdown() {
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
                   <div className=" card-body p-9">
-                    <h1 className="mb-0">Xi măng</h1>
+                    <h1 className="mb-0">{categories.name}</h1>
                   </div>
                 </div>
                 {/* list icon */}
@@ -346,18 +300,21 @@ function Dropdown() {
                   <div>
                     <p className="mb-3 mb-md-0">
                       {" "}
-                      <span className="text-dark">24 </span> sản phẩm{" "}
+                      <span className="text-dark">
+                        {categories.products.length}{" "}
+                      </span>{" "}
+                      sản phẩm{" "}
                     </p>
                   </div>
                   {/* icon */}
                   <div className="d-flex justify-content-between align-items-center">
-                    <Link to="/ShopListCol" className="text-muted me-3">
+                    {/* <Link to="/ShopListCol" className="text-muted me-3">
                       <i className="bi bi-list-ul" />
                     </Link>
                     <Link to="/ShopGridCol3" className="text-muted me-3">
                       <i className="bi bi-grid" />
-                    </Link>
-                    <Link to="/Shop" className="me-3 active">
+                    </Link> */}
+                    <Link to={`/Shop/${cateId}`} className="me-3 active">
                       <i className="bi bi-grid-3x3-gap" />
                     </Link>
                     <div className="me-2">
@@ -397,110 +354,101 @@ function Dropdown() {
                   </div>
                 </div>
                 {/* row */}
-                <div className="row g-4 row-cols-xl-6 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
+                <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
                   {/* col */}
-                  {materials.map((material, index) => (
-                    <div key={index} className="col">
-                      {/* card */}
-                      <div className="card card-product">
-                        <div className="card-body">
-                          {/* Badge */}
-                          <div className="text-center position-relative">
-                            <div className="position-absolute top-0 start-0">
-                              <span className="badge bg-danger">Hot</span>
-                            </div>
-                            <Link to="#!">
-                              <img
-                                src={material.src}
-                                alt={material.alt}
-                                className="mb-3 img-fluid"
-                                style={{ width: "100px", height: "100px" }}
-                              />
-                            </Link>
-                            {/* Action Buttons */}
-                            <div className="card-product-action">
-                              <Link
-                                to="#!"
-                                className="btn-action"
-                                data-bs-toggle="modal"
-                                data-bs-target="#quickViewModal"
-                              >
-                                <i
-                                  className="bi bi-eye"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-html="true"
-                                  title="Quick View"
+                  {categories.products.map((p, index) => {
+                    const isInWishlist = storedWishlist.some(
+                      (item) => item.id === p.id
+                    );
+                    return (
+                      <div key={index} className="col">
+                        {/* card */}
+                        <div className="card card-product">
+                          <div className="card-body">
+                            {/* Badge */}
+                            <div className="text-center position-relative">
+                              <Link>
+                                <img
+                                  src={image1}
+                                  alt={p.images}
+                                  className="mb-3 img-fluid"
+                                  style={{
+                                    width: "150px",
+                                    height: "150px",
+                                  }}
                                 />
                               </Link>
-                              <Link
-                                to="shop-wishlist.html"
-                                className="btn-action"
-                                data-bs-toggle="tooltip"
-                                data-bs-html="true"
-                                title="Wishlist"
-                              >
-                                <i className="bi bi-heart" />
-                              </Link>
+                              {/* Action Buttons */}
+                              <div className="card-product-action">
+                                <Link
+                                  to="#!"
+                                  className="btn-action"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#ViewProduct"
+                                  onClick={() => getProduct(p.id)}
+                                >
+                                  <i
+                                    className="bi bi-eye"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-html="true"
+                                    title="Quick View"
+                                  />
+                                </Link>
+                                <Link
+                                  onClick={
+                                    isInWishlist
+                                      ? null
+                                      : () => handleAddWishList(p)
+                                  }
+                                  className={`btn-action ${
+                                    isInWishlist ? "disabled text-warning" : ""
+                                  }`}
+                                  data-bs-toggle="tooltip"
+                                  data-bs-html="true"
+                                  title="Wishlist"
+                                >
+                                  <i
+                                    className={`bi ${
+                                      isInWishlist
+                                        ? "bi-heart-fill"
+                                        : "bi-heart"
+                                    }`}
+                                  />
+                                </Link>
+                              </div>
+                            </div>
+                            {/* Heading */}
+                            <div className="text-small mb-1"></div>
+                            <h2 className="fs-6">
                               <Link
                                 to="#!"
-                                className="btn-action"
-                                data-bs-toggle="tooltip"
-                                data-bs-html="true"
-                                title="Compare"
+                                className="text-inherit text-decoration-none"
                               >
-                                <i className="bi bi-arrow-left-right" />
+                                {p?.name}
                               </Link>
-                            </div>
-                          </div>
-                          {/* Heading */}
-                          <div className="text-small mb-1">
-                            <Link
-                              to="#!"
-                              className="text-decoration-none text-muted"
-                            >
-                              <small>{material.label}</small>
-                            </Link>
-                          </div>
-                          <h2 className="fs-6">
-                            <Link
-                              to="#!"
-                              className="text-inherit text-decoration-none"
-                            >
-                              {material.label}
-                            </Link>
-                          </h2>
-                          <div>
-                            <small className="text-warning">
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-half" />
-                            </small>
-                            <span className="text-muted small"> 4.5(149)</span>
-                          </div>
-                          {/* Price */}
-                          <div className="d-flex justify-content-between align-items-center mt-3">
+                              <br />
+                              <small>{p.description}</small>
+                              <br />
+                              <small>{p.specifications}</small>
+                            </h2>
                             <div>
-                              <span className="text-dark">$18</span>
-                              <span className="text-decoration-line-through text-muted">
+                              <small className="text-warning">
+                                <i className="bi bi-star-fill" />
+                                <i className="bi bi-star-fill" />
+                                <i className="bi bi-star-fill" />
+                                <i className="bi bi-star-fill" />
+                                <i className="bi bi-star-half" />
+                              </small>
+                              <span className="text-muted small">
                                 {" "}
-                                $24
+                                4.5(149)
                               </span>
-                            </div>
-                            <div>
-                              <button
-                                className="btn btn-warning btn-sm"
-                                onClick={handleAddClick}
-                              >
-                                + Add
-                              </button>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="row mt-8">
                   <div className="col">
@@ -566,6 +514,106 @@ function Dropdown() {
           </div>
         </>
       )}
+      <div
+        className="modal fade"
+        id="ViewProduct"
+        tabIndex={-1}
+        role="dialog"
+        aria-labelledby="paymentModalLabel"
+        aria-hidden="true"
+      >
+        <div
+          className="modal-dialog modal-lg modal-dialog-centered"
+          role="document"
+        >
+          {/* modal content */}
+          <div className="modal-content">
+            {/* modal header */}
+            <div className="modal-header align-items-center d-flex">
+              <h5 className="modal-title" id="paymentModalLabel">
+                Chi tiết sản phẩm
+              </h5>
+              {/* button */}
+              <button
+                type="button"
+                className="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            {/* Modal body */}
+            <div className="modal-body">
+              <div className="row">
+                {/* Hình ảnh bên trái */}
+                <div className="col-md-4">
+                  <img
+                    src={image1}
+                    alt="Sản phẩm"
+                    className="img-fluid rounded"
+                  />
+                </div>
+
+                {/* Mô tả bên phải */}
+                <div className="col-md-8">
+                  <h4 className="mb-3">Tên sản phẩm: {product?.name}</h4>
+                  <p>{product?.description}</p>
+                  <p>{product?.specifications}</p>
+                </div>
+                <div className="col-md-12">
+                  {product?.skus?.length > 0 ? (
+                    <>
+                      {product.skus.map((p, index) => (
+                        <img
+                          key={index}
+                          src={image1 || "default-image.jpg"}
+                          alt="Sản phẩm"
+                          className={`img-fluid rounded border m-1 ${
+                            selectedSku === p
+                              ? "border-primary"
+                              : "border-black"
+                          }`}
+                          style={{
+                            height: "70px",
+                            width: "70px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => setSelectedSku(p)}
+                        />
+                      ))}
+                    </>
+                  ) : (
+                    <p>Loading...</p>
+                  )}
+                  {selectedSku && (
+                    <div className="mt-3">
+                      <p>Màu sắc: {selectedSku.skuCode}</p>
+                      <p>Số lượng: {selectedSku.stock}</p>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <span className="text-decoration-line-through text-muted">
+                            Giá gốc: {selectedSku.sellingPrice} VNĐ
+                          </span>
+                          <br />
+                          <span className="text-danger">
+                            {" "}
+                            Giá khuyến mãi: {selectedSku.costPrice} VNĐ
+                          </span>
+                        </div>
+                        <button
+                          className="btn btn-warning btn-sm"
+                          onClick={() => handleAddCart(selectedSku.id, 1)}
+                        >
+                          + Thêm vào giỏ hàng
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

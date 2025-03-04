@@ -1,55 +1,72 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grocerylogo from "../images/Logo.png";
-import productimage1 from "../images/cement.jpg";
-import productimage2 from "../images/tiles.png";
-import productimage3 from "../images/sand.jpg";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../Utils/config";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [cartItems, setCartItems] = useState([]);
+
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
   const role = useSelector((state) => state.auth.roles);
   const token = useSelector((state) => state.auth.token);
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
-    window.location.reload();
   };
 
-  const cartItems = [
-    {
-      id: 1,
-      name: "Xi măng",
-      image: productimage1,
-      price: "350.000",
-      unit: "10 bao",
-    },
-    {
-      id: 2,
-      name: "Đá ốp",
-      image: productimage2,
-      price: "250.000",
-      oldPrice: "350.000",
-      unit: "10 viên",
-    },
-    {
-      id: 3,
-      name: "Cát",
-      image: productimage3,
-      price: "250.000",
-      unit: "20 bao",
-    },
-  ];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+        });
+
+        const response = await fetch(
+          `${BASE_URL}/api/public/categories?${params.toString()}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+
+    const storedCart = localStorage.getItem("cart");
+    if (storedCart) {
+      setCartItems(JSON.parse(storedCart));
+    }
+  }, []);
+
+  const removeFromCart = (id) => {
+    const updatedCart = cartItems.filter((item) => item.id !== id);
+    setCartItems(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  };
 
   return (
     <div>
@@ -130,42 +147,19 @@ const Header = () => {
                     className="dropdown-menu sm-menu"
                     aria-labelledby="navbarDropdown"
                   >
-                    <Link className="dropdown-item" to="/Shop">
-                      Xi măng
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Gạch
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Cát
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Thép
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Gạch lát
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Gỗ
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Kính
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Sơn
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Ống nước
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Điện
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Mái
-                    </Link>
-                    <Link className="dropdown-item" to="/Shop">
-                      Cách nhiệt
-                    </Link>
+                    {categories.length > 0 ? (
+                      categories.map((material, index) => (
+                        <Link
+                          key={index}
+                          className="dropdown-item"
+                          to={`/Shop/${material.id}`}
+                        >
+                          {material.name}
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="dropdown-item">Đang tải...</p>
+                    )}
                   </div>
                 </li>
               </li>
@@ -384,92 +378,111 @@ const Header = () => {
                 aria-label="Close"
               />
             </div>
-            <div className="offcanvas-body">
-              <div className="alert alert-danger" role="alert">
-                Bạn đã có giao hàng miễn phí. Bắt đầu kiểm tra ngay bây giờ!
+            {cartItems ? (
+              <div className="offcanvas-body">
+                <div className="alert alert-info" role="alert">
+                  Bạn chưa có đơn hàng. Bắt đầu mua sắm ngay bây giờ!
+                </div>
               </div>
-              <ul className="list-group list-group-flush">
-                {cartItems.map((item) => (
-                  <li
-                    key={item.id}
-                    className="list-group-item py-3 px-0 border-top"
-                  >
-                    <div className="row align-items-center">
-                      <div className="col-2">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="img-fluid"
-                        />
-                      </div>
-                      <div className="col-4">
-                        <h6 className="mb-0">{item.name}</h6>
-                        <small className="text-muted">{item.unit}</small>
-                        <div className="mt-2 small">
-                          <Link to="#!" className="text-decoration-none">
-                            <span className="me-1">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width={16}
-                                height={16}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="feather feather-trash-2"
-                              >
-                                <polyline points="3 6 5 6 21 6" />
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                <line x1={10} y1={11} x2={10} y2={17} />
-                                <line x1={14} y1={11} x2={14} y2={17} />
-                              </svg>
-                            </span>
-                            Remove
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="col-3">
-                        <div className="input-group flex-nowrap justify-content-center">
-                          <button className="button-minus form-control text-center">
-                            -
-                          </button>
-                          <input
-                            type="number"
-                            step={1}
-                            max={10}
-                            defaultValue={1}
-                            className="quantity-field form-control text-center"
+            ) : (
+              <div className="offcanvas-body">
+                <div className="alert alert-danger" role="alert">
+                  Bạn đã có giao hàng miễn phí. Bắt đầu kiểm tra ngay bây giờ!
+                </div>
+                <ul className="list-group list-group-flush">
+                  {cartItems.map((item) => (
+                    <li
+                      key={item.id}
+                      className="list-group-item py-3 px-0 border-top"
+                    >
+                      <div className="row align-items-center">
+                        <div className="col-2">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="img-fluid"
                           />
-                          <button className="button-plus form-control text-center">
-                            +
-                          </button>
                         </div>
-                      </div>
-                      <div className="col-3 text-end">
-                        <span className="fw-bold">{item.price} VNĐ</span>
-                        {item.oldPrice && (
+                        <div className="col-4">
+                          <h6 className="mb-0">Tên sản phẩm: {item.name}</h6>
+                          <span className="text-muted">
+                            Số lượng: {item.quantity}
+                          </span>
+                          <div className="mt-2 small">
+                            <Link
+                              onClick={() => removeFromCart(item.id)}
+                              className="text-decoration-none"
+                            >
+                              <span className="me-1">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width={16}
+                                  height={16}
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="feather feather-trash-2"
+                                >
+                                  <polyline points="3 6 5 6 21 6" />
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                                  <line x1={10} y1={11} x2={10} y2={17} />
+                                  <line x1={14} y1={11} x2={14} y2={17} />
+                                </svg>
+                              </span>
+                              Xóa
+                            </Link>
+                          </div>
+                        </div>
+                        <div className="col-3">
+                          <div className="input-group flex-nowrap justify-content-center">
+                            <button className="button-minus form-control text-center">
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              step={1}
+                              defaultValue={item.quantity}
+                              className="quantity-field form-control text-center"
+                            />
+                            <button className="button-plus form-control text-center">
+                              +
+                            </button>
+                          </div>
+                        </div>
+                        <div className="col-3 text-end">
+                          <span className="fw-bold">{item.price} VNĐ</span>
+                          {/* {item.oldPrice && (
                           <span className="text-decoration-line-through text-muted small">
                             {" "}
                             {item.oldPrice}VNĐ
                           </span>
-                        )}
+                        )} */}
+                        </div>
                       </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <div className="d-grid mt-1">
-                <button
-                  className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
-                  type="submit"
-                >
-                  {" "}
-                  Thanh toán <span className="fw-bold">1.200.000 VNĐ</span>
-                </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="d-grid mt-1">
+                  <Link
+                    className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
+                    to={"/ShopCart"}
+                  >
+                    {" "}
+                    Thanh toán{" "}
+                    <span className="fw-bold">
+                      {" "}
+                      {cartItems
+                        .reduce((total, item) => total + 100 * item.quantity, 0)
+                        .toFixed(3)}{" "}
+                      VNĐ
+                    </span>
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </>

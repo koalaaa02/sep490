@@ -48,8 +48,6 @@ const MyAccountSignIn = () => {
       if (!response.ok) {
         throw new Error(data.message || "Đăng nhập thất bại");
       }
-
-      localStorage.setItem("token", data.token);
       dispatch(
         loginSuccess({ user: data.user, roles: data.roles, token: data.token })
       );

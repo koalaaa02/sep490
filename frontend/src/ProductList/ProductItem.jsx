@@ -119,10 +119,10 @@ const ProductItem = () => {
   const handleAddClick = () => {
     Swal.fire({
       icon: "success",
-      title: "Added to Cart",
-      text: "Product has been added to your cart!",
+      title: "Thêm vào giỏ hàng",
+      text: "Sản phẩm đã được thêm vào giỏ hàng của bạn!",
       showConfirmButton: true,
-      timer: 3000,
+      timer: 2000,
     });
   };
 

@@ -20,8 +20,7 @@ const MyAccountOrder = () => {
 
   const handleLogOut = () => {
       dispatch(logout());
-      navigate("/");
-      window.location.reload();
+      navigate("/");  
     };
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);

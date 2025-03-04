@@ -15,7 +15,6 @@ const MyAcconutSetting = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
-    window.location.reload();
   };
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [userData, setUserData] = useState(null);
@@ -231,7 +230,7 @@ const MyAcconutSetting = () => {
                                     <input
                                       type="email"
                                       className="form-control"
-                                      placeholder={userData.email}
+                                      placeholder={userData?.email}
                                       disabled
                                     />
                                   </div>

@@ -21,7 +21,6 @@ const MyAccountAddress = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
-    window.location.reload();
   };
   return (
     <div>

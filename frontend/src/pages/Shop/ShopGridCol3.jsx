@@ -22,13 +22,13 @@ function Dropdown() {
   const handleAddClick = () => {
     Swal.fire({
       icon: "success",
-      title: "Added to Cart",
-      text: "Product has been added to your cart!",
+      title: "Thêm vào giỏ hàng",
+      text: "Sản phẩm đã được thêm vào giỏ hàng của bạn!",
       showConfirmButton: true,
-      timer: 3000,
+      timer: 2000,
     });
   };
-  
+
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -405,7 +405,7 @@ function Dropdown() {
                                 src={material.src}
                                 alt={material.alt}
                                 className="mb-3 img-fluid"
-                                style={{width: "200px", height: "200px"}}
+                                style={{ width: "200px", height: "200px" }}
                               />
                             </Link>
                             {/* Action Buttons */}
@@ -449,7 +449,7 @@ function Dropdown() {
                               to="#!"
                               className="text-decoration-none text-muted"
                             >
-                               {material.label} VIP
+                              {material.label} VIP
                             </Link>
                           </div>
                           <h2 className="fs-6">
