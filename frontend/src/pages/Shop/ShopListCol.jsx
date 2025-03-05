@@ -471,15 +471,6 @@ const ShopListCol = () => {
                                         >
                                           <i className="bi bi-heart" />
                                         </Link>
-                                        <Link
-                                          to="#!"
-                                          className="btn btn-icon btn-sm btn-outline-gray-400 text-muted"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Compare"
-                                        >
-                                          <i className="bi bi-arrow-left-right" />
-                                        </Link>
                                       </div>
                                       {/* btn */}
                                       <div className="mt-2">

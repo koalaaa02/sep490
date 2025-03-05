@@ -29,7 +29,7 @@ const MyAccountSignUp = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ username: fullName, email, password }),
+        body: JSON.stringify({ name: fullName, email, password }),
       });
 
       const text = await response.text();

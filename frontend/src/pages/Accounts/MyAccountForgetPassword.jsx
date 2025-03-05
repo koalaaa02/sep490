@@ -64,7 +64,12 @@ const MyAccountForgetPassword = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ email, otp, newPassword }),
+          body: JSON.stringify({
+            email,
+            resetToken: otp,
+            newPassword,
+            confirmNewPassword: newPassword,
+          }),
         }
       );
 

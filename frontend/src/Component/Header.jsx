@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
+import img from "../images/glass.jpg";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,19 +54,72 @@ const Header = () => {
         console.error("Error fetching categories:", error);
       }
     };
-
     fetchCategories();
-
-    const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
-    }
   }, []);
 
-  const removeFromCart = (id) => {
-    const updatedCart = cartItems.filter((item) => item.id !== id);
-    setCartItems(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/cart`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
+
+        const data = await response.json();
+        setCartItems(data.shops || []);
+      } catch (error) {
+        console.error("Lỗi khi fetch API:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const removeFromCart = async (shopId, productSKUId) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/cart/remove?shopId=${shopId}&productSKUId=${productSKUId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to remove item from cart");
+      }
+
+      setCartItems((prevCartItems) =>
+        prevCartItems
+          .map((shop) => ({
+            ...shop,
+            items: shop.items.filter(
+              (item) => item.productSKUId !== productSKUId
+            ),
+          }))
+          .filter((shop) => shop.items.length > 0)
+      );
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    }
+  };
+
+  const calculateTotal = () => {
+    return cartItems
+      .reduce((total, shop) => {
+        return (
+          total +
+          shop.items.reduce(
+            (shopTotal, item) => shopTotal + 100 * item.quantity,
+            0
+          )
+        );
+      }, 0)
+      .toFixed(3);
   };
 
   return (
@@ -350,7 +404,10 @@ const Header = () => {
                     <path d="M16 10a4 4 0 0 1-8 0" />
                   </svg>
                   <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                    {cartItems.length}
+                    {cartItems.reduce(
+                      (total, shop) => total + shop.items.length,
+                      0
+                    )}
                   </span>
                 </Link>
               </li>
@@ -378,7 +435,7 @@ const Header = () => {
                 aria-label="Close"
               />
             </div>
-            {cartItems ? (
+            {cartItems.length === 0 ? (
               <div className="offcanvas-body">
                 <div className="alert alert-info" role="alert">
                   Bạn chưa có đơn hàng. Bắt đầu mua sắm ngay bây giờ!
@@ -386,99 +443,76 @@ const Header = () => {
               </div>
             ) : (
               <div className="offcanvas-body">
-                <div className="alert alert-danger" role="alert">
-                  Bạn đã có giao hàng miễn phí. Bắt đầu kiểm tra ngay bây giờ!
-                </div>
-                <ul className="list-group list-group-flush">
-                  {cartItems.map((item) => (
-                    <li
-                      key={item.id}
-                      className="list-group-item py-3 px-0 border-top"
-                    >
-                      <div className="row align-items-center">
-                        <div className="col-2">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="img-fluid"
-                          />
-                        </div>
-                        <div className="col-4">
-                          <h6 className="mb-0">Tên sản phẩm: {item.name}</h6>
-                          <span className="text-muted">
-                            Số lượng: {item.quantity}
-                          </span>
-                          <div className="mt-2 small">
-                            <Link
-                              onClick={() => removeFromCart(item.id)}
-                              className="text-decoration-none"
-                            >
-                              <span className="me-1">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width={16}
-                                  height={16}
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  className="feather feather-trash-2"
-                                >
-                                  <polyline points="3 6 5 6 21 6" />
-                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                                  <line x1={10} y1={11} x2={10} y2={17} />
-                                  <line x1={14} y1={11} x2={14} y2={17} />
-                                </svg>
+                {cartItems.map((shop) => (
+                  <div key={shop.shopId} className="mb-3">
+                    <h6 className="fw-bold">{shop.shopName}</h6>
+                    <ul className="list-group list-group-flush">
+                      {shop.items.map((item) => (
+                        <li
+                          key={item.productSKUId}
+                          className="list-group-item py-3 px-0 border-top"
+                        >
+                          <div className="row align-items-center">
+                            <div className="col-2">
+                              <img
+                                src={img}
+                                alt={item.productName}
+                                className="img-fluid"
+                              />
+                            </div>
+                            <div className="col-4">
+                              <h6 className="mb-0">{item.productName}</h6>
+                              <span className="text-muted">
+                                Mã SKU: {item.productSKUCode}
                               </span>
-                              Xóa
-                            </Link>
+                              <div className="mt-2 small">
+                                <button
+                                  onClick={() =>
+                                    removeFromCart(
+                                      shop.shopId,
+                                      item.productSKUId
+                                    )
+                                  }
+                                  className="btn btn-sm btn-outline-danger"
+                                >
+                                  Xóa
+                                </button>
+                              </div>
+                            </div>
+                            <div className="col-3">
+                              <div className="input-group flex-nowrap justify-content-center">
+                                <button className="button-minus form-control text-center">
+                                  -
+                                </button>
+                                <input
+                                  type="number"
+                                  step={1}
+                                  defaultValue={item.quantity}
+                                  className="quantity-field form-control text-center"
+                                />
+                                <button className="button-plus form-control text-center">
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                            <div className="col-3 text-end">
+                              <span className="fw-bold">
+                                {item.quantity * 100} VNĐ
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                        <div className="col-3">
-                          <div className="input-group flex-nowrap justify-content-center">
-                            <button className="button-minus form-control text-center">
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              step={1}
-                              defaultValue={item.quantity}
-                              className="quantity-field form-control text-center"
-                            />
-                            <button className="button-plus form-control text-center">
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <div className="col-3 text-end">
-                          <span className="fw-bold">{item.price} VNĐ</span>
-                          {/* {item.oldPrice && (
-                          <span className="text-decoration-line-through text-muted small">
-                            {" "}
-                            {item.oldPrice}VNĐ
-                          </span>
-                        )} */}
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
                 <div className="d-grid mt-1">
                   <Link
                     className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
-                    to={"/ShopCart"}
+                    to="/ShopCheckout"
                   >
-                    {" "}
-                    Thanh toán{" "}
-                    <span className="fw-bold">
-                      {" "}
-                      {cartItems
-                        .reduce((total, item) => total + 100 * item.quantity, 0)
-                        .toFixed(3)}{" "}
-                      VNĐ
-                    </span>
+                    Thanh toán
+                    <span className="fw-bold">{calculateTotal()} VNĐ</span>
                   </Link>
                 </div>
               </div>
