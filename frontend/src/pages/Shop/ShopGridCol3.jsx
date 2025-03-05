@@ -1,56 +1,95 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import assortment from "../../images/assortment.jpg";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import cement from "../../images/cement.jpg";
-import bricks from "../../images/bricks.jpg";
-import sand from "../../images/sand.jpg";
-import steel from "../../images/steel.jpg";
-import tiles from "../../images/tiles.png";
-import wood from "../../images/wood.jpg";
-import glass from "../../images/glass.jpg";
-import paint from "../../images/paint.jpg";
-import plumbing from "../../images/plumbing.jpg";
-import electrical from "../../images/electrical.jpg";
-import roofing from "../../images/roofing.jpg";
-import insulation from "../../images/insulation.jpg";
 import Swal from "sweetalert2";
 import ScrollToTop from "../ScrollToTop";
+import { BASE_URL } from "../../Utils/config";
+import image1 from "../../images/glass.jpg";
+import ShopProductDetail from "./ShopProductDetail";
 
 function Dropdown() {
-  const handleAddClick = () => {
+  const [loaderStatus, setLoaderStatus] = useState(true);
+  const [stores, setStores] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const { cateId } = useParams();
+  const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
+
+  const ratings = [
+    { id: "ratingFive", stars: 5 },
+    { id: "ratingFour", stars: 4 },
+    { id: "ratingThree", stars: 3 },
+    { id: "ratingTwo", stars: 2 },
+    { id: "ratingOne", stars: 1 },
+  ];
+
+  useEffect(() => {
+    if (!cateId) return;
+
+    const fetchData = async () => {
+      try {
+        setLoaderStatus(true);
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+        });
+
+        const [shopResponse, cateResponse] = await Promise.all([
+          fetch(`${BASE_URL}/api/public/shops?${params.toString()}`, {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetch(`${BASE_URL}/api/public/categories/${cateId}`, {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
+
+        if (shopResponse.ok && cateResponse.ok) {
+          const [shopData, cateData] = await Promise.all([
+            shopResponse.json(),
+            cateResponse.json(),
+          ]);
+          setStores(shopData.content || []);
+          setCategories(cateData || {});
+        } else {
+          throw new Error("Lỗi khi tải dữ liệu");
+        }
+      } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+      } finally {
+        setLoaderStatus(false);
+      }
+    };
+
+    fetchData();
+  }, [cateId]);
+
+  const handleAddWishList = (product) => {
+    const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+    const existingProduct = wishList.find((item) => item.id === product.id);
+
+    if (existingProduct) {
+      existingProduct.quantity += 1;
+    } else {
+      wishList.push({ ...product, quantity: 1 });
+    }
+
+    localStorage.setItem("wishList", JSON.stringify(wishList));
+
     Swal.fire({
-      icon: "success",
-      title: "Thêm vào giỏ hàng",
-      text: "Sản phẩm đã được thêm vào giỏ hàng của bạn!",
+      icon: "info",
+      title: "Thêm vào danh sách yêu thích",
+      text: "Sản phẩm đã được thêm vào danh sách yêu thích!",
       showConfirmButton: true,
       timer: 2000,
     });
   };
-
-  // loading
-  const [loaderStatus, setLoaderStatus] = useState(true);
-  useEffect(() => {
-    setTimeout(() => {
-      setLoaderStatus(false);
-    }, 1500);
-  }, []);
-
-  const materials = [
-    { src: cement, alt: "cement", label: "Cement" },
-    { src: bricks, alt: "bricks", label: "Bricks" },
-    { src: sand, alt: "sand", label: "Sand" },
-    { src: steel, alt: "steel", label: "Steel" },
-    { src: tiles, alt: "tiles", label: "Tiles" },
-    { src: wood, alt: "wood", label: "Wood" },
-    { src: glass, alt: "glass", label: "Glass" },
-    { src: paint, alt: "paint", label: "Paint" },
-    { src: plumbing, alt: "plumbing", label: "Plumbing" },
-    { src: electrical, alt: "electrical", label: "Electrical" },
-    { src: roofing, alt: "roofing", label: "Roofing" },
-    { src: insulation, alt: "insulation", label: "Insulation" },
-  ];
 
   return (
     <div>
@@ -79,233 +118,75 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Stores</h5>
+                    <h5 className="mb-3">Danh sách cửa hàng</h5>
                     <div className="my-4">
                       {/* input */}
                       <input
+                        input
                         type="search"
                         className="form-control"
-                        placeholder="Search by store"
+                        placeholder="Tìm kiếm cửa hàng..."
                       />
                     </div>
+                    {stores.length > 0 ? (
+                      stores.map((stores, index) => (
+                        <div className="form-check mb-2" key={index}>
+                          {/* input */}
+                          <Link
+                            to={`/SingleShop/${stores.id}`}
+                            className="form-check-label"
+                            htmlFor="eGrocery"
+                          >
+                            {stores.shopType}
+                          </Link>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="dropdown-item">Đang tải...</p>
+                    )}
                     {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="eGrocery"
-                        defaultChecked
-                      />
-                      <label className="form-check-label" htmlFor="eGrocery">
-                        E-Grocery
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="DealShare"
-                      />
-                      <label className="form-check-label" htmlFor="DealShare">
-                        DealShare
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Dmart"
-                      />
-                      <label className="form-check-label" htmlFor="Dmart">
-                        DMart
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Blinkit"
-                      />
-                      <label className="form-check-label" htmlFor="Blinkit">
-                        Blinkit
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="BigBasket"
-                      />
-                      <label className="form-check-label" htmlFor="BigBasket">
-                        BigBasket
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="StoreFront"
-                      />
-                      <label className="form-check-label" htmlFor="StoreFront">
-                        StoreFront
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="Spencers"
-                      />
-                      <label className="form-check-label" htmlFor="Spencers">
-                        Spencers
-                      </label>
-                    </div>
-                    {/* form check */}
-                    <div className="form-check mb-2">
-                      {/* input */}
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        defaultValue
-                        id="onlineGrocery"
-                      />
-                      <label
-                        className="form-check-label"
-                        htmlFor="onlineGrocery"
-                      >
-                        Online Grocery
-                      </label>
-                    </div>
                   </div>
                   <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Price</h5>
+                    <h5 className="mb-3">Giá thành</h5>
                     <div>
                       {/* range */}
                       <div id="priceRange" className="mb-3" />
-                      <small className="text-muted">Price:</small>{" "}
+                      <input
+                        type="number"
+                        className="form-control"
+                        placeholder="Nhập số..."
+                      />
                       <span id="priceRange-value" className="small" />
                     </div>
                   </div>
                   {/* rating */}
                   <div className="py-4">
-                    <h5 className="mb-3">Rating</h5>
+                    <h5 className="mb-3">Đánh giá</h5>
                     <div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingFive"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingFive"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingFour"
-                          defaultChecked
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingFour"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingThree"
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="ratingThree"
-                        >
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star-fill text-warning " />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingTwo"
-                        />
-                        <label className="form-check-label" htmlFor="ratingTwo">
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
-                      {/* form check */}
-                      <div className="form-check mb-2">
-                        {/* input */}
-                        <input
-                          className="form-check-input"
-                          type="checkbox"
-                          defaultValue
-                          id="ratingOne"
-                        />
-                        <label className="form-check-label" htmlFor="ratingOne">
-                          <i className="bi bi-star-fill text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                          <i className="bi bi-star text-warning" />
-                        </label>
-                      </div>
+                      {ratings.map((rating, index) => (
+                        <div className="form-check mb-2" key={index}>
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id={rating.id}
+                            defaultChecked={rating.stars === 5}
+                          />
+                          <label
+                            className="form-check-label"
+                            htmlFor={rating.id}
+                          >
+                            {Array.from({ length: 5 }, (_, i) => (
+                              <i
+                                key={i}
+                                className={`bi ${
+                                  i < rating.stars ? "bi-star-fill" : "bi-star"
+                                } text-warning`}
+                              />
+                            ))}
+                          </label>
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div className="py-4">
@@ -338,211 +219,245 @@ function Dropdown() {
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
                   <div className=" card-body p-9">
-                    <h1 className="mb-0">Cement</h1>
+                    <h1 className="mb-0">{categories.name}</h1>
                   </div>
                 </div>
                 {/* list icon */}
-                <div className="d-md-flex justify-content-between align-items-center">
-                  <div>
-                    <p className="mb-3 mb-md-0">
-                      {" "}
-                      <span className="text-dark">24 </span> Products found{" "}
-                    </p>
-                  </div>
-                  {/* icon */}
-                  <div className="d-flex justify-content-between align-items-center">
-                    <Link to="/ShopListCol" className="text-muted me-3">
-                      <i className="bi bi-list-ul" />
-                    </Link>
-                    <Link to="/ShopGridCol3" className=" me-3 active">
-                      <i className="bi bi-grid" />
-                    </Link>
-                    <Link to="/Shop" className="me-3 text-muted">
-                      <i className="bi bi-grid-3x3-gap" />
-                    </Link>
-                    <div className="me-2">
-                      {/* select option */}
-                      <select
-                        className="form-select"
-                        aria-label="Default select example"
-                      >
-                        <option selected>Show: 50</option>
-                        <option value={10}>10</option>
-                        <option value={20}>20</option>
-                        <option value={30}>30</option>
-                      </select>
-                    </div>
-                    <div>
-                      {/* select option */}
-                      <select
-                        className="form-select"
-                        aria-label="Default select example"
-                      >
-                        <option selected>Sort by: Featured</option>
-                        <option value="Low to High">Price: Low to High</option>
-                        <option value="High to Low"> Price: High to Low</option>
-                        <option value="Release Date"> Release Date</option>
-                        <option value="Avg. Rating"> Avg. Rating</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                {/* row */}
-                <div className="row g-4 row-cols-xl-3 row-cols-lg-3 row-cols-2 row-cols-md-2 mt-2">
-                  {/* col */}
-                  {materials.map((material, index) => (
-                    <div key={index} className="col">
-                      {/* card */}
-                      <div className="card card-product">
-                        <div className="card-body">
-                          {/* Badge */}
-                          <div className="text-center position-relative">
-                            <div className="position-absolute top-0 start-0">
-                              <span className="badge bg-danger">Hot</span>
-                            </div>
-                            <Link to="#!">
-                              <img
-                                src={material.src}
-                                alt={material.alt}
-                                className="mb-3 img-fluid"
-                                style={{ width: "200px", height: "200px" }}
-                              />
-                            </Link>
-                            {/* Action Buttons */}
-                            <div className="card-product-action">
-                              <Link
-                                to="#!"
-                                className="btn-action"
-                                data-bs-toggle="modal"
-                                data-bs-target="#quickViewModal"
-                              >
-                                <i
-                                  className="bi bi-eye"
-                                  data-bs-toggle="tooltip"
-                                  data-bs-html="true"
-                                  title="Quick View"
-                                />
-                              </Link>
-                              <Link
-                                to="shop-wishlist.html"
-                                className="btn-action"
-                                data-bs-toggle="tooltip"
-                                data-bs-html="true"
-                                title="Wishlist"
-                              >
-                                <i className="bi bi-heart" />
-                              </Link>
-                            </div>
-                          </div>
-                          {/* Heading */}
-                          <div className="text-small mb-1">
-                            <Link
-                              to="#!"
-                              className="text-decoration-none text-muted"
-                            >
-                              {material.label} VIP
-                            </Link>
-                          </div>
-                          <h2 className="fs-6">
-                            <Link
-                              to="#!"
-                              className="text-inherit text-decoration-none"
-                            >
-                              {material.label} VIP
-                            </Link>
-                          </h2>
-                          <div>
-                            <small className="text-warning">
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-fill" />
-                              <i className="bi bi-star-half" />
-                            </small>
-                            <span className="text-muted small"> 4.5(149)</span>
-                          </div>
-                          {/* Price */}
-                          <div className="d-flex justify-content-between align-items-center mt-3">
-                            <div>
-                              <span className="text-dark">$18</span>
-                              <span className="text-decoration-line-through text-muted">
-                                {" "}
-                                $24
-                              </span>
-                            </div>
-                            <div>
-                              <button
-                                className="btn btn-warning btn-sm"
-                                onClick={handleAddClick}
-                              >
-                                + Add
-                              </button>
-                            </div>
-                          </div>
+                {selectedProduct ? (
+                  <ShopProductDetail
+                    id={selectedProduct.id}
+                    onBack={() => setSelectedProduct(null)}
+                  />
+                ) : (
+                  <>
+                    <div className="d-md-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="mb-3 mb-md-0">
+                          {" "}
+                          <span className="text-dark">
+                            Có {categories.products.length}{" "}
+                          </span>{" "}
+                          sản phẩm{" "}
+                        </p>
+                      </div>
+                      {/* icon */}
+                      <div className="d-flex justify-content-between align-items-center">
+                        <Link
+                          to={`/ShopListCol/${cateId}`}
+                          className="text-muted me-3"
+                        >
+                          <i className="bi bi-list-ul" />
+                        </Link>
+                        <Link
+                          to={`/ShopGridCol3/${cateId}`}
+                          className=" me-3 active"
+                        >
+                          <i className="bi bi-grid" />
+                        </Link>
+                        <Link
+                          to={`/Shop/${cateId}`}
+                          className="me-3 text-muted"
+                        >
+                          <i className="bi bi-grid-3x3-gap" />
+                        </Link>
+                        <div className="me-2">
+                          {/* select option */}
+                          <select
+                            className="form-select"
+                            aria-label="Default select example"
+                          >
+                            <option selected>Show: 50</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                          </select>
+                        </div>
+                        <div>
+                          {/* select option */}
+                          <select
+                            className="form-select"
+                            aria-label="Default select example"
+                          >
+                            <option selected> Sắp xếp theo: Nổi bật </option>
+                            <option value="Low to High">
+                              {" "}
+                              Giá: Từ thấp đến cao{" "}
+                            </option>
+                            <option value="High to Low">
+                              {" "}
+                              Giá: Từ cao đến thấp{" "}
+                            </option>
+                            <option value="Release Date">
+                              {" "}
+                              Ngày phát hành{" "}
+                            </option>
+                            <option value="Avg. Rating">
+                              {" "}
+                              Đánh giá trung bình{" "}
+                            </option>
+                          </select>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-                <div className="row mt-8">
-                  <div className="col">
-                    {/* nav */}
-                    <nav>
-                      <ul className="pagination">
-                        <li className="page-item disabled">
-                          <Link
-                            className="page-link  mx-1 rounded-3 "
-                            to="#"
-                            aria-label="Previous"
-                          >
-                            <i className="fa fa-chevron-left" />
-                          </Link>
-                        </li>
-                        <li className="page-item ">
-                          <Link
-                            className="page-link  mx-1 rounded-3 active"
-                            to="#"
-                          >
-                            1
-                          </Link>
-                        </li>
-                        <li className="page-item">
-                          <Link
-                            className="page-link mx-1 rounded-3 text-body"
-                            to="#"
-                          >
-                            2
-                          </Link>
-                        </li>
-                        <li className="page-item">
-                          <Link
-                            className="page-link mx-1 rounded-3 text-body"
-                            to="#"
-                          >
-                            ...
-                          </Link>
-                        </li>
-                        <li className="page-item">
-                          <Link
-                            className="page-link mx-1 rounded-3 text-body"
-                            to="#"
-                          >
-                            12
-                          </Link>
-                        </li>
-                        <li className="page-item">
-                          <Link
-                            className="page-link mx-1 rounded-3 text-body"
-                            to="#"
-                            aria-label="Next"
-                          >
-                            <i className="fa fa-chevron-right" />
-                          </Link>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
-                </div>
+                    {/* row */}
+                    <div className="row g-4 row-cols-xl-3 row-cols-lg-3 row-cols-2 row-cols-md-2 mt-2">
+                      {/* col */}
+                      {categories.products.map((p, index) => {
+                        const isInWishlist = storedWishlist.some(
+                          (item) => item.id === p.id
+                        );
+                        return (
+                          <div key={index} className="col">
+                            {/* card */}
+                            <div className="card card-product">
+                              <div className="card-body">
+                                {/* Badge */}
+                                <div className="text-center position-relative">
+                                  <div className="position-absolute top-0 start-0">
+                                    <span className="badge bg-danger">Hot</span>
+                                  </div>
+                                  <Link to="#!">
+                                    <img
+                                      src={image1}
+                                      alt={p.images}
+                                      className="mb-3 img-fluid"
+                                      style={{
+                                        width: "200px",
+                                        height: "200px",
+                                      }}
+                                    />
+                                  </Link>
+                                  {/* Action Buttons */}
+                                  <div className="card-product-action">
+                                    <Link
+                                      className="btn-action"
+                                      onClick={() => setSelectedProduct(p)}
+                                    >
+                                      <i
+                                        className="bi bi-eye"
+                                        title="Quick View"
+                                      />
+                                    </Link>
+                                    <Link
+                                      onClick={
+                                        isInWishlist
+                                          ? null
+                                          : () => handleAddWishList(p)
+                                      }
+                                      className={`btn-action ${
+                                        isInWishlist
+                                          ? "disabled text-warning"
+                                          : ""
+                                      }`}
+                                      data-bs-toggle="tooltip"
+                                      data-bs-html="true"
+                                      title="Wishlist"
+                                    >
+                                      <i
+                                        className={`bi ${
+                                          isInWishlist
+                                            ? "bi-heart-fill"
+                                            : "bi-heart"
+                                        }`}
+                                      />
+                                    </Link>
+                                  </div>
+                                </div>
+                                {/* Heading */}
+                                <div className="text-small mb-1"></div>
+                                <Link
+                                  to="#!"
+                                  className="text-decoration-none text-muted"
+                                >
+                                  {p?.name}
+                                </Link>
+                                <h2 className="fs-6">
+                                  <br />
+                                  <small>{p.description}</small>
+                                  <br />
+                                  <small>{p.specifications}</small>
+                                </h2>
+                                <div>
+                                  <small className="text-warning">
+                                    <i className="bi bi-star-fill" />
+                                    <i className="bi bi-star-fill" />
+                                    <i className="bi bi-star-fill" />
+                                    <i className="bi bi-star-fill" />
+                                    <i className="bi bi-star-half" />
+                                  </small>
+                                  <span className="text-muted small">
+                                    {" "}
+                                    4.5(149)
+                                  </span>
+                                </div>
+                                {/* Price */}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <div className="row mt-8">
+                      <div className="col">
+                        {/* nav */}
+                        <nav>
+                          <ul className="pagination">
+                            <li className="page-item disabled">
+                              <Link
+                                className="page-link  mx-1 rounded-3 "
+                                to="#"
+                                aria-label="Previous"
+                              >
+                                <i className="fa fa-chevron-left" />
+                              </Link>
+                            </li>
+                            <li className="page-item ">
+                              <Link
+                                className="page-link  mx-1 rounded-3 active"
+                                to="#"
+                              >
+                                1
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                2
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                ...
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                12
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                                aria-label="Next"
+                              >
+                                <i className="fa fa-chevron-right" />
+                              </Link>
+                            </li>
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </div>

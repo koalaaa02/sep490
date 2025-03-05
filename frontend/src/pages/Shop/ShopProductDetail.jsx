@@ -100,13 +100,13 @@ const ShopProductDetail = ({ id, onBack }) => {
       </div>
       <div className="row">
         {/* Hình ảnh sản phẩm */}
-        <div className="col-md-6">
+        <div className="col-md-5">
           <img
             // src={selectedSku?.images || product.images}
             src={image1}
             alt={product.name}
             className="img-fluid rounded"
-            style={{ width: "400px", height: "300px", cursor: "pointer" }}
+            style={{ width: "350px", height: "250px", cursor: "pointer" }}
           />
           <div className="d-flex mt-3">
             {product.skus.map((sku) => (
@@ -115,8 +115,12 @@ const ShopProductDetail = ({ id, onBack }) => {
                 // src={sku.images}
                 src={image1}
                 alt={sku.skuCode}
-                className="img-thumbnail me-2"
-                style={{ width: "100px", height: "100px", cursor: "pointer" }}
+                className={`img-thumbnail me-2 ${
+                  selectedSku?.id === sku.id
+                    ? "border border-warning border-3"
+                    : ""
+                }`}
+                style={{ width: "90px", height: "90px", cursor: "pointer" }}
                 onClick={() => handleSkuChange(sku)}
               />
             ))}
@@ -125,19 +129,19 @@ const ShopProductDetail = ({ id, onBack }) => {
 
         {/* Thông tin sản phẩm */}
         <div className="col-md-6">
-          <h2 className="text-uppercase text-warning">
+          <h3 className="text-uppercase text-warning">
             Tên sản phẩm: {product.name}
-          </h2>
-          <h3 className="fw-bold">Mô tả: {product.description}</h3>
+          </h3>
+          <h5 className="fw-bold">Mô tả: {product.description}</h5>
           <p className="text-muted">Màu sắc: {selectedSku?.skuCode}</p>
-
-          <h5 className="fw-bold text-dark text-decoration-line-through">
+          <span className="fw-bold text-dark text-decoration-line-through">
             Giá gốc: {selectedSku?.costPrice || 0} VNĐ
             <span className="badge bg-warning text-dark">0%</span>
-          </h5>
-          <h5 className="fw-bold text-danger">
+          </span>
+          <br/>
+          <span className="fw-bold text-danger">
             Giá khuyến mãi: {selectedSku?.sellingPrice || 0} VNĐ
-          </h5>
+          </span>
           <p className="text-muted">Kho: {selectedSku?.stock || 0} PCS</p>
 
           <div className="d-flex align-items-center mb-3">

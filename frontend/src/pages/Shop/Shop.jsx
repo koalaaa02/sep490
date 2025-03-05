@@ -223,6 +223,7 @@ function Dropdown() {
                   </div>
                 </div>
                 {/* list icon */}
+
                 {selectedProduct ? (
                   <ShopProductDetail
                     id={selectedProduct.id}
@@ -242,10 +243,16 @@ function Dropdown() {
                       </div>
                       {/* icon */}
                       <div className="d-flex justify-content-between align-items-center">
-                        <Link to="/ShopListCol" className="text-muted me-3">
+                        <Link
+                          to={`/ShopListCol/${cateId}`}
+                          className="text-muted me-3"
+                        >
                           <i className="bi bi-list-ul" />
                         </Link>
-                        <Link to="/ShopGridCol3" className="text-muted me-3">
+                        <Link
+                          to={`/ShopGridCol3/${cateId}`}
+                          className="text-muted me-3"
+                        >
                           <i className="bi bi-grid" />
                         </Link>
                         <Link to={`/Shop/${cateId}`} className="me-3 active">

@@ -42,8 +42,8 @@ const App = () => {
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
           <Route path="/Shop/:cateId" element={<Shop />} />
-          <Route path="/ShopGridCol3" element={<ShopGridCol3 />} />
-          <Route path="/ShopListCol" element={<ShopListCol />} />
+          <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
+          <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
           <Route path="/ShopWishList" element={<ShopWishList />} />
           <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
           <Route path="/ShopCart" element={<ShopCart />} />
