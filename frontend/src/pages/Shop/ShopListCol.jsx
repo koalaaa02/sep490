@@ -113,7 +113,7 @@ function Dropdown() {
             <ScrollToTop />
           </>
           <div className="container">
-            <div className="row fixed-side">
+            <div className="row">
               {/* Vertical Dropdowns Column */}
               <div className="col-md-3">
                 <div className="py-4">
@@ -207,219 +207,226 @@ function Dropdown() {
                 </div>
                 {/* Banner Design */}
               </div>
-            </div>
-            {/* Cards Column */}
-            <div className="col-lg-9 col-md-8">
-              {/* card */}
-              <div className="card mb-4 bg-light border-0">
-                {/* card body */}
-                <div className="card-body p-9">
-                  <h1 className="mb-0">{categories.name}</h1>
-                </div>
-              </div>
-              {/* list icon */}
-              {selectedProduct ? (
-                <ShopProductDetail
-                  id={selectedProduct.id}
-                  onBack={() => setSelectedProduct(null)}
-                />
-              ) : (
-                <>
-                  <div className="d-md-flex justify-content-between align-items-center">
-                    <div>
-                      <p className="mb-3 mb-md-0">
-                        {" "}
-                        <span className="text-dark">
-                          Có {categories.products.length}{" "}
-                        </span>{" "}
-                        sản phẩm{" "}
-                      </p>
-                    </div>
-                    {/* icon */}
-                    <div className="d-flex justify-content-between align-items-center">
-                      <Link
-                        to={`/ShopListCol/${cateId}`}
-                        className=" me-3 active"
-                      >
-                        <i className="bi bi-list-ul" />
-                      </Link>
-                      <Link
-                        to={`/ShopGridCol3/${cateId}`}
-                        className="text-muted me-3"
-                      >
-                        <i className="bi bi-grid" />
-                      </Link>
-                      <Link to={`/Shop/${cateId}`} className="me-3 text-muted">
-                        <i className="bi bi-grid-3x3-gap" />
-                      </Link>
-                      <div className="me-2">
-                        {/* select option */}
-                        <select
-                          className="form-select"
-                          aria-label="Default select example"
-                        >
-                          <option selected>50</option>
-                          <option value={10}>10</option>
-                          <option value={20}>20</option>
-                          <option value={30}>30</option>
-                        </select>
-                      </div>
-                      <div>
-                        {/* select option */}
-                        <select
-                          className="form-select"
-                          aria-label="Default select example"
-                        >
-                          <option selected> Sắp xếp theo: Nổi bật </option>
-                          <option value="Low to High">
-                            {" "}
-                            Giá: Từ thấp đến cao{" "}
-                          </option>
-                          <option value="High to Low">
-                            {" "}
-                            Giá: Từ cao đến thấp{" "}
-                          </option>
-                          <option value="Release Date"> Ngày phát hành </option>
-                          <option value="Avg. Rating">
-                            {" "}
-                            Đánh giá trung bình{" "}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
+
+              {/* Cards Column */}
+              <div className="col-lg-9 col-md-8">
+                {/* card */}
+                <div className="card mb-4 bg-light border-0">
+                  {/* card body */}
+                  <div className="card-body p-9">
+                    <h1 className="mb-0">{categories.name}</h1>
                   </div>
-                  {/* row */}
-                  <div className="row g-4  row-cols-1 mt-2">
-                    {/* col */}
-                    {categories.products.map((p, index) => {
-                      const isInWishlist = storedWishlist.some(
-                        (item) => item.id === p.id
-                      );
-                      return (
-                        <div key={index} className="col">
-                          {/* card */}
-                          <div className="card card-product">
-                            {/* card body */}
-                            <div className="card-body">
-                              <div className=" row align-items-center">
-                                {/* col */}
-                                <div className="col-md-4 col-12">
-                                  <div className="text-center position-relative ">
-                                    <div className=" position-absolute top-0">
-                                      {/* badge */}{" "}
-                                      <span className="badge bg-danger">
-                                        Hot
+                </div>
+                {/* list icon */}
+                {selectedProduct ? (
+                  <ShopProductDetail
+                    id={selectedProduct.id}
+                    onBack={() => setSelectedProduct(null)}
+                  />
+                ) : (
+                  <>
+                    <div className="d-md-flex justify-content-between align-items-center">
+                      <div>
+                        <p className="mb-3 mb-md-0">
+                          {" "}
+                          <span className="text-dark">
+                            Có {categories.products.length}{" "}
+                          </span>{" "}
+                          sản phẩm{" "}
+                        </p>
+                      </div>
+                      {/* icon */}
+                      <div className="d-flex justify-content-between align-items-center">
+                        <Link
+                          to={`/ShopListCol/${cateId}`}
+                          className=" me-3 active"
+                        >
+                          <i className="bi bi-list-ul" />
+                        </Link>
+                        <Link
+                          to={`/ShopGridCol3/${cateId}`}
+                          className="text-muted me-3"
+                        >
+                          <i className="bi bi-grid" />
+                        </Link>
+                        <Link
+                          to={`/Shop/${cateId}`}
+                          className="me-3 text-muted"
+                        >
+                          <i className="bi bi-grid-3x3-gap" />
+                        </Link>
+                        <div className="me-2">
+                          {/* select option */}
+                          <select
+                            className="form-select"
+                            aria-label="Default select example"
+                          >
+                            <option selected>50</option>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={30}>30</option>
+                          </select>
+                        </div>
+                        <div>
+                          {/* select option */}
+                          <select
+                            className="form-select"
+                            aria-label="Default select example"
+                          >
+                            <option selected> Sắp xếp theo: Nổi bật </option>
+                            <option value="Low to High">
+                              {" "}
+                              Giá: Từ thấp đến cao{" "}
+                            </option>
+                            <option value="High to Low">
+                              {" "}
+                              Giá: Từ cao đến thấp{" "}
+                            </option>
+                            <option value="Release Date">
+                              {" "}
+                              Ngày phát hành{" "}
+                            </option>
+                            <option value="Avg. Rating">
+                              {" "}
+                              Đánh giá trung bình{" "}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    {/* row */}
+                    <div className="row g-4  row-cols-1 mt-2">
+                      {/* col */}
+                      {categories.products.map((p, index) => {
+                        const isInWishlist = storedWishlist.some(
+                          (item) => item.id === p.id
+                        );
+                        return (
+                          <div key={index} className="col">
+                            {/* card */}
+                            <div className="card card-product">
+                              {/* card body */}
+                              <div className="card-body">
+                                <div className=" row align-items-center">
+                                  {/* col */}
+                                  <div className="col-md-4 col-12">
+                                    <div className="text-center position-relative ">
+                                      <div className=" position-absolute top-0">
+                                        {/* badge */}{" "}
+                                        <span className="badge bg-danger">
+                                          Hot
+                                        </span>
+                                      </div>
+                                      <Link to="#!">
+                                        {/* img */}
+                                        <img
+                                          src={image1}
+                                          alt={p.images}
+                                          className="mb-3 img-fluid"
+                                        />
+                                      </Link>
+                                    </div>
+                                  </div>
+                                  <div className="col-md-8 col-12 flex-grow-1">
+                                    {/* heading */}
+                                    <div className="text-small mb-1"></div>
+                                    <Link
+                                      to="#!"
+                                      className="text-decoration-none text-muted"
+                                    >
+                                      {p?.name}
+                                    </Link>
+                                    <h2 className="fs-6">
+                                      <br />
+                                      <small>{p.description}</small>
+                                      <br />
+                                      <small>{p.specifications}</small>
+                                    </h2>
+                                    <div>
+                                      {/* rating */}
+                                      <small className="text-warning">
+                                        {" "}
+                                        <i className="bi bi-star-fill" />
+                                        <i className="bi bi-star-fill" />
+                                        <i className="bi bi-star-fill" />
+                                        <i className="bi bi-star-fill" />
+                                        <i className="bi bi-star-half" />
+                                      </small>{" "}
+                                      <span className="text-muted small">
+                                        4.5(149)
                                       </span>
                                     </div>
-                                    <Link to="#!">
-                                      {/* img */}
-                                      <img
-                                        src={image1}
-                                        alt={p.images}
-                                        className="mb-3 img-fluid"
-                                      />
-                                    </Link>
+                                    {/* Price */}
                                   </div>
-                                </div>
-                                <div className="col-md-8 col-12 flex-grow-1">
-                                  {/* heading */}
-                                  <div className="text-small mb-1"></div>
-                                  <Link
-                                    to="#!"
-                                    className="text-decoration-none text-muted"
-                                  >
-                                    {p?.name}
-                                  </Link>
-                                  <h2 className="fs-6">
-                                    <br />
-                                    <small>{p.description}</small>
-                                    <br />
-                                    <small>{p.specifications}</small>
-                                  </h2>
-                                  <div>
-                                    {/* rating */}
-                                    <small className="text-warning">
-                                      {" "}
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-half" />
-                                    </small>{" "}
-                                    <span className="text-muted small">
-                                      4.5(149)
-                                    </span>
-                                  </div>
-                                  {/* Price */}
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="row mt-8">
-                    <div className="col">
-                      {/* nav */}
-                      <nav>
-                        <ul className="pagination">
-                          <li className="page-item disabled">
-                            <Link
-                              className="page-link  mx-1 rounded-3 "
-                              to="#"
-                              aria-label="Previous"
-                            >
-                              <i className="fa fa-chevron-left" />
-                            </Link>
-                          </li>
-                          <li className="page-item ">
-                            <Link
-                              className="page-link  mx-1 rounded-3 active"
-                              to="#"
-                            >
-                              1
-                            </Link>
-                          </li>
-                          <li className="page-item">
-                            <Link
-                              className="page-link mx-1 rounded-3 text-body"
-                              to="#"
-                            >
-                              2
-                            </Link>
-                          </li>
-                          <li className="page-item">
-                            <Link
-                              className="page-link mx-1 rounded-3 text-body"
-                              to="#"
-                            >
-                              ...
-                            </Link>
-                          </li>
-                          <li className="page-item">
-                            <Link
-                              className="page-link mx-1 rounded-3 text-body"
-                              to="#"
-                            >
-                              12
-                            </Link>
-                          </li>
-                          <li className="page-item">
-                            <Link
-                              className="page-link mx-1 rounded-3 text-body"
-                              to="#"
-                              aria-label="Next"
-                            >
-                              <i className="fa fa-chevron-right" />
-                            </Link>
-                          </li>
-                        </ul>
-                      </nav>
+                        );
+                      })}
                     </div>
-                  </div>
-                </>
-              )}
+                    <div className="row mt-8">
+                      <div className="col">
+                        {/* nav */}
+                        <nav>
+                          <ul className="pagination">
+                            <li className="page-item disabled">
+                              <Link
+                                className="page-link  mx-1 rounded-3 "
+                                to="#"
+                                aria-label="Previous"
+                              >
+                                <i className="fa fa-chevron-left" />
+                              </Link>
+                            </li>
+                            <li className="page-item ">
+                              <Link
+                                className="page-link  mx-1 rounded-3 active"
+                                to="#"
+                              >
+                                1
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                2
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                ...
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                              >
+                                12
+                              </Link>
+                            </li>
+                            <li className="page-item">
+                              <Link
+                                className="page-link mx-1 rounded-3 text-body"
+                                to="#"
+                                aria-label="Next"
+                              >
+                                <i className="fa fa-chevron-right" />
+                              </Link>
+                            </li>
+                          </ul>
+                        </nav>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </>
