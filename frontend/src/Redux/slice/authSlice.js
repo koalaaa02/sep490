@@ -4,13 +4,15 @@ const userFromStorage = localStorage.getItem("user")
   ? JSON.parse(localStorage.getItem("user"))
   : null;
 
-  const initialState = {
-    user: userFromStorage ? userFromStorage.user : null,
-    roles: userFromStorage ? userFromStorage.roles : null,
-    loading: false,
-    error: null,
-    token: null
-  };
+const tokenFromStorage = localStorage.getItem("access_token") || null;
+
+const initialState = {
+  user: userFromStorage,
+  roles: userFromStorage ? userFromStorage.roles : null,
+  token: tokenFromStorage,
+  loading: false,
+  error: null,
+};
 
 const authSlice = createSlice({
   name: "auth",
@@ -22,11 +24,13 @@ const authSlice = createSlice({
     },
     loginSuccess: (state, action) => {
       state.loading = false;
-      state.user = action.payload;
+      state.user = action.payload.user;
       state.roles = action.payload.roles;
       state.token = action.payload.token;
       state.error = null;
-      localStorage.setItem("user", JSON.stringify(action.payload)); 
+
+      localStorage.setItem("user", JSON.stringify(action.payload));
+      localStorage.setItem("access_token", action.payload.token);
     },
     loginFailure: (state, action) => {
       state.loading = false;
@@ -34,10 +38,12 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.user = null;
+      state.roles = null;
+      state.token = null;
       state.loading = false;
       state.error = null;
-      state.token = null;
-      localStorage.removeItem("user"); 
+      localStorage.removeItem("user");
+      localStorage.removeItem("access_token");
     },
   },
 });

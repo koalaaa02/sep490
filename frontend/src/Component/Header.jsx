@@ -323,6 +323,8 @@ const Header = () => {
                               ? "Seller"
                               : role === "ROLE_PROVIDER"
                               ? "Provider"
+                              : role === "ROLE_ADMIN"
+                              ? "Admin"
                               : "User"}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">

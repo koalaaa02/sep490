@@ -5,11 +5,198 @@ import ScrollToTop from "../ScrollToTop";
 import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../Utils/config";
 
 const MyAccountAddress = () => {
+  const token = localStorage.getItem("access_token");
+  const [formData, setFormData] = useState({
+    userId: 30,
+    shopId: 0,
+    recipientName: "",
+    phone: "",
+    address: "",
+    provinceId: "string",
+    districtId: "string",
+    wardId: "string",
+    province: "",
+    district: "",
+    ward: "",
+    postalCode: "",
+    defaultAddresss: true,
+  });
+  const [data, setData] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
+  const [notification, setNotification] = useState(null);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editData, setEditData] = useState({
+    id: "",
+    recipientName: "",
+    address: "",
+    ward: "",
+    district: "",
+    province: "",
+    phone: "",
+  });
+
+  const handleEdit = (p, index) => {
+    setEditIndex(index);
+    setEditData({
+      id: p.id,
+      recipientName: p.recipientName,
+      address: p.address,
+      ward: p.ward,
+      district: p.district,
+      province: p.province,
+      phone: p.phone,
+    });
+  };
+
+  const handleChange = (e) => {
+    if (editIndex !== null) {
+      setEditData({ ...editData, [e.target.name]: e.target.value });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+  };
+
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/addresses/${editData.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(editData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        showNotification("Địa chỉ đã được cập nhật thành công!", "success");
+
+        setData((prevData) => ({
+          ...prevData,
+          content: prevData.content.map((item) =>
+            item.id === editData.id ? result : item
+          ),
+        }));
+
+        setEditIndex(null);
+      } else {
+        showNotification("Địa chỉ cập nhật thất bại!", "danger");
+      }
+    } catch (error) {
+      console.error("Error saving address:", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/addresses`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        showNotification("Địa chỉ đã được thêm thành công!", "success");
+      } else {
+        showNotification("Thêm địa chỉ thất bại!", "danger");
+      }
+      setData((prevData) => ({
+        ...prevData,
+        content: [...prevData.content, result],
+      }));
+    } catch (error) {
+      console.error("Error saving address:", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    }
+  };
+
+  const deleteAdress = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/addresses/${deleteId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (response.ok) {
+        showNotification("Địa chỉ đã được xóa!", "success");
+      } else {
+        showNotification("Xóa địa chỉ thất bại!", "danger");
+      }
+      setData((prevData) => ({
+        ...prevData,
+        content: prevData.content.filter((address) => address.id !== deleteId),
+      }));
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
+    }
+  };
+
+  const handleSetDefaultAddress = async (index) => {
+    const selectedId = data.content[index].id;
+
+    setData((prevData) => ({
+      ...prevData,
+      content: prevData.content.map((item, i) => ({
+        ...item,
+        defaultAddresss: i === index,
+      })),
+    }));
+
+    showNotification("Đã đặt địa chỉ mặc định!", "success");
+
+    try {
+      await fetch(`${BASE_URL}/api/addresses/${selectedId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ defaultAddresss: true, id: selectedId }),
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật server:", error);
+    }
+  };
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/addresses/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
@@ -126,6 +313,7 @@ const MyAccountAddress = () => {
                             {/* heading */}
                             <h2 className="mb-0">Địa chỉ</h2>
                             {/* button */}
+
                             <Link
                               to="#"
                               className="btn btn-outline-warning"
@@ -135,54 +323,135 @@ const MyAccountAddress = () => {
                               Thêm địa chỉ mới{" "}
                             </Link>
                           </div>
-                          <div className="row">
-                            {/* col */}
-                            <div className="col-lg-5 col-xxl-4 col-12 mb-4">
-                              {/* form */}
-                              <div className="border p-6 rounded-3">
-                                <div className="form-check mb-4">
-                                  <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="flexRadioDefault"
-                                    id="homeRadio"
-                                    defaultChecked
-                                  />
-                                  <label
-                                    className="form-check-label text-dark fw-semi-bold"
-                                    htmlFor="homeRadio"
-                                  >
-                                    Nhà
-                                  </label>
-                                </div>
-                                {/* address */}
-                                <p className="mb-6">
-                                  Nguyễn Văn A
-                                  <br />
-                                  Khu 2 Hoàng Cương <br />
-                                  Thanh Ba Phú Thọ
-                                  <br />
-                                  402-776-1106
-                                </p>
-                                {/* btn */}
-                                <Link to="#" className="btn btn-info btn-sm">
-                                  Địa chỉ mặc định
-                                </Link>
-                                <div className="mt-4">
-                                  <Link to="#" className="text-inherit">
-                                    Sửa{" "}
-                                  </Link>
-                                  <Link
-                                    to="#"
-                                    className="text-danger ms-3"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                  >
-                                    Xóa
-                                  </Link>
+                          {notification && (
+                            <p className={`alert alert-${notification.type}`}>
+                              {notification.message}
+                            </p>
+                          )}
+                          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                            {data.content.map((p, index) => (
+                              <div key={index} className="col">
+                                <div className="border p-6 rounded-3">
+                                  <div className="form-check mb-4">
+                                    <input
+                                      className="form-check-input"
+                                      type="radio"
+                                      name="flexRadioDefault"
+                                      id={`homeRadio${index}`}
+                                      defaultChecked={p.defaultAddress}
+                                    />
+                                    <label
+                                      className="form-check-label text-dark fw-semi-bold"
+                                      htmlFor={`homeRadio${index}`}
+                                    >
+                                      Địa chỉ
+                                    </label>
+                                  </div>
+
+                                  {editIndex === index ? (
+                                    <div className="row">
+                                      <input
+                                        className="form-control mb-2"
+                                        name="recipientName"
+                                        value={editData.recipientName}
+                                        onChange={handleChange}
+                                        placeholder="Tên người nhận"
+                                      />
+                                      <input
+                                        className="form-control mb-2"
+                                        name="address"
+                                        value={editData.address}
+                                        onChange={handleChange}
+                                        placeholder="Địa chỉ"
+                                      />
+                                      <input
+                                        className="form-control mb-2"
+                                        name="ward"
+                                        value={editData.ward}
+                                        onChange={handleChange}
+                                        placeholder="Phường/Xã"
+                                      />
+                                      <input
+                                        className="form-control mb-2"
+                                        name="district"
+                                        value={editData.district}
+                                        onChange={handleChange}
+                                        placeholder="Quận/Huyện"
+                                      />
+                                      <input
+                                        className="form-control mb-2"
+                                        name="province"
+                                        value={editData.province}
+                                        onChange={handleChange}
+                                        placeholder="Tỉnh/Thành phố"
+                                      />
+                                      <input
+                                        className="form-control mb-2"
+                                        name="phone"
+                                        value={editData.phone}
+                                        onChange={handleChange}
+                                        placeholder="Số điện thoại"
+                                      />
+                                      <div>
+                                        <button
+                                          className="btn btn-warning btn-sm me-2"
+                                          onClick={handleUpdate}
+                                        >
+                                          Lưu
+                                        </button>
+                                        <button
+                                          className="btn btn-secondary btn-sm"
+                                          onClick={() => setEditIndex(null)}
+                                        >
+                                          Hủy
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p className="mb-6">
+                                      {p.recipientName}
+                                      <br />
+                                      {p.address}, {p.ward} <br />
+                                      {p.district}, {p.province}
+                                      <br />
+                                      {p.phone}
+                                    </p>
+                                  )}
+
+                                  {!p.defaultAddresss && (
+                                    <button
+                                      className="btn btn-info btn-sm"
+                                      onClick={() =>
+                                        handleSetDefaultAddress(index)
+                                      }
+                                    >
+                                      Đặt làm mặc định
+                                    </button>
+                                  )}
+
+                                  {editIndex !== index && (
+                                    <div className="mt-4">
+                                      <Link
+                                        to="#"
+                                        className="text-inherit"
+                                        onClick={() => handleEdit(p, index)}
+                                      >
+                                        Sửa
+                                      </Link>
+                                      <Link
+                                        to="#"
+                                        className="text-danger ms-3"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal"
+                                        onClick={() => setDeleteId(p.id)}
+                                      >
+                                        Xóa
+                                      </Link>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
                       </>
@@ -229,7 +498,11 @@ const MyAccountAddress = () => {
                   >
                     Quay lại
                   </button>
-                  <button type="button" className="btn btn-danger">
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => deleteAdress()}
+                  >
                     Xóa
                   </button>
                 </div>
@@ -245,13 +518,10 @@ const MyAccountAddress = () => {
             aria-hidden="true"
           >
             <div className="modal-dialog">
-              {/* modal content */}
               <div className="modal-content">
-                {/* modal body */}
                 <div className="modal-body p-6">
                   <div className="d-flex justify-content-between mb-5">
                     <div>
-                      {/* heading */}
                       <h5 className="h6 mb-1" id="addAddressModalLabel">
                         Địa chỉ vận chuyển mới
                       </h5>
@@ -261,7 +531,6 @@ const MyAccountAddress = () => {
                       </p>
                     </div>
                     <div>
-                      {/* button */}
                       <button
                         type="button"
                         className="btn-close"
@@ -270,58 +539,86 @@ const MyAccountAddress = () => {
                       />
                     </div>
                   </div>
-                  {/* row */}
                   <div className="row g-3">
-                    {/* col */}
                     <div className="col-12">
-                      {/* input */}
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Họ"
-                        aria-label="First name"
+                        name="recipientName"
+                        placeholder="Họ và Tên"
+                        value={formData.recipientName.trim()}
+                        onChange={handleChange}
                         required
                       />
                     </div>
-                    {/* col */}
                     <div className="col-12">
-                      {/* input */}
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Tên"
-                        aria-label="Last name"
-                        required
-                      />
-                    </div>
-                    {/* col */}
-                    <div className="col-12">
-                      {/* input */}
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Địa chỉ"
-                      />
-                    </div>
-                    {/* col */}
-                    <div className="col-12">
-                      {/* input */}
-                      <input
-                        type="text"
-                        className="form-control"
+                        name="phone"
                         placeholder="Số điện thoại"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="col-4">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="postalCode"
+                        placeholder="Mã bưu điện"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-8">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="address"
+                        placeholder="Địa chỉ"
+                        value={formData.address}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-6">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="ward"
+                        placeholder="Phường"
+                        value={formData.ward}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-6">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="district"
+                        placeholder="Huyện"
+                        value={formData.district}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="col-12">
+                      <input
+                        type="text"
+                        className="form-control"
+                        name="province"
+                        placeholder="Tỉnh"
+                        value={formData.province}
+                        onChange={handleChange}
                       />
                     </div>
                     <div className="col-12 text-end">
                       <button
+                        className="btn btn-outline-warning"
                         type="button"
-                        className="btn btn-outline-warning mr-2"
-                        data-bs-dismiss="modal"
+                        onClick={handleSubmit}
                       >
-                        Cancel
-                      </button>
-                      <button className="btn btn-outline-warning" type="button">
-                        Save Address
+                        Lưu địa chỉ
                       </button>
                     </div>
                   </div>
