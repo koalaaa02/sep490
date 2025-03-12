@@ -65,6 +65,8 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtService.generateToken(checkUser.getName()));
             response.put("roles", user.getRoles());
+            response.put("lastName", checkUser.getLastName());
+            response.put("firstName", checkUser.getFirstName());
             return ResponseEntity.ok(response);
         } else {
             throw new UsernameNotFoundException("invalid user request !");
