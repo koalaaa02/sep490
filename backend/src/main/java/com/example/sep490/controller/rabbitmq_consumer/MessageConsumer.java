@@ -1,4 +1,4 @@
-package com.example.sep490.controller.consumer;
+package com.example.sep490.controller.rabbitmq_consumer;
 
 import com.example.sep490.configs.RabbitMQConfig;
 import com.example.sep490.dto.websocket.ChatMessageRequest;

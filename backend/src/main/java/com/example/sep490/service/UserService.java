@@ -56,18 +56,43 @@ public class UserService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public String addUser(AuthRegisterRequest userInfo) {
+    public User addUser(AuthRegisterRequest userInfo) {
+        String otp = commonUtils.generateOtp();
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         User newUser = User.builder()
 		        .name(userInfo.getName())
                 .email(userInfo.getEmail())
 		        .password(userInfo.getPassword())
                 .roles("ROLE_DEALER")
-                .active(true)
+                .active(false)
                 .userType(UserType.ROLE_DEALER)
+                .resetToken(otp)
 		        .build();
         userRepo.save(newUser);
-        return "user added to system ";
+        String subject = "Xác minh tài khoản";
+        String content = "Xin chào " + newUser.getName() + ",\n\n"
+                + "Đây là mã OTP để xác minh tài khoản: " + otp + "\n\n"
+                + "Xin vui lòng không cung cấp mã OTP cho bất kỳ ai.";
+        try {
+            mailUtils.sendPlainTextEmail(fromEmail, newUser.getEmail(), subject, content);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Không thể gửi email, hãy kiểm tra lại email: " + e.getMessage());
+        }
+        return newUser;
+    }
+
+    @Transactional
+    public String activateAccount(String email, String resetToken) {
+        User user = userRepo.findByEmailAndIsDeleteFalse(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
+        if (user.getResetToken() == null || !user.getResetToken().equals(resetToken)) {
+            throw new RuntimeException("Mã reset không hợp lệ hoặc đã hết hạn.");
+        }
+        user.setResetToken(null);
+        user.setActive(true);
+        userRepo.save(user);
+
+        return "Tài khoản xác minh thành công.";
     }
 
     public PageResponse<UserResponse> getUsers(UserFilterDTO filter) {
@@ -203,6 +228,14 @@ public class UserService {
 
     public User getUserByUserName(String username) {
         return userRepo.findByName(username).orElse(null);
+    }
+
+    public User getUserByEmailIgnoreCase(String email) {
+        return userRepo.findByEmailIgnoreCase(email).orElse(null);
+    }
+
+    public User getUserByUserNameOrEmail(String email, String username) {
+        return userRepo.findByEmailOrNameContainingIgnoreCase(email, username).orElse(null);
     }
 
 }

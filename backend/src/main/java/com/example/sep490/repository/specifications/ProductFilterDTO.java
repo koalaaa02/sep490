@@ -17,7 +17,8 @@ public class ProductFilterDTO {
     private String sortBy = "id";
     @Schema(defaultValue = "ASC")
     private String direction = "ASC";
-
+    @Schema(defaultValue = "true", description = "mặc định là true đối với public api")
+    private boolean active = true;
 
     private String name;
     @Schema(description = "Category ID (null nếu không lọc)", nullable = true)

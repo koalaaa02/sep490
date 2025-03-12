@@ -13,7 +13,7 @@ import com.example.sep490.dto.UserRequest;
 import com.example.sep490.service.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/provider/users")
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -21,25 +21,21 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getUsers(@Valid UserFilterDTO filter) {
         return ResponseEntity.ok(userService.getUsers(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> createUser(@Valid @RequestBody UserRequest user) {
         return ResponseEntity.ok().body(userService.createUser(user));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> updateUser(@PathVariable Long id,@Valid @RequestBody UserRequest user) {
         if (!id.equals(user.getId())) {
             return ResponseEntity.badRequest().body("id và id trong thông tin người dùng không trùng khớp.");
@@ -48,7 +44,6 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userService.deleteUser(id);

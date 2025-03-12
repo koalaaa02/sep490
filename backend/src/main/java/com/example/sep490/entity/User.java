@@ -29,7 +29,9 @@ public class User extends Auditable{ //thông tin tài khoản
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    
+    private String firstName;
+    private String lastName;
+
     @Column(nullable = false, unique = true)
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
@@ -39,15 +41,15 @@ public class User extends Auditable{ //thông tin tài khoản
     private String password;
     
     @Column(nullable = false)
-    @ColumnDefault("true")
-    private boolean active = true;
+    @ColumnDefault("false")
+    private boolean active = false;
     
     @ColumnDefault("'ROLE_DEALER'")
     private String roles;
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ROLE_DEALER'")
-    private UserType userType; // DEALER, PROVIDER, AGENT
+    private UserType userType; // ROLE_DEALER, ROLE_PROVIDER, ROLE_AGENT, ROLE_ADMIN
 
 //    @OneToMany(mappedBy = "user")
 //    private List<Order> orders; // order customer mua

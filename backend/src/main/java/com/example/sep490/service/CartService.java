@@ -3,6 +3,7 @@ package com.example.sep490.service;
 import com.example.sep490.dto.cart.Cart;
 import com.example.sep490.dto.cart.ItemCart;
 import com.example.sep490.dto.cart.ShopCart;
+import com.example.sep490.entity.ProductSKU;
 import com.example.sep490.repository.ProductSKURepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -56,11 +57,14 @@ public class CartService {
                     return newShop;
                 });
 
+        //Lấy thông tin sp từ db
+        ProductSKU proSKU = productSKURepository.findById(productSKUId).orElse(null);
+
         // Tìm sản phẩm trong giỏ hàng của shop
         ItemCart itemCart = shopCart.getItems().stream()
                 .filter(item -> item.getProductSKUId().equals(productSKUId))
                 .findFirst()
-                .orElse(new ItemCart(null, productSKUId, "Product Name", "SKU Code", "Image URL", null, 0));
+                .orElse(new ItemCart(proSKU.getProduct().getId(), productSKUId, proSKU.getProduct().getName(), proSKU.getSkuCode(), proSKU.getImages(), proSKU.getSellingPrice(), 0));
 
         itemCart.setQuantity(itemCart.getQuantity() + quantity);
 

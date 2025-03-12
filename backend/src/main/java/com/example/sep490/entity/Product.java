@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "tbl_product")
@@ -37,6 +38,10 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UnitType unit;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean active = false;
 
     // Relationship
 //    @JsonManagedReference

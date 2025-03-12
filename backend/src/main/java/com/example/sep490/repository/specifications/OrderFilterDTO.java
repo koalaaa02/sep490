@@ -22,6 +22,7 @@ public class OrderFilterDTO {
 
     private Long Id;
     private String deliveryCode;
+    @JsonIgnore
     private Long shopId;
 
     private DeliveryMethod deliveryMethod;

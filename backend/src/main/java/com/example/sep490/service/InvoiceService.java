@@ -1,7 +1,10 @@
 package com.example.sep490.service;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.dto.ShopInvoiceSummary;
+import com.example.sep490.dto.UserInvoiceSummary;
 import com.example.sep490.entity.*;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
@@ -38,6 +41,10 @@ public class InvoiceService {
     private OrderRepository orderRepo;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private ShopRepository shopRepository;
 
     public PageResponse<InvoiceResponse> getInvoices(InvoiceFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
@@ -55,6 +62,29 @@ public class InvoiceService {
         Page<Invoice> invoicePage = invoiceRepo.findAll(spec, pageable);
         Page<InvoiceResponse> invoiceResponsePage = invoicePage.map(invoiceMapper::EntityToResponse);
         return pagination.createPageResponse(invoiceResponsePage);
+    }
+
+    public PageResponse<InvoiceResponse> getInvoicesByDealerId(InvoiceFilterDTO filter, Long dealerId) {
+        filter.setCreatedBy(userService.getContextUser().getId());
+        filter.setAgentId(dealerId);
+        Specification<Invoice> spec = InvoiceSpecification.filterInvoices(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Invoice> invoicePage = invoiceRepo.findAll(spec, pageable);
+        Page<InvoiceResponse> invoiceResponsePage = invoicePage.map(invoiceMapper::EntityToResponse);
+        return pagination.createPageResponse(invoiceResponsePage);
+    }
+
+    public List<UserInvoiceSummary> getUsersWithInvoicesCreatedBy() {
+        return invoiceRepo.findAllUserAndCountInvoiceByCreatedBy(userService.getContextUser().getId());
+    }
+
+    public List<ShopInvoiceSummary> getShopsWithInvoices() {
+        return invoiceRepo.findAllShopAndCountInvoiceByAgentID(userService.getContextUser().getId());
+    }
+
+    public List<InvoiceResponse> getShopsInvoicesByShopIdAndDealerId(Long shopId) {
+        Long agentId = userService.getContextUser().getId();
+        return invoiceMapper.entityToResponses(invoiceRepo.findByShopIdAndAgentId(shopId, agentId));
     }
 
     public InvoiceResponse getInvoiceById(Long id) {
