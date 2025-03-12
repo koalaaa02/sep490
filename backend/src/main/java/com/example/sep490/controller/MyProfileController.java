@@ -19,13 +19,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/myprofile")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
 public class MyProfileController {
     @Autowired
     private UserService userService;
 
 
     @GetMapping("/me")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -36,7 +36,6 @@ public class MyProfileController {
     }
 
     @PostMapping("/change-password")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public String changePassword(@RequestBody ChangePasswordRequest request) {
         // Lấy email người dùng từ authentication context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -12,7 +12,8 @@ import com.example.sep490.dto.DebtPaymentRequest;
 import com.example.sep490.service.DebtPaymentService;
 
 @RestController
-@RequestMapping("/api/debt-payments")
+@RequestMapping("/api/provider/debt-payments")
+//@PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
 public class DebtPaymentController {
     private static final Logger logger = LoggerFactory.getLogger(DebtPaymentController.class);
 
@@ -20,7 +21,6 @@ public class DebtPaymentController {
     private DebtPaymentService debtPaymentService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
     public ResponseEntity<?> getDebtPayments(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -33,21 +33,18 @@ public class DebtPaymentController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
     public ResponseEntity<?> getDebtPaymentById(@PathVariable Long id) {
         logger.info("Fetching debt payment with id: {}", id);
         return ResponseEntity.ok().body(debtPaymentService.getDebtPaymentById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
     public ResponseEntity<?> createDebtPayment(@Valid @RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Creating new debt payment: {}", debtPaymentRequest);
         return ResponseEntity.ok().body(debtPaymentService.createDebtPayment(debtPaymentRequest));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
     public ResponseEntity<?> updateDebtPayment(@PathVariable Long id,@Valid @RequestBody DebtPaymentRequest debtPaymentRequest) {
         logger.info("Updating debt payment with id: {}", id);
         if (!id.equals(debtPaymentRequest.getId())) {
@@ -57,7 +54,6 @@ public class DebtPaymentController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER','ROLE_DEALER')")
     public ResponseEntity<?> deleteDebtPayment(@PathVariable Long id) {
         logger.info("Deleting debt payment with id: {}", id);
         try {

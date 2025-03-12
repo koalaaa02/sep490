@@ -2,11 +2,12 @@ package com.example.sep490.entity.enums;
 
 public enum UnitType {
     PCS,
-    Kg,
+    KG,
     PAIR,
     SET,
     PACK,
     BAG,
     DOZEN,
-    BOX
+    BOX,
+    TON
 }

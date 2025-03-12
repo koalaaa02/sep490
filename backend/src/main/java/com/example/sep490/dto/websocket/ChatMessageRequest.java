@@ -2,6 +2,7 @@ package com.example.sep490.dto.websocket;
 
 import com.example.sep490.entity.enums.MessageStatus;
 import com.example.sep490.entity.enums.MessageType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,6 +13,7 @@ public class ChatMessageRequest {
     private Long id;
 
     private String content;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp = LocalDateTime.now();
     private MessageType messageType = MessageType.TEXT; // TEXT, IMAGE
     private MessageStatus status = MessageStatus.SENT; // SENT, DELIVERED, READ

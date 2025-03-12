@@ -30,7 +30,6 @@ public class CheckoutController {
             @RequestBody OrderRequest orderRequest,
             HttpServletRequest request,
             HttpServletResponse response) {
-
         try {
             checkoutService.checkout(orderRequest, request, response);
             return ResponseEntity.ok("Checkout successful.");

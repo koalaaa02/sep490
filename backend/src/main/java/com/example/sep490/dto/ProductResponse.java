@@ -23,6 +23,7 @@ public class ProductResponse {
     private String specifications;
     private UnitType unit;
     private String images;
+    private boolean active;
 
     @JsonIgnoreProperties({"products","parentCategory","subCategories"})
     private Category category;

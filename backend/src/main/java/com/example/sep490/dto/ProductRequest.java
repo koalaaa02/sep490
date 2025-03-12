@@ -18,6 +18,7 @@ public class ProductRequest {
     private String specifications;
     private UnitType unit = UnitType.PCS;
     private String images;
+    private boolean active = false;
 
     // Relationship
     private Long categoryId;

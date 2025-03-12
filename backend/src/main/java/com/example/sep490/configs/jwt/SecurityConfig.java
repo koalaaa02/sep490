@@ -67,25 +67,19 @@ public class SecurityConfig {
                                 "/html/**"
                         ).permitAll()
                         .requestMatchers(
+                                "/api/admin/**"
+                        ).hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(
+                                "/api/provider/**"
+                        ).hasAnyAuthority("ROLE_PROVIDER")
+                        .requestMatchers(
+                                "/api/dealer/**"
+                        ).hasAnyAuthority("ROLE_DEALER")
+                        .requestMatchers(
                                 "/api/myprofile/**",
-                                "/websocket/**",
-                                "/api/statistics/**",
-                                "/api/financialReport/**",
-                                "/api/products/**",
-                                "/api/productskus/**",
-                                "/api/checkout/**",
-                                "/api/expenses/**",
-                                "/api/addresses/**",
-                                "/api/categories/**",
-                                "/api/invoices/**",
-                                "/api/orders/**",
-                                "/api/shops/**",
-                                "/api/suppliers/**",
-                                "/api/transactions/**",
-                                "/api/users/**",
-                                "/api/debt-payments/**",
-                                "/api/categories/**"
-                		).authenticated()
+                                "/api/chat/**"
+                        ).hasAnyAuthority("ROLE_ADMIN", "ROLE_PROVIDER", "ROLE_DEALER")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
