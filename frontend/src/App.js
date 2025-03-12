@@ -41,15 +41,15 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
-          <Route path="/Shop" element={<Shop />} />
-          <Route path="/ShopGridCol3" element={<ShopGridCol3 />} />
-          <Route path="/ShopListCol" element={<ShopListCol />} />
+          <Route path="/Shop/:cateId" element={<Shop />} />
+          <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
+          <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
           <Route path="/ShopWishList" element={<ShopWishList />} />
           <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
           <Route path="/ShopCart" element={<ShopCart />} />
           {/* Store pages */}
           <Route path="/StoreList" element={<StoreList />} />
-          <Route path="/SingleShop" element={<SingleShop />} />
+          <Route path="/SingleShop/:shopId" element={<SingleShop />} />
           {/* Accounts pages */}
           <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
           <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
