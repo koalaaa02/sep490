@@ -21,7 +21,7 @@ public class ProductControllerAdmin {
         return ResponseEntity.ok(productService.getProductsByFilter(filter));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/activate/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> activateProduct(@PathVariable Long id) {
         try {

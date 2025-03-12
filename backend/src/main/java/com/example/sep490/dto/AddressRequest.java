@@ -37,7 +37,7 @@ public class AddressRequest {
     private String postalCode;
 
     @Schema(defaultValue = "false")
-    private boolean defaultAddresss;
+    private boolean defaultAddress;
 
     // Relationship
 }

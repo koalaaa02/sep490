@@ -166,8 +166,8 @@ public class UserService {
     }
 
     @Transactional
-    public String changePassword(String email, String oldPassword, String newPassword, String confirmNewPassword) {
-        User user = userRepo.findByEmailAndIsDeleteFalse(email)
+    public String changePassword(String userName, String oldPassword, String newPassword, String confirmNewPassword) {
+        User user = userRepo.findByName(userName)
                 .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
             throw new RuntimeException("Mật khẩu cũ không chính xác.");
