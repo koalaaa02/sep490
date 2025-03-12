@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
-import image1 from "../../images/glass.jpg";
+import image1 from "../../images/paint.jpg";
 import { BASE_URL } from "../../Utils/config";
 import Swal from "sweetalert2";
+import { FaArrowLeftLong } from "react-icons/fa6";
+import ChatBox from "../Shop/ChatBox";
 
 const ShopProductDetail = ({ id, onBack }) => {
   const [product, setProduct] = useState(null);
@@ -91,14 +93,14 @@ const ShopProductDetail = ({ id, onBack }) => {
   };
 
   return (
-    <div className="container">
+    <div className="container shadow-sm border rounded p-3">
       <div className="d-flex align-items-center mb-3">
-        <span className="me-2 p-2 rounded btn btn-warning" onClick={onBack}>
-          ←
+        <span className="me-2 btn bg-gray-200" onClick={onBack}>
+          <FaArrowLeftLong size={20} />
         </span>
         <h4 className="mb-0">Chi tiết sản phẩm</h4>
       </div>
-      <div className="row">
+      <div className="row ">
         {/* Hình ảnh sản phẩm */}
         <div className="col-md-5">
           <img
@@ -128,36 +130,43 @@ const ShopProductDetail = ({ id, onBack }) => {
         </div>
 
         {/* Thông tin sản phẩm */}
-        <div className="col-md-6">
-          <h3 className="text-uppercase text-warning">
-            Tên sản phẩm: {product.name}
-          </h3>
-          <h5 className="fw-bold">Mô tả: {product.description}</h5>
-          <p className="text-muted">Màu sắc: {selectedSku?.skuCode}</p>
-          <span className="fw-bold text-dark text-decoration-line-through">
-            Giá gốc: {selectedSku?.costPrice || 0} VNĐ
-            <span className="badge bg-warning text-dark">0%</span>
-          </span>
-          <br/>
-          <span className="fw-bold text-danger">
-            Giá khuyến mãi: {selectedSku?.sellingPrice || 0} VNĐ
-          </span>
-          <p className="text-muted">Kho: {selectedSku?.stock || 0} PCS</p>
-
+        <div className="col-md-6 border-left">
+          <h4 className="text-uppercase text-warning mb-8">{product.name}</h4>
+          <div className="bg-light p-3">
+            <span className="text-muted">Giá bán:</span>
+            <span className="text-danger m-3">
+              {selectedSku?.sellingPrice || 0} đ
+            </span>
+            <span className="text-decoration-line-through">
+              {selectedSku?.costPrice || 0} đ
+              <span className="badge bg-warning text-dark ml-2">0%</span>
+            </span>
+            <br />
+          </div>
+          <p className="text-muted mt-10">Màu sắc: {selectedSku?.skuCode}</p>
+          <h6 className="text-muted mb-10">
+            Vận chuyển:{" "}
+            {!product.skus.bulky ? <>Liên hệ người bán</> : <>12.800 đ</>}{" "}
+          </h6>
           <div className="d-flex align-items-center mb-3">
+            <span className="text-muted mr-3">Số lượng: </span>
             <button
               className="btn btn-outline-secondary"
               onClick={() => handleQuantityChange("decrease")}
             >
               -
             </button>
-            <span className="mx-5">{quantity}</span>
+            <span className="mx-3">{quantity}</span>
             <button
               className="btn btn-outline-secondary"
               onClick={() => handleQuantityChange("increase")}
             >
               +
             </button>
+            <span className="text-muted ml-2">
+              {" "}
+              {selectedSku?.stock || 0} có sẵn
+            </span>
           </div>
 
           <button
@@ -166,6 +175,53 @@ const ShopProductDetail = ({ id, onBack }) => {
           >
             <FaShoppingCart className="me-2" /> Thêm vào giỏ hàng
           </button>
+        </div>
+      </div>
+      <div className="mt-5 mb-1 p-3 shadow-sm border rounded">
+        <div className="d-flex align-items-center">
+          <img
+            src="https://via.placeholder.com/50"
+            alt="logo"
+            className="rounded-circle"
+          />
+          <div>
+            <h6 className="m-0">Người bán: {product.supplier.name}</h6>
+          </div>
+        </div>
+        {/* <div className="mt-3 d-flex gap-2">
+          <button className="btn btn-warning">
+            <FaEye className="me-1" /> Xem Shop
+          </button>
+        </div> */}
+        <hr />
+        <div className="d-flex justify-content-between flex-wrap">
+          <div>
+            <p className="m-0">Email</p>
+            <strong>{product.supplier.contactEmail}</strong>
+          </div>
+          <div>
+            <p className="m-0">Số điện thoại</p>
+            <strong>{product.supplier.phone}</strong>
+          </div>
+          <div>
+            <p className="m-0">Địa chỉ</p>
+            <strong>{product.supplier.address}</strong>
+          </div>
+          <div>
+            <p className="m-0"></p>
+            <strong></strong>
+          </div>
+          <div>
+            <p className="m-0"></p>
+            <strong></strong>
+          </div>
+        </div>
+        <ChatBox />
+      </div>
+      <div className="mt-1 mb-10 p-3 shadow-sm border rounded">
+        <h4 className="m-0 fw-bold">Mô tả sản phẩm</h4>
+        <div className="d-flex justify-content-between flex-wrap">
+          <span>{product.description}</span>
         </div>
       </div>
     </div>

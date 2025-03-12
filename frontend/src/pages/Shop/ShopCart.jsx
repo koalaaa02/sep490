@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
+import { FaTrashAlt } from "react-icons/fa";
 import img1 from "../../images/glass.jpg";
 
 const ShopCart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedItems, setSelectedItems] = useState({});
   const isLoggedIn = !!localStorage.getItem("user");
   const navigate = useNavigate();
 
@@ -26,13 +29,10 @@ const ShopCart = () => {
       } catch (error) {
         console.error("Lỗi khi fetch API:", error);
       }
+      setLoaderStatus(false);
     };
 
     fetchData();
-
-    setTimeout(() => {
-      setLoaderStatus(false);
-    }, 1500);
   }, []);
 
   const removeFromCart = async (shopId, productSKUId) => {
@@ -47,9 +47,8 @@ const ShopCart = () => {
           },
         }
       );
-      if (!response.ok) {
-        throw new Error("Failed to remove item from cart");
-      }
+
+      if (!response.ok) throw new Error("Failed to remove item from cart");
 
       setCartItems((prevCartItems) =>
         prevCartItems
@@ -71,13 +70,15 @@ const ShopCart = () => {
       .reduce((total, shop) => {
         return (
           total +
-          shop.items.reduce(
-            (shopTotal, item) => shopTotal + 100000 * item.quantity,
-            0
-          )
+          shop.items.reduce((shopTotal, item) => {
+            if (selectedItems[item.productSKUId]) {
+              return shopTotal + item.quantity * 100000 * item.quantity;
+            }
+            return shopTotal;
+          }, 0)
         );
       }, 0)
-      .toFixed(3);
+      .toLocaleString("vi-VN");
   };
 
   const handleCheckout = () => {
@@ -85,6 +86,57 @@ const ShopCart = () => {
       navigate("/MyAccountSignIn");
     } else {
       navigate("/ShopCheckout");
+    }
+  };
+
+  const toggleSelectAll = () => {
+    const newSelectAll = !selectAll;
+    setSelectAll(newSelectAll);
+    const updatedSelection = {};
+    cartItems.forEach((shop) => {
+      shop.items.forEach((item) => {
+        updatedSelection[item.productSKUId] = newSelectAll;
+      });
+    });
+    setSelectedItems(updatedSelection);
+  };
+
+  const toggleItemSelection = (productSKUId) => {
+    setSelectedItems((prev) => ({
+      ...prev,
+      [productSKUId]: !prev[productSKUId],
+    }));
+  };
+
+  const updateQuantity = async (shopId, productSKUId, newQuantity) => {
+    if (newQuantity < 1) return;
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/cart/update?shopId=${shopId}&productSKUId=${productSKUId}&quantity=${newQuantity}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error("Lỗi khi cập nhật số lượng");
+
+      setCartItems((prevCartItems) =>
+        prevCartItems.map((shop) => ({
+          ...shop,
+          items: shop.items.map((item) =>
+            item.productSKUId === productSKUId
+              ? { ...item, quantity: newQuantity }
+              : item
+          ),
+        }))
+      );
+    } catch (error) {
+      console.error("Lỗi cập nhật số lượng:", error);
     }
   };
 
@@ -96,133 +148,164 @@ const ShopCart = () => {
             visible={true}
             height="100"
             width="100"
-            ariaLabel="magnifying-glass-loading"
-            glassColor="#c0efff"
             color="#0aad0a"
           />
         </div>
       ) : (
         <>
           <ScrollToTop />
-          <section className="mb-lg-14 mb-8 mt-8">
-            <div className="container">
-              <div className="row">
-                <div className="col-12">
-                  <div className="card py-1 border-0 mb-8">
-                    <h1 className="fw-bold">Giỏ hàng</h1>
-                  </div>
-                </div>
+          <section className="mb-8 mt-8">
+            <div className="container mt-4">
+              <h4>Giỏ hàng</h4>
+              {/* Header Table */}
+              <div className="card p-3 mb-2 d-flex flex-row align-items-center">
+                <h5 className="mb-0 col-4 text-center">Sản Phẩm</h5>
+                <h5 className="mb-0 col-2 text-center">Đơn giá</h5>
+                <h5 className="mb-0 col-2 text-center">Số lượng</h5>
+                <h5 className="mb-0 col-2 text-center">Số tiền</h5>
+                <h5 className="mb-0 col-2 text-center">Thao tác</h5>
               </div>
 
-              <div className="row">
-                <div className="py-3">
-                  {cartItems.length === 0 ? (
-                    <p>Giỏ hàng của bạn đang trống.</p>
-                  ) : (
-                    <div className="row">
-                      <div className="col-lg-8 col-md-8">
-                        <div className="row">
-                          {cartItems.map((shop) => (
-                            <div key={shop.shopId} className="mb-4">
-                              <h5 className="fw-bold mb-3">
-                                Tên cửa hàng: {shop.shopName}
-                              </h5>
-                              <ul className="list-group">
-                                {shop.items.map((item) => (
-                                  <li
-                                    key={item.productSKUId}
-                                    className="list-group-item d-flex align-items-center justify-content-between"
-                                  >
-                                    <div className="d-flex align-items-center">
-                                      <img
-                                        src={img1}
-                                        alt={item.productName}
-                                        className="img-fluid me-3"
-                                        style={{
-                                          width: "100px",
-                                          height: "120px",
-                                        }}
-                                      />
-                                      <div>
-                                        <h6 className="mb-1">
-                                          {item.productName}
-                                        </h6>
-                                        <span>
-                                          Số lượng: {item.quantity}
-                                        </span>
-                                      </div>
-                                    </div>
-                                    <div className="text-end">
-                                      <span className="fw-bold text-danger d-block">
-                                        {(100 * item.quantity).toFixed(3)} VNĐ
-                                      </span>
-                                      <button
-                                        className="btn btn-sm btn-danger mt-2"
-                                        onClick={() =>
-                                          removeFromCart(
-                                            shop.shopId,
-                                            item.productSKUId
-                                          )
-                                        }
-                                      >
-                                        <i className="fas fa-trash"></i>
-                                      </button>
-                                    </div>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
+              {/* Danh sách sản phẩm */}
+              <div className="card p-3">
+                {cartItems.map((shop) => (
+                  <div key={shop.shopId}>
+                    {/* Tên cửa hàng */}
+                    <div className="d-flex align-items-center mb-3 border-bottom pb-3">
+                      <input
+                        type="checkbox"
+                        checked={selectAll}
+                        onChange={toggleSelectAll}
+                        className="me-2"
+                      />
+                      <strong>Tên cửa hàng: {shop.shopName}</strong>
+                    </div>
 
-                      <div className="col-lg-4 col-md-4">
-                        <div className="card mt-6">
-                          <div className="card-body">
-                            <h2 className="h5 mb-4">Tổng tiền</h2>
-                            <ul className="list-group list-group-flush">
-                              <li className="list-group-item d-flex justify-content-between">
-                                <div>Tổng sản phẩm:</div>
-                                <span>
-                                  {Number(calculateTotal()).toLocaleString(
-                                    "vi-VN"
-                                  )}{" "}
-                                  VNĐ
-                                </span>
-                              </li>
-                              <li className="list-group-item d-flex justify-content-between">
-                                <div>Phí giao hàng:</div>
-                                <span>10.000 VNĐ</span>
-                              </li>
-                              <li className="list-group-item d-flex justify-content-between fw-bold">
-                                <div>Tổng cộng:</div>
-                                <span>
-                                  {(
-                                    Number(calculateTotal()) + 10000
-                                  ).toLocaleString("vi-VN")}{" "}
-                                  VNĐ
-                                </span>
-                              </li>
-                            </ul>
-                            <div
-                              className="d-grid mt-4"
-                              onClick={handleCheckout}
+                    {/* Sản phẩm trong cửa hàng */}
+                    {shop.items.map((item) => (
+                      <div
+                        key={item.productSKUId}
+                        className="row border-bottom container"
+                      >
+                        <div
+                          className={`row align-items-center m-2 p-2 border border-1 rounded-1 ${
+                            selectedItems[item.productSKUId] ? "bg-light" : ""
+                          }`}
+                        >
+                          {/* Checkbox */}
+                          <div className="col-1 text-center">
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedItems[item.productSKUId] || false
+                              }
+                              onChange={() =>
+                                toggleItemSelection(item.productSKUId)
+                              }
+                            />
+                          </div>
+
+                          {/* Ảnh sản phẩm */}
+                          <div className="col-1 text-center">
+                            <img
+                              src={img1}
+                              alt={item.productName}
+                              className="img-fluid mt-2"
+                              style={{
+                                height: "70px",
+                                width: "70px",
+                                border: "1px solid #ddd",
+                                borderRadius: "5px",
+                                padding: "2px",
+                              }}
+                            />
+                          </div>
+
+                          {/* Tên sản phẩm */}
+                          <div className="col-2">
+                            <h6>{item.productName}</h6>
+                            <p className="text-muted">
+                              Mã SKU: {item.productSKUCode}
+                            </p>
+                          </div>
+
+                          {/* Đơn giá */}
+                          <div className="col-2 text-center">
+                            <strong className="text-muted">
+                              {(100000).toLocaleString("vi-VN")}đ
+                            </strong>
+                          </div>
+
+                          {/* Số lượng */}
+                          <div className="col-2 text-center">
+                            <button
+                              className="btn btn-outline-secondary btn-sm"
+                              onClick={() =>
+                                updateQuantity(
+                                  shop.shopId,
+                                  item.productSKUId,
+                                  item.quantity - 1
+                                )
+                              }
+                              disabled={item.quantity <= 1}
                             >
-                              <Link className="btn btn-warning fw-bold">
-                                Thanh toán ngay
-                              </Link>
-                            </div>
+                              -
+                            </button>
+                            <span className="mx-2">{item.quantity}</span>
+                            <button
+                              className="btn btn-outline-secondary btn-sm"
+                              onClick={() =>
+                                updateQuantity(
+                                  shop.shopId,
+                                  item.productSKUId,
+                                  item.quantity + 1
+                                )
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {/* Số tiền */}
+                          <div className="col-3 text-center">
+                            <strong className="text-danger">
+                              {(item.quantity * 100000).toLocaleString("vi-VN")}
+                              đ
+                            </strong>
+                          </div>
+
+                          {/* Nút xóa */}
+                          <div className="col-1 text-center">
+                            <button
+                              onClick={() =>
+                                removeFromCart(shop.shopId, item.productSKUId)
+                              }
+                              className="btn btn-link text-warning"
+                            >
+                              <FaTrashAlt />
+                            </button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
+                ))}
+
+                {/* Tổng thanh toán */}
+                <div className="d-flex justify-content-between align-items-center border-top pt-3">
+                  <h6 className="m-0">
+                    Tổng thanh toán:{" "}
+                    <strong className="text-warning">
+                      {calculateTotal()}đ
+                    </strong>
+                  </h6>
+                  <button
+                    onClick={handleCheckout}
+                    className="btn btn-warning btn-lg"
+                  >
+                    Mua Hàng
+                  </button>
                 </div>
-              </div>
-              <div className="d-flex justify-content-between mt-4">
-                <Link to="/" className="btn btn-warning">
-                  Tiếp tục mua sắm
-                </Link>
               </div>
             </div>
           </section>

@@ -89,9 +89,9 @@ const MyAcconutPaymentMethod = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutNotification">
+                        <Link className="nav-link" to="/MyAcconutInvoice">
                           <i className="fas fa-bell me-2" />
-                          Thông báo
+                          Hóa đơn của tôi
                         </Link>
                       </li>
                       {/* nav item */}

@@ -7770,6 +7770,7 @@ html {
 }
 .text-inherit {
   color: #21313c;
+  text-decoration: none;
 }
 .icon-xxs {
   height: 1rem;
@@ -26970,7 +26971,13 @@ h4 {
 }
 .footer {
   background-color: #f0f3f2;
-  padding: 4rem 0;
+  padding: 1rem 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  text-align: center;
 }
 .footer .nav .nav-item .nav-link {
   color: #5c6c75;
@@ -27279,6 +27286,7 @@ input::-webkit-outer-spin-button {
   .docs-main-wrapper .main-content {
     margin-left: 0;
     width: auto;
+    flex: 1;
   }
   .docs-content {
     margin: 1rem;
@@ -28679,6 +28687,14 @@ select {
   opacity: 0;
   visibility: hidden;
   z-index: 999;
+}
+
+.chat {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
 }
 
 .scroll-to-top button:hover {

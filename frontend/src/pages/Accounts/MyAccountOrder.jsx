@@ -13,18 +13,56 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../Utils/config";
 
 const MyAccountOrder = () => {
+  const token = localStorage.getItem("access_token");
+  const [data, setData] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogOut = () => {
-      dispatch(logout());
-      navigate("/");  
-    };
+    dispatch(logout());
+    navigate("/");
+  };
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+          shopId: 1,
+          deliveryCode: "string",
+          deliveryMethod: "GHN",
+          paymentMethod: "COD",
+          status: "PENDING",
+          paid: false,
+        });
+
+        const response = await fetch(
+          // `${BASE_URL}/api/orders/?${params.toString()}`,
+          `${BASE_URL}/api/orders/1`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
@@ -167,9 +205,9 @@ const MyAccountOrder = () => {
                     </li>
                     {/* nav item */}
                     <li className="nav-item">
-                      <Link className="nav-link" to="/MyAcconutNotification">
+                      <Link className="nav-link" to="/MyAcconutInvoice">
                         <i className="fas fa-bell me-2" />
-                        Thông báo
+                        Hóa đơn của tôi
                       </Link>
                     </li>
                     {/* nav item */}

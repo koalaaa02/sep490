@@ -350,9 +350,9 @@ const Header = () => {
                           </Link>
                           <Link
                             className="dropdown-item"
-                            to="/MyAcconutNotification"
+                            to="/MyAcconutInvoice"
                           >
-                            Thông báo
+                            Hóa đơn của tôi
                           </Link>
                           <button
                             className="dropdown-item"
@@ -499,7 +499,7 @@ const Header = () => {
                             </div>
                             <div className="col-3 text-end">
                               <span className="fw-bold">
-                                {item.quantity * 100} VNĐ
+                                {(item.quantity * 100).toFixed(3)} VNĐ
                               </span>
                             </div>
                           </div>
@@ -511,7 +511,7 @@ const Header = () => {
                 <div className="d-grid mt-1">
                   <Link
                     className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
-                    to="/ShopCheckout"
+                    to="/ShopCart"
                   >
                     Thanh toán
                     <span className="fw-bold">{calculateTotal()} VNĐ</span>

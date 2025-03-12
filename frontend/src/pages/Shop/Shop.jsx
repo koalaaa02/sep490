@@ -134,7 +134,7 @@ function Dropdown() {
                           {/* input */}
                           <Link
                             to={`/SingleShop/${stores.id}`}
-                            className="form-check-label"
+                            className="form-check-label text-decoration-none text-warning"
                             htmlFor="eGrocery"
                           >
                             {stores.shopType}
@@ -218,8 +218,8 @@ function Dropdown() {
                 {/* card */}
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
-                  <div className=" card-body p-9">
-                    <h1 className="mb-0">{categories.name}</h1>
+                  <div className=" card-body p-4">
+                    <h4 className="mb-0">{categories.name}</h4>
                   </div>
                 </div>
                 {/* list icon */}
@@ -243,7 +243,7 @@ function Dropdown() {
                       </div>
                       {/* icon */}
                       <div className="d-flex justify-content-between align-items-center">
-                        <Link
+                        {/* <Link
                           to={`/ShopListCol/${cateId}`}
                           className="text-muted me-3"
                         >
@@ -257,7 +257,7 @@ function Dropdown() {
                         </Link>
                         <Link to={`/Shop/${cateId}`} className="me-3 active">
                           <i className="bi bi-grid-3x3-gap" />
-                        </Link>
+                        </Link> */}
                         <div className="me-2">
                           {/* select option */}
                           <select

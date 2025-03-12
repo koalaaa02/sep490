@@ -271,9 +271,9 @@ const MyAccountAddress = () => {
                       </li>
                       {/* nav item */}
                       <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutNotification">
+                        <Link className="nav-link" to="/MyAcconutInvoice">
                           <i className="fas fa-bell me-2" />
-                          Thông báo
+                          Hóa đơn của tôi
                         </Link>
                       </li>
                       {/* nav item */}
@@ -418,16 +418,17 @@ const MyAccountAddress = () => {
                                     </p>
                                   )}
 
-                                  {!p.defaultAddresss && (
-                                    <button
-                                      className="btn btn-info btn-sm"
-                                      onClick={() =>
-                                        handleSetDefaultAddress(index)
-                                      }
-                                    >
-                                      Đặt làm mặc định
-                                    </button>
-                                  )}
+                                  {!p.defaultAddresss &&
+                                    editIndex !== index && (
+                                      <button
+                                        className="btn btn-info btn-sm"
+                                        onClick={() =>
+                                          handleSetDefaultAddress(index)
+                                        }
+                                      >
+                                        Đặt làm mặc định
+                                      </button>
+                                    )}
 
                                   {editIndex !== index && (
                                     <div className="mt-4">
@@ -440,7 +441,7 @@ const MyAccountAddress = () => {
                                       </Link>
                                       <Link
                                         to="#"
-                                        className="text-danger ms-3"
+                                        className="text-danger ms-3 text-decoration-none"
                                         data-bs-toggle="modal"
                                         data-bs-target="#deleteModal"
                                         onClick={() => setDeleteId(p.id)}
