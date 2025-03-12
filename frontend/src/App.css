@@ -28689,14 +28689,6 @@ select {
   z-index: 999;
 }
 
-.chat {
-  position: fixed;
-  bottom: 25px;
-  right: 20px;
-  padding: 10px 20px;
-  font-size: 20px;
-}
-
 .scroll-to-top button:hover {
   background-color: #ffc107;
 }
@@ -29950,4 +29942,10 @@ background-color: #f3f6ff;
     opacity: .75;
     color: #fff;
 }
-
+.chat {
+  position: fixed;
+  bottom: 25px;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
+}
