@@ -14,7 +14,7 @@ import com.example.sep490.service.CategoryService;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/api/admin/categories")
 public class CategoryController {
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
 //logger.info("Fetching category with id: {}", id);
@@ -23,25 +23,21 @@ public class CategoryController {
 	private CategoryService categoryService;
 	
 	@GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getCategories(@Valid CategoryFilterDTO filter) {
     	return ResponseEntity.ok(categoryService.getCategories(filter));
     }
 	
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getCategorysById(@PathVariable Long id) {
     	return ResponseEntity.ok().body(categoryService.getCategoryById(id));
     }
     
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> createCategory(@Valid @RequestBody CategoryRequest category) {
     	return ResponseEntity.ok().body(categoryService.createCategory(category));
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryRequest category) {
         if (!id.equals(category.getId())) {
             return ResponseEntity.badRequest().body("id và id trong danh mục không trùng khớp.");
@@ -50,13 +46,11 @@ public class CategoryController {
     }
 
     @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(categoryService.uploadImage(id, file)) ;
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> deleteCategory(@PathVariable Long id) {
 		try {
         	categoryService.deleteCategory(id);

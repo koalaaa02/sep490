@@ -18,8 +18,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserRequest {
 	private Long id;
-    
     private String name;
+    private String firstName;
+    private String lastName;
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;

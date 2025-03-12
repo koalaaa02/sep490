@@ -35,7 +35,7 @@ public class ProductSpecification {
             if (filter.getMaxPrice() != null) {
                 predicates.add(cb.lessThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMaxPrice()));
             }
-
+            predicates.add(cb.equal(root.get("active"), filter.isActive()));
             predicates.add(cb.equal(root.get("isDelete"), false));
             return cb.and(predicates.toArray(new Predicate[0]));
         };

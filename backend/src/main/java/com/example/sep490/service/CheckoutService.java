@@ -50,8 +50,6 @@ public class CheckoutService {
             throw new RuntimeException("Bạn chưa chọn sản phẩm cuả shop nào.");
         }
 
-
-
         // Lấy giỏ hàng từ cookie
         Cart cart = cartService.getCartFromCookies(request);
 

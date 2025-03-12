@@ -22,7 +22,7 @@ public class Invoice  extends Auditable{//hóa đơn nợ cho đơn hàng nào (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal totalAmount; //tổng nợ phải trả
-    private BigDecimal paidAmount = BigDecimal.ZERO;; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
+    private BigDecimal paidAmount = BigDecimal.ZERO; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
 
     @Enumerated(EnumType.STRING)
     private InvoiceStatus status = InvoiceStatus.UNPAID;; // UNPAID, PARTIALLY_PAID, PAID

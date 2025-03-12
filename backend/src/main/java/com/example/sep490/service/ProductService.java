@@ -143,6 +143,15 @@ public class ProductService {
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 	}
 
+	public void activateProduct(Long id) {
+		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
+				.map(existingProduct -> {
+					existingProduct.setActive(!existingProduct.isActive());
+					return productRepo.save(existingProduct);
+				})
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
+	}
+
 	private Product getProduct(Long id) {
 		return id == null ? null
 				: productRepo.findByIdAndIsDeleteFalse(id).orElse(null);

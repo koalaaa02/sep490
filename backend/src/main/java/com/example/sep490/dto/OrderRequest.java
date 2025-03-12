@@ -9,6 +9,7 @@ import com.example.sep490.entity.enums.DeliveryMethod;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.entity.enums.PaymentMethod;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 
 import jakarta.persistence.EnumType;
@@ -35,9 +36,11 @@ public class OrderRequest {
     private BigDecimal totalAmount;
         
 	@NotNull(message = "Phương thức thanh toán không được để trống.")
-    private PaymentMethod paymentMethod; // CARD, COD
+    private PaymentMethod paymentMethod; // VNPAY, MOMO, COD,DEBT
 
     private DeliveryMethod deliveryMethod = DeliveryMethod.GHN;
+
+    @Schema(defaultValue = "false")
     private boolean paid = false;
 
 
