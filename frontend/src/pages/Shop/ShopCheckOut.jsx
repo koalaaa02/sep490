@@ -233,8 +233,12 @@ const ShopCheckOut = () => {
                       <div className="col-5 card-header fw-bold text-black">
                         Sản phẩm
                       </div>
-                      <div className="col-2 card-header text-muted">Đơn giá</div>
-                      <div className="col-2 card-header text-muted">Số lượng</div>
+                      <div className="col-2 card-header text-muted">
+                        Đơn giá
+                      </div>
+                      <div className="col-2 card-header text-muted">
+                        Số lượng
+                      </div>
                       <div className="col-3 card-header text-muted">
                         Thành tiền
                       </div>
@@ -280,10 +284,7 @@ const ShopCheckOut = () => {
                               {/* Đơn giá */}
                               <div className="col-2 text-center">
                                 <strong className="text-muted">
-                                  {(item.quantity * 100000).toLocaleString(
-                                    "vi-VN"
-                                  )}
-                                  đ
+                                  {(100000).toLocaleString("vi-VN")}đ
                                 </strong>
                               </div>
 
@@ -295,10 +296,9 @@ const ShopCheckOut = () => {
                               {/* Số tiền */}
                               <div className="col-2 text-center">
                                 <strong className="text-danger">
-                                  {(
-                                    item.quantity *
-                                    (item.quantity * 100000)
-                                  ).toLocaleString("vi-VN")}
+                                  {(item.quantity * 100000).toLocaleString(
+                                    "vi-VN"
+                                  )}
                                   đ
                                 </strong>
                               </div>

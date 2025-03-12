@@ -22,7 +22,7 @@ const MyAccountAddress = () => {
     district: "",
     ward: "",
     postalCode: "",
-    defaultAddresss: true,
+    defaultAddress: true,
   });
   const [data, setData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -112,13 +112,13 @@ const MyAccountAddress = () => {
       const result = await response.json();
       if (response.ok) {
         showNotification("Địa chỉ đã được thêm thành công!", "success");
+        setData((prevData) => ({
+          ...prevData,
+          content: [...prevData.content, result],
+        }));
       } else {
         showNotification("Thêm địa chỉ thất bại!", "danger");
       }
-      setData((prevData) => ({
-        ...prevData,
-        content: [...prevData.content, result],
-      }));
     } catch (error) {
       console.error("Error saving address:", error);
       alert("Đã có lỗi xảy ra, vui lòng thử lại.");
@@ -156,7 +156,7 @@ const MyAccountAddress = () => {
       ...prevData,
       content: prevData.content.map((item, i) => ({
         ...item,
-        defaultAddresss: i === index,
+        defaultAddress: i === index,
       })),
     }));
 
@@ -170,7 +170,7 @@ const MyAccountAddress = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ defaultAddresss: true, id: selectedId }),
+        body: JSON.stringify({ defaultAddress: true, id: selectedId }),
       });
     } catch (error) {
       console.error("Lỗi khi cập nhật server:", error);
