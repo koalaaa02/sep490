@@ -2,6 +2,9 @@ package com.example.sep490.controller;
 
 import com.example.sep490.dto.AuthRegisterRequest;
 import com.example.sep490.dto.publicdto.ChangeForgotPasswordRequest;
+import com.example.sep490.entity.User;
+import com.example.sep490.repository.RedisDAO;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,11 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRequest;
@@ -32,19 +32,38 @@ public class AuthController {
     private JwtService jwtService;
     @Autowired
     private AuthenticationManager authenticationManager;
-    
+    @Autowired
+    private RedisDAO redisDAO;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 	@PostMapping("/register")
-    public String addNewUser(@RequestBody AuthRegisterRequest userInfo) {
-        return service.addUser(userInfo);
+    public ResponseEntity<?> addNewUser(@RequestBody AuthRegisterRequest userInfo) {
+        User checkuser = service.getUserByUserNameOrEmail(userInfo.getEmail(), userInfo.getName());
+        if(checkuser != null) return  ResponseEntity.badRequest().body("Email hoặc UserName đã tồn tại");
+        return ResponseEntity.ok().body(service.addUser(userInfo));
+    }
+
+    @PostMapping("/activate")
+    public String activateAccount(@RequestBody ActivateAccount activateAccount) {
+        return service.activateAccount(
+                activateAccount.email,
+                activateAccount.resetToken
+        );
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        User checkUser = service.getUserByEmailIgnoreCase(authRequest.getEmail());
+        if(checkUser == null) return  ResponseEntity.badRequest().body("Email không tồn tại.");
+        if (!passwordEncoder.matches(authRequest.getPassword(), checkUser.getPassword())) {
+            throw new RuntimeException("Mật khẩu không chính xác");
+        }
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(checkUser.getName(), authRequest.getPassword()));
         if (authentication.isAuthenticated()) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
             Map<String, Object> response = new HashMap<>();
-            response.put("token", jwtService.generateToken(authRequest.getUsername()));
+            response.put("token", jwtService.generateToken(checkUser.getName()));
             response.put("roles", user.getRoles());
             return ResponseEntity.ok(response);
         } else {
@@ -69,6 +88,11 @@ public class AuthController {
         public String email;
     }
 
+    public static class ActivateAccount {
+        public String email;
+        public String resetToken;
+    }
+
     @PostMapping("/forgot-password")
     public String forgotPassword(@RequestBody EmailDTO email) {
         return service.forgotPassword(email.email);
@@ -82,6 +106,13 @@ public class AuthController {
                 request.getNewPassword(),
                 request.getConfirmNewPassword()
         );
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestParam("token") String token) {
+        long expirationTime = 3600;
+        redisDAO.save(token, expirationTime);
+        return ResponseEntity.ok("Đăng xuất thành công!");
     }
 
 

@@ -1,6 +1,7 @@
 package com.example.sep490.filter;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetailsService;
+import com.example.sep490.repository.RedisDAO;
 import com.example.sep490.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private UserInfoUserDetailsService userDetailsService;
 
+    @Autowired
+    private RedisDAO redisDAO;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -34,7 +38,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             token = authHeader.substring(7);
             username = jwtService.extractUsername(token);
         }
-
+        if (token != null && redisDAO.isBlacklisted(token)) {
+            throw new ServletException("Token đã bị vô hiệu hóa!");
+        }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             if (jwtService.validateToken(token, userDetails)) {

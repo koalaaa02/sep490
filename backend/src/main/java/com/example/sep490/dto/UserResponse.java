@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
 	private Long id;
     private String name;
-    
+    private String firstName;
+    private String lastName;
     @NotBlank(message = "Email không được để trống")
     @Email(message = "Email không hợp lệ")
     private String email;
@@ -30,7 +31,7 @@ public class UserResponse {
     private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 
 //    private List<Order> orders;
-    @JsonIgnoreProperties({"debtPayments","agent"})
+    @JsonIgnoreProperties({"debtPayments","agent","order"})
     private List<Invoice> invoices;
 
     @JsonIgnoreProperties({"user","shop"})

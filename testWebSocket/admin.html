@@ -16,7 +16,7 @@
 
 <script>
     let stompClient = null;
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lciIsImlhdCI6MTc0MDA0NzA1NiwiZXhwIjoxNzQwMDUwNjU2fQ.9zSqiLNYEHnr70Zqv3e2cMGA2MowvxlV_a9pYtj6QOQ"; // Thay bằng token thực tế
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwcm92aWRlciIsImlhdCI6MTc0MDQxODAzNCwiZXhwIjoxNzQwNDIxNjM0fQ.KhojrWbQignPprQsmnrxeh3ul_4zwH0-t0V7ahPZ4Tc"; // Thay bằng token thực tế
 
     function connect() {
         const socket = new SockJS(`http://localhost:8088/ws?token=${token}`);

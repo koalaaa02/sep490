@@ -14,7 +14,7 @@ import com.example.sep490.service.ShopService;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/shops")
+@RequestMapping("/api/admin/shops")
 public class ShopController {
     private static final Logger logger = LoggerFactory.getLogger(ShopController.class);
 
@@ -33,21 +33,20 @@ public class ShopController {
         return ResponseEntity.ok().body(shopService.getShopById(id));
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
-    public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
-        return ResponseEntity.ok().body(shopService.createShop(shopRequest));
-    }
+//    @PostMapping
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
+//    public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
+//        return ResponseEntity.ok().body(shopService.createShop(shopRequest));
+//    }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
-    public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
-        if (!id.equals(shopRequest.getId())) {
-            return ResponseEntity.badRequest().body("id và id trong cửa hàng không trùng khớp.");
-        }
-        return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
-    }
-
+//    @PutMapping("/{id}")
+//    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
+//    public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
+//        if (!id.equals(shopRequest.getId())) {
+//            return ResponseEntity.badRequest().body("id và id trong cửa hàng không trùng khớp.");
+//        }
+//        return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
+//    }
 
 
     @PutMapping("/{id}/active")
@@ -56,7 +55,6 @@ public class ShopController {
         shopService.changeActiveShop(id);
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
     }
-
 
 
     @DeleteMapping("/{id}")

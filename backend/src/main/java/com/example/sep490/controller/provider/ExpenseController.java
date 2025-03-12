@@ -15,7 +15,7 @@ import com.example.sep490.service.ExpenseService;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/api/provider/expenses")
 public class ExpenseController {
     private static final Logger logger = LoggerFactory.getLogger(ExpenseController.class);
 
@@ -23,28 +23,24 @@ public class ExpenseController {
     private ExpenseService expenseService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getExpenses(@Valid ExpenseFilterDTO filter) {
         logger.info("Fetching expenses with pagination and filters");
         return ResponseEntity.ok(expenseService.getExpenses(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
         logger.info("Fetching expense with id: {}", id);
         return ResponseEntity.ok().body(expenseService.getExpenseById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> createExpense(@Valid @RequestBody ExpenseRequest expense) {
         logger.info("Creating a new expense");
         return ResponseEntity.ok().body(expenseService.createExpense(expense));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> updateExpense(@PathVariable Long id,@Valid @RequestBody ExpenseRequest expense) {
         logger.info("Updating expense with id: {}", id);
         if (!Objects.equals(id, expense.getId())) {
@@ -54,7 +50,6 @@ public class ExpenseController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> deleteExpense(@PathVariable Long id) {
         logger.info("Deleting expense with id: {}", id);
         try {

@@ -3,7 +3,6 @@ package com.example.sep490.controller.dealer;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.entity.enums.OrderStatus;
-import com.example.sep490.mapper.UserMapper;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
 import com.example.sep490.service.InvoiceService;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/dealer")
+//@PreAuthorize("hasAnyAuthority('ROLE_DEALER')") //    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_PROVIDER')")
 public class DealerController {
     @Autowired
     private OrderService orderService;
@@ -32,7 +32,6 @@ public class DealerController {
 
 
     @GetMapping("/orders")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyOrders(OrderFilterDTO filter) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -43,7 +42,6 @@ public class DealerController {
     }
 
     @GetMapping("/orders/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getOrderByIdCustomer(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -53,19 +51,27 @@ public class DealerController {
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 
-    @GetMapping("/invoices")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
-    public ResponseEntity<?> getMyInvoices(InvoiceFilterDTO filter) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
-            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(invoiceService.getInvoicesByUserId(filter));
-        }
-        return ResponseEntity.badRequest().body("No authenticated user");
+//    @GetMapping("/invoices")
+//    public ResponseEntity<?> getMyInvoices(InvoiceFilterDTO filter) {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+//            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+//            return ResponseEntity.ok().body(invoiceService.getInvoicesByUserId(filter));
+//        }
+//        return ResponseEntity.badRequest().body("No authenticated user");
+//    }
+
+    @GetMapping("/ShopInvoiceSummary")
+    public ResponseEntity<?> getShopInvoiceSummary() {
+        return ResponseEntity.ok(invoiceService.getShopsWithInvoices());
+    }
+
+    @GetMapping("/GetInvoicesByShopId/{shopId}")
+    public ResponseEntity<?> GetInvoicesOfAShop(@PathVariable Long shopId) {
+        return ResponseEntity.ok(invoiceService.getShopsInvoicesByShopIdAndDealerId(shopId));
     }
 
     @GetMapping("/invoices/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getInvoiceById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
@@ -86,7 +92,6 @@ public class DealerController {
 //    }
 
     @GetMapping("/orderdetails/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getMyOrderDetailsByOrderId(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -104,7 +109,6 @@ public class DealerController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAnyAuthority('ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam OrderStatus status) {
@@ -113,7 +117,6 @@ public class DealerController {
     }
 
     @PostMapping(value = "/shop/create")
-    @PreAuthorize("hasAnyAuthority('ROLE_DEALER')")
     public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }

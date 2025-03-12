@@ -21,6 +21,7 @@ public class InvoiceFilterDTO {
     private String agentName;
     @Schema(defaultValue = "UNPAID")
     private InvoiceStatus status;
+    @JsonIgnore
     private Long agentId;
     @JsonIgnore
     private Long createdBy;

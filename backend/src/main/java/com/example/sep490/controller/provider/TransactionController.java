@@ -20,7 +20,7 @@ import com.example.sep490.dto.TransactionRequest;
 import com.example.sep490.service.TransactionService;
 
 @RestController
-@RequestMapping("/api/transactions")
+@RequestMapping("/api/provider/transactions")
 public class TransactionController {
     private static final Logger logger = LoggerFactory.getLogger(TransactionController.class);
 
@@ -28,25 +28,21 @@ public class TransactionController {
     private TransactionService transactionService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getTransactions(@Valid TransactionFilterDTO filter) {
         return ResponseEntity.ok(transactionService.getTransactions(filter));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getTransactionById(@PathVariable Long id) {
         return ResponseEntity.ok().body(transactionService.getTransactionById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> createTransaction(@Valid @RequestBody TransactionRequest transaction) {
         return ResponseEntity.ok().body(transactionService.createTransaction(transaction));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> updateTransaction(@PathVariable Long id,@Valid @RequestBody TransactionRequest transaction) {
         if (!id.equals(transaction.getId())) {
             return ResponseEntity.badRequest().body("Id và id trong giao dịch không trùng khớp.");
@@ -55,7 +51,6 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> deleteTransaction(@PathVariable Long id) {
         try {
             transactionService.deleteTransaction(id);

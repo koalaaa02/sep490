@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/financialReport")
+@RequestMapping("/api/provider/financialReport")
 public class FinancialReportController {
     @Autowired
     private FinancialReportService financialReportService;

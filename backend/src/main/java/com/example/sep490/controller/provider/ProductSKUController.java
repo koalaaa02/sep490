@@ -13,7 +13,7 @@ import com.example.sep490.service.ProductSKUService;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/productskus")
+@RequestMapping("/api/provider/productskus")
 public class ProductSKUController {
     private static final Logger logger = LoggerFactory.getLogger(ProductSKUController.class);
 
@@ -21,7 +21,6 @@ public class ProductSKUController {
     private ProductSKUService productSKUService;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getProductSKUes(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -33,21 +32,18 @@ public class ProductSKUController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER', 'ROLE_DEALER')")
     public ResponseEntity<?> getProductSKUById(@PathVariable Long id) {
         logger.info("Fetching address with id: {}", id);
         return ResponseEntity.ok().body(productSKUService.getProductSKUById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> createProductSKU(@Valid @RequestBody ProductSKURequest address) {
         logger.info("Creating new address.");
         return ResponseEntity.ok().body(productSKUService.createProductSKU(address));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> updateProductSKU(@PathVariable Long id,@Valid @RequestBody ProductSKURequest address) {
         logger.info("Updating address with id: {}", id);
         if (!id.equals(address.getId())) {
@@ -62,7 +58,6 @@ public class ProductSKUController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> deleteProductSKU(@PathVariable Long id) {
         logger.info("Deleting address with id: {}", id);
         try {

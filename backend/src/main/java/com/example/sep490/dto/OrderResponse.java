@@ -45,7 +45,7 @@ public class OrderResponse {
     private Address address;
     @JsonIgnoreProperties( { "orders","manager","address","products" })
     private Shop shop;
-    @JsonIgnoreProperties( { "order","agent","debtPayments"})
+    @JsonIgnoreProperties({"debtPayments","agent","order"})
     private Invoice invoice;
 
 
