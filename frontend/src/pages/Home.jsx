@@ -127,7 +127,7 @@ const Home = () => {
                             </h2>
                             <p className="lead">
                               Cung cấp một loạt các vật liệu xây dựng với giá
-                              cạnh tranh với giao hàng nhanh.
+                              cạnh tranh
                             </p>
                             <Link
                               to="#!"
@@ -156,8 +156,8 @@ const Home = () => {
                             </h2>
                             <p className="lead text-white">
                               Giảm giá đặc biệt cho các đơn đặt hàng lớn. Lấy
-                              Vật liệu xây dựng chất lượng cao ở mức tốt nhất
-                              Giá cả.
+                              Vật liệu xây dựng chất lượng cao ở mức giá tốt
+                              nhất
                             </p>
                             <Link
                               to="#!"
@@ -220,7 +220,7 @@ const Home = () => {
                               <h3 className="mb-0 fw-bold text-white">
                                 Giảm giá 10%
                                 <br />
-                                Đơn đặt hàng xi măng số lượng lớn
+                                Đặt hàng số lượng lớn
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -288,7 +288,7 @@ const Home = () => {
                               <h3 className="fs-2 fw-bold lh-1 mb-2 text-white">
                                 Dịch vụ giao hàng
                                 <br />
-                                Nhanh chóng và đáng tin cậy
+                                Đáng tin cậy
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -453,8 +453,8 @@ const Home = () => {
                               <h3 className="h5 mb-3">Giao hàng nhanh chóng</h3>
                               <p>
                                 Nhận đơn hàng vật liệu xây dựng của bạn được
-                                giao tận nơi nhanh chóng. Mang đến cho bạn sự tiện
-                                lợi và nhanh chóng trong mỗi lần mua sắm!
+                                giao tận nơi nhanh chóng. Mang đến cho bạn sự
+                                tiện lợi và nhanh chóng trong mỗi lần mua sắm!
                               </p>
                             </div>
                           </div>

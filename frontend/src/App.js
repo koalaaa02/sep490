@@ -33,11 +33,14 @@ import MyAccountAddress from "./pages/Accounts/MyAccountAddress";
 import MyAccountForgetPassword from "./pages/Accounts/MyAccountForgetPassword";
 import MyAccountSignIn from "./pages/Accounts/MyAccountSignIn";
 import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
+// Provider
+import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
+
 const App = () => {
   return (
     <div>
       <Router>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
@@ -64,8 +67,10 @@ const App = () => {
           <Route path="/BlogCategory" element={<BlogCategory />} />
           <Route path="/Contact" element={<Contact />} />
           <Route path="/AboutUs" element={<AboutUs />} />
+          {/* Provider */}
+          <Route path="/ProviderDashBoard" element={<ProviderDashBoard />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </Router>
     </div>
   );

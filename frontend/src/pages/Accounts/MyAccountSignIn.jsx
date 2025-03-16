@@ -40,7 +40,7 @@ const MyAccountSignIn = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email: username, password }),
       });
 
       const data = await response.json();
@@ -53,7 +53,7 @@ const MyAccountSignIn = () => {
       navigate("/");
     } catch (err) {
       dispatch(loginFailure(err.message));
-      setErrorMessage("Sai tên đăng nhập hoặc mật khẩu");
+      setErrorMessage("Sai email hoặc mật khẩu");
     }
   };
 
@@ -85,7 +85,8 @@ const MyAccountSignIn = () => {
                   <div className="col-12">
                     <input
                       className="form-control"
-                      placeholder="Tên đăng nhập"
+                      placeholder="Email"
+                      type="email"
                       value={username}
                       onChange={(e) => {
                         setUsername(e.target.value);

@@ -7,6 +7,7 @@ import { logout } from "../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
 import img from "../images/glass.jpg";
+import { FaStore } from "react-icons/fa";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -217,36 +218,6 @@ const Header = () => {
                   </div>
                 </li>
               </li>
-              <li className="nav-item dmenu dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Thông tin
-                </Link>
-                <div
-                  className="dropdown-menu sm-menu"
-                  aria-labelledby="navbarDropdown"
-                >
-                  <Link class="dropdown-item" to="/Blog">
-                    Bài viết
-                  </Link>
-                  <Link className="dropdown-item" to="/BlogCategory">
-                    Bài viết danh mục
-                  </Link>
-                  <Link className="dropdown-item" to="/AboutUs">
-                    Thông tin về chúng tôi
-                  </Link>
-                  <Link className="dropdown-item" to="/Contact">
-                    Liên hệ
-                  </Link>
-                </div>
-              </li>
 
               <li className="nav-item dmenu dropdown">
                 <Link
@@ -292,6 +263,37 @@ const Header = () => {
                 >
                   <Link className="dropdown-item" to="/StoreList">
                     Danh sách cửa hàng
+                  </Link>
+                </div>
+              </li>
+              
+              <li className="nav-item dmenu dropdown">
+                <Link
+                  className="nav-link dropdown-toggle"
+                  to="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Thông tin
+                </Link>
+                <div
+                  className="dropdown-menu sm-menu"
+                  aria-labelledby="navbarDropdown"
+                >
+                  <Link class="dropdown-item" to="/Blog">
+                    Bài viết
+                  </Link>
+                  <Link className="dropdown-item" to="/BlogCategory">
+                    Bài viết danh mục
+                  </Link>
+                  <Link className="dropdown-item" to="/AboutUs">
+                    Thông tin về chúng tôi
+                  </Link>
+                  <Link className="dropdown-item" to="/Contact">
+                    Liên hệ
                   </Link>
                 </div>
               </li>
@@ -411,6 +413,14 @@ const Header = () => {
                       0
                     )}
                   </span>
+                </Link>
+                <Link
+                  className="text-muted position-relative"
+                  to="/ProviderDashBoard"
+                  role="button"
+                  aria-controls="storeOffcanvas"
+                >
+                  <FaStore size={20} className="mt-2 ms-3" />
                 </Link>
               </li>
             </ul>
