@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../Utils/config";
+import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAccountOrder = () => {
   const token = localStorage.getItem("access_token");
@@ -167,63 +168,8 @@ const MyAccountOrder = () => {
                 </div>
               </div>
               {/* col */}
-              <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
-                <div className="pt-10 pe-lg-10">
-                  {/* nav */}
-                  <ul className="nav flex-column nav-pills nav-pills-dark">
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link active"
-                        aria-current="page"
-                        to="/MyAccountOrder"
-                      >
-                        <i className="fas fa-shopping-bag me-2" />
-                        Đơn đặt hàng của bạn
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAccountSetting">
-                        <i className="fas fa-cog me-2" />
-                        Cài đặt
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAccountAddress">
-                        <i className="fas fa-map-marker-alt me-2" />
-                        Địa chỉ
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAcconutPaymentMethod">
-                        <i className="fas fa-credit-card me-2" />
-                        Phương thức thanh toán
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAcconutInvoice">
-                        <i className="fas fa-bell me-2" />
-                        Hóa đơn của tôi
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <hr />
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <button className="nav-link " onClick={handleLogOut}>
-                        <i className="fas fa-sign-out-alt me-2" />
-                        Đăng Xuất
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              {/* sideBar */}
+              <MyAccountSideBar activeKey={'MyAccountOrder'}/>
 
               <div className="col-lg-9 col-md-8 col-12">
                 <div>

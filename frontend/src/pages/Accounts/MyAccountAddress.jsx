@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../Utils/config";
+import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAccountAddress = () => {
   const token = localStorage.getItem("access_token");
@@ -82,7 +83,7 @@ const MyAccountAddress = () => {
 
         setData((prevData) => ({
           ...prevData,
-          content: prevData.content.map((item) =>
+          content: prevData?.content?.map((item) =>
             item.id === editData.id ? result : item
           ),
         }));
@@ -154,7 +155,7 @@ const MyAccountAddress = () => {
 
     setData((prevData) => ({
       ...prevData,
-      content: prevData.content.map((item, i) => ({
+      content: prevData.content?.map((item, i) => ({
         ...item,
         defaultAddress: i === index,
       })),
@@ -230,66 +231,7 @@ const MyAccountAddress = () => {
                   </div>
                 </div>
                 {/* col */}
-                <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
-                  <div className="pt-10 pe-lg-10">
-                    {/* nav */}
-                    <ul className="nav flex-column nav-pills nav-pills-dark">
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link"
-                          aria-current="page"
-                          to="/MyAccountOrder"
-                        >
-                          <i className="fas fa-shopping-bag me-2" />
-                          Đơn đặt hàng của bạn
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAccountSetting">
-                          <i className="fas fa-cog me-2" />
-                          Cài đặt
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link active"
-                          to="/MyAccountAddress"
-                        >
-                          <i className="fas fa-map-marker-alt me-2" />
-                          Địa chỉ
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutPaymentMethod">
-                          <i className="fas fa-credit-card me-2" />
-                          Phương thức thanh toán
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutInvoice">
-                          <i className="fas fa-bell me-2" />
-                          Hóa đơn của tôi
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <hr />
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <button className="nav-link " onClick={handleLogOut}>
-                          <i className="fas fa-sign-out-alt me-2" />
-                          Đăng Xuất
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+                <MyAccountSideBar activeKey={'MyAccountAddress'}/>
                 <div className="col-lg-9 col-md-8 col-12">
                   <div>
                     {loaderStatus ? (
@@ -329,7 +271,7 @@ const MyAccountAddress = () => {
                             </p>
                           )}
                           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                            {data.content.map((p, index) => (
+                            {data?.content?.map((p, index) => (
                               <div key={index} className="col">
                                 <div className="border p-6 rounded-3">
                                   <div className="form-check mb-4">

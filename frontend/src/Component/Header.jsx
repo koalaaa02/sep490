@@ -266,7 +266,7 @@ const Header = () => {
                   </Link>
                 </div>
               </li>
-              
+
               <li className="nav-item dmenu dropdown">
                 <Link
                   className="nav-link dropdown-toggle"
@@ -370,6 +370,9 @@ const Header = () => {
                           </Link>
                           <Link className="dropdown-item" to="/MyAccountSignUp">
                             Đăng ký
+                          </Link>
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
                           </Link>
                           <Link
                             className="dropdown-item"

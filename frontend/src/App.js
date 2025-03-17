@@ -35,6 +35,7 @@ import MyAccountSignIn from "./pages/Accounts/MyAccountSignIn";
 import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
 // Provider
 import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
+import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 
 const App = () => {
   return (
@@ -62,6 +63,7 @@ const App = () => {
           <Route path="/MyAccountForgetPassword" element={<MyAccountForgetPassword />} />
           <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
           <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
+          <Route path="/MyDebt" element={<MyDebt />} />
           {/* About pages */}
           <Route path="/Blog" element={<Blog />} />
           <Route path="/BlogCategory" element={<BlogCategory />} />
