@@ -1,5 +1,6 @@
 package com.example.sep490.configs.jwt;
 
+import com.example.sep490.entity.Role;
 import com.example.sep490.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,10 +23,17 @@ public class UserInfoUserDetails implements UserDetails {
     	id=userInfo.getId();
         name=userInfo.getName();
         password=userInfo.getPassword();
-        roles=userInfo.getRoles();
-        authorities= Arrays.stream(userInfo.getRoles().split(","))
-                .map(SimpleGrantedAuthority::new)
+//        roles=userInfo.getRoles();
+//        authorities= Arrays.stream(userInfo.getRoles().split(","))
+//                .map(SimpleGrantedAuthority::new)
+//                .collect(Collectors.toList());
+        roles = userInfo.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.joining(","));
+        authorities = userInfo.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
+
     }
 
     @Override

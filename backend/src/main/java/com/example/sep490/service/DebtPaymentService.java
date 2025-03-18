@@ -109,9 +109,12 @@ public class DebtPaymentService {
                 .map(DebtPayment::getAmountPaid)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         invoice.setPaidAmount(totalPaidAmount);
-        if( isGreaterThanOrEqual(invoice.getPaidAmount(),invoice.getTotalAmount()))
+        if( isGreaterThanOrEqual(invoice.getPaidAmount(),invoice.getTotalAmount())){
             invoice.setStatus(InvoiceStatus.PAID);
-        else invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+            Order order = invoice.getOrder();
+            order.setPaid(true);
+            orderRepo.save(order);
+        }else invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
         invoiceRepo.save(invoice);
 
         return debtPaymentMapper.EntityToResponse(debtPayment);

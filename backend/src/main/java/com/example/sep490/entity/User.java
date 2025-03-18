@@ -1,6 +1,7 @@
 package com.example.sep490.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,9 +44,17 @@ public class User extends Auditable{ //thông tin tài khoản
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean active = false;
-    
-    @ColumnDefault("'ROLE_DEALER'")
-    private String roles;
+
+//    @ColumnDefault("'ROLE_DEALER'")
+//    private String roles;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "tbl_user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private List<Role> roles = new ArrayList<>();
+
 
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ROLE_DEALER'")
