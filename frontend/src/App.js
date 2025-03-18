@@ -1,11 +1,11 @@
-// react 
+// react
 import React from "react";
 // css
 import "./App.css";
-// browserrouter 
+// browserrouter
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // Components
-import Header from './Component/Header';
+import Header from "./Component/Header";
 import Footer from "./Component/Footer";
 // pages
 import Home from "./pages/Home";
@@ -37,7 +37,7 @@ const App = () => {
   return (
     <div>
       <Router>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
@@ -53,10 +53,19 @@ const App = () => {
           {/* Accounts pages */}
           <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
           <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
-          <Route path="/MyAcconutNotification" element={<MyAcconutNotification />} />
-          <Route path="/MyAcconutPaymentMethod" element={<MyAcconutPaymentMethod />} />
+          <Route
+            path="/MyAcconutNotification"
+            element={<MyAcconutNotification />}
+          />
+          <Route
+            path="/MyAcconutPaymentMethod"
+            element={<MyAcconutPaymentMethod />}
+          />
           <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
-          <Route path="/MyAccountForgetPassword" element={<MyAccountForgetPassword />} />
+          <Route
+            path="/MyAccountForgetPassword"
+            element={<MyAccountForgetPassword />}
+          />
           <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
           <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
           {/* About pages */}
@@ -65,7 +74,7 @@ const App = () => {
           <Route path="/Contact" element={<Contact />} />
           <Route path="/AboutUs" element={<AboutUs />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </Router>
     </div>
   );
