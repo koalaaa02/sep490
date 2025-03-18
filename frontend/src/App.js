@@ -33,11 +33,15 @@ import MyAccountAddress from "./pages/Accounts/MyAccountAddress";
 import MyAccountForgetPassword from "./pages/Accounts/MyAccountForgetPassword";
 import MyAccountSignIn from "./pages/Accounts/MyAccountSignIn";
 import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
+// Provider
+import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
+import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
+
 const App = () => {
   return (
     <div>
       <Router>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop pages */}
@@ -59,13 +63,16 @@ const App = () => {
           <Route path="/MyAccountForgetPassword" element={<MyAccountForgetPassword />} />
           <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
           <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
+          <Route path="/MyDebt" element={<MyDebt />} />
           {/* About pages */}
           <Route path="/Blog" element={<Blog />} />
           <Route path="/BlogCategory" element={<BlogCategory />} />
           <Route path="/Contact" element={<Contact />} />
           <Route path="/AboutUs" element={<AboutUs />} />
+          {/* Provider */}
+          <Route path="/ProviderDashBoard" element={<ProviderDashBoard />} />
         </Routes>
-        <Footer/>
+        <Footer />
       </Router>
     </div>
   );
