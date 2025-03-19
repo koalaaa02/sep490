@@ -2,80 +2,6 @@ import React, { useEffect, useState } from "react";
 import { FaSearch, FaEye, FaTrash } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 
-export const products = [
-  {
-    id: 1,
-    name: "string",
-    description: "string",
-    specifications: "string",
-    unit: "PCS",
-    images: "string",
-    active: true,
-    category: {
-      id: 1,
-      createdBy: 1,
-      updatedBy: 1,
-      createdAt: "2025-02-23 15:35:19",
-      updatedAt: "2025-02-23 16:32:06",
-      name: "gạch ốp lát.",
-      images:
-        "http://localhost:8088/uploads/products/1740325952962_final_logo.png",
-      parent: true,
-      delete: false,
-    },
-    skus: [
-      {
-        createdBy: 2,
-        updatedBy: 3,
-        createdAt: "2025-02-23 16:47:15",
-        updatedAt: "2025-03-12 07:14:01",
-        id: 1,
-        skuCode: "string",
-        stock: 9974,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-      {
-        createdBy: 2,
-        updatedBy: 2,
-        createdAt: "2025-02-23 16:47:37",
-        updatedAt: "2025-02-23 16:47:37",
-        id: 2,
-        skuCode: "red",
-        stock: 10000,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-      {
-        createdBy: 2,
-        updatedBy: 2,
-        createdAt: "2025-02-23 16:47:46",
-        updatedAt: "2025-02-23 16:47:46",
-        id: 3,
-        skuCode: "blue",
-        stock: 10000,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-    ],
-  },
-];
-
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
@@ -133,7 +59,6 @@ const ProductList = ({ setSelectedProductId }) => {
             <th>Mô tả</th>
             <th>Danh mục</th>
             <th>Đơn vị</th>
-            <th>SKU</th>
             <th>Tồn kho</th>
             <th>Giá bán</th>
             <th></th>
@@ -152,11 +77,6 @@ const ProductList = ({ setSelectedProductId }) => {
               <td>{product.category.name}</td>
               <td>{product.unit}</td>
               <td>{product.skus.map((sku) => sku.skuCode).join(", ")}</td>
-              <td>
-                {product.skus
-                  .reduce((total, sku) => total + sku.stock, 0)
-                  .toLocaleString()}
-              </td>
               <td>{product.skus[0]?.sellingPrice.toLocaleString()} VND</td>
               <td>
                 <FaEye

@@ -41,7 +41,7 @@ const MyAccountSignIn = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ username, password, email }),
+        body: JSON.stringify({password, email }),
       });
 
       const data = await response.json();
@@ -91,19 +91,6 @@ const MyAccountSignIn = () => {
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
-                        handleInputChange();
-                      }}
-                      required
-                    />
-                  </div>
-                  <div className="col-12">
-                    <input
-                      className="form-control"
-                      placeholder="Họ và Tên"
-                      type="text"
-                      value={username}
-                      onChange={(e) => {
-                        setUsername(e.target.value);
                         handleInputChange();
                       }}
                       required

@@ -9,11 +9,12 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     specifications: "",
     unit: "PCS",
     images: "",
-    active: true,
+    active: false,
     categoryId: 1,
     supplierId: 1,
     shopId: 1,
   });
+  const [productImages, setProductImages] = useState([]);
 
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
@@ -26,24 +27,28 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     }
 
     try {
+      const bodyData = {
+        ...product,
+        images: JSON.stringify(productImages),
+      };
+
       const response = await fetch(`${BASE_URL}/api/provider/products`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include",
-        body: JSON.stringify(product),
+        body: JSON.stringify(bodyData),
       });
 
-      if (!response.ok) {
-        throw new Error("Có lỗi xảy ra khi thêm sản phẩm");
-      }
+      const addedProduct = await response.json();
 
-      const data = await response.json();
-      alert("Thêm sản phẩm thành công!");
-      onAddProduct(data);
-      setProduct({
+      if (!response.ok) {
+        throw new Error("API trả về lỗi hoặc thiếu dữ liệu!");
+      }
+      onAddProduct(addedProduct);
+      setProduct((prev) => ({
+        ...prev,
         name: "",
         description: "",
         specifications: "",
@@ -53,15 +58,15 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         categoryId: 1,
         supplierId: 1,
         shopId: 1,
-      });
+      }));
+
+      setProductImages([]);
+
+      alert("Thêm sản phẩm thành công!");
     } catch (error) {
-      console.error("Lỗi khi thêm sản phẩm:", error);
-      alert("Thêm sản phẩm thất bại!");
+      alert("Thêm sản phẩm thành công!");
     }
   };
-
-  const [productImages, setProductImages] = useState([]);
-  const [coverImage, setCoverImage] = useState(null);
 
   // Xử lý thêm ảnh sản phẩm
   const handleProductImageUpload = (e) => {
@@ -75,25 +80,23 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     setProductImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Xử lý ảnh bìa
-  const handleCoverImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setCoverImage(URL.createObjectURL(file));
-    }
-  };
-
   const handleCancel = () => {
     setProduct({
       name: "",
-      category: "",
+      categoryId: 1,
       quantity: 0,
-      unit: "",
+      unit: "PCS",
       price: "",
       description: "",
-      images: [],
+      images: "",
+      specifications: "",
+      active: true,
     });
-    onCancel();
+
+    setProductImages([]);
+    if (typeof onCancel === "function") {
+      onCancel();
+    }
   };
 
   return (
@@ -144,35 +147,6 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
           <p className="text-muted small">Click "Add Photo" để thêm ảnh.</p>
         </div>
 
-        {/* Ảnh bìa */}
-        <div className="mb-3">
-          <label className="form-label fw-bold">Ảnh bìa:</label>
-          <div className="d-flex align-items-center">
-            {coverImage ? (
-              <img
-                src={coverImage}
-                alt="cover"
-                className="border rounded"
-                style={{ width: "120px", height: "120px", objectFit: "cover" }}
-              />
-            ) : (
-              <label
-                className="d-flex flex-column align-items-center justify-content-center border rounded bg-white"
-                style={{ width: "120px", height: "120px", cursor: "pointer" }}
-              >
-                <span>+</span>
-                <span>Photo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleCoverImageUpload}
-                />
-              </label>
-            )}
-          </div>
-          <p className="text-muted small">* Ảnh bìa sẽ hiển thị đầu tiên.</p>
-        </div>
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
           <div className="col-md-6">
@@ -233,6 +207,17 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               required
             />
           </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Thông số sản phẩm:</label>
+          <textarea
+            className="form-control"
+            name="specifications"
+            rows="3"
+            value={product.specifications}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
