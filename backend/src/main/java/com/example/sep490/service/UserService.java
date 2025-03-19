@@ -4,10 +4,12 @@ import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.AuthRegisterRequest;
 import com.example.sep490.dto.UserRequest;
 import com.example.sep490.dto.UserResponse;
+import com.example.sep490.entity.Role;
 import com.example.sep490.entity.User;
 import com.example.sep490.entity.Shop;
 import com.example.sep490.entity.enums.UserType;
 import com.example.sep490.mapper.UserMapper;
+import com.example.sep490.repository.RoleRepository;
 import com.example.sep490.repository.UserRepository;
 import com.example.sep490.repository.ShopRepository;
 import com.example.sep490.repository.specifications.UserFilterDTO;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,6 +54,8 @@ public class UserService {
     @Autowired
     private ShopRepository shopRepo;
     @Autowired
+    private RoleRepository roleRepo;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Value("${spring.mail.username}")
@@ -59,11 +64,15 @@ public class UserService {
     public User addUser(AuthRegisterRequest userInfo) {
         String otp = commonUtils.generateOtp();
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+        List<Role> roles = List.of(roleRepo.findByName("ROLE_DEALER")
+                .orElseThrow(() -> new RuntimeException("Có lỗi xảy ra, không xác định được quyền cho bạn.")));
         User newUser = User.builder()
 		        .name(userInfo.getName())
+                .lastName("user")
+                .firstName(userInfo.getName())
                 .email(userInfo.getEmail())
 		        .password(userInfo.getPassword())
-                .roles("ROLE_DEALER")
+                .roles(roles)
                 .active(false)
                 .userType(UserType.ROLE_DEALER)
                 .resetToken(otp)

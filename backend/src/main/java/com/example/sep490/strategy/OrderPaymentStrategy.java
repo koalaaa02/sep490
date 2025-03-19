@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class OrderPaymentStrategy implements PaymentStrategy {
         String vnp_TransactionNo = request.getParameter("vnp_TransactionNo");
 
         TransactionRequest newTransaction = TransactionRequest.builder()
-                .amount(BigDecimal.ONE)
+                .amount(new BigDecimal(vnp_Amount).divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN))
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)

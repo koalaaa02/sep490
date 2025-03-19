@@ -10,7 +10,7 @@ services:
     ports:
       - "3336:3306"  # Chạy MySQL trên port 3336 của máy host
     environment:
-      MYSQL_DATABASE: sep490v1
+      MYSQL_DATABASE: sep490v5
       MYSQL_ROOT_PASSWORD: Dtvuvu1522002
       MYSQL_ROOT_HOST: "%"  # Cho phép remote access
     networks:

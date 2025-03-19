@@ -27,7 +27,7 @@ public class UserResponse {
     @Email(message = "Email không hợp lệ")
     private String email;
     private boolean active = true;
-    private String roles = "ROLE_DEALER";
+    private List<Role> roles;
     private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 
 //    private List<Order> orders;

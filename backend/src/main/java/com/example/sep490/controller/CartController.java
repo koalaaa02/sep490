@@ -30,14 +30,14 @@ public class CartController {
      * Method: POST
      */
     @PostMapping("/add")
-    public ResponseEntity<Void> addToCart(
+    public ResponseEntity<?> addToCart(
             @RequestParam Long shopId,
             @RequestParam Long productSKUId,
             @RequestParam int quantity,
             HttpServletRequest request,
             HttpServletResponse response) {
         cartService.addToCart(shopId, productSKUId, quantity, request, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Thêm vào giỏ hàng thành công.");
     }
 
     /**
@@ -45,14 +45,14 @@ public class CartController {
      * Method: PUT
      */
     @PutMapping("/update")
-    public ResponseEntity<Void> updateCart(
+    public ResponseEntity<?> updateCart(
             @RequestParam Long shopId,
             @RequestParam Long productSKUId,
             @RequestParam int quantity,
             HttpServletRequest request,
             HttpServletResponse response) {
         cartService.updateCart(shopId, productSKUId, quantity, request, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Cập nhật giỏ hàng thành công.");
     }
 
     /**
@@ -60,12 +60,12 @@ public class CartController {
      * Method: DELETE
      */
     @DeleteMapping("/remove")
-    public ResponseEntity<Void> removeFromCart(
+    public ResponseEntity<?> removeFromCart(
             @RequestParam Long shopId,
             @RequestParam Long productSKUId,
             HttpServletRequest request,
             HttpServletResponse response) {
         cartService.removeFromCart(shopId, productSKUId, request, response);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Xóa sản phẩm khỏi giỏ hàng thành công.");
     }
 }

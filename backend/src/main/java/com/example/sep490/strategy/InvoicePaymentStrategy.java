@@ -7,6 +7,7 @@ import com.example.sep490.dto.TransactionRequest;
 import com.example.sep490.dto.publicdto.PaymentResponse;
 import com.example.sep490.dto.publicdto.PaymentResultResponse;
 import com.example.sep490.entity.Invoice;
+import com.example.sep490.entity.Order;
 import com.example.sep490.entity.enums.*;
 import com.example.sep490.repository.InvoiceRepository;
 import com.example.sep490.service.DebtPaymentService;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -34,6 +36,21 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
 
     @Override
     public PaymentResponse processPayment(HttpServletRequest request, long amount, String bankCode, Long invoiceId) {
+//        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
+//        vnpParamsMap.put("vnp_Amount", String.valueOf(amount * 100));
+//        if (bankCode != null && !bankCode.isEmpty()) {
+//            vnpParamsMap.put("vnp_BankCode", bankCode);
+//        }
+//        String orderInfo = VNPayUtils.generateOrderInfo(PaymentType.INVOICE,invoiceId);
+//        vnpParamsMap.put("vnp_OrderInfo", orderInfo);
+//        vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(request));
+//
+//        Invoice invoice = invoiceRepo.findByIdAndIsDeleteFalse(invoiceId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn."));
+//        vnpParamsMap.put("vnp_TmnCode", invoice.getOrder().getShop().getSecretA());
+//        vnpParamsMap.put("secretKey", invoice.getOrder().getShop().getSecretB());
+//
+//        return generateResponse(vnpParamsMap);
         Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount * 100));
         if (bankCode != null && !bankCode.isEmpty()) {
@@ -46,9 +63,13 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
         Invoice invoice = invoiceRepo.findByIdAndIsDeleteFalse(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn."));
         vnpParamsMap.put("vnp_TmnCode", invoice.getOrder().getShop().getSecretA());
-        vnpParamsMap.put("secretKey", invoice.getOrder().getShop().getSecretB());
 
-        return generateResponse(vnpParamsMap);
+        String queryUrl = VNPayUtils.getPaymentURL(vnpParamsMap, true);
+        String hashData = VNPayUtils.getPaymentURL(vnpParamsMap, false);
+        String vnpSecureHash = VNPayUtils.hmacSHA512(invoice.getOrder().getShop().getSecretB(), hashData);
+        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+        return PaymentResponse.builder().code("ok").message("success").paymentUrl(paymentUrl).build();
     }
 
     @Transactional
@@ -63,7 +84,7 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
         String vnp_TransactionNo = request.getParameter("vnp_TransactionNo");
 
         TransactionRequest newTransaction = TransactionRequest.builder()
-                .amount(BigDecimal.ONE)
+                .amount(new BigDecimal(vnp_Amount).divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN))
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)

@@ -1,11 +1,15 @@
 package com.example.sep490.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.InvoiceStatus;
 import com.example.sep490.entity.enums.OrderStatus;
+import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
 import com.example.sep490.repository.specifications.OrderSpecification;
@@ -23,6 +27,7 @@ import com.example.sep490.mapper.OrderMapper;
 import com.example.sep490.entity.Order;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
@@ -43,6 +48,10 @@ public class OrderService {
     private ShopRepository shopRepo;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InvoiceService invoiceService;
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
     public PageResponse<OrderResponse> getOrdersPublicFilter(OrderFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
@@ -140,25 +149,40 @@ public class OrderService {
         return orderMapper.EntityToResponse(updatedOrder);
     }
 
+    @Transactional
     public void changeStatusOrders(List<Long> orderIds, OrderStatus orderStatus) {
-        List<Order> orders = orderRepo.findAllById(orderIds)
-                .stream()
-                .filter(order -> !order.isDelete()) // Lọc bỏ các đơn hàng đã bị xóa
-                .peek(order -> {
-                    order.setStatus(orderStatus);
-                    if(orderStatus.equals(OrderStatus.DELIVERED)) {
-                        order.setShippedDate(LocalDateTime.now());
-                    }
-                })
+        List<Invoice> invoices = new ArrayList<>();
+        List<Order> orders = orderRepo.findAllById(orderIds).stream()
+                .filter(order -> !order.isDelete())
+                .peek(order -> processOrder(order, orderStatus, invoices))
                 .toList();
-
         if (orders.isEmpty()) {
             throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với danh sách ID đã cung cấp");
         }
-
+        if (!invoices.isEmpty()) {
+            invoiceRepository.saveAll(invoices);
+        }
         orderRepo.saveAll(orders);
     }
 
+
+    private void processOrder(Order order, OrderStatus orderStatus, List<Invoice> invoices) {
+        order.setStatus(orderStatus);
+        if (orderStatus == OrderStatus.DELIVERED) {
+            order.setShippedDate(LocalDateTime.now());
+        }
+        if (orderStatus == OrderStatus.ACCEPTED && order.getPaymentMethod() == PaymentMethod.DEBT) {
+            invoices.add(
+                    Invoice.builder()
+                    .status(InvoiceStatus.UNPAID)
+                    .agent(order.getAddress().getUser())
+                    .order(order)
+                    .paidAmount(BigDecimal.ZERO)
+                    .totalAmount(order.getTotalAmount())
+                    .build()
+            );
+        }
+    }
 
     public void deleteOrder(Long id) {
         Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)
