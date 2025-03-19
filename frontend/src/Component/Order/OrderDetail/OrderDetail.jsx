@@ -67,7 +67,7 @@ const OrderDetail = ({ order }) => {
         <div className="my-auto">
           <div className="bg-warning-subtle w-80 mx-auto mt-5  py-4 rounded border ">
             <p className="fs-6 fw-bold">Tổng tiền</p>
-            <div className="border border-dark py-1 w-50 mx-auto rounded">
+            <div className="border border-dark fs-5 py-1 w-50 mx-auto rounded">
               {totalSum.toLocaleString()}
             </div>
           </div>
