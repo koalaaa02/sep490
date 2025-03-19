@@ -18,6 +18,7 @@ const MyAccountSignIn = () => {
   );
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch();
@@ -40,16 +41,16 @@ const MyAccountSignIn = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ email: username, password }),
+        body: JSON.stringify({ username, password, email }),
       });
 
       const data = await response.json();
+
       if (!response.ok) {
         throw new Error(data.message || "Đăng nhập thất bại");
       }
-      dispatch(
-        loginSuccess({ user: data.user, roles: data.roles, token: data.token })
-      );
+
+      dispatch(loginSuccess({ user: data, token: data.token }));
       navigate("/");
     } catch (err) {
       dispatch(loginFailure(err.message));
@@ -87,6 +88,19 @@ const MyAccountSignIn = () => {
                       className="form-control"
                       placeholder="Email"
                       type="email"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        handleInputChange();
+                      }}
+                      required
+                    />
+                  </div>
+                  <div className="col-12">
+                    <input
+                      className="form-control"
+                      placeholder="Họ và Tên"
+                      type="text"
                       value={username}
                       onChange={(e) => {
                         setUsername(e.target.value);

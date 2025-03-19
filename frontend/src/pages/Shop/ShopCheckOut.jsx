@@ -5,61 +5,50 @@ import { BASE_URL } from "../../Utils/config";
 import img1 from "../../images/glass.jpg";
 import Swal from "sweetalert2";
 import PaymentMethod from "../../Component/PaymentMethod";
-import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 const ShopCheckOut = () => {
-  const [cartItems, setCartItems] = useState([]);
+  const location = useLocation();
+  const cartItems = location.state?.selectedShops || [];
+
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState("COD");
-  const [selectedDelivery, setSelectedDelivery] = useState("GHN");
   const token = localStorage.getItem("access_token");
   const [dataAddress, setDataAddress] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(10);
   const [expandedAddressId, setExpandedAddressId] = useState(null);
-  const bank = useSelector((state) => state.purchase.bank);
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const hasBulkyItem = cartItems.some((cart) =>
+    cart.items.some((item) => item.productSKUResponse?.bulky === true)
+  );
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAddress = async () => {
       try {
         setLoaderStatus(true);
-        const [cartResponse, addressResponse] = await Promise.all([
-          fetch(`${BASE_URL}/api/cart`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }),
-          fetch(`${BASE_URL}/api/addresses/`, {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }),
-        ]);
+        const addressResponse = await fetch(`${BASE_URL}/api/addresses/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
 
-        if (!cartResponse.ok)
-          throw new Error(`Lỗi API Cart: ${cartResponse.status}`);
         if (!addressResponse.ok)
           throw new Error(`Lỗi API Address: ${addressResponse.status}`);
 
-        const cartData = await cartResponse.json();
         const addressData = await addressResponse.json();
-
-        setCartItems(cartData.shops || []);
         setDataAddress(addressData.content || []);
-        setSelectedAddressId(addressData.content[0].id);
+        setSelectedAddressId(addressData.content[0]?.id || null);
       } catch (error) {
-        console.error("Lỗi khi fetch API:", error);
+        console.error("Lỗi khi fetch API Address:", error);
       }
       setLoaderStatus(false);
     };
 
-    fetchData();
+    fetchAddress();
   }, []);
 
   const calculateTotal = () => {
@@ -67,7 +56,9 @@ const ShopCheckOut = () => {
       return (
         total +
         shop.items.reduce((shopTotal, item) => {
-          return shopTotal + item.quantity * 100000 * item.quantity;
+          return (
+            shopTotal + item.quantity * item.productSKUResponse.sellingPrice
+          );
         }, 0)
       );
     }, 0);
@@ -84,38 +75,12 @@ const ShopCheckOut = () => {
         shop?.items?.map((item) => item.productSKUId)
       );
 
-      const paymentRequest = new URLSearchParams({
-        paymentProvider: "VNPAY",
-        paymentType: "ORDER",
-        amount: totalAmount,
-        bankCode: bank,
-        referenceId: 1,
-      });
-
-      const paymentResponse = await fetch(
-        `${BASE_URL}/api/v1.1/payment/pay?${paymentRequest.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-
-      const paymentData = await paymentResponse.json();
-
-      if (!paymentResponse.ok || !paymentData.paymentUrl) {
-        throw new Error(paymentData.message || "Lỗi khi tạo thanh toán.");
-      }
-
       const checkoutData = {
         status: "PENDING",
-        shippingFee: 12500,
-        totalAmount: totalAmount + 12500,
+        shippingFee: 0,
+        totalAmount: totalAmount,
         paymentMethod: selectedPayment,
-        deliveryMethod: selectedDelivery,
+        deliveryMethod: hasBulkyItem ? "SELF_DELIVERY" : "GHN",
         paid: true,
         shopId: cartItems[0]?.shopId || 0,
         addressId: selectedAddressId,
@@ -147,7 +112,6 @@ const ShopCheckOut = () => {
         showConfirmButton: true,
         timer: 2000,
       });
-      window.location.href = paymentData.paymentUrl;
     } catch (error) {
       console.error("Lỗi khi xử lý thanh toán hoặc đặt hàng:", error);
       Swal.fire({
@@ -187,8 +151,8 @@ const ShopCheckOut = () => {
               <ScrollToTop />
             </>
             <div className="container mt-4">
-              <h4 className="mb-3">Thanh Toán</h4>
-              <div className="row">
+              <h4 className="mb-3">Thanh Toán Đơn Hàng</h4>
+              <div className="row mb-10">
                 {/* Cột bên trái */}
                 <div className="col-md-8">
                   {/* Địa chỉ nhận hàng */}
@@ -275,7 +239,7 @@ const ShopCheckOut = () => {
 
                               {/* Tên sản phẩm */}
                               <div className="col-3">
-                                <h6>{item.productName}</h6>
+                                <h6>Tên sản phẩm: {item.productName}</h6>
                                 <p className="text-muted">
                                   Mã SKU: {item.productSKUCode}
                                 </p>
@@ -284,7 +248,10 @@ const ShopCheckOut = () => {
                               {/* Đơn giá */}
                               <div className="col-2 text-center">
                                 <strong className="text-muted">
-                                  {(100000).toLocaleString("vi-VN")}đ
+                                  {item.productSKUResponse.sellingPrice.toLocaleString(
+                                    "vi-VN"
+                                  )}
+                                  đ
                                 </strong>
                               </div>
 
@@ -296,9 +263,10 @@ const ShopCheckOut = () => {
                               {/* Số tiền */}
                               <div className="col-2 text-center">
                                 <strong className="text-danger">
-                                  {(item.quantity * 100000).toLocaleString(
-                                    "vi-VN"
-                                  )}
+                                  {(
+                                    item.quantity *
+                                    item.productSKUResponse.sellingPrice
+                                  ).toLocaleString("vi-VN")}
                                   đ
                                 </strong>
                               </div>
@@ -309,34 +277,65 @@ const ShopCheckOut = () => {
                     ))}
                   </div>
 
-                  {/* Phương thức vận chuyển */}
-                  <div className="card mb-10">
+                  {/* Phương thức thanh toán */}
+                  <div className="card mb-3">
                     <div className="card-header bg-warning fw-bold text-black">
-                      Phương thức vận chuyển
+                      Phương thức thanh toán
                     </div>
                     <div className="card-body">
+                      {/* Trả góp - DETB */}
                       <div className="form-check border-bottom border-1 pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
-                          name="shippingMethod"
-                          id="fast"
+                          name="paymentMethod"
+                          id="installment"
+                          value="DETB"
+                          checked={selectedPayment === "DETB"}
+                          onChange={(e) => setSelectedPayment(e.target.value)}
                         />
-                        <label className="form-check-label" htmlFor="fast">
-                          Nhanh - 12.500 đ
+                        <label
+                          className="form-check-label"
+                          htmlFor="installment"
+                        >
+                          Trả góp
                         </label>
                       </div>
+
+                      {/* Thanh toán khi nhận hàng - COD */}
+                      <div className="form-check border-bottom border-1 pb-3">
+                        <input
+                          className="form-check-input"
+                          type="radio"
+                          name="paymentMethod"
+                          id="cod"
+                          value="COD"
+                          checked={selectedPayment === "COD"}
+                          onChange={(e) => setSelectedPayment(e.target.value)}
+                        />
+                        <label className="form-check-label" htmlFor="cod">
+                          Thanh toán khi nhận hàng
+                        </label>
+                      </div>
+
+                      {/* Thanh toán qua VNPay - VNPAY */}
                       <div className="form-check pt-3">
                         <input
                           className="form-check-input"
                           type="radio"
-                          name="shippingMethod"
-                          id="economy"
+                          name="paymentMethod"
+                          id="vnpay"
+                          value="VNPAY"
+                          checked={selectedPayment === "VNPAY"}
+                          onChange={(e) => setSelectedPayment(e.target.value)}
                         />
-                        <label className="form-check-label" htmlFor="economy">
-                          Tiết kiệm - 8.000 đ
+                        <label className="form-check-label" htmlFor="vnpay">
+                          Thanh toán qua ví VNPay
                         </label>
                       </div>
+
+                      {/* Hiển thị PaymentMethod nếu chọn VNPay */}
+                      {selectedPayment === "VNPAY" && <PaymentMethod />}
                     </div>
                   </div>
                 </div>
@@ -346,51 +345,37 @@ const ShopCheckOut = () => {
                   {/* Phương thức thanh toán */}
                   <div className="card mb-3">
                     <div className="card-header bg-warning fw-bold text-black">
-                      Phương thức thanh toán
+                      Phương thức vận chuyển
                     </div>
                     <div className="card-body">
-                      {/* <div className="form-check border-bottom border-1 pb-3">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="shippingMethod"
-                          id="fast"
-                        />
-                        <label className="form-check-label" htmlFor="fast">
-                          Trả góp
-                        </label>
+                      <div className="d-flex align-items-center">
+                        <p className="mb-0 me-2">
+                          <strong>
+                            Tiền vận chuyển:{" "}
+                            {hasBulkyItem ? "Liên hệ người bán" : "0đ"}
+                          </strong>
+                        </p>
                       </div>
-                      <div className="form-check pt-3">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="shippingMethod"
-                          id="economy"
-                        />
-                        <label className="form-check-label" htmlFor="economy">
-                          Thanh toán qua ví VN pay
-                        </label>
-                      </div> */}
-                      <PaymentMethod />
                     </div>
                   </div>
                   <div className="card mb-10">
-                    <div className="card-header fw-bold text-black">
+                    <div className="card-header bg-warning fw-bold text-black">
                       Thanh toán
                     </div>
                     <div className="card-body">
                       <p>
-                        <strong>Tổng tiền hàng:</strong> {calculateTotal()} đ
+                        <strong>Tiền đơn hàng:</strong>{" "}
                       </p>
-                      <p>
-                        <strong>Phí vận chuyển:</strong> 0 đ
-                      </p>
-                      <h5 className="text-warning">
-                        <strong>
-                          Tổng thanh toán:{" "}
-                          {calculateTotal().toLocaleString("vi-VN")} đ
-                        </strong>
-                      </h5>
+                      <input
+                        type="text"
+                        className="form-control text-end fw-bold"
+                        value={
+                          (calculateTotal() - paymentAmount).toLocaleString(
+                            "vi-VN"
+                          ) + " đ"
+                        }
+                        readOnly
+                      />
                       <button
                         className="btn btn-warning w-100 mt-3"
                         onClick={handleCheckout}

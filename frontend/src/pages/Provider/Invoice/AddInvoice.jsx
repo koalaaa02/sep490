@@ -44,7 +44,7 @@ const AddInvoice = () => {
   };
 
   return (
-    <div className="container mt-4 mb-10">
+    <div className="p-3 mb-10">
       <h3>Thêm hóa đơn</h3>
       <form onSubmit={handleSubmit}>
         <div className="border p-3 mb-3">
