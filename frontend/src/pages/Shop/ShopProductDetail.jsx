@@ -163,10 +163,6 @@ const ShopProductDetail = ({ id, onBack }) => {
             >
               +
             </button>
-            <span className="text-muted ml-2">
-              {" "}
-              {selectedSku?.stock || 0} có sẵn
-            </span>
           </div>
 
           <button

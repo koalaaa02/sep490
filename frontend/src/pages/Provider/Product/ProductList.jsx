@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
 
-const products = [
+export const products = [
   {
-    id: "001",
+    id: "1",
     name: "Xi măng ABC",
     description:
       "Xi măng của công ty ABC có độ bền cao, khả năng kết dính tốt và chịu lực tốt, phù hợp cho các công trình xây dựng...",
@@ -11,7 +11,7 @@ const products = [
     quantity: 88888,
   },
   {
-    id: "002",
+    id: "2",
     name: "Gạch lót nền",
     description:
       "Gạch lót nền của công ty 123 có thiết kế đa dạng, độ bền cao và khả năng chịu lực tốt...",
@@ -19,7 +19,7 @@ const products = [
     quantity: 99999,
   },
   {
-    id: "003",
+    id: "3",
     name: "Thép XYZ",
     description:
       "Thép XYZ có độ cứng cao, khả năng chịu lực lớn và chống ăn mòn tốt...",
@@ -28,7 +28,7 @@ const products = [
   },
 ];
 
-const ProductList = () => {
+const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("all");
 
@@ -42,7 +42,7 @@ const ProductList = () => {
   );
 
   return (
-    <div className="container mt-4">
+    <div className="p-3 mb-10">
       <h2 className="mb-3">Danh sách sản phẩm</h2>
       <div className="d-flex mb-3">
         <input
@@ -65,7 +65,7 @@ const ProductList = () => {
           Tất cả
         </button>
         <button
-          className="b  tn btn-outline-warning me-2"
+          className="btn btn-outline-warning me-2"
           onClick={() => setFilter("unpaid")}
         >
           Chưa thanh toán
@@ -118,7 +118,11 @@ const ProductList = () => {
               <td>{product.price}</td>
               <td>{product.quantity.toLocaleString()}</td>
               <td>
-                <FaEye className="mx-1 text-primary" />
+                <FaEye
+                  className="mx-1 text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setSelectedProductId(product.id)}
+                />
                 <FaEdit className="mx-1 text-warning" />
                 <FaTrash className="mx-1 text-danger" />
               </td>

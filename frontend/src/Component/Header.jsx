@@ -16,7 +16,7 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const role = useSelector((state) => state.auth.roles);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
 
   const dispatch = useDispatch();
@@ -266,7 +266,7 @@ const Header = () => {
                   </Link>
                 </div>
               </li>
-              
+
               <li className="nav-item dmenu dropdown">
                 <Link
                   className="nav-link dropdown-toggle"
@@ -315,19 +315,10 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      {role && token ? (
+                      {token ? (
                         <>
                           <div className="dropdown-item disabled text-dark">
-                            Xin chào{" "}
-                            {role === "ROLE_DEALER"
-                              ? "Dealer"
-                              : role === "ROLE_SELLER"
-                              ? "Seller"
-                              : role === "ROLE_PROVIDER"
-                              ? "Provider"
-                              : role === "ROLE_ADMIN"
-                              ? "Admin"
-                              : "User"}
+                            Xin chào {name}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">
                             Đơn hàng

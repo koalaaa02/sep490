@@ -163,14 +163,13 @@ const MyAccountAddress = () => {
     showNotification("Đã đặt địa chỉ mặc định!", "success");
 
     try {
-      await fetch(`${BASE_URL}/api/addresses/${selectedId}`, {
+      await fetch(`${BASE_URL}/api/addresses/setdefault/${selectedId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ defaultAddress: true, id: selectedId }),
       });
     } catch (error) {
       console.error("Lỗi khi cập nhật server:", error);
@@ -328,132 +327,138 @@ const MyAccountAddress = () => {
                               {notification.message}
                             </p>
                           )}
-                          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                            {data.content.map((p, index) => (
-                              <div key={index} className="col">
-                                <div className="border p-6 rounded-3">
-                                  <div className="form-check mb-4">
-                                    <input
-                                      className="form-check-input"
-                                      type="radio"
-                                      name="flexRadioDefault"
-                                      id={`homeRadio${index}`}
-                                      defaultChecked={p.defaultAddress}
-                                    />
-                                    <label
-                                      className="form-check-label text-dark fw-semi-bold"
-                                      htmlFor={`homeRadio${index}`}
-                                    >
-                                      Địa chỉ
-                                    </label>
-                                  </div>
-
-                                  {editIndex === index ? (
-                                    <div className="row">
+                          {!data.content ? (
+                            <span className={`alert alert-info`}>
+                              Bạn chưa có địa chỉ. Thêm mới địa chỉ ngay
+                            </span>
+                          ) : (
+                            <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                              {data.content.map((p, index) => (
+                                <div key={index} className="col">
+                                  <div className="border p-6 rounded-3">
+                                    <div className="form-check mb-4">
                                       <input
-                                        className="form-control mb-2"
-                                        name="recipientName"
-                                        value={editData.recipientName}
-                                        onChange={handleChange}
-                                        placeholder="Tên người nhận"
+                                        className="form-check-input"
+                                        type="radio"
+                                        name="flexRadioDefault"
+                                        id={`homeRadio${index}`}
+                                        defaultChecked={p.defaultAddress}
                                       />
-                                      <input
-                                        className="form-control mb-2"
-                                        name="address"
-                                        value={editData.address}
-                                        onChange={handleChange}
-                                        placeholder="Địa chỉ"
-                                      />
-                                      <input
-                                        className="form-control mb-2"
-                                        name="ward"
-                                        value={editData.ward}
-                                        onChange={handleChange}
-                                        placeholder="Phường/Xã"
-                                      />
-                                      <input
-                                        className="form-control mb-2"
-                                        name="district"
-                                        value={editData.district}
-                                        onChange={handleChange}
-                                        placeholder="Quận/Huyện"
-                                      />
-                                      <input
-                                        className="form-control mb-2"
-                                        name="province"
-                                        value={editData.province}
-                                        onChange={handleChange}
-                                        placeholder="Tỉnh/Thành phố"
-                                      />
-                                      <input
-                                        className="form-control mb-2"
-                                        name="phone"
-                                        value={editData.phone}
-                                        onChange={handleChange}
-                                        placeholder="Số điện thoại"
-                                      />
-                                      <div>
-                                        <button
-                                          className="btn btn-warning btn-sm me-2"
-                                          onClick={handleUpdate}
-                                        >
-                                          Lưu
-                                        </button>
-                                        <button
-                                          className="btn btn-secondary btn-sm"
-                                          onClick={() => setEditIndex(null)}
-                                        >
-                                          Hủy
-                                        </button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <p className="mb-6">
-                                      {p.recipientName}
-                                      <br />
-                                      {p.address}, {p.ward} <br />
-                                      {p.district}, {p.province}
-                                      <br />
-                                      {p.phone}
-                                    </p>
-                                  )}
-
-                                  {!p.defaultAddresss &&
-                                    editIndex !== index && (
-                                      <button
-                                        className="btn btn-info btn-sm"
-                                        onClick={() =>
-                                          handleSetDefaultAddress(index)
-                                        }
+                                      <label
+                                        className="form-check-label text-dark fw-semi-bold"
+                                        htmlFor={`homeRadio${index}`}
                                       >
-                                        Đặt làm mặc định
-                                      </button>
+                                        Địa chỉ
+                                      </label>
+                                    </div>
+
+                                    {editIndex === index ? (
+                                      <div className="row">
+                                        <input
+                                          className="form-control mb-2"
+                                          name="recipientName"
+                                          value={editData.recipientName}
+                                          onChange={handleChange}
+                                          placeholder="Tên người nhận"
+                                        />
+                                        <input
+                                          className="form-control mb-2"
+                                          name="address"
+                                          value={editData.address}
+                                          onChange={handleChange}
+                                          placeholder="Địa chỉ"
+                                        />
+                                        <input
+                                          className="form-control mb-2"
+                                          name="ward"
+                                          value={editData.ward}
+                                          onChange={handleChange}
+                                          placeholder="Phường/Xã"
+                                        />
+                                        <input
+                                          className="form-control mb-2"
+                                          name="district"
+                                          value={editData.district}
+                                          onChange={handleChange}
+                                          placeholder="Quận/Huyện"
+                                        />
+                                        <input
+                                          className="form-control mb-2"
+                                          name="province"
+                                          value={editData.province}
+                                          onChange={handleChange}
+                                          placeholder="Tỉnh/Thành phố"
+                                        />
+                                        <input
+                                          className="form-control mb-2"
+                                          name="phone"
+                                          value={editData.phone}
+                                          onChange={handleChange}
+                                          placeholder="Số điện thoại"
+                                        />
+                                        <div>
+                                          <button
+                                            className="btn btn-warning btn-sm me-2"
+                                            onClick={handleUpdate}
+                                          >
+                                            Lưu
+                                          </button>
+                                          <button
+                                            className="btn btn-secondary btn-sm"
+                                            onClick={() => setEditIndex(null)}
+                                          >
+                                            Hủy
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p className="mb-6">
+                                        {p.recipientName}
+                                        <br />
+                                        {p.address}, {p.ward} <br />
+                                        {p.district}, {p.province}
+                                        <br />
+                                        {p.phone}
+                                      </p>
                                     )}
 
-                                  {editIndex !== index && (
-                                    <div className="mt-4">
-                                      <Link
-                                        to="#"
-                                        className="text-inherit"
-                                        onClick={() => handleEdit(p, index)}
-                                      >
-                                        Sửa
-                                      </Link>
-                                      <Link
-                                        to="#"
-                                        className="text-danger ms-3 text-decoration-none"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal"
-                                        onClick={() => setDeleteId(p.id)}
-                                      >
-                                        Xóa
-                                      </Link>
-                                    </div>
-                                  )}
+                                    {!p.defaultAddresss &&
+                                      editIndex !== index && (
+                                        <button
+                                          className="btn btn-info btn-sm"
+                                          onClick={() =>
+                                            handleSetDefaultAddress(index)
+                                          }
+                                        >
+                                          Đặt làm mặc định
+                                        </button>
+                                      )}
+
+                                    {editIndex !== index && (
+                                      <div className="mt-4">
+                                        <Link
+                                          to="#"
+                                          className="text-inherit"
+                                          onClick={() => handleEdit(p, index)}
+                                        >
+                                          Sửa
+                                        </Link>
+                                        <Link
+                                          to="#"
+                                          className="text-danger ms-3 text-decoration-none"
+                                          data-bs-toggle="modal"
+                                          data-bs-target="#deleteModal"
+                                          onClick={() => setDeleteId(p.id)}
+                                        >
+                                          Xóa
+                                        </Link>
+                                      </div>
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
