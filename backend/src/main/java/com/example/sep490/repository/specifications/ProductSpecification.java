@@ -27,7 +27,7 @@ public class ProductSpecification {
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy()));
             }
-            Join<Product, ProductSKU> skuJoin = root.join("skus", JoinType.INNER);
+            Join<Product, ProductSKU> skuJoin = root.join("skus", JoinType.LEFT);
 
             if (filter.getMinPrice() != null) {
                 predicates.add(cb.greaterThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMinPrice()));

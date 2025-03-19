@@ -25,10 +25,11 @@ public class ProductSKUController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction
+            @RequestParam(defaultValue = "ASC") String direction,
+            @RequestParam(defaultValue = "productId") Long productId
     ) {
         logger.info("Fetching addresses with pagination, sort, and filter options.");
-        return ResponseEntity.ok(productSKUService.getProductSKUs(page, size, sortBy, direction));
+        return ResponseEntity.ok(productSKUService.getProductSKUs(page, size, sortBy, direction, productId));
     }
 
     @GetMapping("/{id}")

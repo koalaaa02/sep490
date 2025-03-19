@@ -14,7 +14,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>{
     Page<ProductSKU> findByIsDeleteFalse(Pageable pageable);
-	Optional<ProductSKU> findByIdAndIsDeleteFalse(Long id);
+    @Query("SELECT p FROM ProductSKU p WHERE p.isDelete = false AND p.product.id = :productId")
+    Page<ProductSKU> findByProductIdAndIsDeleteFalse(@Param("productId") Long productId, Pageable pageable);
+
+    Optional<ProductSKU> findByIdAndIsDeleteFalse(Long id);
     @Query(value = "SELECT stock FROM tbl_productsku WHERE id = :productSKUId", nativeQuery = true)
     Integer getAvailableQuantity(@Param("productSKUId") Long productSKUId);
 
