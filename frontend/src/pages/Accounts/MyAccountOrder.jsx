@@ -11,7 +11,12 @@ import { BASE_URL } from "../../Utils/config";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 import OrderStatus from "../../Component/Order/OrderStatus/OrderStatus";
 import OrderList from "../../Component/Order/OrderDetail/OrderList";
-
+import cement from "../../images/cement.jpg";
+import bricks from "../../images/bricks.jpg";
+import sand from "../../images/sand.jpg";
+import steel from "../../images/steel.jpg";
+import tiles from "../../images/tiles.png";
+import wood from "../../images/wood.jpg";
 const MyAccountOrder = () => {
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -73,7 +78,239 @@ const MyAccountOrder = () => {
   //     [index]: !prev[index],
   //   }));
   // };
-
+  const orders = [
+    {
+      id: "1",
+      name: "Xây nhà",
+      date: "March 5, 2025",
+      status: "Processing",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Xi măng",
+          quantity: 10,
+          price: 90000,
+          src: cement,
+          alt: "cement",
+        },
+        {
+          id: 2,
+          name: "Cát",
+          quantity: 10,
+          price: 15000,
+          src: sand,
+          alt: "sand",
+        },
+        {
+          id: 3,
+          name: "Gạch",
+          quantity: 10,
+          price: 15000,
+          src: bricks,
+          alt: "bricks",
+        },
+      ],
+    },
+    {
+      id: "2",
+      name: "Làm sân",
+      date: "March 5, 2025",
+      status: "Accepted",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+    {
+      id: "3",
+      name: "Làm sân 2",
+      date: "March 5, 2025",
+      status: "Completed",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+    {
+      id: "2",
+      name: "Làm sân",
+      date: "March 5, 2025",
+      status: "Declined",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+    {
+      id: "2",
+      name: "Làm sân",
+      date: "March 5, 2025",
+      status: "Canceled",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+    {
+      id: "2",
+      name: "Làm sân",
+      date: "March 5, 2025",
+      status: "Processing",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+    {
+      id: "2",
+      name: "Làm sân",
+      date: "March 5, 2025",
+      status: "",
+      badgeClass: "bg-warning",
+      products: [
+        {
+          id: 1,
+          name: "Thép",
+          quantity: 10,
+          price: 90000,
+          src: steel,
+          alt: "steel",
+        },
+        {
+          id: 2,
+          name: "gạch ốp",
+          quantity: 10,
+          price: 15000,
+          src: tiles,
+          alt: "tiles",
+        },
+        {
+          id: 3,
+          name: "gỗ",
+          quantity: 10,
+          price: 15000,
+          src: wood,
+          alt: "wood",
+        },
+      ],
+    },
+  ];
   return (
     <div>
       <>
@@ -118,7 +355,7 @@ const MyAccountOrder = () => {
                       <>
                         <div className="">
                           <OrderStatus />
-                          <OrderList />
+                          <OrderList orders={orders} />
                         </div>
                       </>
                     )}
