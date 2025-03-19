@@ -362,6 +362,9 @@ const Header = () => {
                           <Link className="dropdown-item" to="/MyAccountSignUp">
                             Đăng ký
                           </Link>
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
+                          </Link>
                           <Link
                             className="dropdown-item"
                             to="/MyAccountForgetPassword"

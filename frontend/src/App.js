@@ -1,11 +1,11 @@
-// react 
+// react
 import React from "react";
 // css
 import "./App.css";
-// browserrouter 
+// browserrouter
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 // Components
-import Header from './Component/Header';
+import Header from "./Component/Header";
 import Footer from "./Component/Footer";
 // pages
 import Home from "./pages/Home";
@@ -35,6 +35,7 @@ import MyAccountSignIn from "./pages/Accounts/MyAccountSignIn";
 import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
 // Provider
 import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
+import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 
 const App = () => {
   return (
@@ -57,11 +58,26 @@ const App = () => {
           <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
           <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
           <Route path="/MyAcconutInvoice" element={<MyAcconutInvoice />} />
-          <Route path="/MyAcconutPaymentMethod" element={<MyAcconutPaymentMethod />} />
+          <Route
+            path="/MyAcconutPaymentMethod"
+            element={<MyAcconutPaymentMethod />}
+          />
+          {/* <Route
+            path="/MyAcconutNotification"
+            element={<MyAcconutNotification />}
+          /> */}
+          <Route
+            path="/MyAcconutPaymentMethod"
+            element={<MyAcconutPaymentMethod />}
+          />
           <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
-          <Route path="/MyAccountForgetPassword" element={<MyAccountForgetPassword />} />
+          <Route
+            path="/MyAccountForgetPassword"
+            element={<MyAccountForgetPassword />}
+          />
           <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
           <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
+          <Route path="/MyDebt" element={<MyDebt />} />
           {/* About pages */}
           <Route path="/Blog" element={<Blog />} />
           <Route path="/BlogCategory" element={<BlogCategory />} />

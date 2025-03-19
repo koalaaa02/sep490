@@ -1,0 +1,13 @@
+.orderStatusContainer {
+  display: flex;
+}
+.orderStatusItem {
+  text-align: center;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1rem;
+  border-right: 1px solid grey;
+}
+.orderStatusItem:hover {
+  background-color: aliceblue;
+}
