@@ -1,45 +1,113 @@
-import React, { useState } from "react";
-import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaSearch, FaEye, FaTrash } from "react-icons/fa";
+import { BASE_URL } from "../../../Utils/config";
 
 export const products = [
   {
-    id: "1",
-    name: "Xi măng ABC",
-    description:
-      "Xi măng của công ty ABC có độ bền cao, khả năng kết dính tốt và chịu lực tốt, phù hợp cho các công trình xây dựng...",
-    price: "75.000/bao",
-    quantity: 88888,
-  },
-  {
-    id: "2",
-    name: "Gạch lót nền",
-    description:
-      "Gạch lót nền của công ty 123 có thiết kế đa dạng, độ bền cao và khả năng chịu lực tốt...",
-    price: "120.000/1m2",
-    quantity: 99999,
-  },
-  {
-    id: "3",
-    name: "Thép XYZ",
-    description:
-      "Thép XYZ có độ cứng cao, khả năng chịu lực lớn và chống ăn mòn tốt...",
-    price: "14.000/kg",
-    quantity: 9999,
+    id: 1,
+    name: "string",
+    description: "string",
+    specifications: "string",
+    unit: "PCS",
+    images: "string",
+    active: true,
+    category: {
+      id: 1,
+      createdBy: 1,
+      updatedBy: 1,
+      createdAt: "2025-02-23 15:35:19",
+      updatedAt: "2025-02-23 16:32:06",
+      name: "gạch ốp lát.",
+      images:
+        "http://localhost:8088/uploads/products/1740325952962_final_logo.png",
+      parent: true,
+      delete: false,
+    },
+    skus: [
+      {
+        createdBy: 2,
+        updatedBy: 3,
+        createdAt: "2025-02-23 16:47:15",
+        updatedAt: "2025-03-12 07:14:01",
+        id: 1,
+        skuCode: "string",
+        stock: 9974,
+        costPrice: 0,
+        listPrice: 0,
+        sellingPrice: 1000000,
+        wholesalePrice: 0,
+        images: "string",
+        bulky: true,
+        delete: false,
+      },
+      {
+        createdBy: 2,
+        updatedBy: 2,
+        createdAt: "2025-02-23 16:47:37",
+        updatedAt: "2025-02-23 16:47:37",
+        id: 2,
+        skuCode: "red",
+        stock: 10000,
+        costPrice: 0,
+        listPrice: 0,
+        sellingPrice: 1000000,
+        wholesalePrice: 0,
+        images: "string",
+        bulky: true,
+        delete: false,
+      },
+      {
+        createdBy: 2,
+        updatedBy: 2,
+        createdAt: "2025-02-23 16:47:46",
+        updatedAt: "2025-02-23 16:47:46",
+        id: 3,
+        skuCode: "blue",
+        stock: 10000,
+        costPrice: 0,
+        listPrice: 0,
+        sellingPrice: 1000000,
+        wholesalePrice: 0,
+        images: "string",
+        bulky: true,
+        delete: false,
+      },
+    ],
   },
 ];
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState("all");
+  const token = localStorage.getItem("access_token");
+  const [data, setData] = useState(null);
 
-  const filteredProducts = products.filter(
-    (p) =>
-      (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.includes(searchTerm)) &&
-      (filter === "all" ||
-        (filter === "unpaid" && p.quantity > 50000) ||
-        (filter === "paid" && p.quantity <= 50000))
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+        });
+
+        const response = await fetch(`${BASE_URL}/api/provider/products/?${params.toString()}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const result = await response.json();
+        setData(result.content);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="p-3 mb-10">
@@ -57,56 +125,22 @@ const ProductList = ({ setSelectedProductId }) => {
         </button>
       </div>
 
-      <div className="mb-3">
-        <button
-          className="btn btn-outline-primary me-2"
-          onClick={() => setFilter("all")}
-        >
-          Tất cả
-        </button>
-        <button
-          className="btn btn-outline-warning me-2"
-          onClick={() => setFilter("unpaid")}
-        >
-          Chưa thanh toán
-        </button>
-        <button
-          className="btn btn-outline-success"
-          onClick={() => setFilter("paid")}
-        >
-          Đã thanh toán
-        </button>
-      </div>
-
-      <div className="mb-3 p-3 border rounded">
-        <h5>Thống kê nhanh:</h5>
-        <p>Tổng sản phẩm: {filteredProducts.length}</p>
-        <p>
-          Tổng tiền:{" "}
-          {filteredProducts
-            .reduce(
-              (sum, p) =>
-                sum + parseFloat(p.price.replace(/[^0-9]/g, "")) * p.quantity,
-              0
-            )
-            .toLocaleString()}{" "}
-          VND
-        </p>
-      </div>
-
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
-            <th>Mã</th>
+            <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Mô tả</th>
-            <th>Đơn giá/Đơn vị</th>
-            <th>Số lượng</th>
+            <th>Danh mục</th>
+            <th>Đơn vị</th>
+            <th>SKU</th>
+            <th>Tồn kho</th>
+            <th>Giá bán</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((product) => (
+          {data?.map((product) => (
             <tr key={product.id}>
               <td>{product.id}</td>
               <td>{product.name}</td>
@@ -115,16 +149,25 @@ const ProductList = ({ setSelectedProductId }) => {
                   ? product.description.substring(0, 50) + "..."
                   : product.description}
               </td>
-              <td>{product.price}</td>
-              <td>{product.quantity.toLocaleString()}</td>
+              <td>{product.category.name}</td>
+              <td>{product.unit}</td>
+              <td>{product.skus.map((sku) => sku.skuCode).join(", ")}</td>
+              <td>
+                {product.skus
+                  .reduce((total, sku) => total + sku.stock, 0)
+                  .toLocaleString()}
+              </td>
+              <td>{product.skus[0]?.sellingPrice.toLocaleString()} VND</td>
               <td>
                 <FaEye
                   className="mx-1 text-primary"
                   style={{ cursor: "pointer" }}
                   onClick={() => setSelectedProductId(product.id)}
                 />
-                <FaEdit className="mx-1 text-warning" />
-                <FaTrash className="mx-1 text-danger" />
+                <FaTrash
+                  className="mx-1 text-danger"
+                  style={{ cursor: "pointer" }}
+                />
               </td>
             </tr>
           ))}

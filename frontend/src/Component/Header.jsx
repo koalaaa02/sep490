@@ -347,6 +347,9 @@ const Header = () => {
                           >
                             Hóa đơn của tôi
                           </Link>
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
+                          </Link>
                           <button
                             className="dropdown-item"
                             onClick={handleLogOut}
@@ -361,9 +364,6 @@ const Header = () => {
                           </Link>
                           <Link className="dropdown-item" to="/MyAccountSignUp">
                             Đăng ký
-                          </Link>
-                          <Link className="dropdown-item" to="/MyDebt">
-                            Khoản nợ
                           </Link>
                           <Link
                             className="dropdown-item"

@@ -1,15 +1,64 @@
 import React, { useState } from "react";
+import { BASE_URL } from "../../../Utils/config";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
+  const token = localStorage.getItem("access_token");
   const [product, setProduct] = useState({
     name: "",
-    category: "",
-    quantity: 0,
-    unit: "",
-    price: "",
     description: "",
-    images: [],
+    specifications: "",
+    unit: "PCS",
+    images: "",
+    active: true,
+    categoryId: 1,
+    supplierId: 1,
+    shopId: 1,
   });
+
+  const handleChange = (e) => {
+    setProduct({ ...product, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    if (!product.name || !product.description) {
+      alert("Vui lòng nhập tên sản phẩm và mô tả!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/provider/products`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(product),
+      });
+
+      if (!response.ok) {
+        throw new Error("Có lỗi xảy ra khi thêm sản phẩm");
+      }
+
+      const data = await response.json();
+      alert("Thêm sản phẩm thành công!");
+      onAddProduct(data);
+      setProduct({
+        name: "",
+        description: "",
+        specifications: "",
+        unit: "PCS",
+        images: "",
+        active: true,
+        categoryId: 1,
+        supplierId: 1,
+        shopId: 1,
+      });
+    } catch (error) {
+      console.error("Lỗi khi thêm sản phẩm:", error);
+      alert("Thêm sản phẩm thất bại!");
+    }
+  };
 
   const [productImages, setProductImages] = useState([]);
   const [coverImage, setCoverImage] = useState(null);
@@ -32,27 +81,6 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     if (file) {
       setCoverImage(URL.createObjectURL(file));
     }
-  };
-
-  const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
-  };
-
-  const handleSave = () => {
-    if (!product.name || !product.price) {
-      alert("Vui lòng nhập tên sản phẩm và giá!");
-      return;
-    }
-    onAddProduct(product);
-    setProduct({
-      name: "",
-      category: "",
-      quantity: 0,
-      unit: "",
-      price: "",
-      description: "",
-      images: [],
-    });
   };
 
   const handleCancel = () => {
