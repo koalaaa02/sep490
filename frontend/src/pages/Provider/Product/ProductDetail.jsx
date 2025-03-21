@@ -241,18 +241,21 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${BASE_URL}/api/provider/products/${productId}/upload`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();
         alert("Tải ảnh thành công!");
-        setProduct({ ...product, images: data.imageUrl }); 
+        setProduct({ ...product, images: data.imageUrl });
       } else {
         alert("Lỗi khi tải ảnh!");
       }
@@ -346,6 +349,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               className="form-control"
               name="category"
               value={product.category?.name || ""}
+              onChange={handleChange}
+              readOnly={!isEditing}
+            />
+          </div>
+          <div className="mt-2">
+            <label className="form-label fw-bold">Đơn vị:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="unit"
+              value={product?.unit || ""}
               onChange={handleChange}
               readOnly={!isEditing}
             />
