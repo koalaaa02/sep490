@@ -37,17 +37,12 @@ const MyAccountOrder = () => {
           size: 10,
           sortBy: "id",
           direction: "ASC",
-          shopId: 1,
-          deliveryCode: "string",
-          deliveryMethod: "GHN",
-          paymentMethod: "COD",
-          status: "PENDING",
-          paid: false,
         });
+        console.log(`${BASE_URL}/api/dealer/orders?${params.toString()}`);
 
         const response = await fetch(
-          // `${BASE_URL}/api/orders/?${params.toString()}`,
-          `${BASE_URL}/api/orders/1`,
+          `${BASE_URL}/api/dealer/orders?${params.toString()}`,
+          // `${BASE_URL}/api/orders/1`,
           {
             method: "GET",
             headers: {
@@ -69,6 +64,7 @@ const MyAccountOrder = () => {
       setLoaderStatus(false);
     }, 1500);
   }, []);
+  // console.log(data);
 
   // const [expandedRows, setExpandedRows] = useState({});
 
