@@ -10,6 +10,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   const [productSkuData, setProductSkuData] = useState([]);
   const [editingSkuId, setEditingSkuId] = useState(null);
   const [newSku, setNewSku] = useState(null);
+  const [previewImages, setPreviewImages] = useState({});
 
   const defaultSkuData = {
     id: 0,
@@ -68,8 +69,6 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       setProduct({ ...productData });
     }
   }, [productData]);
-
-  console.log(productData);
 
   if (!product) {
     return (
@@ -151,7 +150,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             listPrice: sku.listPrice || 0,
             sellingPrice: sku.sellingPrice,
             wholesalePrice: sku.wholesalePrice,
-            images: sku.images || "",
+            images: sku.images,
             bulky: sku.bulky || false,
             productId: product.id,
           }),
@@ -255,12 +254,61 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       if (response.ok) {
         const data = await response.json();
         alert("Tải ảnh thành công!");
-        setProduct({ ...product, images: data.imageUrl });
+        setProduct({ ...product, images: data.images });
       } else {
         alert("Lỗi khi tải ảnh!");
       }
     } catch (error) {
       console.error("Lỗi tải ảnh:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    }
+  };
+
+  const handleImageSkuUpload = async (event, skuId) => {
+    if (!event || !event.target || !event.target.files) {
+      console.error("Sự kiện không hợp lệ hoặc không có tệp tin.");
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Tạo URL tạm để xem trước ảnh
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImages((prev) => ({
+      ...prev,
+      [skuId]: previewUrl,
+    }));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/productskus/${skuId}/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data.images;
+        alert("Tải ảnh SKU thành công!");
+        setProductSkuData((prevData) =>
+          prevData.map((sku) =>
+            sku.id === skuId ? { ...sku, images: imageUrl } : sku
+          )
+        );
+      } else {
+        alert("Lỗi khi tải ảnh SKU!");
+      }
+    } catch (error) {
+      console.error("Lỗi tải ảnh SKU:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
@@ -287,8 +335,8 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 alt="product"
                 className="me-2"
                 style={{
-                  width: "80px",
-                  height: "80px",
+                  width: "100px",
+                  height: "100px",
                   objectFit: "cover",
                   borderRadius: "5px",
                 }}
@@ -359,7 +407,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               type="text"
               className="form-control"
               name="unit"
-              value={product?.unit || ""}
+              value={product?.unit.toUpperCase() || ""}
               onChange={handleChange}
               readOnly={!isEditing}
             />
@@ -372,6 +420,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Ảnh</th>
                 <th>Mã SKU</th>
                 <th>Số lượng tồn kho</th>
                 <th>Giá bán (VNĐ)</th>
@@ -382,6 +431,66 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               {productSkuData?.map((sku, index) => (
                 <tr key={sku.id}>
                   <td>{sku.id}</td>
+                  {editingSkuId === sku.id ? (
+                    <td>
+                      <td>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id={`fileInput-${sku.id}`}
+                            className="form-control ms-2"
+                            onChange={(event) =>
+                              handleImageSkuUpload(event, sku.id)
+                            }
+                            style={{ display: "none" }}
+                          />
+
+                          <img
+                            src={previewImages[sku.id] || sku.images}
+                            alt="Preview"
+                            style={{
+                              width: "70px",
+                              height: "70px",
+                              objectFit: "cover",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              document
+                                .getElementById(`fileInput-${sku.id}`)
+                                .click()
+                            }
+                          />
+                        </div>
+                      </td>
+                    </td>
+                  ) : (
+                    <td>
+                      {sku.images ? (
+                        <img
+                          src={sku.images}
+                          alt="sku"
+                          className="me-2"
+                          style={{
+                            width: "70px",
+                            height: "70px",
+                            objectFit: "cover",
+                            borderRadius: "5px",
+                          }}
+                        />
+                      ) : (
+                        <span>Không có hình ảnh</span>
+                      )}
+                    </td>
+                  )}
+
                   <td>
                     <input
                       type="text"
