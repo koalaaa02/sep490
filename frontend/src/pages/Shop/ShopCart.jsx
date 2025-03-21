@@ -72,7 +72,9 @@ const ShopCart = () => {
           total +
           shop.items.reduce((shopTotal, item) => {
             if (selectedItems[item.productSKUId]) {
-              return shopTotal + item.quantity * 100000 * item.quantity;
+              return (
+                shopTotal + item.quantity * item.productSKUResponse.sellingPrice
+              );
             }
             return shopTotal;
           }, 0)

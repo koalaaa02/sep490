@@ -186,13 +186,28 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
           </div>
           <div className="col-md-6">
             <label className="form-label fw-bold">Đơn vị:</label>
-            <input
-              type="text"
+            <select
               className="form-control"
               name="unit"
               value={product.unit}
               onChange={handleChange}
-            />
+            >
+              {[
+                "PCS",
+                "KG",
+                "PAIR",
+                "SET",
+                "PACK",
+                "BAG",
+                "DOZEN",
+                "BOX",
+                "TON",
+              ].map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
