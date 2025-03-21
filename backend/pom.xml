@@ -142,7 +142,13 @@
 			<artifactId>jedis</artifactId>
 			<version>5.1.2</version>
 		</dependency>
-<dependency>
+		<!--WebClient-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+		<dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-ui</artifactId>
     <version>1.6.13</version>  <!-- Use the latest version -->

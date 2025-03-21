@@ -20,6 +20,31 @@ const SidebarComponent = ({ setSelectedComponent }) => {
       style={{ width: "250px", height: "100vh" }}
     >
       <ul className="nav flex-column navbar-nav navbar-light">
+        {/* Quản lý sản phẩm */}
+        <li>
+          <button
+            className="nav-link"
+            onClick={() => toggleDropdown("product")}
+          >
+            <RiShoppingCart2Line size={30} className="ms-1" /> Cửa hàng của tôi
+          </button>
+          {openDropdown === "product" && (
+            <div className="dropdown-menu show">
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("ProductList")}
+              >
+                Danh sách sản phẩm
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("AddProduct")}
+              >
+                Thêm sản phẩm
+              </button>
+            </div>
+          )}
+        </li>
         {/* Hóa đơn */}
         <li>
           <button
@@ -41,32 +66,6 @@ const SidebarComponent = ({ setSelectedComponent }) => {
                 onClick={() => setSelectedComponent("AddInvoice")}
               >
                 Thêm hóa đơn
-              </button>
-            </div>
-          )}
-        </li>
-
-        {/* Quản lý sản phẩm */}
-        <li>
-          <button
-            className="nav-link"
-            onClick={() => toggleDropdown("product")}
-          >
-            <RiShoppingCart2Line size={30} className="ms-1" /> Quản lý sản phẩm
-          </button>
-          {openDropdown === "product" && (
-            <div className="dropdown-menu show">
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("ProductList")}
-              >
-                Danh sách sản phẩm
-              </button>
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("AddProduct")}
-              >
-                Thêm sản phẩm
               </button>
             </div>
           )}

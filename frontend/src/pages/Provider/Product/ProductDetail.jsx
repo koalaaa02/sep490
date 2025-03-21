@@ -1,28 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
+import { FaEdit, FaPlus } from "react-icons/fa";
 
 const ProductDetail = ({ productId, setSelectedProductId }) => {
   const [isEditing, setIsEditing] = useState(false);
   const token = localStorage.getItem("access_token");
   const [productData, setProductData] = useState(null);
   const [product, setProduct] = useState(null);
+  const [productSkuData, setProductSkuData] = useState([]);
+  const [editingSkuId, setEditingSkuId] = useState(null);
+  const [newSku, setNewSku] = useState(null);
+  const [previewImages, setPreviewImages] = useState({});
+
+  const defaultSkuData = {
+    id: 0,
+    skuCode: "",
+    stock: 10000,
+    costPrice: 0,
+    listPrice: 0,
+    sellingPrice: 0,
+    wholesalePrice: 0,
+    images: "string",
+    bulky: false,
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `${BASE_URL}/api/provider/products/${productId}`,
-          {
+        const [productResponse, anotherResponse] = await Promise.all([
+          fetch(`${BASE_URL}/api/provider/products/${productId}`, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
             },
             credentials: "include",
-          }
-        );
-        const result = await response.json();
-        setProductData(result);
+          }),
+          fetch(
+            `${BASE_URL}/api/provider/productskus/?page=1&size=10&sortBy=id&direction=ASC&productId=${productId}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+            }
+          ),
+        ]);
+
+        const [productData, anotherData] = await Promise.all([
+          productResponse.json(),
+          anotherResponse.json(),
+        ]);
+
+        setProductData(productData);
+        setProductSkuData(anotherData.content);
       } catch (error) {
         console.error("Lỗi khi fetch dữ liệu:", error);
       }
@@ -36,8 +69,6 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       setProduct({ ...productData });
     }
   }, [productData]);
-
-  console.log(productData);
 
   if (!product) {
     return (
@@ -96,9 +127,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   };
 
   const handleSkuChange = (index, field, value) => {
-    const updatedSkus = [...product.skus];
+    const updatedSkus = [...productSkuData];
     updatedSkus[index] = { ...updatedSkus[index], [field]: value };
-    setProduct({ ...product, skus: updatedSkus });
+    setProductSkuData(updatedSkus);
   };
 
   const handleSaveSku = async (sku) => {
@@ -119,13 +150,13 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             listPrice: sku.listPrice || 0,
             sellingPrice: sku.sellingPrice,
             wholesalePrice: sku.wholesalePrice,
-            images: sku.images || "",
+            images: sku.images,
             bulky: sku.bulky || false,
             productId: product.id,
           }),
         }
       );
-
+      setEditingSkuId(null);
       if (response.ok) {
         alert("Cập nhật SKU thành công!");
       } else {
@@ -151,48 +182,134 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       );
 
       if (response.ok) {
+        setProductSkuData((prevSkus) =>
+          prevSkus.filter((item) => item.id !== sku.id)
+        );
         alert("Xóa SKU thành công!");
       } else {
         alert("Lỗi khi xóa SKU!");
       }
+      setEditingSkuId(null);
     } catch (error) {
       console.error("Lỗi khi xóa SKU:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
 
-  const handleAddSku = async () => {
-    const newSku = {
-      id: 0,
-      skuCode: `SKU-${Date.now()}`,
-      stock: 10000,
-      costPrice: 0,
-      listPrice: 0,
-      sellingPrice: 0,
-      wholesalePrice: 0,
-      images: "string",
-      bulky: false,
-      productId: product.id,
-    };
-
+  const handleAddNewSku = async () => {
+    if (!newSku.skuCode || newSku.stock <= 0) {
+      alert("Vui lòng nhập đầy đủ thông tin SKU hợp lệ!");
+      return;
+    }
     try {
+      const bodyData = {
+        ...defaultSkuData,
+        skuCode: newSku.skuCode,
+        stock: newSku.stock,
+        sellingPrice: newSku.sellingPrice,
+        wholesalePrice: newSku.wholesalePrice,
+        productId: productId,
+      };
       const response = await fetch(`${BASE_URL}/api/provider/productskus`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newSku),
+        body: JSON.stringify(bodyData),
       });
 
+      if (!response.ok) throw new Error("Lỗi khi thêm SKU!");
+
+      const addedSku = await response.json();
+      setProductSkuData([...productSkuData, addedSku]);
+      setNewSku(null); // Xóa form nhập
+    } catch (error) {
+      console.error(error);
+      alert("Thêm SKU thất bại!");
+    }
+    setProductSkuData([...productSkuData, newSku]);
+    setNewSku(null);
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
       if (response.ok) {
-        setProduct((prevProduct) => ({
-          ...prevProduct,
-          skus: [...prevProduct.skus, response.data],
-        }));
+        const data = await response.json();
+        alert("Tải ảnh thành công!");
+        setProduct({ ...product, images: data.images });
+      } else {
+        alert("Lỗi khi tải ảnh!");
       }
     } catch (error) {
-      console.error("Lỗi khi thêm SKU:", error);
+      console.error("Lỗi tải ảnh:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    }
+  };
+
+  const handleImageSkuUpload = async (event, skuId) => {
+    if (!event || !event.target || !event.target.files) {
+      console.error("Sự kiện không hợp lệ hoặc không có tệp tin.");
+      return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Tạo URL tạm để xem trước ảnh
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImages((prev) => ({
+      ...prev,
+      [skuId]: previewUrl,
+    }));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/productskus/${skuId}/upload`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data.images;
+        alert("Tải ảnh SKU thành công!");
+        setProductSkuData((prevData) =>
+          prevData.map((sku) =>
+            sku.id === skuId ? { ...sku, images: imageUrl } : sku
+          )
+        );
+      } else {
+        alert("Lỗi khi tải ảnh SKU!");
+      }
+    } catch (error) {
+      console.error("Lỗi tải ảnh SKU:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
 
@@ -210,15 +327,16 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         {/* Hình ảnh sản phẩm */}
         <div className="mb-3">
           <label className="form-label fw-bold">Hình ảnh sản phẩm:</label>
-          <div className="d-flex">
+          <div className="d-flex align-items-center">
+            {/* Hiển thị ảnh hiện tại hoặc thông báo nếu chưa có ảnh */}
             {product.images ? (
               <img
                 src={product.images}
                 alt="product"
                 className="me-2"
                 style={{
-                  width: "80px",
-                  height: "80px",
+                  width: "100px",
+                  height: "100px",
                   objectFit: "cover",
                   borderRadius: "5px",
                 }}
@@ -226,11 +344,19 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             ) : (
               <span>Không có hình ảnh</span>
             )}
+
+            {/* Input chọn ảnh mới */}
+            <input
+              type="file"
+              accept="image/*"
+              className="form-control ms-2"
+              onChange={handleImageUpload}
+            />
           </div>
         </div>
 
         {/* Hình ảnh danh mục */}
-        <div className="mb-3">
+        {/* <div className="mb-3">
           <label className="form-label fw-bold">Hình ảnh danh mục:</label>
           <div className="d-flex">
             {product.category?.images ? (
@@ -249,7 +375,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               <span>Không có hình ảnh</span>
             )}
           </div>
-        </div>
+        </div> */}
 
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
@@ -275,6 +401,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               readOnly={!isEditing}
             />
           </div>
+          <div className="mt-2">
+            <label className="form-label fw-bold">Đơn vị:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="unit"
+              value={product?.unit.toUpperCase() || ""}
+              onChange={handleChange}
+              readOnly={!isEditing}
+            />
+          </div>
         </div>
 
         <div className="row mb-3">
@@ -283,6 +420,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             <thead>
               <tr>
                 <th>ID</th>
+                <th>Ảnh</th>
                 <th>Mã SKU</th>
                 <th>Số lượng tồn kho</th>
                 <th>Giá bán (VNĐ)</th>
@@ -290,9 +428,69 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               </tr>
             </thead>
             <tbody>
-              {product.skus?.map((sku, index) => (
+              {productSkuData?.map((sku, index) => (
                 <tr key={sku.id}>
                   <td>{sku.id}</td>
+                  {editingSkuId === sku.id ? (
+                    <td>
+                      <td>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                          }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id={`fileInput-${sku.id}`}
+                            className="form-control ms-2"
+                            onChange={(event) =>
+                              handleImageSkuUpload(event, sku.id)
+                            }
+                            style={{ display: "none" }}
+                          />
+
+                          <img
+                            src={previewImages[sku.id] || sku.images}
+                            alt="Preview"
+                            style={{
+                              width: "70px",
+                              height: "70px",
+                              objectFit: "cover",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() =>
+                              document
+                                .getElementById(`fileInput-${sku.id}`)
+                                .click()
+                            }
+                          />
+                        </div>
+                      </td>
+                    </td>
+                  ) : (
+                    <td>
+                      {sku.images ? (
+                        <img
+                          src={sku.images}
+                          alt="sku"
+                          className="me-2"
+                          style={{
+                            width: "70px",
+                            height: "70px",
+                            objectFit: "cover",
+                            borderRadius: "5px",
+                          }}
+                        />
+                      ) : (
+                        <span>Không có hình ảnh</span>
+                      )}
+                    </td>
+                  )}
+
                   <td>
                     <input
                       type="text"
@@ -334,23 +532,107 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                     />
                   </td>
                   <td>
+                    {editingSkuId === sku.id ? (
+                      <>
+                        <button
+                          className="btn btn-success ms-1"
+                          onClick={() => handleSaveSku(sku)}
+                        >
+                          Lưu
+                        </button>
+                        <button
+                          className="btn btn-danger ms-1"
+                          onClick={() => handleDeleteSku(sku)}
+                        >
+                          Xóa
+                        </button>
+                      </>
+                    ) : (
+                      <FaEdit
+                        className="text-primary cursor-pointer"
+                        onClick={() => setEditingSkuId(sku.id)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {newSku && (
+                <tr>
+                  <td>-</td>
+                  <td>
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={newSku.skuCode}
+                      onChange={(e) =>
+                        setNewSku({ ...newSku, skuCode: e.target.value })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={newSku.stock}
+                      onChange={(e) =>
+                        setNewSku({ ...newSku, stock: e.target.value })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={newSku.sellingPrice}
+                      onChange={(e) =>
+                        setNewSku({ ...newSku, sellingPrice: e.target.value })
+                      }
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={newSku.wholesalePrice}
+                      onChange={(e) =>
+                        setNewSku({ ...newSku, wholesalePrice: e.target.value })
+                      }
+                    />
+                  </td>
+                  <td>
                     <button
-                      className="btn btn-success"
-                      onClick={() => handleSaveSku(sku)}
+                      className="btn btn-success ms-1"
+                      onClick={handleAddNewSku}
                     >
                       Lưu
                     </button>
                     <button
                       className="btn btn-danger ms-1"
-                      onClick={() => handleDeleteSku(sku)}
+                      onClick={() => setNewSku(null)}
                     >
-                      Xóa
+                      Hủy
                     </button>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
+          {!newSku && (
+            <button
+              className="btn btn-primary mt-2"
+              onClick={() =>
+                setNewSku({
+                  skuCode: "",
+                  stock: 0,
+                  sellingPrice: 0,
+                  wholesalePrice: 0,
+                })
+              }
+            >
+              <FaPlus /> Thêm SKU mới
+            </button>
+          )}
         </div>
 
         <div className="mb-3">

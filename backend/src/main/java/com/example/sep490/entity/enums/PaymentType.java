@@ -1,7 +1,7 @@
 package com.example.sep490.entity.enums;
 
 public enum PaymentType {
-    ORDER, PLATFORM_FEE, INVOICE;
+    ORDER, PLATFORMFEE, INVOICE;
 
     public static PaymentType fromString(String value) {
         try {

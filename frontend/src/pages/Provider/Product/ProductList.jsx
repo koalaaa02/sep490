@@ -1,80 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaEye, FaTrash } from "react-icons/fa";
+import { FaSearch, FaEye, FaTrash, FaStore } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
-
-export const products = [
-  {
-    id: 1,
-    name: "string",
-    description: "string",
-    specifications: "string",
-    unit: "PCS",
-    images: "string",
-    active: true,
-    category: {
-      id: 1,
-      createdBy: 1,
-      updatedBy: 1,
-      createdAt: "2025-02-23 15:35:19",
-      updatedAt: "2025-02-23 16:32:06",
-      name: "gạch ốp lát.",
-      images:
-        "http://localhost:8088/uploads/products/1740325952962_final_logo.png",
-      parent: true,
-      delete: false,
-    },
-    skus: [
-      {
-        createdBy: 2,
-        updatedBy: 3,
-        createdAt: "2025-02-23 16:47:15",
-        updatedAt: "2025-03-12 07:14:01",
-        id: 1,
-        skuCode: "string",
-        stock: 9974,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-      {
-        createdBy: 2,
-        updatedBy: 2,
-        createdAt: "2025-02-23 16:47:37",
-        updatedAt: "2025-02-23 16:47:37",
-        id: 2,
-        skuCode: "red",
-        stock: 10000,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-      {
-        createdBy: 2,
-        updatedBy: 2,
-        createdAt: "2025-02-23 16:47:46",
-        updatedAt: "2025-02-23 16:47:46",
-        id: 3,
-        skuCode: "blue",
-        stock: 10000,
-        costPrice: 0,
-        listPrice: 0,
-        sellingPrice: 1000000,
-        wholesalePrice: 0,
-        images: "string",
-        bulky: true,
-        delete: false,
-      },
-    ],
-  },
-];
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,36 +8,83 @@ const ProductList = ({ setSelectedProductId }) => {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const params = new URLSearchParams({
-          page: 1,
-          size: 10,
-          sortBy: "id",
-          direction: "ASC",
-        });
+    fetchData();
+  }, []);
 
-        const response = await fetch(`${BASE_URL}/api/provider/products/?${params.toString()}`, {
-          method: "GET",
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu:", error);
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}`,
+        {
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          credentials: "include",
-        });
-        const result = await response.json();
-        setData(result.content);
-      } catch (error) {
-        console.error("Lỗi khi fetch dữ liệu:", error);
+        }
+      );
+      if (response.ok) {
+        alert("Xóa sản phẩm thành công!");
+        fetchData();
+      } else {
+        alert("Xóa sản phẩm thất bại!");
       }
-    };
-
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
 
   return (
     <div className="p-3 mb-10">
-      <h2 className="mb-3">Danh sách sản phẩm</h2>
+      <div className="p-3 shadow bg-light rounded">
+        <div className="d-flex align-items-center">
+          <img
+            // src={data.registrationCertificateImages}
+            alt="Shop Logo"
+            className="rounded-circle me-3"
+            width="80"
+            height="80"
+          />
+          <p>Tên cửa hàng: {data?.name}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Shop type: {data?.shopType}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Địa chỉ: {data?.address?.address}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Số điện thoại: {data?.address?.phone}</p>
+        </div>
+        <hr />
+
+        <div className="d-flex flex-wrap justify-content-between">
+          <p>
+            <FaStore /> Sản Phẩm: <strong>{data?.products?.length}</strong>
+          </p>
+        </div>
+      </div>
+      <h5 className="mb-3 mt-3">Danh sách sản phẩm</h5>
       <div className="d-flex mb-3">
         <input
           type="text"
@@ -133,44 +106,41 @@ const ProductList = ({ setSelectedProductId }) => {
             <th>Mô tả</th>
             <th>Danh mục</th>
             <th>Đơn vị</th>
-            <th>SKU</th>
             <th>Tồn kho</th>
             <th>Giá bán</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {data?.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td title={product.description}>
-                {product.description.length > 50
-                  ? product.description.substring(0, 50) + "..."
-                  : product.description}
-              </td>
-              <td>{product.category.name}</td>
-              <td>{product.unit}</td>
-              <td>{product.skus.map((sku) => sku.skuCode).join(", ")}</td>
-              <td>
-                {product.skus
-                  .reduce((total, sku) => total + sku.stock, 0)
-                  .toLocaleString()}
-              </td>
-              <td>{product.skus[0]?.sellingPrice.toLocaleString()} VND</td>
-              <td>
-                <FaEye
-                  className="mx-1 text-primary"
-                  style={{ cursor: "pointer" }}
-                  onClick={() => setSelectedProductId(product.id)}
-                />
-                <FaTrash
-                  className="mx-1 text-danger"
-                  style={{ cursor: "pointer" }}
-                />
-              </td>
-            </tr>
-          ))}
+          {data?.products
+            ?.filter((product) => product.delete === false)
+            .map((product) => (
+              <tr key={product.id}>
+                <td>{product.id}</td>
+                <td>{product.name}</td>
+                <td title={product.description}>
+                  {product.description.length > 50
+                    ? product.description.substring(0, 50) + "..."
+                    : product.description}
+                </td>
+                <td>{product.specifications}</td>
+                <td>{product.unit}</td>
+                <td>1</td>
+                <td>2</td>
+                <td>
+                  <FaEye
+                    className="mx-1 text-primary"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedProductId(product.id)}
+                  />
+                  <FaTrash
+                    className="mx-1 text-danger"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => deleteProduct(product.id)}
+                  />
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

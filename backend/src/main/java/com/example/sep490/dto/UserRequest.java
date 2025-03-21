@@ -1,4 +1,5 @@
 package com.example.sep490.dto;
+import com.example.sep490.entity.Role;
 import jakarta.annotation.Nullable;
 import org.hibernate.annotations.ColumnDefault;
 import com.example.sep490.entity.Shop;
@@ -12,13 +13,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserRequest {
 	private Long id;
-    private String name;
+    private String name;//username
     private String firstName;
     private String lastName;
     @NotBlank(message = "Email không được để trống")
@@ -30,7 +33,7 @@ public class UserRequest {
     @ColumnDefault("true")
     private boolean active = true;
     
-    private String roles = "ROLE_DEALER";
+    private List<Role> roles;
 
     private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
 

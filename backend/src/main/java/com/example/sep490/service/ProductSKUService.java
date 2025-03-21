@@ -38,9 +38,9 @@ public class ProductSKUService {
     @Value("${env.backendBaseURL}")
     private String baseURL;
 
-    public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction) {
+    public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction, Long productId) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<ProductSKU> productSKUPage = productSKURepo.findByIsDeleteFalse(pageable);
+        Page<ProductSKU> productSKUPage = productSKURepo.findByProductIdAndIsDeleteFalse(productId,pageable);
         Page<ProductSKUResponse> productSKUResponsePage = productSKUPage.map(productSKUMapper::EntityToResponse);
         return pagination.createPageResponse(productSKUResponsePage);
     }

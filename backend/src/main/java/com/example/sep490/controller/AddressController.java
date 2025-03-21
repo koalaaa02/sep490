@@ -48,6 +48,13 @@ public class AddressController {
         return ResponseEntity.ok().body(addressService.updateAddress(id, address));
     }
 
+    @PutMapping("/setdefault/{id}")
+    public ResponseEntity<?> setDefaultAddress(@PathVariable Long id) {
+        logger.info("Updating address with id: {}", id);
+        addressService.setDefaultAddress(id);
+        return ResponseEntity.ok().body("Thay đổi địa chỉ mặc định thành công.");
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteAddress(@PathVariable Long id) {
         logger.info("Deleting address with id: {}", id);

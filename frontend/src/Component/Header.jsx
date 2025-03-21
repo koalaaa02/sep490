@@ -18,6 +18,7 @@ const Header = () => {
   };
   const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.user?.roles);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -408,14 +409,16 @@ const Header = () => {
                     )}
                   </span>
                 </Link>
-                <Link
-                  className="text-muted position-relative"
-                  to="/ProviderDashBoard"
-                  role="button"
-                  aria-controls="storeOffcanvas"
-                >
-                  <FaStore size={20} className="mt-2 ms-3" />
-                </Link>
+                {role === "ROLE_PROVIDER" && (
+                  <Link
+                    className="text-muted position-relative"
+                    to="/ProviderDashBoard"
+                    role="button"
+                    aria-controls="storeOffcanvas"
+                  >
+                    <FaStore size={20} className="mt-2 ms-3" />
+                  </Link>
+                )}
               </li>
             </ul>
           </div>

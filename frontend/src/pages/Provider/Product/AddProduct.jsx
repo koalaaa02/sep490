@@ -8,12 +8,13 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     description: "",
     specifications: "",
     unit: "PCS",
-    images: "",
-    active: true,
+    images: "string",
+    active: false,
     categoryId: 1,
     supplierId: 1,
     shopId: 1,
   });
+  const [productImages, setProductImages] = useState([]);
 
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
@@ -26,24 +27,28 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     }
 
     try {
+      const bodyData = {
+        ...product,
+        images: JSON.stringify(productImages),
+      };
+
       const response = await fetch(`${BASE_URL}/api/provider/products`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include",
-        body: JSON.stringify(product),
+        body: JSON.stringify(bodyData),
       });
 
-      if (!response.ok) {
-        throw new Error("Có lỗi xảy ra khi thêm sản phẩm");
-      }
+      const addedProduct = await response.json();
 
-      const data = await response.json();
-      alert("Thêm sản phẩm thành công!");
-      onAddProduct(data);
-      setProduct({
+      if (!response.ok) {
+        throw new Error("API trả về lỗi hoặc thiếu dữ liệu!");
+      }
+      onAddProduct(addedProduct);
+      setProduct((prev) => ({
+        ...prev,
         name: "",
         description: "",
         specifications: "",
@@ -53,21 +58,23 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         categoryId: 1,
         supplierId: 1,
         shopId: 1,
-      });
-    } catch (error) {
-      console.error("Lỗi khi thêm sản phẩm:", error);
+      }));
+
+      setProductImages([]);
+
       alert("Thêm sản phẩm thất bại!");
+    } catch (error) {
+      alert("Thêm sản phẩm thành công!");
     }
   };
 
-  const [productImages, setProductImages] = useState([]);
-  const [coverImage, setCoverImage] = useState(null);
-
   // Xử lý thêm ảnh sản phẩm
   const handleProductImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setProductImages((prev) => [...prev, ...newImages]);
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setProductImages([imageUrl]);
+    }
   };
 
   // Xóa ảnh sản phẩm
@@ -75,25 +82,23 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     setProductImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Xử lý ảnh bìa
-  const handleCoverImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setCoverImage(URL.createObjectURL(file));
-    }
-  };
-
   const handleCancel = () => {
     setProduct({
       name: "",
-      category: "",
+      categoryId: 1,
       quantity: 0,
-      unit: "",
+      unit: "PCS",
       price: "",
       description: "",
-      images: [],
+      images: "",
+      specifications: "",
+      active: true,
     });
-    onCancel();
+
+    setProductImages([]);
+    if (typeof onCancel === "function") {
+      onCancel();
+    }
   };
 
   return (
@@ -104,10 +109,10 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         <div className="mb-3">
           <label className="form-label fw-bold">Hình ảnh sản phẩm:</label>
           <div className="d-flex flex-wrap align-items-center">
-            {productImages.map((image, index) => (
-              <div key={index} className="position-relative me-2">
+            {productImages.length > 0 && (
+              <div className="position-relative me-2">
                 <img
-                  src={image}
+                  src={productImages[0]}
                   alt="product preview"
                   className="border rounded"
                   style={{
@@ -119,43 +124,13 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
                 <button
                   type="button"
                   className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                  onClick={() => handleRemoveProductImage(index)}
+                  onClick={handleRemoveProductImage}
                 >
                   x
                 </button>
               </div>
-            ))}
-            {/* Nút thêm ảnh */}
-            <label
-              className="d-flex flex-column align-items-center justify-content-center border rounded bg-white"
-              style={{ width: "120px", height: "120px", cursor: "pointer" }}
-            >
-              <span>+</span>
-              <span>Photo</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                hidden
-                onChange={handleProductImageUpload}
-              />
-            </label>
-          </div>
-          <p className="text-muted small">Click "Add Photo" để thêm ảnh.</p>
-        </div>
-
-        {/* Ảnh bìa */}
-        <div className="mb-3">
-          <label className="form-label fw-bold">Ảnh bìa:</label>
-          <div className="d-flex align-items-center">
-            {coverImage ? (
-              <img
-                src={coverImage}
-                alt="cover"
-                className="border rounded"
-                style={{ width: "120px", height: "120px", objectFit: "cover" }}
-              />
-            ) : (
+            )}
+            {productImages.length === 0 && (
               <label
                 className="d-flex flex-column align-items-center justify-content-center border rounded bg-white"
                 style={{ width: "120px", height: "120px", cursor: "pointer" }}
@@ -166,13 +141,13 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
                   type="file"
                   accept="image/*"
                   hidden
-                  onChange={handleCoverImageUpload}
+                  onChange={handleProductImageUpload}
                 />
               </label>
             )}
           </div>
-          <p className="text-muted small">* Ảnh bìa sẽ hiển thị đầu tiên.</p>
         </div>
+
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
           <div className="col-md-6">
@@ -192,8 +167,8 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               type="text"
               className="form-control"
               name="category"
-              value={product.category}
-              onChange={handleChange}
+              value="Gạch ốp lát"
+              readOnly
             />
           </div>
         </div>
@@ -233,6 +208,17 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               required
             />
           </div>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label fw-bold">Thông số sản phẩm:</label>
+          <textarea
+            className="form-control"
+            name="specifications"
+            rows="3"
+            value={product.specifications}
+            onChange={handleChange}
+          />
         </div>
 
         <div className="mb-3">
