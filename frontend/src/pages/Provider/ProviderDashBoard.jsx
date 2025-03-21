@@ -7,7 +7,7 @@ import ProductDetail from "./Product/ProductDetail";
 import AddProduct from "./Product/AddProduct";
 
 const ProviderDashBoard = () => {
-  const [selectedComponent, setSelectedComponent] = useState("InvoiceList");
+  const [selectedComponent, setSelectedComponent] = useState("ProductList");
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   const handleSidebarClick = (component) => {
