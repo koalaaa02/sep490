@@ -82,6 +82,14 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
 
+  const getNextId = () => {
+    if (!productSkuData || productSkuData.length === 0) {
+      return 1;
+    }
+    const nextId = Math.max(...productSkuData.map((sku) => sku.id)) + 1;
+    return nextId;
+  };
+
   const handleSave = async () => {
     try {
       const response = await fetch(
@@ -97,7 +105,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             name: product.name,
             description: product.description,
             specifications: product.specifications,
-            unit: product.unit,
+            unit: product.unit.toUpperCase(),
             // images: product.images,
             active: product.active,
             categoryId: 1,
@@ -223,7 +231,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
       const addedSku = await response.json();
       setProductSkuData([...productSkuData, addedSku]);
-      setNewSku(null); // Xóa form nhập
+      setNewSku(null);
     } catch (error) {
       console.error(error);
       alert("Thêm SKU thất bại!");
@@ -401,16 +409,31 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               readOnly={!isEditing}
             />
           </div>
-          <div className="mt-2">
+          <div className="col-md-6">
             <label className="form-label fw-bold">Đơn vị:</label>
-            <input
-              type="text"
+            <select
               className="form-control"
               name="unit"
-              value={product?.unit.toUpperCase() || ""}
+              value={product.unit}
               onChange={handleChange}
-              readOnly={!isEditing}
-            />
+              disabled={!isEditing}
+            >
+              {[
+                "PCS",
+                "KG",
+                "PAIR",
+                "SET",
+                "PACK",
+                "BAG",
+                "DOZEN",
+                "BOX",
+                "TON",
+              ].map((unit) => (
+                <option key={unit} value={unit}>
+                  {unit}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -559,6 +582,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               ))}
               {newSku && (
                 <tr>
+                  <td>{newSku.id}</td>
                   <td>-</td>
                   <td>
                     <input
@@ -623,6 +647,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               className="btn btn-primary mt-2"
               onClick={() =>
                 setNewSku({
+                  id: getNextId(),
                   skuCode: "",
                   stock: 0,
                   sellingPrice: 0,
