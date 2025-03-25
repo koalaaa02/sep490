@@ -5,6 +5,7 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import styles from "./MyDebt.module.css";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import classNames from "classnames";
+import CheckoutForm from "../../../Component/MyDebt/CheckoutForm";
 const DebtOrder = (item) => {
   const items = item?.item;
   return (
@@ -14,7 +15,12 @@ const DebtOrder = (item) => {
           "d-flex align-items-center justify-content-between px-2"
         )}
       >
-        <div className="d-flex gap-2 align-items-center fw-bold">
+        <div
+          className={classNames(
+            "d-flex gap-2 align-items-center fw-bold",
+            styles.shopName
+          )}
+        >
           <AiOutlineShoppingCart />
           {items?.shopName}
         </div>
@@ -45,6 +51,7 @@ const DebtOrder = (item) => {
 };
 const MyDebt = () => {
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [showModal, setShowModal] = useState(false);
   const items = [
     {
       shopName: "Shop 1",
@@ -156,22 +163,36 @@ const MyDebt = () => {
                                 </div>
                               </div>
                             </div>
-                            <div
-                              className={classNames(styles.total, "col-3")}
-                            >
+                            <div className={classNames(styles.total, "col-3")}>
                               <h5 className={styles.sectionHeader}>
                                 Khoản nợ đã chọn
                               </h5>
                               <span className={styles.secondaryHeader}>
-                                <span className="text-danger">*</span>Bạn có thể thanh toán khoản nợ đã
-                                chọn nếu chúng cùng một người bán
+                                <span className="text-danger">*</span>Bạn có thể
+                                thanh toán khoản nợ đã chọn nếu chúng cùng một
+                                người bán
                               </span>
                               <div>
                                 <p>Số tiền cần thanh toàn</p>
-                                <p className={classNames("text-danger", styles.totalPrice)}>300.000 vnđ</p>
+                                <p
+                                  className={classNames(
+                                    "text-danger",
+                                    styles.totalPrice
+                                  )}
+                                >
+                                  300.000 vnđ
+                                </p>
                               </div>
                               <div className="d-flex justify-content-center">
-                                <button className={classNames("bg-black text-white", styles.cashOutButton)}>Thanh Toán</button>
+                                <button
+                                  className={classNames(
+                                    "bg-black text-white",
+                                    styles.cashOutButton
+                                  )}
+                                  onClick={() => setShowModal(true)}
+                                >
+                                  Thanh Toán
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -184,6 +205,10 @@ const MyDebt = () => {
             </div>
           </section>
         </div>
+        <CheckoutForm
+          showModal={showModal}
+          handleCloseModal={() => setShowModal(false)}
+        />
       </>
     </div>
   );
