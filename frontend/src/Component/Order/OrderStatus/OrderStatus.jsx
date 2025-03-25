@@ -1,13 +1,32 @@
+import { useState } from "react";
 import styles from "./style.module.css";
-const OrderStatus = () => {
+const OrderStatus = ({ setStatus }) => {
+  const [statusActive, setStatusActive] = useState("PENDING");
+  const statusTab = [
+    "PENDING",
+    "ACCEPTED",
+    "PACKAGING",
+    "FINDINGTRUCK",
+    "DELIVERING",
+    "DELIVERED",
+    "LOST",
+    "CANCELLED",
+  ];
   return (
-    <div className={styles.orderStatusContainer}>
-      <div className={styles.orderStatusItem}>Tất Cả</div>
-      <div className={styles.orderStatusItem}>Chờ xét duyệt</div>
-      <div className={styles.orderStatusItem}>Chấp nhận</div>
-      <div className={styles.orderStatusItem}>Hoành thành</div>
-      <div className={styles.orderStatusItem}>Từ chối</div>
-      <div className={styles.orderStatusItem}>Đã huỷ</div>
+    <div className="d-flex">
+      {statusTab.map((s) => (
+        <div
+          onClick={(e) => {
+            setStatusActive(s);
+            setStatus(s);
+          }}
+          className={`${styles.orderStatusItem}  ${
+            statusActive === s ? ` ${styles.activeStatus}` : ""
+          }`}
+        >
+          {s}
+        </div>
+      ))}
     </div>
   );
 };

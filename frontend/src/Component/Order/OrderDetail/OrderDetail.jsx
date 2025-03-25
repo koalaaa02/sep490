@@ -17,7 +17,7 @@ const OrderDetail = ({ order }) => {
               alt=""
             />
           </span>
-          <span>{order.name}</span>
+          <span>{order.shopName}</span>
         </div>
         <div className="order-product">
           <table class="table table-bordered">
@@ -30,14 +30,14 @@ const OrderDetail = ({ order }) => {
               </tr>
             </thead>
             <tbody>
-              {order.products.map((p) => (
+              {order?.products?.map((p) => (
                 <tr className="">
                   <th className="d-flex">
                     <img
                       width={200}
                       height={150}
                       className="object-fit-cover"
-                      src={p.src}
+                      src={p.image}
                       alt=""
                     />{" "}
                     <span className="pl-1 fw-light ">{p.name}</span>
