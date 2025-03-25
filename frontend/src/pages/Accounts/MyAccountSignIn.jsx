@@ -41,7 +41,7 @@ const MyAccountSignIn = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({password, email }),
+        body: JSON.stringify({ password, email }),
       });
 
       const data = await response.json();
