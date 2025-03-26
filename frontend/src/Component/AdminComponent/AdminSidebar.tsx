@@ -9,11 +9,12 @@ const AdminSideBar = ({ setActive, active }) => {
     "Providers",
   ];
   return (
-    <Nav className="flex-column sticky-top h-100 " variant="pills">
+    <Nav className="flex-column focus sticky-top h-100 " variant="pills">
       {navLink.map((n) => (
         <Nav.Item className="p-2 ">
           <Nav.Link
-            className={active === n ? "bg-warning" : ""}
+            style={{ outline: "none", boxShadow: "none" }}
+            className={` ${active === n ? "bg-warning" : ""}`}
             active={active === n}
             onClick={() => setActive(n)}
           >

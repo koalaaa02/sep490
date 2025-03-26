@@ -11,12 +11,6 @@ import { BASE_URL } from "../../Utils/config";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 import OrderStatus from "../../Component/Order/OrderStatus/OrderStatus";
 import OrderList from "../../Component/Order/OrderDetail/OrderList";
-import cement from "../../images/cement.jpg";
-import bricks from "../../images/bricks.jpg";
-import sand from "../../images/sand.jpg";
-import steel from "../../images/steel.jpg";
-import tiles from "../../images/tiles.png";
-import wood from "../../images/wood.jpg";
 const MyAccountOrder = () => {
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -63,7 +57,6 @@ const MyAccountOrder = () => {
       setLoaderStatus(false);
     }, 1500);
   }, [status]);
-  console.log(data);
   const orders = data?.content
     ?.map((order) => ({
       shopName: order?.shop.name,
@@ -318,7 +311,6 @@ const MyAccountOrder = () => {
   //     ],
   //   },
   // ];
-  console.log(orders);
 
   return (
     <div>
