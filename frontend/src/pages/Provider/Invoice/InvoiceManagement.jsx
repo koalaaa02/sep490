@@ -37,7 +37,7 @@ const InvoiceListComponent = () => {
   );
 
   return (
-    <div className="container mt-4">
+    <div className="p-3 mb-10">
       <h3>Danh sách hóa đơn</h3>
       <div className="mb-3 d-flex align-items-center">
         <input

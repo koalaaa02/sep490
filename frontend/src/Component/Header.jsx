@@ -16,8 +16,9 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const role = useSelector((state) => state.auth.roles);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.user?.roles);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -315,19 +316,10 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      {role && token ? (
+                      {token ? (
                         <>
                           <div className="dropdown-item disabled text-dark">
-                            Xin chào{" "}
-                            {role === "ROLE_DEALER"
-                              ? "Dealer"
-                              : role === "ROLE_SELLER"
-                              ? "Seller"
-                              : role === "ROLE_PROVIDER"
-                              ? "Provider"
-                              : role === "ROLE_ADMIN"
-                              ? "Admin"
-                              : "User"}
+                            Xin chào {name}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">
                             Đơn hàng
@@ -356,6 +348,9 @@ const Header = () => {
                           >
                             Hóa đơn của tôi
                           </Link>
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
+                          </Link>
                           <button
                             className="dropdown-item"
                             onClick={handleLogOut}
@@ -370,9 +365,6 @@ const Header = () => {
                           </Link>
                           <Link className="dropdown-item" to="/MyAccountSignUp">
                             Đăng ký
-                          </Link>
-                          <Link className="dropdown-item" to="/MyDebt">
-                            Khoản nợ
                           </Link>
                           <Link
                             className="dropdown-item"
@@ -417,14 +409,16 @@ const Header = () => {
                     )}
                   </span>
                 </Link>
-                <Link
-                  className="text-muted position-relative"
-                  to="/ProviderDashBoard"
-                  role="button"
-                  aria-controls="storeOffcanvas"
-                >
-                  <FaStore size={20} className="mt-2 ms-3" />
-                </Link>
+                {role === "ROLE_PROVIDER" && (
+                  <Link
+                    className="text-muted position-relative"
+                    to="/ProviderDashBoard"
+                    role="button"
+                    aria-controls="storeOffcanvas"
+                  >
+                    <FaStore size={20} className="mt-2 ms-3" />
+                  </Link>
+                )}
               </li>
             </ul>
           </div>
