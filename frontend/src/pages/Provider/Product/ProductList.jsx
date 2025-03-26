@@ -1,49 +1,90 @@
-import React, { useState } from "react";
-import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaSearch, FaEye, FaTrash, FaStore } from "react-icons/fa";
+import { BASE_URL } from "../../../Utils/config";
 
-const products = [
-  {
-    id: "001",
-    name: "Xi măng ABC",
-    description:
-      "Xi măng của công ty ABC có độ bền cao, khả năng kết dính tốt và chịu lực tốt, phù hợp cho các công trình xây dựng...",
-    price: "75.000/bao",
-    quantity: 88888,
-  },
-  {
-    id: "002",
-    name: "Gạch lót nền",
-    description:
-      "Gạch lót nền của công ty 123 có thiết kế đa dạng, độ bền cao và khả năng chịu lực tốt...",
-    price: "120.000/1m2",
-    quantity: 99999,
-  },
-  {
-    id: "003",
-    name: "Thép XYZ",
-    description:
-      "Thép XYZ có độ cứng cao, khả năng chịu lực lớn và chống ăn mòn tốt...",
-    price: "14.000/kg",
-    quantity: 9999,
-  },
-];
-
-const ProductList = () => {
+const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState("all");
+  const token = localStorage.getItem("access_token");
+  const [data, setData] = useState(null);
 
-  const filteredProducts = products.filter(
-    (p) =>
-      (p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.id.includes(searchTerm)) &&
-      (filter === "all" ||
-        (filter === "unpaid" && p.quantity > 50000) ||
-        (filter === "paid" && p.quantity <= 50000))
-  );
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu:", error);
+    }
+  };
+
+  const deleteProduct = async (productId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        alert("Xóa sản phẩm thành công!");
+        fetchData();
+      } else {
+        alert("Xóa sản phẩm thất bại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-3">Danh sách sản phẩm</h2>
+    <div className="p-3 mb-10">
+      <div className="p-3 shadow bg-light rounded">
+        <div className="d-flex align-items-center">
+          <img
+            // src={data.registrationCertificateImages}
+            alt="Shop Logo"
+            className="rounded-circle me-3"
+            width="80"
+            height="80"
+          />
+          <p>Tên cửa hàng: {data?.name}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Shop type: {data?.shopType}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Địa chỉ: {data?.address?.address}</p>
+        </div>
+        <div className="d-flex align-items-center">
+          <p>Số điện thoại: {data?.address?.phone}</p>
+        </div>
+        <hr />
+
+        <div className="d-flex flex-wrap justify-content-between">
+          <p>
+            <FaStore /> Sản Phẩm: <strong>{data?.products?.length}</strong>
+          </p>
+        </div>
+      </div>
+      <h5 className="mb-3 mt-3">Danh sách sản phẩm</h5>
       <div className="d-flex mb-3">
         <input
           type="text"
@@ -57,73 +98,45 @@ const ProductList = () => {
         </button>
       </div>
 
-      <div className="mb-3">
-        <button
-          className="btn btn-outline-primary me-2"
-          onClick={() => setFilter("all")}
-        >
-          Tất cả
-        </button>
-        <button
-          className="b  tn btn-outline-warning me-2"
-          onClick={() => setFilter("unpaid")}
-        >
-          Chưa thanh toán
-        </button>
-        <button
-          className="btn btn-outline-success"
-          onClick={() => setFilter("paid")}
-        >
-          Đã thanh toán
-        </button>
-      </div>
-
-      <div className="mb-3 p-3 border rounded">
-        <h5>Thống kê nhanh:</h5>
-        <p>Tổng sản phẩm: {filteredProducts.length}</p>
-        <p>
-          Tổng tiền:{" "}
-          {filteredProducts
-            .reduce(
-              (sum, p) =>
-                sum + parseFloat(p.price.replace(/[^0-9]/g, "")) * p.quantity,
-              0
-            )
-            .toLocaleString()}{" "}
-          VND
-        </p>
-      </div>
-
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
-            <th>Mã</th>
+            <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Mô tả</th>
-            <th>Đơn giá/Đơn vị</th>
-            <th>Số lượng</th>
+            <th>Thông số kỹ thuật</th>
+            <th>Đơn vị</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((product) => (
-            <tr key={product.id}>
-              <td>{product.id}</td>
-              <td>{product.name}</td>
-              <td title={product.description}>
-                {product.description.length > 50
-                  ? product.description.substring(0, 50) + "..."
-                  : product.description}
-              </td>
-              <td>{product.price}</td>
-              <td>{product.quantity.toLocaleString()}</td>
-              <td>
-                <FaEye className="mx-1 text-primary" />
-                <FaEdit className="mx-1 text-warning" />
-                <FaTrash className="mx-1 text-danger" />
-              </td>
-            </tr>
-          ))}
+          {data?.products
+            ?.filter((product) => product.delete === false)
+            .map((product) => (
+              <tr key={product.id}>
+                <td>{product.id}</td>
+                <td>{product.name}</td>
+                <td title={product.description}>
+                  {product.description.length > 50
+                    ? product.description.substring(0, 50) + "..."
+                    : product.description}
+                </td>
+                <td>{product.specifications}</td>
+                <td>{product.unit}</td>
+                <td>
+                  <FaEye
+                    className="mx-1 text-primary"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedProductId(product.id)}
+                  />
+                  <FaTrash
+                    className="mx-1 text-danger"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => deleteProduct(product.id)}
+                  />
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

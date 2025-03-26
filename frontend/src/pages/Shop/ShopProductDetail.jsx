@@ -5,6 +5,7 @@ import { BASE_URL } from "../../Utils/config";
 import Swal from "sweetalert2";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import ChatBox from "../Shop/ChatBox";
+import { Carousel } from "react-bootstrap";
 
 const ShopProductDetail = ({ id, onBack }) => {
   const [product, setProduct] = useState(null);
@@ -26,16 +27,21 @@ const ShopProductDetail = ({ id, onBack }) => {
         }
 
         const data = await response.json();
-        setProduct(data);
-        if (data.skus.length > 0) {
-          setSelectedSku(data.skus[0]);
+        const validSkus = data.skus.filter((sku) => sku.delete === false);
+
+        if (validSkus.length === 0) {
+          throw new Error("Không có SKU hợp lệ.");
         }
+
+        setProduct({ ...data, skus: validSkus });
+        setSelectedSku(validSkus[0]);
       } catch (error) {
         console.error("Error fetching product:", error);
       }
     };
     fetchProduct();
   }, [id]);
+
   const handleQuantityChange = (type) => {
     setQuantity((prev) => {
       if (type === "increase") return prev + 1;
@@ -101,32 +107,34 @@ const ShopProductDetail = ({ id, onBack }) => {
         <h4 className="mb-0">Chi tiết sản phẩm</h4>
       </div>
       <div className="row ">
-        {/* Hình ảnh sản phẩm */}
         <div className="col-md-5">
           <img
-            // src={selectedSku?.images || product.images}
-            src={image1}
+            src={selectedSku?.images || product?.images || image1}
             alt={product.name}
             className="img-fluid rounded"
-            style={{ width: "350px", height: "250px", cursor: "pointer" }}
+            style={{ width: "350px", height: "350px", cursor: "pointer" }}
           />
-          <div className="d-flex mt-3">
-            {product.skus.map((sku) => (
-              <img
-                key={sku.id}
-                // src={sku.images}
-                src={image1}
-                alt={sku.skuCode}
-                className={`img-thumbnail me-2 ${
-                  selectedSku?.id === sku.id
-                    ? "border border-warning border-3"
-                    : ""
-                }`}
-                style={{ width: "90px", height: "90px", cursor: "pointer" }}
-                onClick={() => handleSkuChange(sku)}
-              />
-            ))}
-          </div>
+          {/* Carousel hiển thị các SKU */}
+          <Carousel indicators={false} interval={null} className="mt-3">
+            <Carousel.Item>
+              <div className="d-flex gap-2 justify-content-center">
+                {product.skus.map((sku) => (
+                  <img
+                    key={sku.id}
+                    src={sku.images || image1}
+                    alt={sku.skuCode}
+                    className={`img-thumbnail ${
+                      selectedSku?.id === sku.id
+                        ? "border border-warning border-3"
+                        : ""
+                    }`}
+                    style={{ width: "90px", height: "90px", cursor: "pointer" }}
+                    onClick={() => handleSkuChange(sku)}
+                  />
+                ))}
+              </div>
+            </Carousel.Item>
+          </Carousel>
         </div>
 
         {/* Thông tin sản phẩm */}
@@ -163,10 +171,6 @@ const ShopProductDetail = ({ id, onBack }) => {
             >
               +
             </button>
-            <span className="text-muted ml-2">
-              {" "}
-              {selectedSku?.stock || 0} có sẵn
-            </span>
           </div>
 
           <button

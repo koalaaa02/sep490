@@ -20,8 +20,33 @@ const SidebarComponent = ({ setSelectedComponent }) => {
       style={{ width: "250px", height: "100vh" }}
     >
       <ul className="nav flex-column navbar-nav navbar-light">
+        {/* Quản lý sản phẩm */}
+        <li>
+          <button
+            className="nav-link"
+            onClick={() => toggleDropdown("product")}
+          >
+            <RiShoppingCart2Line size={30} className="ms-1" /> Cửa hàng của tôi
+          </button>
+          {openDropdown === "product" && (
+            <div className="dropdown-menu show">
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("ProductList")}
+              >
+                Danh sách sản phẩm
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("AddProduct")}
+              >
+                Thêm sản phẩm
+              </button>
+            </div>
+          )}
+        </li>
         {/* Hóa đơn */}
-        <li className="nav-item">
+        <li>
           <button
             className="nav-link"
             onClick={() => toggleDropdown("invoice")}
@@ -46,45 +71,25 @@ const SidebarComponent = ({ setSelectedComponent }) => {
           )}
         </li>
 
-        {/* Quản lý sản phẩm */}
-        <li className="nav-item">
-          <button
-            className="nav-link"
-            onClick={() => toggleDropdown("product")}
-          >
-            <RiShoppingCart2Line size={30} className="ms-1" /> Quản lý sản phẩm
-          </button>
-          {openDropdown === "product" && (
-            <div className="dropdown-menu show">
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("ProductList")}
-              >
-                Danh sách sản phẩm
-              </button>
-              <Link className="dropdown-item" to="#">
-                Thêm sản phẩm
-              </Link>
-            </div>
-          )}
-        </li>
-
         {/* Đặt hàng */}
-        <li className="nav-item">
+        <li>
           <button className="nav-link" onClick={() => toggleDropdown("order")}>
             <FaClipboardList size={30} className="ms-1" /> Đặt hàng
           </button>
           {openDropdown === "order" && (
             <div className="dropdown-menu show">
-              <Link className="dropdown-item" to="#">
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("OrderList")}
+              >
                 Danh sách đặt hàng
-              </Link>
+              </button>
             </div>
           )}
         </li>
 
         {/* Báo cáo */}
-        <li className="nav-item">
+        <li>
           <button className="nav-link" onClick={() => toggleDropdown("report")}>
             <TbMessageReport size={30} className="ms-1" /> Báo cáo
           </button>
@@ -98,7 +103,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         </li>
 
         {/* Giao dịch */}
-        <li className="nav-item">
+        <li>
           <button
             className="nav-link"
             onClick={() => toggleDropdown("transaction")}
@@ -115,7 +120,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         </li>
 
         {/* Chat */}
-        <li className="nav-item">
+        <li>
           <Link className="nav-link" to="#">
             <HiChatBubbleBottomCenterText size={30} className="ms-1" /> Trò
             chuyện

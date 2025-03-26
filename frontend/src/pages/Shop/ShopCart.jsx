@@ -72,7 +72,9 @@ const ShopCart = () => {
           total +
           shop.items.reduce((shopTotal, item) => {
             if (selectedItems[item.productSKUId]) {
-              return shopTotal + item.quantity * 100000 * item.quantity;
+              return (
+                shopTotal + item.quantity * item.productSKUResponse.sellingPrice
+              );
             }
             return shopTotal;
           }, 0)
@@ -85,7 +87,23 @@ const ShopCart = () => {
     if (!isLoggedIn) {
       navigate("/MyAccountSignIn");
     } else {
-      navigate("/ShopCheckout");
+      const selectedShops = cartItems
+        .map((shop) => {
+          const selectedProducts = shop.items.filter(
+            (item) => selectedItems?.[item.productSKUId]
+          );
+          return selectedProducts.length > 0
+            ? { ...shop, items: selectedProducts }
+            : null;
+        })
+        .filter(Boolean);
+
+      if (selectedShops.length === 0) {
+        alert("Vui lòng chọn ít nhất một sản phẩm để đặt hàng!");
+        return;
+      }
+
+      navigate("/ShopCheckout", { state: { selectedShops } });
     }
   };
 
@@ -232,7 +250,10 @@ const ShopCart = () => {
                           {/* Đơn giá */}
                           <div className="col-2 text-center">
                             <strong className="text-muted">
-                              {(100000).toLocaleString("vi-VN")}đ
+                              {item.productSKUResponse.sellingPrice.toLocaleString(
+                                "vi-VN"
+                              )}
+                              đ
                             </strong>
                           </div>
 
@@ -269,7 +290,10 @@ const ShopCart = () => {
                           {/* Số tiền */}
                           <div className="col-3 text-center">
                             <strong className="text-danger">
-                              {(item.quantity * 100000).toLocaleString("vi-VN")}
+                              {(
+                                item.quantity *
+                                item.productSKUResponse.sellingPrice
+                              ).toLocaleString("vi-VN")}
                               đ
                             </strong>
                           </div>
@@ -303,7 +327,7 @@ const ShopCart = () => {
                     onClick={handleCheckout}
                     className="btn btn-warning btn-lg"
                   >
-                    Mua Hàng
+                    Đặt hàng
                   </button>
                 </div>
               </div>

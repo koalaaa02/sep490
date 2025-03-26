@@ -149,11 +149,11 @@ const StoreList = () => {
                                     to={`/SingleShop/${stores.id}`}
                                     className="text-inherit"
                                   >
-                                    {stores.shopType}
+                                    {stores.name}
                                   </Link>
                                 </h5>
                                 <div className="small text-muted">
-                                  <span>{stores.address.recipientName}</span>
+                                  <span>{stores.shopType}</span>
                                   <span className="mx-1">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"

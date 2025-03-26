@@ -3,18 +3,40 @@ import SidebarComponent from "./SidebarComponent";
 import InvoiceManagement from "./Invoice/InvoiceManagement";
 import AddInvoice from "./Invoice/AddInvoice";
 import ProductList from "./Product/ProductList";
+import ProductDetail from "./Product/ProductDetail";
+import AddProduct from "./Product/AddProduct";
+import OrderList from "./Product/OrderList";
 
 const ProviderDashBoard = () => {
-  const [selectedComponent, setSelectedComponent] = useState("InvoiceList");
+  const [selectedComponent, setSelectedComponent] = useState("ProductList");
+  const [selectedProductId, setSelectedProductId] = useState(null);
+
+  const handleSidebarClick = (component) => {
+    setSelectedComponent(component);
+    setSelectedProductId(null);
+  };
 
   const renderComponent = () => {
+    if (selectedProductId) {
+      return (
+        <ProductDetail
+          productId={selectedProductId}
+          setSelectedProductId={setSelectedProductId}
+        />
+      );
+    }
+
     switch (selectedComponent) {
       case "InvoiceManagement":
         return <InvoiceManagement />;
       case "AddInvoice":
         return <AddInvoice />;
-        case "ProductList":
-          return <ProductList />;
+      case "ProductList":
+        return <ProductList setSelectedProductId={setSelectedProductId} />;
+      case "AddProduct":
+        return <AddProduct />;
+      case "OrderList":
+        return <OrderList />;
       default:
         return <InvoiceManagement />;
     }
@@ -22,7 +44,7 @@ const ProviderDashBoard = () => {
 
   return (
     <div className="d-flex">
-      <SidebarComponent setSelectedComponent={setSelectedComponent} />
+      <SidebarComponent setSelectedComponent={handleSidebarClick} />
       <div className="flex-grow-1 p-1">{renderComponent()}</div>
     </div>
   );
