@@ -44,6 +44,8 @@ public class ProductService {
 	private UserService userService;
     @Autowired
     private ProductRepository productRepository;
+	@Autowired
+	private StorageService storageService;
 	@Value("${env.backendBaseURL}")
 	private String baseURL;
 
@@ -66,7 +68,13 @@ public class ProductService {
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}
-
+	public PageResponse<ProductResponse> getProductsByFilterForAdminForAdmin(ProductFilterDTO filter) {
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
+	}
 	public PageResponse<ProductResponse> getProductsByFilter(ProductFilterDTO filter) {
 		filter.setCreatedBy(userService.getContextUser().getId());
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
@@ -75,7 +83,6 @@ public class ProductService {
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}
-
 	public ProductResponse getProductById(Long id) {
 		Optional<Product> Product = productRepo.findByIdAndIsDeleteFalse(id);
 		if (Product.isPresent()) {
@@ -124,14 +131,16 @@ public class ProductService {
 		Product product = productRepo.findByIdAndIsDeleteFalse(id)
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 		try {
-			String imageURL = FileUtils.uploadFile(image);
-			product.setImages(baseURL + "/" + imageURL);
+//			String imageURL = FileUtils.uploadFile(image);
+//			product.setImages(baseURL + "/" + imageURL);
+			product.setImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
 			return productMapper.EntityToResponse(productRepo.save(product));
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e.getMessage());
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
 		}
+//		catch (IOException e) {
+//			throw new RuntimeException(e.getMessage());
+//		}
 	}
 
 	public void deleteProduct(Long id) {

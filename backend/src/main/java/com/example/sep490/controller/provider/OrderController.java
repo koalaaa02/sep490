@@ -54,12 +54,15 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.updateOrder(id, order));
     }
 
-    @PutMapping("/status")
-    public ResponseEntity<String> updateOrderStatus(
-            @RequestBody List<Long> ids,
-            @RequestBody OrderStatus status) {
+    private static class OrderStatusUpdate{
+        public List<Long> ids;
+        public OrderStatus status;
+    }
 
-        orderService.changeStatusOrders(ids, status);
+    @PutMapping("/status")
+    public ResponseEntity<String> updateOrderStatus(@RequestBody OrderStatusUpdate orderStatusUpdate) {
+
+        orderService.changeStatusOrders(orderStatusUpdate.ids, orderStatusUpdate.status);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 
