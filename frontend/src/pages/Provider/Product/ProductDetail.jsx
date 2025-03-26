@@ -673,6 +673,19 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           />
         </div>
 
+        <div className="mb-3">
+          <label className="form-label fw-bold">Thông số kỹ thuật: </label>
+          <textarea
+            className="form-control"
+            name="specifications"
+            rows="3"
+            value={product.specifications || ""}
+            onChange={handleChange}
+            readOnly={!isEditing}
+            style={{ height: "120px" }}
+          />
+        </div>
+
         {/* Nhà cung cấp */}
         <div className="mb-3">
           <label className="form-label fw-bold">Nhà cung cấp:</label>

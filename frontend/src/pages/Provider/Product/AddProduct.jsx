@@ -175,16 +175,6 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Số lượng:</label>
-            <input
-              type="number"
-              className="form-control"
-              name="quantity"
-              value={product.quantity}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="col-md-6">
             <label className="form-label fw-bold">Đơn vị:</label>
             <select
               className="form-control"

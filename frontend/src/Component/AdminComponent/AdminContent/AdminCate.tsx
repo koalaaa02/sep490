@@ -30,12 +30,11 @@ const AdminCate = () => {
     const fetchData = async () => {
       try {
         const params = new URLSearchParams({
-          page: currentPage, // Use currentPage for pagination
+          page: currentPage,
           size: itemsPerPage,
           sortBy: "id",
           direction: "ASC",
         });
-
         const response = await fetch(
           `${BASE_URL}/api/admin/categories/?${params.toString()}`,
           {

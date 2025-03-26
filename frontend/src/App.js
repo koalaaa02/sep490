@@ -39,8 +39,7 @@ import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 import Admin from "./pages/Admin/Admin.tsx";
 
 const App = () => {
-  const userInfo = JSON.parse(localStorage.getItem("user"));
-
+  const userInfo = JSON.parse(localStorage.getItem("user"));  
   return (
     <div>
       <Router>

@@ -283,15 +283,15 @@ const ShopCheckOut = () => {
                       Phương thức thanh toán
                     </div>
                     <div className="card-body">
-                      {/* Trả góp - DETB */}
+                      {/* Trả góp - DEBT */}
                       <div className="form-check border-bottom border-1 pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
                           name="paymentMethod"
                           id="installment"
-                          value="DETB"
-                          checked={selectedPayment === "DETB"}
+                          value="DEBT"
+                          checked={selectedPayment === "DEBT"}
                           onChange={(e) => setSelectedPayment(e.target.value)}
                         />
                         <label
