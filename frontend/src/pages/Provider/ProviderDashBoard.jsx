@@ -5,6 +5,7 @@ import AddInvoice from "./Invoice/AddInvoice";
 import ProductList from "./Product/ProductList";
 import ProductDetail from "./Product/ProductDetail";
 import AddProduct from "./Product/AddProduct";
+import OrderList from "./Product/OrderList";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState("ProductList");
@@ -34,6 +35,8 @@ const ProviderDashBoard = () => {
         return <ProductList setSelectedProductId={setSelectedProductId} />;
       case "AddProduct":
         return <AddProduct />;
+      case "OrderList":
+        return <OrderList />;
       default:
         return <InvoiceManagement />;
     }

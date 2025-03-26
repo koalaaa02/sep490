@@ -78,9 +78,12 @@ const SidebarComponent = ({ setSelectedComponent }) => {
           </button>
           {openDropdown === "order" && (
             <div className="dropdown-menu show">
-              <Link className="dropdown-item" to="#">
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("OrderList")}
+              >
                 Danh sách đặt hàng
-              </Link>
+              </button>
             </div>
           )}
         </li>

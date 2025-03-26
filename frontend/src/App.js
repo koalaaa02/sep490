@@ -36,12 +36,10 @@ import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
 // Provider
 import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
 import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
-import { useSelector } from "react-redux";
 import Admin from "./pages/Admin/Admin.tsx";
 
 const App = () => {
-  const userInfo = useSelector((u) => u.auth.user);
-
+  const userInfo = JSON.parse(localStorage.getItem("user"));  
   return (
     <div>
       <Router>
