@@ -1,5 +1,5 @@
 // react
-import React from "react";
+import React, { useEffect } from "react";
 // css
 import "./App.css";
 // browserrouter
@@ -37,9 +37,12 @@ import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
 import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
 import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 import Admin from "./pages/Admin/Admin.tsx";
-
+import { useLocalStorage } from "./Hook/useLocalStorage.ts";
+import { useSelector } from "react-redux";
 const App = () => {
-  const userInfo = JSON.parse(localStorage.getItem("user"));
+  // const userInfo = useLocalStorage("user");
+  const userInfo = useSelector((state) => state.auth.user);
+  console.log(userInfo);
 
   return (
     <div>

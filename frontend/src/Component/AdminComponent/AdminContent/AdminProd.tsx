@@ -11,7 +11,13 @@ import {
 } from "react-bootstrap";
 import { FiSearch } from "react-icons/fi";
 import { BASE_URL } from "../../../Utils/config";
-
+interface PaginationState {
+  activePage: number;
+  inactivePage: number;
+  itemsPerPage: number;
+  activeTotalPages?: number;
+  inactiveTotalPages?: number;
+}
 const AdminProd = () => {
   const token = localStorage.getItem("access_token");
   const [activeProducts, setActiveProducts] = useState([]);
@@ -19,21 +25,21 @@ const AdminProd = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [rfkey, setRfKey] = useState(true);
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<PaginationState>({
     activePage: 1,
     inactivePage: 1,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
   });
 
   useEffect(() => {
     const fetchProducts = async (activeStatus, page) => {
       try {
         const params = new URLSearchParams({
-          page: page,
-          size: pagination.itemsPerPage,
+          page: String(page),
+          size: String(pagination.itemsPerPage),
           sortBy: "id",
           direction: "ASC",
-          active: activeStatus,
+          active: String(activeStatus),
         });
 
         const response = await fetch(
