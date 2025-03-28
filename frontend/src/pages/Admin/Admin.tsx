@@ -14,13 +14,13 @@ const Admin = () => {
     switch (active) {
       case "Dashboard":
         return <AdminDashboard />;
-      case "Categories":
+      case "Phân loại":
         return <AdminCate />;
-      case "Products":
+      case "Sản phẩm":
         return <AdminProd />;
-      case "Dealers":
+      case "Khách hàng":
         return <AdminDealer />;
-      case "Providers":
+      case "Nhà cung cấp":
         return <AdminProvider />;
       default:
         return <AdminDashboard />;

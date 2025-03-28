@@ -23,10 +23,10 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
       <thead>
         <tr>
           <th>ID</th>
-          <th>Image</th>
-          <th>Category Name</th>
-          <th>Parent Category Name</th>
-          <th>Actions</th>
+          <th>Ảnh</th>
+          <th>Phân loại</th>
+          <th>Phân loại cha</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>

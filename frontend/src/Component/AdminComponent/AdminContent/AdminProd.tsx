@@ -144,7 +144,7 @@ const AdminProd = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Products List</h2>
+      <h2 className="mb-4">Danh sách sản phẩm</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>
@@ -152,7 +152,7 @@ const AdminProd = () => {
             <FiSearch />
           </InputGroup.Text>
           <Form.Control
-            placeholder="Search products..."
+            placeholder="Tìm sản phẩm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -169,10 +169,10 @@ const AdminProd = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
+                <th>Tên sản phẩm</th>
+                <th>Phân loại</th>
+                <th>Nhà cung cấp</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
@@ -206,10 +206,10 @@ const AdminProd = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
+                <th>Tên sản phẩm</th>
+                <th>Phân loại</th>
+                <th>Nhà cung cấp</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>

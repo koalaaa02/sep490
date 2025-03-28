@@ -76,7 +76,7 @@ const AdminCate = () => {
   );
 
   const handleDeleteCategory = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
+    if (window.confirm("Bạn có chắc muốn xoá danh mục này không?")) {
       try {
         const response = await fetch(`${BASE_URL}/api/admin/categories/${id}`, {
           method: "DELETE",
@@ -88,9 +88,9 @@ const AdminCate = () => {
 
         if (response.ok) {
           setRfKey(!rfKey);
-          alert("Category deleted successfully");
+          alert("Xoá thành công");
         } else {
-          alert("Error deleting category: " + response.statusText);
+          alert("Có lỗi xảy ra, vui lòng thử lại " + response.statusText);
         }
       } catch (error) {
         alert("An error occurred while deleting the category");
@@ -109,7 +109,7 @@ const AdminCate = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Categories List</h2>
+      <h2 className="mb-4">Danh sách phân loại</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>
@@ -117,13 +117,13 @@ const AdminCate = () => {
             <FiSearch />
           </InputGroup.Text>
           <Form.Control
-            placeholder="Search categories..."
+            placeholder="Tìm phân loại..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </InputGroup>
         <Button variant="primary" onClick={() => setShowAddModal(true)}>
-          Add Category
+          Thêm loại mới
         </Button>
       </div>
 

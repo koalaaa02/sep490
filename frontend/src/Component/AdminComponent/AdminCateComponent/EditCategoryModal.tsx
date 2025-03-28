@@ -28,12 +28,13 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const token = localStorage.getItem("access_token");
   useEffect(() => {
     setName(category.name);
     setHasParent(!!category.parentName);
     setPreviewImage(category.image || null);
     setSelectedFile(null);
+    console.log("Category changed", category.id);
   }, [category]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +75,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to update category details");
+        throw new Error("Chỉnh phân loại không thành công!!");
       }
 
       if (selectedFile) {
@@ -100,7 +101,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${token}`,
           },
           credentials: "include",
           body: formData,
@@ -109,7 +110,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
       console.log(response);
 
       if (!response.ok) {
-        throw new Error("Failed to upload image");
+        throw new Error("Upload ảnh lỗi");
       }
     } catch (error) {
       throw error;
@@ -119,14 +120,14 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Edit Category</Modal.Title>
+        <Modal.Title>Chỉnh phân loại</Modal.Title>
       </Modal.Header>
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           <Row>
             <Col xs={6}>
               <div className="mb-3">
-                <strong>Current Name:</strong> {category.name}
+                <strong>Tên hiện tại:</strong> {category.name}
               </div>
               <div className="mb-3">
                 {previewImage ? (
@@ -137,11 +138,11 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                     thumbnail
                   />
                 ) : (
-                  <div className="text-muted">No image available</div>
+                  <div className="text-muted">không có ảnh khả dụng</div>
                 )}
               </div>
               <Form.Group className="mb-3">
-                <Form.Label>Change Image</Form.Label>
+                <Form.Label>Đổi ảnh</Form.Label>
                 <Form.Control
                   type="file"
                   accept="image/*"
@@ -153,18 +154,18 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                   variant="outline-secondary"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  Choose File
+                  Chọn ảnh
                 </Button>
                 {selectedFile && (
                   <div className="mt-2">
-                    <small>Selected: {selectedFile.name}</small>
+                    <small>Ảnh đã chọn: {selectedFile.name}</small>
                   </div>
                 )}
               </Form.Group>
             </Col>
             <Col xs={6}>
               <Form.Group className="mb-3">
-                <Form.Label>New Category Name</Form.Label>
+                <Form.Label>Tên phân loại mới</Form.Label>
                 <Form.Control
                   type="text"
                   value={name}
@@ -175,14 +176,14 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
 
               {category.parentName ? (
                 <Form.Group className="mb-3">
-                  <Form.Label>Parent Category</Form.Label>
+                  <Form.Label>Phân loại cha</Form.Label>
                   <Form.Select
                     value={parentCategoryId || ""}
                     onChange={(e) =>
                       setParentCategoryId(Number(e.target.value))
                     }
                   >
-                    <option value="">Select Category</option>
+                    <option value="">Chọn một phân loại dưới đây</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
@@ -196,21 +197,21 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
                     <Form.Check
                       type="switch"
                       id="parent-switch"
-                      label="Does this category have a parent?"
+                      label="Phân loại này có phân loại cha không?"
                       checked={hasParent}
                       onChange={(e) => setHasParent(e.target.checked)}
                     />
                   </Form.Group>
                   {hasParent && (
                     <Form.Group className="mb-3">
-                      <Form.Label>Parent Category</Form.Label>
+                      <Form.Label>Phân loại cha</Form.Label>
                       <Form.Select
                         value={parentCategoryId || ""}
                         onChange={(e) =>
                           setParentCategoryId(Number(e.target.value))
                         }
                       >
-                        <option value="">Select Category</option>
+                        <option value="">Chọn phân loại dưới đây</option>
                         {categories.map((cat) => (
                           <option key={cat.id} value={cat.id}>
                             {cat.name}
@@ -226,10 +227,10 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide}>
-            Close
+            Đóng
           </Button>
           <Button variant="primary" type="submit">
-            Save Changes
+            Lưu thay đổi
           </Button>
         </Modal.Footer>
       </form>
