@@ -121,10 +121,16 @@ const SidebarComponent = ({ setSelectedComponent }) => {
 
         {/* Chat */}
         <li>
-          <Link className="nav-link" to="#">
+          <button
+            className="nav-link"
+            onClick={() => {
+              setSelectedComponent("ChatBox");
+              toggleDropdown("chat");
+            }}
+          >
             <HiChatBubbleBottomCenterText size={30} className="ms-1" /> Trò
             chuyện
-          </Link>
+          </button>
         </li>
       </ul>
     </div>
