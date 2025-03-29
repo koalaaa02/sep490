@@ -144,7 +144,7 @@ const AdminProd = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Danh sách sản phẩm</h2>
+      <h2 className="mb-4 text-center">Danh sách sản phẩm</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>
@@ -164,7 +164,7 @@ const AdminProd = () => {
         onSelect={(k) => setActiveTab(k)}
         className="mb-3"
       >
-        <Tab eventKey="active" title="Active Products">
+        <Tab eventKey="active" title="Sản phẩm active">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>
@@ -201,7 +201,7 @@ const AdminProd = () => {
             ))}
           </Pagination>
         </Tab>
-        <Tab eventKey="inactive" title="Inactive Products">
+        <Tab eventKey="inactive" title="Sản phẩm inactive">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>

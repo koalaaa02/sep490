@@ -24,6 +24,15 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
+            onClick={() => setSelectedComponent("ProviderDashBoardDetail")}
+          >
+            <RiShoppingCart2Line size={30} className="ms-1" /> Dashboard
+          </button>
+        </li>
+        {/* Quản lý sản phẩm */}
+        <li>
+          <button
+            className="nav-link"
             onClick={() => toggleDropdown("product")}
           >
             <RiShoppingCart2Line size={30} className="ms-1" /> Cửa hàng của tôi

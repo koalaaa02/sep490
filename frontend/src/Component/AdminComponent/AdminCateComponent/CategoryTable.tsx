@@ -44,7 +44,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
             </td>
             <td>{category.name}</td>
             <td>{category.parentName || "none"}</td>
-            <td>
+            <td width={120}>
               <button
                 className="btn btn-outline-primary me-2"
                 onClick={() => onEdit(category)}

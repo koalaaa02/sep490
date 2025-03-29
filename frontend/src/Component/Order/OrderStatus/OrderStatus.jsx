@@ -4,7 +4,6 @@ import styles from "./style.module.css";
 const OrderStatus = ({ setStatus }) => {
   const [statusActive, setStatusActive] = useState("PENDING");
 
-  // Mapping English status codes to Vietnamese translations
   const statusTab = [
     { code: "PENDING", label: "Đang chờ" },
     { code: "ACCEPTED", label: "Đã chấp nhận" },

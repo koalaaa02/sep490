@@ -109,7 +109,7 @@ const AdminCate = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Danh sách phân loại</h2>
+      <h2 className="mb-4 text-center">Danh sách phân loại</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>

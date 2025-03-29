@@ -27,7 +27,7 @@ const Admin = () => {
     }
   };
   return (
-    <Row className="w-100 vh-100">
+    <Row className="mx-3">
       <Col md={3} lg={2} className="bg-light ">
         <AdminSideBar active={active} setActive={setActive} />
       </Col>
