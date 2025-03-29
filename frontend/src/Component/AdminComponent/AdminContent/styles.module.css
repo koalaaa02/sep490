@@ -1,0 +1,68 @@
+.leftSideCharts {
+    width: 68%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .itemsChart,
+    .lowerItemsChart {
+        border: 1px solid rgb(189, 189, 189);
+        border-radius: 5px;
+        background-color: white;
+        /* box-shadow: 5px 7px rgba(0, 0, 0, 0.137); */
+    }
+
+    .itemsChart {
+        height: 130px;
+
+        .title {
+            font-weight: 700;
+        }
+
+        .amount {
+            font-size: 30px;
+            font-weight: 700;
+        }
+    }
+
+    .lowerItemsChart {
+        height: 250px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        .chart {
+            width: 200px;
+            height: 200px;
+        }
+    }
+}
+
+.rightSideChart {
+    width: 30%;
+    align-self: stretch;
+}
+
+.adminDashBoardContainer {
+    padding: 10px;
+    background-color: rgb(248, 248, 248);
+    min-height: 90vh;
+}
+
+.barChart {
+    background-color: white;
+    border: 1px solid rgb(189, 189, 189);
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+
+    canvas {
+        height: 100%;
+    }
+}
+
+.lowerChart {
+    background-color: white;
+    border: 1px solid rgb(189, 189, 189);
+}

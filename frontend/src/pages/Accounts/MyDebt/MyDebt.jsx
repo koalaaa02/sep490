@@ -94,11 +94,12 @@ const MyDebt = () => {
   const [showModal, setShowModal] = useState(false);
   const [activeShop, setActiveShop] = useState(null);
   const [orders, setOrders] = useState([]);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${BASE_URL}/api/dealer/GetInvoicesByShopId/1`,
+          `${BASE_URL}/api/dealer/ShopInvoiceSummary`,
           {
             method: "GET",
             headers: {

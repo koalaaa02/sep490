@@ -1,6 +1,6 @@
 import React from "react";
 import AdminSideBar from "../../Component/AdminComponent/AdminSidebar.tsx";
-import { Container, Row, Col, Nav } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 import { useState } from "react";
 import AdminDashboard from "../../Component/AdminComponent/AdminContent/AdminDashboard.tsx";
 import AdminCate from "../../Component/AdminComponent/AdminContent/AdminCate.tsx";

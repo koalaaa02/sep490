@@ -39,17 +39,19 @@ import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 import Admin from "./pages/Admin/Admin.tsx";
 
 const App = () => {
-  const userInfo = JSON.parse(localStorage.getItem("user"));  
+  const userInfo = JSON.parse(localStorage.getItem("user"));
   return (
     <div>
       <Router>
         <Header />
         <Routes>
-          {userInfo?.roles === "ROLE_ADMIN" ? (
+          {/* {userInfo?.roles === "ROLE_ADMIN" ? (
             <Route path="/" element={<Admin />} />
           ) : (
             <Route path="/" element={<Home />} />
-          )}
+          )} */}
+
+          <Route path="/" element={<Admin />} />
 
           {/* Shop pages */}
           <Route path="/Shop/:cateId" element={<Shop />} />
