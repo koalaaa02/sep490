@@ -9,15 +9,31 @@ import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
 import image1 from "../../images/glass.jpg";
 import ShopProductDetail from "./ShopProductDetail";
+import { FaSearch } from "react-icons/fa";
 
 function Dropdown() {
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { cateId } = useParams();
   const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(6);
+  const [direction, setDirection] = useState("ASC");
+  const [searchName, setSearchName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const params1 = new URLSearchParams({
+    page: page,
+    size: size,
+    sortBy: "id",
+    direction: direction,
+    active: true,
+    categoryId: cateId,
+    name: searchQuery,
+  });
 
   const ratings = [
     { id: "ratingFive", stars: 5 },
@@ -40,7 +56,7 @@ function Dropdown() {
           direction: "ASC",
         });
 
-        const [shopResponse, cateResponse] = await Promise.all([
+        const [shopResponse, cateResponse, proResponse] = await Promise.all([
           fetch(`${BASE_URL}/api/public/shops?${params.toString()}`, {
             method: "GET",
             credentials: "include",
@@ -49,15 +65,21 @@ function Dropdown() {
             method: "GET",
             credentials: "include",
           }),
+          fetch(`${BASE_URL}/api/public/products?${params1.toString()}`, {
+            method: "GET",
+            credentials: "include",
+          }),
         ]);
 
-        if (shopResponse.ok && cateResponse.ok) {
-          const [shopData, cateData] = await Promise.all([
+        if (shopResponse.ok && cateResponse.ok && proResponse.ok) {
+          const [shopData, cateData, proData] = await Promise.all([
             shopResponse.json(),
             cateResponse.json(),
+            proResponse.json(),
           ]);
           setStores(shopData.content || []);
           setCategories(cateData || {});
+          setProducts(proData || {});
         } else {
           throw new Error("Lỗi khi tải dữ liệu");
         }
@@ -69,7 +91,31 @@ function Dropdown() {
     };
 
     fetchData();
-  }, [cateId]);
+  }, [cateId, size, page, direction, searchQuery]);
+
+  const handleChange = (event) => {
+    setSize(event.target.value);
+  };
+
+  const handleChangeDirection = (event) => {
+    setDirection(event.target.value);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchName(event.target.value);
+  };
+
+  const handleSearchClick = () => {
+    setSearchQuery(searchName); // Cập nhật giá trị tìm kiếm
+  };
+
+  const totalPages = Math.ceil(products.totalElements / size);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   const handleAddWishList = (product) => {
     const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
@@ -148,7 +194,7 @@ function Dropdown() {
                   </div>
                   <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Giá thành</h5>
+                    <h5 className="mb-3">Danh mục</h5>
                     <div>
                       {/* range */}
                       <div id="priceRange" className="mb-3" />
@@ -191,7 +237,27 @@ function Dropdown() {
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
                   <div className=" card-body p-4">
-                    <h4 className="mb-0">{categories.name}</h4>
+                    <div style={{ position: "relative", width: "35%" }}>
+                      <input
+                        className="form-control responsivesearch"
+                        list="datalistOptions"
+                        id="exampleDataList"
+                        placeholder={`Tìm kiếm trong ${categories.name}...`}
+                        value={searchName}
+                        onChange={handleSearchChange}
+                        style={{ paddingRight: "35px" }} // Chừa chỗ cho icon bên phải
+                      />
+                      <FaSearch
+                        style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#aaa",
+                        }}
+                        onClick={handleSearchClick}
+                      />
+                    </div>
                   </div>
                 </div>
                 {/* list icon */}
@@ -208,38 +274,30 @@ function Dropdown() {
                         <p className="mb-3 mb-md-0">
                           {" "}
                           <span className="text-dark">
-                            Có {categories.products.filter((p) => !p.delete).length}{" "}
+                            Có{" "}
+                            {
+                              categories.products.filter((p) => !p.delete)
+                                .length
+                            }{" "}
                           </span>{" "}
                           sản phẩm{" "}
                         </p>
                       </div>
                       {/* icon */}
                       <div className="d-flex justify-content-between align-items-center">
-                        {/* <Link
-                          to={`/ShopListCol/${cateId}`}
-                          className="text-muted me-3"
-                        >
-                          <i className="bi bi-list-ul" />
-                        </Link>
-                        <Link
-                          to={`/ShopGridCol3/${cateId}`}
-                          className="text-muted me-3"
-                        >
-                          <i className="bi bi-grid" />
-                        </Link>
-                        <Link to={`/Shop/${cateId}`} className="me-3 active">
-                          <i className="bi bi-grid-3x3-gap" />
-                        </Link> */}
                         <div className="me-2">
                           {/* select option */}
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            value={size}
+                            onChange={handleChange}
                           >
-                            <option selected>50</option>
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={30}>30</option>
+                            <option selected value={6}>
+                              6
+                            </option>
+                            <option value={12}>12</option>
+                            <option value={18}>18</option>
                           </select>
                         </div>
                         <div>
@@ -247,31 +305,21 @@ function Dropdown() {
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            value={direction}
+                            onChange={handleChangeDirection}
                           >
-                            <option selected> Sắp xếp theo: Nổi bật </option>
-                            <option value="Low to High">
+                            <option value={"ASC"} selected>
                               {" "}
-                              Giá: Từ thấp đến cao{" "}
+                              Mới nhất{" "}
                             </option>
-                            <option value="High to Low">
-                              {" "}
-                              Giá: Từ cao đến thấp{" "}
-                            </option>
-                            <option value="Release Date">
-                              {" "}
-                              Ngày phát hành{" "}
-                            </option>
-                            <option value="Avg. Rating">
-                              {" "}
-                              Đánh giá trung bình{" "}
-                            </option>
+                            <option value={"DESC"}> Cũ nhất </option>
                           </select>
                         </div>
                       </div>
                     </div>
                     {/* row */}
                     <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
-                      {categories.products
+                      {products.content
                         .filter((p) => !p.delete)
                         .map((p, index) => {
                           const isInWishlist = storedWishlist.some(
@@ -347,7 +395,7 @@ function Dropdown() {
                                       }}
                                     >
                                       <Link
-                                        to="#!"
+                                        onClick={() => setSelectedProduct(p)}
                                         className="text-inherit text-decoration-none"
                                         title={p?.name} // Hiện tooltip khi hover
                                       >
@@ -361,7 +409,7 @@ function Dropdown() {
                                         overflow: "hidden",
                                         display: "-webkit-box",
                                         WebkitBoxOrient: "vertical",
-                                        WebkitLineClamp: 2
+                                        WebkitLineClamp: 2,
                                       }}
                                       title={p.description}
                                     >
@@ -376,54 +424,55 @@ function Dropdown() {
                     </div>
                     <div className="row mt-8">
                       <div className="col">
-                        {/* nav */}
                         <nav>
                           <ul className="pagination">
-                            <li className="page-item disabled">
+                            {/* Nút Previous */}
+                            <li
+                              className={`page-item ${
+                                page === 1 ? "disabled" : ""
+                              }`}
+                            >
                               <Link
-                                className="page-link  mx-1 rounded-3 "
+                                className="page-link mx-1 rounded-3"
                                 to="#"
+                                onClick={() => handlePageChange(page - 1)}
                                 aria-label="Previous"
                               >
                                 <i className="fa fa-chevron-left" />
                               </Link>
                             </li>
-                            <li className="page-item ">
+
+                            {/* Hiển thị số trang */}
+                            {[...Array(totalPages)].map((_, index) => {
+                              const pageNumber = index + 1;
+                              return (
+                                <li
+                                  key={pageNumber}
+                                  className={`page-item ${
+                                    page === pageNumber ? "active" : ""
+                                  }`}
+                                >
+                                  <Link
+                                    className="page-link mx-1 rounded-3 text-body"
+                                    to="#"
+                                    onClick={() => handlePageChange(pageNumber)}
+                                  >
+                                    {pageNumber}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+
+                            {/* Nút Next */}
+                            <li
+                              className={`page-item ${
+                                page === totalPages ? "disabled" : ""
+                              }`}
+                            >
                               <Link
-                                className="page-link  mx-1 rounded-3 active"
+                                className="page-link mx-1 rounded-3"
                                 to="#"
-                              >
-                                1
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                2
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                ...
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                12
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
+                                onClick={() => handlePageChange(page + 1)}
                                 aria-label="Next"
                               >
                                 <i className="fa fa-chevron-right" />

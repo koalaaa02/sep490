@@ -257,8 +257,7 @@ const SingleShop = () => {
                               </p>
                             </div>
                             <div className="d-flex justify-content-md-between align-items-center">
-                              <div className="me-2">
-                                {/* select option */}
+                              {/* <div className="me-2">
                                 <select
                                   className="form-select"
                                   aria-label="Default select example"
@@ -268,9 +267,8 @@ const SingleShop = () => {
                                   <option value={20}>20</option>
                                   <option value={30}>30</option>
                                 </select>
-                              </div>
-                              <div>
-                                {/* select option */}
+                              </div> */}
+                              {/* <div>
                                 <select
                                   className="form-select"
                                   aria-label="Default select example"
@@ -296,7 +294,7 @@ const SingleShop = () => {
                                     Đánh giá trung bình{" "}
                                   </option>
                                 </select>
-                              </div>
+                              </div> */}
                             </div>
                           </div>
                           <div className="row g-4 row-cols-xl-5 row-cols-lg-3 row-cols-2 row-cols-md-2 mt-2">
@@ -326,6 +324,9 @@ const SingleShop = () => {
                                                 height: "150px",
                                                 objectFit: "cover", // Giữ hình ảnh đúng tỉ lệ
                                               }}
+                                              onClick={() =>
+                                                setSelectedProduct(p)
+                                              }
                                             />
                                           </Link>
                                           <div className="card-product-action">
@@ -378,7 +379,9 @@ const SingleShop = () => {
                                             }}
                                           >
                                             <Link
-                                              to="#!"
+                                              onClick={() =>
+                                                setSelectedProduct(p)
+                                              }
                                               className="text-inherit text-decoration-none"
                                               title={p?.name} // Hiện tooltip khi hover
                                             >

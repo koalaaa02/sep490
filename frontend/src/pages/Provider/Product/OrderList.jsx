@@ -17,7 +17,7 @@ const OrderList = () => {
     "PACKAGING",
     "DELIVERING",
     "DELIVERED",
-    "LOST",
+    // "LOST",
   ];
 
   useEffect(() => {
@@ -145,12 +145,50 @@ const OrderList = () => {
                     onChange={(e) =>
                       handleStatusChange(order.id, e.target.value)
                     }
+                    disabled={order.status === "CANCELLED"}
                   >
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
+                    {(() => {
+                      let filteredOptions = [];
+
+                      if (
+                        order.status === "PENDING" ||
+                        order.status === "FINDINGTRUCK"
+                      ) {
+                        filteredOptions = [
+                          order.status,
+                          "ACCEPTED",
+                          "CANCELLED",
+                        ];
+                      } else if (order.status === "ACCEPTED") {
+                        filteredOptions = [
+                          "PACKAGING",
+                          "DELIVERING",
+                          "DELIVERED",
+                        ];
+                      } else if (
+                        order.status === "PACKAGING" ||
+                        order.status === "DELIVERING" ||
+                        order.status === "DELIVERED"
+                      ) {
+                        filteredOptions = [
+                          "PACKAGING",
+                          "DELIVERING",
+                          "DELIVERED",
+                        ];
+                      } else {
+                        filteredOptions = statusOptions;
+                      }
+
+                      return filteredOptions.map((status) => (
+                        <option
+                          key={status}
+                          value={status}
+                          disabled={status === order.status}
+                        >
+                          {status}
+                        </option>
+                      ));
+                    })()}
                   </select>
                 </td>
               </tr>
