@@ -8,11 +8,14 @@ import Swal from "sweetalert2";
 import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
 import image1 from "../../images/glass.jpg";
+import ShopProductDetail from "../Shop/ShopProductDetail";
+
 const SingleShop = () => {
   const [stores, setStores] = useState([]);
   const [product, setProduct] = useState([]);
   const [selectedSku, setSelectedSku] = useState(null);
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { shopId } = useParams();
 
   const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
@@ -182,7 +185,7 @@ const SingleShop = () => {
                       <div className="mb-8 bg-light rounded-3 d-lg-flex justify-content-lg-between">
                         <div className="align-self-center p-8">
                           <div className="mb-3">
-                            <h5 className="mb-4 fw-bold">{stores?.shopType}</h5>
+                            <h5 className="mb-4 fw-bold">{stores?.name}</h5>
                             <span className="fw-bold">
                               Chủ shop: {stores.manager?.name}
                             </span>
@@ -233,205 +236,180 @@ const SingleShop = () => {
                           />
                         </div>
                       </div>
-                      <div className="d-md-flex justify-content-between mb-3 align-items-center">
-                        <div>
-                          <p className="mb-3 mb-md-0">
-                            Có {stores.products?.length} sản phẩm
-                          </p>
-                        </div>
-                        <div className="d-flex justify-content-md-between align-items-center">
-                          <div className="me-2">
-                            {/* select option */}
-                            <select
-                              className="form-select"
-                              aria-label="Default select example"
-                            >
-                              <option selected>Show: 50</option>
-                              <option value={10}>10</option>
-                              <option value={20}>20</option>
-                              <option value={30}>30</option>
-                            </select>
-                          </div>
-                          <div>
-                            {/* select option */}
-                            <select
-                              className="form-select"
-                              aria-label="Default select example"
-                            >
-                              <option selected>Sort by: Featured</option>
-                              <option value="Low to High">
-                                Price: Low to High
-                              </option>
-                              <option value="High to Low">
-                                Price: High to Low
-                              </option>
-                              <option value="Release Date">Release Date</option>
-                              <option value="Avg. Rating">Avg. Rating</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
+
                       {/* row */}
-                      <div className="row g-4 row-cols-xl-5 row-cols-lg-3 row-cols-2 row-cols-md-2 mt-2">
-                        {stores?.products?.map((material, index) => {
-                          const isInWishlist = storedWishlist.some(
-                            (item) => item.id === material.id
-                          );
-                          return (
-                            <div key={index} className="col">
-                              {/* card */}
-                              <div className="card card-product">
-                                <div className="card-body">
-                                  {/* Badge */}
-                                  <div className="text-center position-relative">
-                                    {/* <div className="position-absolute top-0 start-0">
-                                      <span className="badge bg-danger">Hot</span>
-                                    </div> */}
-                                    <Link>
-                                      <img
-                                        src={image1}
-                                        alt={material.images}
-                                        className="mb-3 img-fluid"
-                                        style={{
-                                          width: "150px",
-                                          height: "150px",
-                                        }}
-                                      />
-                                    </Link>
-                                    {/* Action Buttons */}
-                                    <div className="card-product-action">
-                                      <Link
-                                        to="#!"
-                                        className="btn-action"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#ViewProduct"
-                                        onClick={() => getProduct(material.id)}
+                      {selectedProduct ? (
+                        <ShopProductDetail
+                          id={selectedProduct.id}
+                          onBack={() => setSelectedProduct(null)}
+                        />
+                      ) : (
+                        <>
+                          <div className="d-md-flex justify-content-between mb-3 align-items-center">
+                            <div>
+                              <p className="mb-3 mb-md-0">
+                                Có{" "}
+                                {
+                                  stores.products?.filter((p) => !p.delete)
+                                    .length
+                                }{" "}
+                                sản phẩm
+                              </p>
+                            </div>
+                            <div className="d-flex justify-content-md-between align-items-center">
+                              {/* <div className="me-2">
+                                <select
+                                  className="form-select"
+                                  aria-label="Default select example"
+                                >
+                                  <option selected>Show: 50</option>
+                                  <option value={10}>10</option>
+                                  <option value={20}>20</option>
+                                  <option value={30}>30</option>
+                                </select>
+                              </div> */}
+                              {/* <div>
+                                <select
+                                  className="form-select"
+                                  aria-label="Default select example"
+                                >
+                                  <option selected>
+                                    {" "}
+                                    Sắp xếp theo: Nổi bật{" "}
+                                  </option>
+                                  <option value="Low to High">
+                                    {" "}
+                                    Giá: Từ thấp đến cao{" "}
+                                  </option>
+                                  <option value="High to Low">
+                                    {" "}
+                                    Giá: Từ cao đến thấp{" "}
+                                  </option>
+                                  <option value="Release Date">
+                                    {" "}
+                                    Ngày phát hành{" "}
+                                  </option>
+                                  <option value="Avg. Rating">
+                                    {" "}
+                                    Đánh giá trung bình{" "}
+                                  </option>
+                                </select>
+                              </div> */}
+                            </div>
+                          </div>
+                          <div className="row g-4 row-cols-xl-5 row-cols-lg-3 row-cols-2 row-cols-md-2 mt-2">
+                            {stores?.products
+                              ?.filter((p) => !p.delete)
+                              ?.map((p, index) => {
+                                const isInWishlist = storedWishlist.some(
+                                  (item) => item.id === p.id
+                                );
+                                return (
+                                  <div key={index} className="col">
+                                    {/* card */}
+                                    <div className="card card-product">
+                                      <div
+                                        className="card-body d-flex flex-column justify-content-between"
+                                        style={{ height: "300px" }} // Đảm bảo chiều cao cố định
                                       >
-                                        <i
-                                          className="bi bi-eye"
-                                          data-bs-toggle="tooltip"
-                                          data-bs-html="true"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        onClick={
-                                          isInWishlist
-                                            ? null
-                                            : () => handleAddWishList(material)
-                                        }
-                                        className={`btn-action ${
-                                          isInWishlist
-                                            ? "disabled text-warning"
-                                            : ""
-                                        }`}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i
-                                          className={`bi ${
-                                            isInWishlist
-                                              ? "bi-heart-fill"
-                                              : "bi-heart"
-                                          }`}
-                                        />
-                                      </Link>
+                                        {/* Ảnh - Cố định kích thước */}
+                                        <div className="text-center position-relative">
+                                          <Link>
+                                            <img
+                                              src={p.images || image1}
+                                              alt={p.images}
+                                              className="mb-3 img-fluid"
+                                              style={{
+                                                width: "150px",
+                                                height: "150px",
+                                                objectFit: "cover", // Giữ hình ảnh đúng tỉ lệ
+                                              }}
+                                              onClick={() =>
+                                                setSelectedProduct(p)
+                                              }
+                                            />
+                                          </Link>
+                                          <div className="card-product-action">
+                                            <Link
+                                              className="btn-action"
+                                              onClick={() =>
+                                                setSelectedProduct(p)
+                                              }
+                                            >
+                                              <i
+                                                className="bi bi-eye"
+                                                title="Quick View"
+                                              />
+                                            </Link>
+                                            <Link
+                                              onClick={
+                                                isInWishlist
+                                                  ? null
+                                                  : () => handleAddWishList(p)
+                                              }
+                                              className={`btn-action ${
+                                                isInWishlist
+                                                  ? "disabled text-warning"
+                                                  : ""
+                                              }`}
+                                              data-bs-toggle="tooltip"
+                                              data-bs-html="true"
+                                              title="Wishlist"
+                                            >
+                                              <i
+                                                className={`bi ${
+                                                  isInWishlist
+                                                    ? "bi-heart-fill"
+                                                    : "bi-heart"
+                                                }`}
+                                              />
+                                            </Link>
+                                          </div>
+                                        </div>
+
+                                        {/* Thông tin sản phẩm */}
+                                        <div>
+                                          <h2
+                                            className="fs-6 text-truncate"
+                                            style={{
+                                              maxWidth: "100%", // Giữ trong vùng hiển thị
+                                              whiteSpace: "nowrap",
+                                              overflow: "hidden",
+                                              textOverflow: "ellipsis",
+                                            }}
+                                          >
+                                            <Link
+                                              onClick={() =>
+                                                setSelectedProduct(p)
+                                              }
+                                              className="text-inherit text-decoration-none"
+                                              title={p?.name} // Hiện tooltip khi hover
+                                            >
+                                              {p?.name}
+                                            </Link>
+                                          </h2>
+                                          <p
+                                            className="text-muted"
+                                            style={{
+                                              height: "40px",
+                                              overflow: "hidden",
+                                              display: "-webkit-box",
+                                              WebkitBoxOrient: "vertical",
+                                              WebkitLineClamp: 2,
+                                            }}
+                                            title={p.description}
+                                          >
+                                            {p.description}
+                                          </p>
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
-                                  {/* Heading */}
-                                  <div className="text-small mb-1"></div>
-                                  <h2 className="fs-6">
-                                    <Link
-                                      to="#!"
-                                      className="text-inherit text-decoration-none"
-                                    >
-                                      {material?.name}
-                                    </Link>
-                                    <br />
-                                    <small>{material.description}</small>
-                                    <br />
-                                    <small>{material.specifications}</small>
-                                  </h2>
-                                  <div>
-                                    <small className="text-warning">
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-fill" />
-                                      <i className="bi bi-star-half" />
-                                    </small>
-                                    <span className="text-muted small">
-                                      {" "}
-                                      4.5(149)
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      {/* row */}
-                      <div className="row mt-8">
-                        <div className="col">
-                          {/* nav */}
-                          <nav>
-                            <ul className="pagination">
-                              <li className="page-item disabled">
-                                <Link
-                                  className="page-link mx-1 rounded-3"
-                                  to="#"
-                                  aria-label="Previous"
-                                >
-                                  <i className="fa fa-chevron-left" />
-                                </Link>
-                              </li>
-                              <li className="page-item">
-                                <Link
-                                  className="page-link mx-1 rounded-3 active"
-                                  to="#"
-                                >
-                                  1
-                                </Link>
-                              </li>
-                              <li className="page-item">
-                                <Link
-                                  className="page-link mx-1 rounded-3 text-body"
-                                  to="#"
-                                >
-                                  2
-                                </Link>
-                              </li>
-                              <li className="page-item">
-                                <Link
-                                  className="page-link mx-1 rounded-3 text-body"
-                                  to="#"
-                                >
-                                  ...
-                                </Link>
-                              </li>
-                              <li className="page-item">
-                                <Link
-                                  className="page-link mx-1 rounded-3 text-body"
-                                  to="#"
-                                >
-                                  12
-                                </Link>
-                              </li>
-                              <li className="page-item">
-                                <Link
-                                  className="page-link mx-1 rounded-3 text-body"
-                                  to="#"
-                                  aria-label="Next"
-                                >
-                                  <i className="fa fa-chevron-right" />
-                                </Link>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
+                                );
+                              })}
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

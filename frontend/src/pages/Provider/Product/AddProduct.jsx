@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
   const token = localStorage.getItem("access_token");
+  const [categories, setCategories] = useState([]);
   const [product, setProduct] = useState({
     name: "",
     description: "",
@@ -10,10 +11,40 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     unit: "PCS",
     images: "string",
     active: false,
-    categoryId: 1,
+    categoryId: "",
     supplierId: 1,
     shopId: 1,
   });
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10,
+          sortBy: "id",
+          direction: "ASC",
+        });
+
+        const response = await fetch(
+          `${BASE_URL}/api/public/categories?${params.toString()}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const [productImages, setProductImages] = useState([]);
 
   const handleChange = (e) => {
@@ -55,7 +86,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         unit: "PCS",
         images: "",
         active: true,
-        categoryId: 1,
+        categoryId: "",
         supplierId: 1,
         shopId: 1,
       }));
@@ -85,7 +116,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
   const handleCancel = () => {
     setProduct({
       name: "",
-      categoryId: 1,
+      categoryId: "",
       quantity: 0,
       unit: "PCS",
       price: "",
@@ -103,7 +134,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
   return (
     <div className="p-3 mb-10">
-      <h2 className="mb-3">Thêm sản phẩm mới</h2>
+      <h3 className="mb-3">Thêm sản phẩm mới</h3>
       <div className="border p-3 rounded">
         {/* Hình ảnh sản phẩm */}
         <div className="mb-3">
@@ -163,27 +194,22 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
           </div>
           <div className="col-md-6">
             <label className="form-label fw-bold">Phân loại:</label>
-            <input
-              type="text"
+            <select
               className="form-control"
-              name="category"
-              value="Gạch ốp lát"
-              readOnly
-            />
+              name="categoryId"
+              onChange={handleChange}
+              // value={product.categoryId}
+            >
+              {categories?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
         <div className="row mb-3">
-          <div className="col-md-6">
-            <label className="form-label fw-bold">Số lượng:</label>
-            <input
-              type="number"
-              className="form-control"
-              name="quantity"
-              value={product.quantity}
-              onChange={handleChange}
-            />
-          </div>
           <div className="col-md-6">
             <label className="form-label fw-bold">Đơn vị:</label>
             <select

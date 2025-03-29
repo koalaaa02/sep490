@@ -104,10 +104,8 @@ const ProductList = ({ setSelectedProductId }) => {
             <th>ID</th>
             <th>Tên sản phẩm</th>
             <th>Mô tả</th>
-            <th>Danh mục</th>
+            <th>Thông số kỹ thuật</th>
             <th>Đơn vị</th>
-            <th>Tồn kho</th>
-            <th>Giá bán</th>
             <th></th>
           </tr>
         </thead>
@@ -125,8 +123,6 @@ const ProductList = ({ setSelectedProductId }) => {
                 </td>
                 <td>{product.specifications}</td>
                 <td>{product.unit}</td>
-                <td>1</td>
-                <td>2</td>
                 <td>
                   <FaEye
                     className="mx-1 text-primary"

@@ -87,9 +87,12 @@ const SidebarComponent = ({ setSelectedComponent }) => {
           </button>
           {openDropdown === "order" && (
             <div className="dropdown-menu show">
-              <Link className="dropdown-item" to="#">
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("OrderList")}
+              >
                 Danh sách đặt hàng
-              </Link>
+              </button>
             </div>
           )}
         </li>
@@ -127,10 +130,16 @@ const SidebarComponent = ({ setSelectedComponent }) => {
 
         {/* Chat */}
         <li>
-          <Link className="nav-link" to="#">
+          <button
+            className="nav-link"
+            onClick={() => {
+              setSelectedComponent("ChatBox");
+              toggleDropdown("chat");
+            }}
+          >
             <HiChatBubbleBottomCenterText size={30} className="ms-1" /> Trò
             chuyện
-          </Link>
+          </button>
         </li>
       </ul>
     </div>

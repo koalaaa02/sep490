@@ -6,6 +6,8 @@ import ProductList from "./Product/ProductList";
 import ProductDetail from "./Product/ProductDetail";
 import AddProduct from "./Product/AddProduct";
 import ProviderDashBoardDetail from "./ProviderDashboar/ProviderDashBoardDetail.tsx";
+import OrderList from "./Product/OrderList";
+import ChatBox from "./Chat/ChatBox";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState(
@@ -39,6 +41,10 @@ const ProviderDashBoard = () => {
         return <ProductList setSelectedProductId={setSelectedProductId} />;
       case "AddProduct":
         return <AddProduct />;
+      case "OrderList":
+        return <OrderList />;
+      case "ChatBox":
+        return <ChatBox />;
       default:
         return <InvoiceManagement />;
     }
