@@ -35,13 +35,8 @@ const AdminCate = () => {
     const fetchData = async () => {
       try {
         const params = new URLSearchParams({
-<<<<<<< HEAD
           page: currentPage.toString(),
           size: itemsPerPage.toString(),
-=======
-          page: currentPage,
-          size: itemsPerPage,
->>>>>>> 30de9657f726ccce5063bc84f3bcca787fe6cf9e
           sortBy: "id",
           direction: "ASC",
         });

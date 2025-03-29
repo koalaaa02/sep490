@@ -56,7 +56,6 @@ const ProviderNearlyOutOfStock = () => {
 
     fetchData();
   }, [token]);
-console.log(inventoryData);
 
   const inventoryCount = inventoryData.length;
 
