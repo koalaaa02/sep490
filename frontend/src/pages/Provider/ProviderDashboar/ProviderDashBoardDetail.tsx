@@ -8,7 +8,7 @@ import { Row, Col } from "react-bootstrap";
 
 const ProviderDashBoardDetail = () => {
   return (
-    <div className="w-100">
+    <div className="w-100 mt-3">
       <Row>
         <Col>
           <TopSellingProduct />

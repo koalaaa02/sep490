@@ -61,7 +61,7 @@ const TopSellingProduct = () => {
     labels: Object.keys(data),
     datasets: [
       {
-        label: "Quantity Sold",
+        label: "Số lượng đã bán",
         data: Object.values(data),
         backgroundColor: [
           "rgba(255, 99, 132, 0.7)",
@@ -90,7 +90,7 @@ const TopSellingProduct = () => {
       },
       title: {
         display: true,
-        text: "Top Selling Products",
+        text: "Top sản phẩm đã bán",
         font: {
           size: 18,
         },
@@ -101,13 +101,13 @@ const TopSellingProduct = () => {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Quantity Sold",
+          text: "Số lượng đã bán",
         },
       },
       x: {
         title: {
           display: true,
-          text: "Product Names",
+          text: "Tên sản phẩm",
         },
       },
     },
@@ -116,11 +116,11 @@ const TopSellingProduct = () => {
   return (
     <div className="p-4 bg-white rounded shadow-sm">
       <div className="mb-4">
-        <h3 className="mb-3">Top Selling Products</h3>
+        <h3 className="mb-3">Top Sản phẩm bán được</h3>
         <div className="row g-3">
-          <div className="col-md-3">
+          <div className="col-md-6">
             <label htmlFor="limit" className="form-label">
-              Number of Products
+              Số lượng sản phẩm
             </label>
             <input
               type="number"
@@ -132,18 +132,18 @@ const TopSellingProduct = () => {
               onChange={(e) => setLimit(parseInt(e.target.value))}
             />
           </div>
-          <div className="col-md-3 d-flex align-items-end">
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
+          <div className="col-md-6 d-flex align-items-end">
+            <div className="form-group">
+              <label htmlFor="isMostSold">Thứ tự</label>
+              <select
+                className="form-select"
                 id="isMostSold"
-                checked={isMostSold}
-                onChange={(e) => setIsMostSold(e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="isMostSold">
-                Show Most Sold
-              </label>
+                value={isMostSold ? "true" : "false"}
+                onChange={(e) => setIsMostSold(e.target.value === "true")}
+              >
+                <option value="true">Nhiều nhất</option>
+                <option value="false">Ít nhất</option>
+              </select>
             </div>
           </div>
         </div>

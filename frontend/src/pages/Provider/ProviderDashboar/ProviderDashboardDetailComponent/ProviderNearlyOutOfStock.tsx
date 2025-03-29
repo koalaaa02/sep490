@@ -29,7 +29,10 @@ interface InventoryItem {
 
 const ProviderNearlyOutOfStock = () => {
   const token = localStorage.getItem("access_token");
-  const [inventoryData, setInventoryData] = useState<InventoryItem[]>([]);
+  const [inventoryData, setInventoryData] = useState<InventoryItem[] | null>(
+    null
+  );
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -48,16 +51,29 @@ const ProviderNearlyOutOfStock = () => {
         );
 
         const result = await response.json();
-        setInventoryData(result);
+
+        if (Array.isArray(result)) {
+          setInventoryData(result);
+          setErrorMessage(null);
+        } else if (result.message) {
+          // Handle case where API returns a message instead of array
+          setInventoryData([]);
+          setErrorMessage(result.message);
+        } else {
+          setInventoryData([]);
+          setErrorMessage("No nearly out-of-stock items found");
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
+        setInventoryData([]);
+        setErrorMessage("Failed to fetch inventory data");
       }
     };
 
     fetchData();
   }, [token]);
 
-  const inventoryCount = inventoryData.length;
+  const inventoryCount = inventoryData?.length || 0;
 
   return (
     <>
@@ -67,7 +83,7 @@ const ProviderNearlyOutOfStock = () => {
         onClick={() => setShowModal(true)}
         style={{ cursor: "pointer" }}
       >
-        <span className="fw-bold">Nearly Out Of Stock</span>
+        <span className="fw-bold">Sản phẩm sắp hết hàng</span>
         <Badge pill bg="warning">
           {inventoryCount}
         </Badge>
@@ -75,7 +91,7 @@ const ProviderNearlyOutOfStock = () => {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Nearly Out Of Stock Products</Modal.Title>
+          <Modal.Title>Sản phầm tồn kho sắp hết</Modal.Title>
         </Modal.Header>
         <Modal.Body
           style={{
@@ -84,65 +100,67 @@ const ProviderNearlyOutOfStock = () => {
             paddingTop: 0,
           }}
         >
-          <div className="table-responsive">
-            <Table striped bordered hover>
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Product</th>
-                  <th>SKU</th>
-                  <th>Stock</th>
-                  <th>Price</th>
-                  {/* <th>Status</th> */}
-                </tr>
-              </thead>
-              <tbody>
-                {inventoryData?.map((item, index) => (
-                  <tr key={item.id}>
-                    <td>{index + 1}</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <Image
-                          src={item.images || item.product.images}
-                          thumbnail
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            objectFit: "cover",
-                          }}
-                          className="me-2"
-                          onError={(
-                            e: React.SyntheticEvent<HTMLImageElement, Event>
-                          ) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "https://via.placeholder.com/50";
-                          }}
-                        />
-                        <div>
-                          <div className="fw-bold">{item.product.name}</div>
-                          <small className="text-muted">{item.skuCode}</small>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{item.skuCode}</td>
-                    <td>{item.stock}</td>
-                    <td>${item.sellingPrice.toFixed(2)}</td>
-                    {/* <td>
-                      {item.stock > 0 ? (
-                        <Badge bg="warning">Low Stock</Badge>
-                      ) : (
-                        <Badge bg="danger">Out of Stock</Badge>
-                      )}
-                    </td> */}
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
+          {errorMessage ? (
+            <Alert variant="info">{errorMessage}</Alert>
+          ) : (
+            <div className="table-responsive">
+              {inventoryData && inventoryData.length > 0 ? (
+                <Table striped bordered hover>
+                  <thead className="table-dark">
+                    <tr>
+                      <th>#</th>
+                      <th>Sản phẩm</th>
+                      <th>SKU</th>
+                      <th>Tồn kho</th>
+                      <th>Giá</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inventoryData.map((item, index) => (
+                      <tr key={item.id}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <div className="d-flex align-items-center">
+                            <Image
+                              src={item.images || item.product.images}
+                              thumbnail
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                              }}
+                              className="me-2"
+                              onError={(
+                                e: React.SyntheticEvent<HTMLImageElement, Event>
+                              ) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = "https://via.placeholder.com/50";
+                              }}
+                            />
+                            <div>
+                              <div className="fw-bold">{item.product.name}</div>
+                              <small className="text-muted">
+                                {item.skuCode}
+                              </small>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{item.skuCode}</td>
+                        <td>{item.stock}</td>
+                        <td>${item.sellingPrice.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <Alert variant="info">Không có hàng tồn kho sắp hết</Alert>
+              )}
+            </div>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
+            Đóng
           </Button>
         </Modal.Footer>
       </Modal>

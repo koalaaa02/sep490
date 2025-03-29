@@ -44,7 +44,7 @@ const ProviderInventory = () => {
         onClick={() => setShowModal(true)}
         style={{ cursor: "pointer" }}
       >
-        <span className="fw-bold">Inventory</span>
+        <span className="fw-bold">Hàng tồn kho</span>
         <Badge pill bg="primary">
           {inventoryCount}
         </Badge>
@@ -52,7 +52,7 @@ const ProviderInventory = () => {
 
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Inventory Details</Modal.Title>
+          <Modal.Title>Chi tiết hàng tồn kho</Modal.Title>
         </Modal.Header>
         <Modal.Body
           style={{
@@ -66,9 +66,9 @@ const ProviderInventory = () => {
               <thead className="table-dark">
                 <tr>
                   <th>#</th>
-                  <th>Product Name</th>
-                  <th>Quantity</th>
-                  <th>Status</th>
+                  <th>Tên sản phẩm</th>
+                  <th>Số lượng</th>
+                  <th>Trạng thái</th>
                 </tr>
               </thead>
               <tbody>
@@ -80,9 +80,9 @@ const ProviderInventory = () => {
                       <td>{quantity.toLocaleString()}</td>
                       <td>
                         {quantity > 0 ? (
-                          <Badge bg="success">In Stock</Badge>
+                          <Badge bg="success">Còn</Badge>
                         ) : (
-                          <Badge bg="danger">Out of Stock</Badge>
+                          <Badge bg="danger">Đã hết</Badge>
                         )}
                       </td>
                     </tr>
@@ -94,7 +94,7 @@ const ProviderInventory = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
+            Đóng
           </Button>
         </Modal.Footer>
       </Modal>

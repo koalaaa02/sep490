@@ -65,7 +65,7 @@ const ProviderPeriod = () => {
     labels: Object.keys(data).map((day) => `${day}/${month}`),
     datasets: [
       {
-        label: "Number of Orders",
+        label: "Số đơn",
         data: Object.values(data),
         borderColor: "rgb(75, 192, 192)",
         backgroundColor: "rgba(75, 192, 192, 0.5)",
@@ -83,7 +83,7 @@ const ProviderPeriod = () => {
       },
       title: {
         display: true,
-        text: `Orders Made in ${month}/${year}`,
+        text: `Số đơn trong ${month}/${year}`,
         font: {
           size: 18,
         },
@@ -94,13 +94,13 @@ const ProviderPeriod = () => {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Number of Orders",
+          text: "Số lượng đơn",
         },
       },
       x: {
         title: {
           display: true,
-          text: "Date",
+          text: "Ngày",
         },
       },
     },
@@ -114,11 +114,11 @@ const ProviderPeriod = () => {
   return (
     <div className="p-4 w-100 bg-white rounded shadow-sm">
       <div className="mb-4">
-        <h3 className="mb-3">Daily Order Statistics</h3>
+        <h3 className="mb-3">Số liệu đơn theo ngày</h3>
         <div className="row g-3">
           <div className="col-md-3">
             <label htmlFor="month" className="form-label">
-              Month
+              Tháng
             </label>
             <select
               id="month"
@@ -135,7 +135,7 @@ const ProviderPeriod = () => {
           </div>
           <div className="col-md-3">
             <label htmlFor="year" className="form-label">
-              Year
+              Năm
             </label>
             <select
               id="year"
