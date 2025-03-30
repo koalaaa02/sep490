@@ -14,20 +14,20 @@ const Admin = () => {
     switch (active) {
       case "Dashboard":
         return <AdminDashboard />;
-      case "Categories":
+      case "Phân loại":
         return <AdminCate />;
-      case "Products":
+      case "Sản phẩm":
         return <AdminProd />;
-      // case "Dealers":
+      // case "Khách hàng":
       //   return <AdminDealer />;
-      case "Shops":
+      case "Cửa hàng":
         return <AdminProvider />;
       default:
         return <AdminDashboard />;
     }
   };
   return (
-    <Row className="w-100 vh-100">
+    <Row className="mx-3">
       <Col md={3} lg={2} className="bg-light ">
         <AdminSideBar active={active} setActive={setActive} />
       </Col>

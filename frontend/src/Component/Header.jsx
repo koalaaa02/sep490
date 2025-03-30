@@ -26,6 +26,7 @@ const Header = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
+    window.location.reload();
   };
 
   const [categories, setCategories] = useState([]);

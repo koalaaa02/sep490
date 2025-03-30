@@ -3,7 +3,17 @@ const OrderDetail = ({ order }) => {
   const totalSum = order.products.reduce((sum, product) => {
     return sum + product.price * product.quantity;
   }, 0);
-
+  console.log(order);
+  const statusTab = {
+    PENDING: "Đang chờ",
+    ACCEPTED: "Đã chấp nhận",
+    PACKAGING: "Đóng gói",
+    FINDINGTRUCK: "Tìm xe tải",
+    DELIVERING: "Đang giao",
+    DELIVERED: "Đã giao",
+    LOST: "Mất hàng",
+    CANCELLED: "Đã hủy",
+  };
   return (
     <div className="d-flex p-2 border  mt-2 mb-5 rounded shadow-sm">
       <div className="order-info w-75 ">
@@ -47,7 +57,6 @@ const OrderDetail = ({ order }) => {
                   </td>
                   <td className=" w-20 text-center">
                     <input
-                      // width={10}
                       className="w-50 text-right"
                       type="number"
                       value={p.quantity}
@@ -71,7 +80,7 @@ const OrderDetail = ({ order }) => {
               {totalSum.toLocaleString()}
             </div>
           </div>
-          <div className={`my-3 ${order.badgeClass} py-2 rounded mx-auto w-60`}>
+          <div className={`my-3  py-2 rounded mx-auto w-60`}>
             {" "}
             Chờ xét duyệt
           </div>

@@ -5,11 +5,14 @@ import AddInvoice from "./Invoice/AddInvoice";
 import ProductList from "./Product/ProductList";
 import ProductDetail from "./Product/ProductDetail";
 import AddProduct from "./Product/AddProduct";
+import ProviderDashBoardDetail from "./ProviderDashboar/ProviderDashBoardDetail.tsx";
 import OrderList from "./Product/OrderList";
 import ChatBox from "./Chat/ChatBox";
 
 const ProviderDashBoard = () => {
-  const [selectedComponent, setSelectedComponent] = useState("ProductList");
+  const [selectedComponent, setSelectedComponent] = useState(
+    "ProviderDashBoardDetail"
+  );
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   const handleSidebarClick = (component) => {
@@ -28,6 +31,8 @@ const ProviderDashBoard = () => {
     }
 
     switch (selectedComponent) {
+      case "ProviderDashBoardDetail":
+        return <ProviderDashBoardDetail />;
       case "InvoiceManagement":
         return <InvoiceManagement />;
       case "AddInvoice":
