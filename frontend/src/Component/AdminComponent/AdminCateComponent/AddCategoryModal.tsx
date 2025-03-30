@@ -53,7 +53,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
   return (
     <Modal show={show} onHide={onHide}>
       <Modal.Header closeButton>
-        <Modal.Title>Add Category</Modal.Title>
+        <Modal.Title>Thêm phân loại mới</Modal.Title>
       </Modal.Header>
       <form onSubmit={handleSubmit}>
         <Modal.Body>
@@ -80,12 +80,12 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
 
           {hasParent && (
             <Form.Group className="mb-3">
-              <Form.Label>Parent Category</Form.Label>
+              <Form.Label>Danh mục cha</Form.Label>
               <Form.Select
                 value={parentCategoryId || ""}
                 onChange={(e) => setParentCategoryId(Number(e.target.value))}
               >
-                <option value="">Select Category</option>
+                <option value="">Chọn phân loại</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -97,14 +97,14 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={onHide}>
-            Close
+            Đóng
           </Button>
           <Button
             variant="primary"
             type="submit"
             disabled={!name || (hasParent && !parentCategoryId)}
           >
-            Save
+            Lưu
           </Button>
         </Modal.Footer>
       </form>
