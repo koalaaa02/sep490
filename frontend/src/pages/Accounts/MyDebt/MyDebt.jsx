@@ -7,15 +7,16 @@ import { AiOutlineShoppingCart } from "react-icons/ai";
 import classNames from "classnames";
 import CheckoutForm from "../../../Component/MyDebt/CheckoutForm";
 import { BASE_URL } from "../../../Utils/config";
+import { format } from "date-fns";
 const DebtOrder = ({ item, activeShop, setActiveShop, orders }) => {
   return (
     <div
       className={styles.debtOrderCard}
       onClick={() => {
-        if (item?.id === activeShop) {
+        if (item === activeShop) {
           setActiveShop(null);
         } else {
-          setActiveShop(item?.id);
+          setActiveShop(item);
         }
       }}
     >
@@ -33,53 +34,52 @@ const DebtOrder = ({ item, activeShop, setActiveShop, orders }) => {
           <AiOutlineShoppingCart />
           {item?.shopName}
         </div>
-        <input type="checkbox" checked={item?.id === activeShop} />
+        <input type="checkbox" checked={item?.shopId === activeShop?.shopId} />
       </div>
-      {item?.id === activeShop && (
+      {item?.shopId === activeShop?.shopId && (
         <>
-          {orders?.map((o, index) => (
-            <div className={styles.itemCard} key={index}>
-              <img src={o?.itemImage} alt="" />
-              <div className={styles.infoCard}>
-                <div className="d-flex flex-column fw-bold">
-                  <span>{o?.orderName}</span>
-                  {/* <span>50kg/1 bao</span> */}
-                </div>
-                <div className={classNames(styles.middlePart)}>
-                  <span>
-                    {Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(o?.price)}
-                    /1 lần
-                  </span>
-                  <input
-                    className="inputNumber"
-                    min="1"
-                    disabled
-                    value={o?.amount}
-                    defaultValue="1"
-                  />
-                </div>
-                <span>
-                  {Intl.NumberFormat("vi-VN", {
-                    style: "currency",
-                    currency: "VND",
-                  }).format(o?.amount * o?.price)}
-                </span>
-              </div>
-            </div>
-          ))}
-          <div className="d-flex justify-content-between align-items-center">
-            <span className="fw-bold">Tổng tiền nợ của đơn hàng</span>
+          <table className={styles.shopDebtDetail}>
+            <thead>
+              <th className="col-4">Thời gian giao dịch</th>
+              <th className="col-4">Tổng nợ</th>
+              <th className="col-4">Số tiền còn nợ</th>
+            </thead>
+            <tbody>
+              {orders
+                ?.filter((o) => o?.status !== "PAID")
+                ?.map((o) => (
+                  <tr className={styles.itemCard} key={o?.id}>
+                    <td className="fw-bold">
+                      {format(new Date(o?.createdAt), "dd-MM-yyyy")}
+                    </td>
+                    <td>
+                      {Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(o?.totalAmount)}
+                    </td>
+                    <td className="text-danger">
+                      {Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(o?.totalAmount - o?.paidAmount)}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          <div className="d-flex justify-content-between alig n-items-center">
+            <span className="fw-bold">Tổng tiền còn nợ của đơn hàng</span>
             <span>
               {Intl.NumberFormat("vi-VN", {
                 style: "currency",
                 currency: "VND",
               }).format(
-                orders?.reduce((acc, index) => {
-                  return acc + index?.price * index?.amount;
-                }, 0)
+                orders
+                  ?.filter((o) => o?.status !== "PAID")
+                  ?.reduce((acc, index) => {
+                    return acc + (index?.totalAmount - index?.paidAmount);
+                  }, 0)
               )}
             </span>
           </div>
@@ -93,8 +93,9 @@ const MyDebt = () => {
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [activeShop, setActiveShop] = useState(null);
+  const [shops, setShops] = useState([]);
   const [orders, setOrders] = useState([]);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -110,7 +111,7 @@ const MyDebt = () => {
           }
         );
         const result = await response.json();
-        console.log(result);
+        setShops(result);
       } catch (error) {
         console.error("Lỗi khi fetch dữ liệu:", error);
       }
@@ -122,51 +123,32 @@ const MyDebt = () => {
     }, 1500);
   }, []);
 
-  const shops = [
-    {
-      id: 1,
-      shopName: "shop1",
-    },
-    {
-      id: 2,
-      shopName: "shop2",
-    },
-    {
-      id: 3,
-      shopName: "shopDunk",
-    },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/dealer/GetInvoicesByShopId/${activeShop?.shopId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        console.log(result);
+        setOrders(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
 
-  const activeShopOrders = [
-    {
-      orderName: "Xi măng 50kg/1 bao",
-      amount: 2,
-      price: 1500000,
-      itemImage:
-        "https://i.pcmag.com/imagery/reviews/00xBy0JjVybodfIwWxeGCkZ-1.fit_lim.size_1050x591.v1679417407.jpg",
-    },
-    {
-      orderName: "Cát xây dựng 1m3",
-      amount: 5,
-      price: 800000,
-      itemImage:
-        "https://cdn.mos.cms.futurecdn.net/uPALkW3UzvgE6FhMy3nCzD-1200-80.png",
-    },
-    {
-      orderName: "Gạch xây dựng loại 10x20",
-      amount: 50,
-      price: 5000,
-      itemImage:
-        "https://i.pcmag.com/imagery/reviews/00xBy0JjVybodfIwWxeGCkZ-1.fit_lim.size_1050x591.v1679417407.jpg",
-    },
-    {
-      orderName: "Đá 1x2 1m3",
-      amount: 3,
-      price: 900000,
-      itemImage:
-        "https://cdn.mos.cms.futurecdn.net/uPALkW3UzvgE6FhMy3nCzD-1200-80.png",
-    },
-  ];
+    if (activeShop?.shopId) {
+      fetchData();
+    }
+  }, [activeShop?.shopId]);
 
   return (
     <div>
@@ -231,15 +213,16 @@ const MyDebt = () => {
                                   Các đơn hàng đang còn nợ
                                 </h5>
                                 <div className={styles.itemsList}>
-                                  {shops?.map((i, index) => (
-                                    <DebtOrder
-                                      item={i}
-                                      key={i?.id}
-                                      activeShop={activeShop}
-                                      orders={activeShopOrders}
-                                      setActiveShop={setActiveShop}
-                                    />
-                                  ))}
+                                  {shops?.length > 0 &&
+                                    shops?.map((i) => (
+                                      <DebtOrder
+                                        item={i}
+                                        key={i?.shopId}
+                                        activeShop={activeShop}
+                                        orders={orders}
+                                        setActiveShop={setActiveShop}
+                                      />
+                                    ))}
                                 </div>
                               </div>
                             </div>
@@ -256,30 +239,31 @@ const MyDebt = () => {
                                 <p>Số tiền cần thanh toàn</p>
                                 <p
                                   className={classNames(
-                                    !activeShop && "text-danger",
+                                    !activeShop?.shopId && "text-danger",
                                     styles.totalPrice
                                   )}
                                 >
-                                  {activeShop
+                                  {activeShop?.shopId
                                     ? Intl.NumberFormat("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
                                       }).format(
-                                        activeShopOrders?.reduce(
-                                          (acc, index) => {
+                                        orders
+                                          ?.filter((o) => o?.status !== "PAID")
+                                          ?.reduce((acc, index) => {
                                             return (
-                                              acc + index?.price * index?.amount
+                                              acc +
+                                              (index?.totalAmount -
+                                                index?.paidAmount)
                                             );
-                                          },
-                                          0
-                                        )
+                                          }, 0)
                                       )
                                     : "Please choose a shop "}
                                 </p>
                               </div>
                               <div className="d-flex justify-content-center">
                                 <button
-                                  disabled={!activeShopOrders}
+                                  disabled={!activeShop}
                                   className={classNames(
                                     "bg-black text-white",
                                     styles.cashOutButton
@@ -303,6 +287,8 @@ const MyDebt = () => {
         <CheckoutForm
           showModal={showModal}
           handleCloseModal={() => setShowModal(false)}
+          shop={activeShop}
+          orders={orders}
         />
       </>
     </div>
