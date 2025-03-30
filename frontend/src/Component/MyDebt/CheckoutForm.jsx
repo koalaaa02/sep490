@@ -2,9 +2,60 @@ import classNames from "classnames";
 import styles from "./styles.module.css";
 import storeImg from "../../images/stores-logo-1.svg";
 import { CiWarning } from "react-icons/ci";
-const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
-  console.log(showModal);
+import { useEffect, useState } from "react";
+import { BASE_URL } from "../../Utils/config";
+import PaymentMethods from "../PaymentMethod";
+import { useSelector } from "react-redux";
+const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
+  const token = localStorage.getItem("access_token");
+  const bankCode = useSelector((state) => state.purchase.bank);
+  const [amount, setAmount] = useState(
+    orders
+      ?.filter((o) => o?.status !== "PAID")
+      ?.reduce((acc, index) => {
+        return acc + index?.totalAmount;
+      }, 0)
+  );
+  const [payMode, setPayMode] = useState("payAll");
+  useEffect(() => {
+    if (payMode === "payAll") {
+      setAmount(
+        orders
+          ?.filter((o) => o?.status !== "PAID")
+          ?.reduce((acc, index) => {
+            return acc + index?.totalAmount;
+          }, 0)
+      );
+    } else {
+      setAmount(0);
+    }
+  }, [payMode]);
 
+  const pay = async () => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/v1/payment/pay?${new URLSearchParams({
+          paymentProvider: "VNPAY",
+          paymentType: "INVOICE",
+          amount: amount,
+          bankCode: bankCode,
+          referenceId: shop?.shopId,
+        })}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      window.location.href = result?.paymentUrl;
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu:", error);
+    }
+  };
   return (
     <>
       <div
@@ -33,112 +84,14 @@ const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
               </button>
             </div>
             <div className={"modal-body d-flex flex-column gap-3"}>
-              <div
-                className={classNames(
-                  "d-flex align-items-center justify-content-between",
-                  styles.info
-                )}
-              >
-                <div className="d-flex flex-column">
-                  <div
-                    className={classNames("d-flex align-items-center gap-3")}
-                  >
-                    <span>Nguyen Van A</span>
-                    <span>|</span>
-                    <>
-                      <span>03759931455</span>
-                      <span className={styles.defaultTag}>Mặc định</span>
-                    </>
-                  </div>
-                  <span className={styles.extraInfo}>
-                    Khu 3, xã Hoàng Chương.
-                  </span>
-                  <span className={styles.extraInfo}>
-                    Huyện Thanh Ba, Tỉnh Phú Thọ
-                  </span>
-                </div>
-                <button className={styles.changeInfo}>Thay đổi</button>
-              </div>
-
-              <div className={styles.order}>
-                <div className="d-flex align-items-center gap-3 fw-bold">
-                  <img
-                    className="rounded-5"
-                    src={storeImg}
-                    width={50}
-                    height={50}
-                    alt=""
-                  />
-                  <span>Công Ty ABC</span>
-                </div>
-                <table>
-                  <thead>
-                    <tr className={styles.tbleHeader}>
-                      <th class="col-5">Sản phẩm</th>
-                      <th class="col-3">Đơn giá</th>
-                      <th class="col-1">Số lượng</th>
-                      <th class="col-3">Thành tiền</th>
-                    </tr>
-                  </thead>
-                  <tbody className="fw-normal">
-                    {Array.from({ length: 3 }).map((_, index) => (
-                      <tr className={styles.item} key={index}>
-                        <td className="d-flex gap-3">
-                          <img
-                            className="rounded-3"
-                            src={storeImg}
-                            width={80}
-                            height={80}
-                            alt=""
-                          />
-                          <div className="d-flex flex-column">
-                            <span>Xi măng ABC</span>
-                            <span>50kg/1 bao</span>
-                          </div>
-                        </td>
-                        <td>
-                          {Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(1650000)}{" "}
-                          / 1 lần
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            name="amount"
-                            min="0"
-                            defaultValue={1}
-                          />
-                        </td>
-                        <td>
-                          {Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(1650000)}{" "}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="d-flex align-items-start">
-                <span className="fw-bold">Lời nhắn</span>
-                <textarea
-                  class="form-control"
-                  id="exampleFormControlTextarea1"
-                  rows="3"
-                ></textarea>
-              </div>
-              <div className="d-flex flex-column gap-4 col-8">
+              <div className="d-flex flex-column gap-4 col-12">
                 <div className="d-flex align-items-center gap-3">
                   <div className="d-flex align-items-center gap-3">
                     <span className="fw-bold">Số tiền nợ</span>
                     <span
                       className={classNames(styles.textCard, styles.debtTo)}
                     >
-                      CongTyABC
+                      {shop?.shopName}
                     </span>
                   </div>
                   <div className="d-flex align-items-center gap-3 flex-grow-1">
@@ -155,13 +108,18 @@ const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
                   </div>
                 </div>
                 <div className="d-flex align-items-center gap-3">
-                  <span className="fw-bold">Tiền đơn hàng</span>
+                  <span className="fw-bold">Tổng Tiền Nợ</span>
                   <span className={classNames(styles.textCard, "flex-grow-1")}>
                     {Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(3300000)}{" "}
-                    VND
+                    }).format(
+                      orders
+                        ?.filter((o) => o?.status !== "PAID")
+                        ?.reduce((acc, index) => {
+                          return acc + index?.totalAmount;
+                        }, 0)
+                    )}
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-3">
@@ -170,15 +128,26 @@ const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
                     {Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(3200000)}{" "}
-                    VND
+                    }).format(
+                      orders
+                        ?.filter((o) => o?.status !== "PAID")
+                        ?.reduce((acc, index) => {
+                          return acc + index?.paidAmount;
+                        }, 0)
+                    )}
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">Trạng thái</span>
-                  <span className={classNames(styles.textCard, "flex-grow-1")}>
-                    Tôi muốn thanh toán khoản nợ
-                  </span>
+                  <select
+                    className={classNames(styles.textCard, "flex-grow-1")}
+                    onChange={(e) => {
+                      setPayMode(e?.target?.value);
+                    }}
+                  >
+                    <option value="payAll">Tôi muốn thanh toán khoản nợ</option>
+                    <option value="payPart">Tôi muốn một phần nợ</option>
+                  </select>
                 </div>
               </div>
               <div className="d-flex align-items-center">
@@ -188,7 +157,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
                 <div
                   className={classNames(styles.warningMessage, "flex-grow-1")}
                 >
-                  Hãy nhập số tiền muón thanh toán cho khoản nợ
+                  Hãy nhập số tiền muốn thanh toán cho khoản nợ
                 </div>
               </div>
               <div className="d-flex flex-column gap-4 col-12">
@@ -197,27 +166,34 @@ const CheckoutForm = ({ showModal, handleCloseModal, data }) => {
                   <input
                     type="number"
                     className="flex-grow-1"
-                    defaultValue={300000}
+                    value={amount}
+                    disabled={payMode === "payAll"}
+                    onChange={(e) => {
+                      setAmount(e?.target?.value);
+                    }}
                   />
                 </div>
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">
-                    Số tiền nợ còn lại của đơn hàng
+                    Số tiền nợ còn lại của đơn hàng sau khi thanh toán
                   </span>
                   <span className={classNames(styles.textCard, "flex-grow-1")}>
                     {Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(100000)}
+                    }).format(100000 - amount)}
                   </span>
                 </div>
               </div>
             </div>
+            <PaymentMethods />
             <div className="modal-footer">
               <button
                 type="button"
                 className="btn btn-primary"
-                onClick={handleCloseModal}
+                onClick={() => {
+                  pay();
+                }}
               >
                 Thanh Toán
               </button>
