@@ -379,7 +379,7 @@ const Header = () => {
                 </div>
               </li>
               <li className="nav-item dmenu dropdown ml-3">
-                <Link
+                {/* <Link
                   className="text-muted position-relative"
                   data-bs-toggle="offcanvas"
                   data-bs-target="#offcanvasRight"
@@ -408,7 +408,7 @@ const Header = () => {
                       0
                     )}
                   </span>
-                </Link>
+                </Link> */}
                 {role === "ROLE_PROVIDER" && (
                   <Link
                     className="text-muted position-relative"

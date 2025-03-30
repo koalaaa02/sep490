@@ -29944,8 +29944,22 @@ background-color: #f3f6ff;
 }
 .chat {
   position: fixed;
-  bottom: 25px;
+  bottom: 20px;
   right: 20px;
-  padding: 10px 20px;
-  font-size: 20px;
+  width: 750px; 
+  height: 450px; 
+  padding: 10px;
+  font-size: 16px; 
+  z-index: 99999;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease-in-out;
 }
+.chat.collapsed {
+  height: 50px; 
+  width: 200px;
+  overflow: hidden;
+  cursor: pointer;
+}
+

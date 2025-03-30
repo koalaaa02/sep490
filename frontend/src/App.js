@@ -45,13 +45,13 @@ const App = () => {
       <Router>
         <Header />
         <Routes>
-          {/* {userInfo?.roles === "ROLE_ADMIN" ? (
+          {userInfo?.roles === "ROLE_ADMIN" ? (
             <Route path="/" element={<Admin />} />
           ) : (
             <Route path="/" element={<Home />} />
-          )} */}
+          )}
 
-          <Route path="/" element={<Admin />} />
+          {/* <Route path="/" element={<Admin />} /> */}
 
           {/* Shop pages */}
           <Route path="/Shop/:cateId" element={<Shop />} />

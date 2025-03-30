@@ -59,7 +59,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
           <h5>Tổng tiền: {u.totalAmount}</h5>
           <h5>Tiền đã trả: {u.paidAmount}</h5>
           <h5>Trạng thái: {u.status}</h5>
-          <h5>Chi tiết giao dịch:</h5>
+          <h5>Lịch sử giao dịch:</h5>
           {u.debtPayments?.length > 0 ? (
             <table className="table table-bordered mb-5">
               <thead>

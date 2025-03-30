@@ -4,7 +4,6 @@ import image1 from "../../images/paint.jpg";
 import { BASE_URL } from "../../Utils/config";
 import Swal from "sweetalert2";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import ChatBox from "../Shop/ChatBox";
 import { Carousel } from "react-bootstrap";
 
 const ShopProductDetail = ({ id, onBack }) => {
@@ -220,7 +219,6 @@ const ShopProductDetail = ({ id, onBack }) => {
             <strong></strong>
           </div>
         </div>
-        <ChatBox />
       </div>
       <div className="mt-1 mb-10 p-3 shadow-sm border rounded">
         <h4 className="m-0 fw-bold">Mô tả sản phẩm</h4>

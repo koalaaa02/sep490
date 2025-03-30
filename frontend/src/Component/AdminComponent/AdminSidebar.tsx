@@ -5,8 +5,7 @@ const AdminSideBar = ({ setActive, active }) => {
     "Dashboard",
     "Categories",
     "Products",
-    "Dealers",
-    "Providers",
+    "Shops",
   ];
   return (
     <Nav className="flex-column focus sticky-top h-100 " variant="pills">
