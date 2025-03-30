@@ -38,12 +38,10 @@ const MyAccountSideBar = ({ activeKey }) => {
           {/* nav item */}
           <li className="nav-item">
             <Link
-              className={`nav-link ${
-                activeKey === "MyDebt" && "active"
-              }`}
+              className={`nav-link ${activeKey === "MyDebt" && "active"}`}
               to="/MyDebt"
             >
-              <i className="fas fa-cog me-2" />
+              <i className="fas fa-credit-card me-2" />
               Khoản nợ của bạn
             </Link>
           </li>
@@ -60,7 +58,7 @@ const MyAccountSideBar = ({ activeKey }) => {
             </Link>
           </li>
           {/* nav item */}
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link
               className={`nav-link ${
                 activeKey === "MyAccountPaymentMethod" && "active"
@@ -70,7 +68,7 @@ const MyAccountSideBar = ({ activeKey }) => {
               <i className="fas fa-credit-card me-2" />
               Phương thức thanh toán
             </Link>
-          </li>
+          </li> */}
           {/* nav item */}
           <li className="nav-item">
             <Link

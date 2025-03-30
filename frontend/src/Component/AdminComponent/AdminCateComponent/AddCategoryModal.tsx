@@ -58,10 +58,10 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
       <form onSubmit={handleSubmit}>
         <Modal.Body>
           <Form.Group className="mb-3">
-            <Form.Label>Category Name</Form.Label>
+            <Form.Label>Tên danh mục:</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Enter category name"
+              placeholder="nhập tên..."
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -72,7 +72,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
             <Form.Check
               type="switch"
               id="parent-switch"
-              label="Does this category have a parent?"
+              label="Thuộc danh mục?"
               checked={hasParent}
               onChange={(e) => setHasParent(e.target.checked)}
             />
@@ -80,12 +80,12 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
 
           {hasParent && (
             <Form.Group className="mb-3">
-              <Form.Label>Danh mục cha</Form.Label>
+              <Form.Label>Danh mục</Form.Label>
               <Form.Select
                 value={parentCategoryId || ""}
                 onChange={(e) => setParentCategoryId(Number(e.target.value))}
               >
-                <option value="">Chọn phân loại</option>
+                <option disabled>Chọn danh mục</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}

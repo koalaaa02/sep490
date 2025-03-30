@@ -258,7 +258,7 @@ const MyDebt = () => {
                                             );
                                           }, 0)
                                       )
-                                    : "Please choose a shop "}
+                                    : "Chọn khoản nợ "}
                                 </p>
                               </div>
                               <div className="d-flex justify-content-center">

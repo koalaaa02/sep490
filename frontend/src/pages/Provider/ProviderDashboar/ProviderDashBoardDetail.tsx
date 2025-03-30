@@ -8,19 +8,28 @@ import { Row, Col } from "react-bootstrap";
 
 const ProviderDashBoardDetail = () => {
   return (
-    <div className="w-100 mt-3">
-      <Row>
-        <Col>
-          <TopSellingProduct />
-        </Col>
-        <Col>
-          <ProviderInventory />
-          <ProviderNearlyOutOfStock />
-          <ProviderOutOfStock />
-        </Col>
-      </Row>
-
-      <ProviderPeriod />
+    <div className="w-100 mt-3 mb-5">
+      <Col>
+        <Row>
+          <Col>
+            <ProviderInventory />
+          </Col>
+          <Col>
+            <ProviderNearlyOutOfStock />
+          </Col>
+          <Col>
+            <ProviderOutOfStock />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <TopSellingProduct />
+          </Col>
+          <Col>
+            <ProviderPeriod />
+          </Col>
+        </Row>
+      </Col>
     </div>
   );
 };

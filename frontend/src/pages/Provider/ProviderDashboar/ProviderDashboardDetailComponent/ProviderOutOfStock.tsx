@@ -103,10 +103,10 @@ const ProviderOutOfStock = () => {
           {errorMessage ? (
             <Alert variant="info">{errorMessage}</Alert>
           ) : (
-            <div className="table-responsive">
+            <div>
               {inventoryData && inventoryData.length > 0 ? (
                 <Table striped bordered hover>
-                  <thead className="table-dark">
+                  <thead>
                     <tr>
                       <th>#</th>
                       <th>Sản phẩm</th>

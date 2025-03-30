@@ -164,7 +164,7 @@ const AdminProd = () => {
         onSelect={(k) => setActiveTab(k)}
         className="mb-3"
       >
-        <Tab eventKey="active" title="Sản phẩm active">
+        <Tab eventKey="active" title="Sản phẩm kích hoạt">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>
@@ -183,7 +183,7 @@ const AdminProd = () => {
                   <td>{product.category}</td>
                   <td>{product.supplier}</td>
                   <td onClick={() => handleActive(product.id)}>
-                    <Badge bg="success">active</Badge>
+                    <Badge bg="success">Kích hoạt</Badge>
                   </td>
                 </tr>
               ))}
@@ -201,7 +201,7 @@ const AdminProd = () => {
             ))}
           </Pagination>
         </Tab>
-        <Tab eventKey="inactive" title="Sản phẩm inactive">
+        <Tab eventKey="inactive" title="Sản phẩm ngừng kích hoạt">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>
@@ -220,7 +220,7 @@ const AdminProd = () => {
                   <td>{product.category}</td>
                   <td>{product.supplier}</td>
                   <td onClick={() => handleActive(product.id)}>
-                    <Badge bg="secondary">inactive</Badge>
+                    <Badge bg="secondary">Ngừng kích hoạt</Badge>
                   </td>
                 </tr>
               ))}
