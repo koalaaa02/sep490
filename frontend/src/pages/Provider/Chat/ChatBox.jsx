@@ -1,12 +1,21 @@
+import "bootstrap/dist/css/bootstrap.min.css";
+import { FaCommentDots } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaCheckCircle, FaPaperPlane } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
+import { useSelector } from "react-redux";
+import img from "../../../images/member6.jpg";
 
 const ChatBox = () => {
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
-  const [selectedChatId, setSelectedChat] = useState(1);
+  const [selectedChatId, setSelectedChat] = useState(null);
+  const shopId = 1;
+  const userId = useSelector((state) => state?.auth?.user?.uid);
+  const [messages, setMessages] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [messageContent, setMessageContent] = useState("");
 
   const formatTimestamp = (timestamp) => {
     const now = new Date();
@@ -23,22 +32,10 @@ const ChatBox = () => {
     }
   };
 
-  const params = new URLSearchParams({
-    page: 1,
-    size: 10,
-    sortBy: "id",
-    direction: "ASC",
-    chatRoomId: 1,
-  });
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/chat/messages/?${params.toString()}`,
+        `${BASE_URL}/api/chat/rooms/shop/${shopId}`,
         {
           method: "GET",
           headers: {
@@ -50,70 +47,148 @@ const ChatBox = () => {
       );
       const result = await response.json();
       setData(result);
+      if (result.length > 0) {
+        setSelectedChat(result[0].id);
+      }
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu:", error);
     }
   };
 
-  const selectedChat = data?.content?.find(
-    (chat) => chat.id === selectedChatId
-  );
+  const fetchMessages = async () => {
+    try {
+      const params = new URLSearchParams({
+        page: 1,
+        size: 100,
+        sortBy: "id",
+        direction: "ASC",
+        chatRoomId: selectedChatId,
+      });
+
+      const response = await fetch(
+        `${BASE_URL}/api/chat/messages/?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const result = await response.json();
+      setMessages(result.content);
+    } catch (error) {
+      console.error("Lỗi khi fetch tin nhắn:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (selectedChatId) {
+      fetchMessages(selectedChatId);
+    }
+  }, [selectedChatId]);
+
+  const handleSendMessage = async () => {
+    if (!messageContent.trim()) return;
+
+    const newMessage = {
+      id: Date.now(),
+      content: messageContent,
+      sender: { id: userId },
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    setMessageContent("");
+
+    const param = new URLSearchParams({
+      content: messageContent,
+      messageType: "TEXT",
+      status: "SENT",
+      chatRoomId: selectedChatId,
+      id: 0,
+    });
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/chat/messages/send?${param.toString()}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Gửi tin nhắn thất bại");
+        setMessages((prevMessages) =>
+          prevMessages.filter((msg) => msg.id !== newMessage.id)
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi khi gửi tin nhắn:", error);
+    }
+  };
 
   return (
     <div className="container p-3" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="row mt-2">
         <div className="col-md-4">
-          {data?.content?.map((d) => (
+          {data?.map((d) => (
             <div className="list-group mb-1" key={d.id}>
               <div
                 key={d.id}
                 className={`list-group-item d-flex align-items-center ${
-                  selectedChat === d.id ? "selected-chat" : ""
+                  selectedChatId === d.id ? "selected-chat" : ""
                 }`}
                 style={{
                   cursor: "pointer",
-                  backgroundColor: selectedChat === d.id ? "#d0ebff" : "",
-                  color: selectedChat === d.id ? "#fff" : "#000",
+                  backgroundColor: selectedChatId === d.id ? "#d0ebff" : "",
+                  color: selectedChatId === d.id ? "#fff" : "#000",
                 }}
-                onClick={() => setSelectedChat(d.id)}
+                onClick={() => {
+                  setSelectedUser(d?.dealer?.name);
+                  setSelectedChat(d.id);
+                }}
                 onMouseEnter={(e) =>
                   (e.currentTarget.style.backgroundColor = "#e9ecef")
                 }
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.backgroundColor =
-                    selectedChat === d.id ? "#d0ebff" : "")
+                    selectedChatId === d.id ? "#d0ebff" : "")
                 }
               >
                 <img
-                  src="https://via.placeholder.com/40"
+                  src={img}
                   alt="avatar"
                   className="rounded-circle me-2"
+                  style={{ height: "50px", width: "50px" }}
                 />
-                <div className="flex-grow-1">
-                  <strong>{d?.sender?.name}</strong>{" "}
-                  <FaCheckCircle className="text-danger" />
-                  <p
-                    className="text-muted mb-0 text-truncate"
-                    style={{
-                      display: "-webkit-box",
-                      WebkitBoxOrient: "vertical",
-                      WebkitLineClamp: 1,
-                      overflow: "hidden",
-                    }}
+                <div className="flex-grow-1 d-flex flex-column">
+                  <strong
+                    className="text-black"
                   >
-                    {d.content}...
-                  </p>
+                    {d?.dealer?.name}
+                  </strong>
+                  <small className="text-muted">
+                    {formatTimestamp(d.updatedAt)}
+                  </small>
                 </div>
-                <small className="text-muted">
-                  {formatTimestamp(d.timestamp)}
-                </small>
               </div>
             </div>
           ))}
         </div>
 
         <div className="col-md-8">
-          {selectedChat ? (
+          {selectedChatId ? (
             <div className="card">
               <div className="card-header bg-white d-flex align-items-center">
                 <img
@@ -122,7 +197,7 @@ const ChatBox = () => {
                   className="rounded-circle me-2"
                 />
                 <div>
-                  <strong>{selectedChat?.sender?.name}</strong>{" "}
+                  <strong>{selectedUser}</strong>{" "}
                   <FaCheckCircle className="text-danger" />
                 </div>
               </div>
@@ -130,42 +205,38 @@ const ChatBox = () => {
                 className="card-body"
                 style={{ height: "450px", overflowY: "auto" }}
               >
-                {/* Tin nhắn đi */}
-                <div className="d-flex flex-column">
-                  <div
-                    className="align-self-start bg-light p-2 rounded mb-2"
-                    style={{ maxWidth: "75%" }}
-                  >
-                    <p className="mb-0">{selectedChat?.content}</p>
-                    <small className="text-muted">
-                      {formatTimestamp(selectedChat?.timestamp)}
-                    </small>
+                {messages.map((msg) => (
+                  <div key={msg.id} className="d-flex flex-column">
+                    <div
+                      className={`p-2 rounded mb-2 ${
+                        msg.sender.id === userId
+                          ? "align-self-end bg-primary text-white"
+                          : "align-self-start bg-light"
+                      }`}
+                      style={{ maxWidth: "75%" }}
+                    >
+                      <p className="mb-0">{msg.content}</p>
+                      <small
+                        className={
+                          msg.sender.id === userId ? "text-light" : "text-muted"
+                        }
+                      >
+                        {formatTimestamp(msg.timestamp)}
+                      </small>
+                    </div>
                   </div>
-                </div>
-
-                {/* Tin nhắn phản hồi */}
-                <div className="d-flex flex-column">
-                  <div
-                    className="align-self-end bg-primary text-white p-2 rounded mb-2"
-                    style={{ maxWidth: "75%" }}
-                  >
-                    <p className="mb-0">
-                      Cảm ơn bạn! Mình sẽ liên hệ nếu cần hỗ trợ thêm.
-                    </p>
-                    <small className="text-light">
-                      {formatTimestamp(selectedChat.timestamp)}
-                    </small>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="card-footer d-flex align-items-center">
                 <input
                   type="text"
                   className="form-control me-2"
-                  placeholder="Type a message"
+                  placeholder="Nhập tin nhắn..."
+                  value={messageContent}
+                  onChange={(e) => setMessageContent(e.target.value)}
                 />
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={handleSendMessage}>
                   <FaPaperPlane />
                 </button>
               </div>

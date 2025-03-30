@@ -37,64 +37,74 @@ import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
 import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
 import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
 import Admin from "./pages/Admin/Admin.tsx";
-
+import { useSelector } from "react-redux";
 const App = () => {
-  const userInfo = JSON.parse(localStorage.getItem("user"));
+  // const userInfo = useLocalStorage("user");
+  const userInfo = useSelector((state) => state.auth.user);
+
   return (
     <div>
       <Router>
-        <Header />
-        <Routes>
-          {/* {userInfo?.roles === "ROLE_ADMIN" ? (
-            <Route path="/" element={<Admin />} />
-          ) : (
-            <Route path="/" element={<Home />} />
-          )} */}
-
-          <Route path="/" element={<Admin />} />
-
-          {/* Shop pages */}
-          <Route path="/Shop/:cateId" element={<Shop />} />
-          <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
-          <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
-          <Route path="/ShopWishList" element={<ShopWishList />} />
-          <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
-          <Route path="/ShopCart" element={<ShopCart />} />
-          {/* Store pages */}
-          <Route path="/StoreList" element={<StoreList />} />
-          <Route path="/SingleShop/:shopId" element={<SingleShop />} />
-          {/* Accounts pages */}
-          <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
-          <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
-          <Route path="/MyAcconutInvoice" element={<MyAcconutInvoice />} />
-          <Route
-            path="/MyAcconutPaymentMethod"
-            element={<MyAcconutPaymentMethod />}
-          />
-          {/* <Route
+        {userInfo?.roles === "ROLE_ADMIN" ? (
+          <>
+            <Routes>
+              <Route path="/" element={<Admin />} />{" "}
+              <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
+            </Routes>
+          </>
+        ) : (
+          <>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              {/* Shop pages */}
+              <Route path="/Shop/:cateId" element={<Shop />} />
+              <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
+              <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
+              <Route path="/ShopWishList" element={<ShopWishList />} />
+              <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
+              <Route path="/ShopCart" element={<ShopCart />} />
+              {/* Store pages */}
+              <Route path="/StoreList" element={<StoreList />} />
+              <Route path="/SingleShop/:shopId" element={<SingleShop />} />
+              {/* Accounts pages */}
+              <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
+              <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
+              <Route path="/MyAcconutInvoice" element={<MyAcconutInvoice />} />
+              <Route
+                path="/MyAcconutPaymentMethod"
+                element={<MyAcconutPaymentMethod />}
+              />
+              {/* <Route
             path="/MyAcconutNotification"
             element={<MyAcconutNotification />}
           /> */}
-          <Route
-            path="/MyAcconutPaymentMethod"
-            element={<MyAcconutPaymentMethod />}
-          />
-          <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
-          <Route
-            path="/MyAccountForgetPassword"
-            element={<MyAccountForgetPassword />}
-          />
-          <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
-          <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
-          <Route path="/MyDebt" element={<MyDebt />} />
-          {/* About pages */}
-          <Route path="/Blog" element={<Blog />} />
-          <Route path="/BlogCategory" element={<BlogCategory />} />
-          <Route path="/Contact" element={<Contact />} />
-          <Route path="/AboutUs" element={<AboutUs />} />
-          {/* Provider */}
-          <Route path="/ProviderDashBoard" element={<ProviderDashBoard />} />
-        </Routes>
+              <Route
+                path="/MyAcconutPaymentMethod"
+                element={<MyAcconutPaymentMethod />}
+              />
+              <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
+              <Route
+                path="/MyAccountForgetPassword"
+                element={<MyAccountForgetPassword />}
+              />
+              <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
+              <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
+              <Route path="/MyDebt" element={<MyDebt />} />
+              {/* About pages */}
+              <Route path="/Blog" element={<Blog />} />
+              <Route path="/BlogCategory" element={<BlogCategory />} />
+              <Route path="/Contact" element={<Contact />} />
+              <Route path="/AboutUs" element={<AboutUs />} />
+              {/* Provider */}
+              <Route
+                path="/ProviderDashBoard"
+                element={<ProviderDashBoard />}
+              />{" "}
+            </Routes>
+          </>
+        )}
+
         <Footer />
       </Router>
     </div>

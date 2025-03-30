@@ -9,6 +9,7 @@ import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
 import image1 from "../../images/glass.jpg";
 import ShopProductDetail from "../Shop/ShopProductDetail";
+import ChatBox from "../Shop/ChatBox";
 
 const SingleShop = () => {
   const [stores, setStores] = useState([]);
@@ -201,31 +202,7 @@ const SingleShop = () => {
                               {stores.address?.province}
                             </span>
                           </div>
-                          <div className="position-relative">
-                            <input
-                              type="email"
-                              className="form-control"
-                              id="exampleFormControlInput1"
-                              placeholder="Tìm kiếm sản phẩm..."
-                            />
-                            <span className="position-absolute end-0 top-0 mt-2 me-3">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width={14}
-                                height={14}
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="feather feather-search"
-                              >
-                                <circle cx={11} cy={11} r={8} />
-                                <line x1={21} y1={21} x2="16.65" y2="16.65" />
-                              </svg>
-                            </span>
-                          </div>
+                          <ChatBox />
                         </div>
                         <div className="py-4">
                           {/* img */}

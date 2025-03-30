@@ -3,13 +3,13 @@ import { Nav } from "react-bootstrap";
 const AdminSideBar = ({ setActive, active }) => {
   const navLink = [
     "Dashboard",
-    "Categories",
-    "Products",
-    "Dealers",
-    "Providers",
+    "Danh mục",
+    "Sản phẩm",
+    // "Khách hàng",
+    "Cửa hàng",
   ];
   return (
-    <Nav className="flex-column focus sticky-top h-100 " variant="pills">
+    <Nav className="flex-column sticky-top h-100 " variant="pills">
       {navLink.map((n) => (
         <Nav.Item className="p-2 ">
           <Nav.Link

@@ -11,7 +11,13 @@ import {
 } from "react-bootstrap";
 import { FiSearch } from "react-icons/fi";
 import { BASE_URL } from "../../../Utils/config";
-
+interface PaginationState {
+  activePage: number;
+  inactivePage: number;
+  itemsPerPage: number;
+  activeTotalPages?: number;
+  inactiveTotalPages?: number;
+}
 const AdminProd = () => {
   const token = localStorage.getItem("access_token");
   const [activeProducts, setActiveProducts] = useState([]);
@@ -19,21 +25,21 @@ const AdminProd = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [rfkey, setRfKey] = useState(true);
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<PaginationState>({
     activePage: 1,
     inactivePage: 1,
-    itemsPerPage: 10,
+    itemsPerPage: 5,
   });
 
   useEffect(() => {
     const fetchProducts = async (activeStatus, page) => {
       try {
         const params = new URLSearchParams({
-          page: page,
-          size: pagination.itemsPerPage,
+          page: String(page),
+          size: String(pagination.itemsPerPage),
           sortBy: "id",
           direction: "ASC",
-          active: activeStatus,
+          active: String(activeStatus),
         });
 
         const response = await fetch(
@@ -138,7 +144,7 @@ const AdminProd = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Products List</h2>
+      <h2 className="mb-4 text-center">Danh sách sản phẩm</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>
@@ -146,7 +152,7 @@ const AdminProd = () => {
             <FiSearch />
           </InputGroup.Text>
           <Form.Control
-            placeholder="Search products..."
+            placeholder="Tìm sản phẩm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -158,15 +164,15 @@ const AdminProd = () => {
         onSelect={(k) => setActiveTab(k)}
         className="mb-3"
       >
-        <Tab eventKey="active" title="Active Products">
+        <Tab eventKey="active" title="Sản phẩm active">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
+                <th>Tên sản phẩm</th>
+                <th>Phân loại</th>
+                <th>Nhà cung cấp</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
@@ -195,15 +201,15 @@ const AdminProd = () => {
             ))}
           </Pagination>
         </Tab>
-        <Tab eventKey="inactive" title="Inactive Products">
+        <Tab eventKey="inactive" title="Sản phẩm inactive">
           <Table striped hover responsive className="mt-3">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
+                <th>Tên sản phẩm</th>
+                <th>Phân loại</th>
+                <th>Nhà cung cấp</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
