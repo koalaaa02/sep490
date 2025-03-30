@@ -5,7 +5,7 @@ const AdminSideBar = ({ setActive, active }) => {
     "Dashboard",
     "Danh mục",
     "Sản phẩm",
-    "Khách hàng",
+    // "Khách hàng",
     "Cửa hàng",
   ];
   return (
