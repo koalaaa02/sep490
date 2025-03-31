@@ -18,7 +18,10 @@ const Header = () => {
   };
   const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
-  const role = useSelector((state) => state.auth.user?.roles);
+  const role = useSelector((state) => state.auth.user?.roles || []);
+  const normalizedRoles = typeof role === "string" ? role.split(",") : [];
+
+  const isProvider = normalizedRoles.includes("ROLE_PROVIDER");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -410,7 +413,7 @@ const Header = () => {
                     )}
                   </span>
                 </Link> */}
-                {role === "ROLE_PROVIDER" && (
+                {isProvider && (
                   <Link
                     className="text-muted position-relative"
                     to="/ProviderDashBoard"
