@@ -68,7 +68,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
           body: JSON.stringify({
             id: category.id,
             name,
-            parent: hasParent,
+            parent: hasParent ? false : true,
             parentCategoryId: hasParent ? parentCategoryId : undefined,
           }),
         }

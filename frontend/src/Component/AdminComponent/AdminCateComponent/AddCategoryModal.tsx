@@ -31,7 +31,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
         credentials: "include",
         body: JSON.stringify({
           name,
-          parent: hasParent,
+          parent: hasParent ? false : true,
           parentCategoryId: hasParent ? parentCategoryId : undefined,
         }),
       });

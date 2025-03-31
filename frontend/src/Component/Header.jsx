@@ -339,18 +339,18 @@ const Header = () => {
                           </Link>
                           <Link
                             className="dropdown-item"
-                            to="/MyAcconutPaymentMethod"
-                          >
-                            Phương thức thanh toán
-                          </Link>
-                          <Link
-                            className="dropdown-item"
                             to="/MyAcconutInvoice"
                           >
                             Hóa đơn của tôi
                           </Link>
                           <Link className="dropdown-item" to="/MyDebt">
                             Khoản nợ
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAcconutPaymentMethod"
+                          >
+                            Mở cửa hàng
                           </Link>
                           <button
                             className="dropdown-item"

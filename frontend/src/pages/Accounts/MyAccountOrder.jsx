@@ -32,6 +32,7 @@ const MyAccountOrder = () => {
           size: 100,
           sortBy: "id",
           direction: "ASC",
+          paid: false,
         });
         const response = await fetch(
           `${BASE_URL}/api/dealer/orders?${params.toString()}`,
@@ -89,16 +90,14 @@ const MyAccountOrder = () => {
       <>
         <section>
           <div className="container">
-        
             <div className="row">
-           
               <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
                 <div className="mt-5 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
                   <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
-           
+
               <div className="d-flex">
                 <MyAccountSideBar activeKey={"MyAccountOrder"} />
 

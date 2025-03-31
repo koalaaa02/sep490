@@ -58,18 +58,6 @@ const MyAccountSideBar = ({ activeKey }) => {
             </Link>
           </li>
           {/* nav item */}
-          {/* <li className="nav-item">
-            <Link
-              className={`nav-link ${
-                activeKey === "MyAccountPaymentMethod" && "active"
-              }`}
-              to="/MyAcconutPaymentMethod"
-            >
-              <i className="fas fa-credit-card me-2" />
-              Phương thức thanh toán
-            </Link>
-          </li> */}
-          {/* nav item */}
           <li className="nav-item">
             <Link
               className={`nav-link ${
@@ -79,6 +67,18 @@ const MyAccountSideBar = ({ activeKey }) => {
             >
               <i className="fas fa-bell me-2" />
               Hóa đơn của tôi
+            </Link>
+          </li>
+          {/* nav item */}
+          <li className="nav-item">
+            <Link
+              className={`nav-link ${
+                activeKey === "MyAccountPaymentMethod" && "active"
+              }`}
+              to="/MyAcconutPaymentMethod"
+            >
+              <i className="fas fa-shop me-2" />
+              Mở cửa hàng
             </Link>
           </li>
           {/* nav item */}
