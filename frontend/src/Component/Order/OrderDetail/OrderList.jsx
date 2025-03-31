@@ -26,7 +26,7 @@ const OrderList = ({ orders, status }) => {
   return (
     <>
       {orders?.map((o) => (
-        <OrderDetail order={o} />
+        <OrderDetail order={o} status={status} />
       ))}
     </>
   );

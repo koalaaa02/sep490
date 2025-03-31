@@ -37,7 +37,7 @@ const AdminSideBar = ({ setActive, active }) => {
       <Nav.Item className="p-2 " onClick={handleLogOut}>
         <Nav.Link style={{ outline: "none", boxShadow: "none" }}>
           <span className="mr-2">Đăng xuất</span>
-          <CiLogout size={25} />
+          <i className="fas fa-sign-out-alt me-2" />
         </Nav.Link>
       </Nav.Item>
     </Nav>

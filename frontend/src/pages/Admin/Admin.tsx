@@ -14,7 +14,7 @@ const Admin = () => {
     switch (active) {
       case "Dashboard":
         return <AdminDashboard />;
-      case "Phân loại":
+      case "Danh mục":
         return <AdminCate />;
       case "Sản phẩm":
         return <AdminProd />;

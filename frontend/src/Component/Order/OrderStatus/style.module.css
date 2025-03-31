@@ -1,19 +1,30 @@
 .orderStatusContainer {
   display: flex;
   justify-content: space-between;
+  border-inline-bottom: 3px solid rgb(213, 213, 213);
 }
 .orderStatusItem {
   text-align: center;
   margin-top: 1rem;
   padding: 1rem;
-  border-right: 1px solid grey;
+  position: relative;
+  /* border-right: 1px solid rgb(235, 235, 235); */
   font-weight: 600;
 }
+.orderStatusItem::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 10px;
+  height: 70%;
+  border-right: 1px solid rgb(235, 235, 235);
+}
 .orderStatusItem:hover {
-  background-color: aliceblue;
+  color: rgb(255, 193, 7);
 }
 .activeStatus {
-  background-color: rgb(255, 193, 7) !important;
-  color: white;
-  border-radius: 5px;
+  /* background-color: rgb(255, 193, 7) !important; */
+  /* color: white; */
+  border-bottom: 3px solid rgb(255, 193, 7);
+  /* border-radius: 5px; */
 }

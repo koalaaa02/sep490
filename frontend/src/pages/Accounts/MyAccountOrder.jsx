@@ -56,7 +56,6 @@ const MyAccountOrder = () => {
       setLoaderStatus(false);
     }, 1500);
   }, [status]);
-  console.log(status);
 
   const orders = data?.content
     ?.map((order) => ({
@@ -70,17 +69,6 @@ const MyAccountOrder = () => {
       })),
     }))
     .filter((f) => f.status === status);
-  console.log(orders);
-  const statusTab = {
-    PENDING: "Đang chờ",
-    ACCEPTED: "Đã chấp nhận",
-    PACKAGING: "Đóng gói",
-    FINDINGTRUCK: "Tìm xe tải",
-    DELIVERING: "Đang giao",
-    DELIVERED: "Đã giao",
-    LOST: "Mất hàng",
-    CANCELLED: "Đã hủy",
-  };
   return (
     <div>
       <>
@@ -89,16 +77,14 @@ const MyAccountOrder = () => {
       <>
         <section>
           <div className="container">
-        
             <div className="row">
-           
               <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
                 <div className="mt-5 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
                   <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
               </div>
-           
+
               <div className="d-flex">
                 <MyAccountSideBar activeKey={"MyAccountOrder"} />
 
