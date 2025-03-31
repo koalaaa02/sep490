@@ -108,7 +108,7 @@ const AdminCate = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4 text-center">Danh sách phân loại</h2>
+      <h2 className="mb-4 text-center">Danh sách danh mục</h2>
 
       <div className="d-flex justify-content-between mb-4">
         <InputGroup style={{ width: "300px" }}>
@@ -116,13 +116,13 @@ const AdminCate = () => {
             <FiSearch />
           </InputGroup.Text>
           <Form.Control
-            placeholder="Tìm phân loại..."
+            placeholder="Tìm danh mục..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </InputGroup>
         <Button variant="primary" onClick={() => setShowAddModal(true)}>
-          Thêm loại mới
+          Thêm danh mục mới
         </Button>
       </div>
 

@@ -18,7 +18,10 @@ const Header = () => {
   };
   const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
-  const role = useSelector((state) => state.auth.user?.roles);
+  const role = useSelector((state) => state.auth.user?.roles || []);
+  const normalizedRoles = typeof role === "string" ? role.split(",") : [];
+
+  const isProvider = normalizedRoles.includes("ROLE_PROVIDER");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -36,7 +39,7 @@ const Header = () => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 10,
+          size: 100,
           sortBy: "id",
           direction: "ASC",
         });
@@ -339,18 +342,18 @@ const Header = () => {
                           </Link>
                           <Link
                             className="dropdown-item"
-                            to="/MyAcconutPaymentMethod"
-                          >
-                            Phương thức thanh toán
-                          </Link>
-                          <Link
-                            className="dropdown-item"
                             to="/MyAcconutInvoice"
                           >
                             Hóa đơn của tôi
                           </Link>
                           <Link className="dropdown-item" to="/MyDebt">
                             Khoản nợ
+                          </Link>
+                          <Link
+                            className="dropdown-item"
+                            to="/MyAcconutPaymentMethod"
+                          >
+                            Mở cửa hàng
                           </Link>
                           <button
                             className="dropdown-item"
@@ -410,7 +413,7 @@ const Header = () => {
                     )}
                   </span>
                 </Link> */}
-                {role === "ROLE_PROVIDER" && (
+                {isProvider && (
                   <Link
                     className="text-muted position-relative"
                     to="/ProviderDashBoard"

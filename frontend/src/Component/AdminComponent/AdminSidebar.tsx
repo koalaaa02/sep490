@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 
 const AdminSideBar = ({ setActive, active }) => {
   const navLink = [
-    "Dashboard",
+    "Thống kê",
     "Danh mục",
     "Sản phẩm",
     // "Khách hàng",
@@ -26,7 +26,7 @@ const AdminSideBar = ({ setActive, active }) => {
         <Nav.Item className="p-2 ">
           <Nav.Link
             style={{ outline: "none", boxShadow: "none" }}
-            className={` ${active === n ? "bg-warning" : ""}`}
+            className={` ${active === n ? "bg-warning" : ""} text-black`}
             active={active === n}
             onClick={() => setActive(n)}
           >
@@ -36,8 +36,8 @@ const AdminSideBar = ({ setActive, active }) => {
       ))}{" "}
       <Nav.Item className="p-2 " onClick={handleLogOut}>
         <Nav.Link style={{ outline: "none", boxShadow: "none" }}>
-          <span className="mr-2">Đăng xuất</span>
-          <i className="fas fa-sign-out-alt me-2" />
+          <CiLogout size={25} />
+          <span className="ml-2 text-black">Đăng xuất</span>
         </Nav.Link>
       </Nav.Item>
     </Nav>

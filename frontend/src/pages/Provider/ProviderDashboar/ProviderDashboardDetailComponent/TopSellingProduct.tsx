@@ -114,9 +114,9 @@ const TopSellingProduct = () => {
   };
 
   return (
-    <div className="p-4 bg-white rounded shadow-sm">
+    <div className="p-4 bg-white">
       <div className="mb-4">
-        <h3 className="mb-3">Top Sản phẩm bán được</h3>
+        <h4 className="mb-3">Top Sản phẩm bán được</h4>
         <div className="row g-3">
           <div className="col-md-6">
             <label htmlFor="limit" className="form-label">

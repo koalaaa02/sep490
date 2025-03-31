@@ -61,9 +61,9 @@ const ProviderInventory = () => {
             paddingTop: 0,
           }}
         >
-          <div className="table-responsive">
+          <div>
             <Table striped bordered hover>
-              <thead className="table-dark">
+              <thead>
                 <tr>
                   <th>#</th>
                   <th>Tên sản phẩm</th>

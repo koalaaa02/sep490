@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
-import amazonpay from "../../images/amazonpay.svg";
-import american from "../../images/american-express.svg";
-import mastercard from "../../images/mastercard.svg";
-import paypal from "../../images/paypal.svg";
-import visa from "../../images/visa.svg";
-import discover from "../../images/discover.svg";
 import ScrollToTop from "../ScrollToTop";
-import { useDispatch } from "react-redux";
-import { logout } from "../../Redux/slice/authSlice";
-import { useNavigate } from "react-router-dom";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
+import { BASE_URL } from "../../Utils/config";
+import { useSelector } from "react-redux";
 
 const MyAcconutPaymentMethod = () => {
+  const [storeName, setStoreName] = useState("");
+  const [addressId, setAddressId] = useState("");
+  const [registrationCertificate, setRegistrationCertificate] = useState("");
+  const [citizenId, setCitizenId] = useState("");
+  const [shopType, setShopType] = useState("ENTERPRISE");
+  const [taxCode, setTaxCode] = useState("");
+  const [secretA, setSecretA] = useState("");
+  const [secretB, setSecretB] = useState("");
+  const [error, setError] = useState("");
+  const [notification, setNotification] = useState(null);
+
+  const token = useSelector((state) => state.auth.token);
+
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -22,12 +27,52 @@ const MyAcconutPaymentMethod = () => {
     }, 1500);
   }, []);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const showNotification = (message, type = "success") => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
-  const handleLogOut = () => {
-    dispatch(logout());
-    navigate("/");
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const storeData = {
+      name: storeName,
+      addressId: 3,
+      registrationCertificateImages: "string",
+      citizenIdentificationCard: citizenId,
+      shopType: shopType,
+      active: false,
+      close: false,
+      totalFeeDueAmount: 0,
+      tin: taxCode,
+      secretA: secretA,
+      secretB: secretB,
+    };
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(storeData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        showNotification("Bạn đã mở cửa hàng thành công!", "success");
+      } else {
+        const errorMessage =
+          data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
+        showNotification(errorMessage, "danger");
+      }
+    } catch (err) {
+      setError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+      );
+    }
   };
 
   return (
@@ -70,171 +115,112 @@ const MyAcconutPaymentMethod = () => {
                       <>
                         <div className="p-6 p-lg-10">
                           {/* heading */}
-                          <div className="d-flex justify-content-between mb-6 align-items-center">
-                            <h2 className="mb-0">Phương thức thanh toán</h2>
-                            <Link
-                              to="#"
-                              className="btn btn-outline-warning"
-                              data-bs-toggle="modal"
-                              data-bs-target="#paymentModal"
-                            >
-                              Thêm phương thức thanh toán{" "}
-                            </Link>
+                          <div className="container">
+                            <h2>Đăng ký cửa hàng</h2>
+                            {notification && (
+                              <p className={`alert alert-${notification.type}`}>
+                                {notification.message}
+                              </p>
+                            )}
+                            <form onSubmit={handleSubmit}>
+                              {/* Tên cửa hàng */}
+                              <label>Tên cửa hàng:</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Nhập tên cửa hàng"
+                                value={storeName}
+                                onChange={(e) => setStoreName(e.target.value)}
+                                required
+                              />
+
+                              {/* Địa chỉ ID */}
+                              {/* <label>ID địa chỉ:</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Nhập ID địa chỉ"
+                                value={addressId}
+                                onChange={(e) => setAddressId(e.target.value)}
+                                required
+                              /> */}
+
+                              {/* Ảnh giấy phép đăng ký */}
+                              {/* <label>Ảnh giấy phép đăng ký:</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Nhập đường dẫn ảnh"
+                                value={registrationCertificate}
+                                onChange={(e) =>
+                                  setRegistrationCertificate(e.target.value)
+                                }
+                                required
+                              /> */}
+
+                              {/* Số CCCD */}
+                              <label>CCCD của chủ cửa hàng:</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Nhập số CCCD"
+                                value={citizenId}
+                                onChange={(e) => setCitizenId(e.target.value)}
+                                required
+                              />
+
+                              {/* Loại cửa hàng */}
+                              <label>Loại cửa hàng:</label>
+                              <select
+                                className="form-control"
+                                value={shopType}
+                                onChange={(e) => setShopType(e.target.value)}
+                              >
+                                <option value="ENTERPRISE">Doanh nghiệp</option>
+                                <option value="BUSINESS">Cá nhân</option>
+                              </select>
+
+                              {/* Mã số thuế */}
+                              <label>Mã số thuế:</label>
+                              <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Nhập mã số thuế"
+                                value={taxCode}
+                                onChange={(e) => setTaxCode(e.target.value)}
+                              />
+
+                              {/* Secret A */}
+                              <label>Secret A:</label>
+                              <input
+                                type="password"
+                                className="form-control"
+                                placeholder="Nhập Secret A"
+                                value={secretA}
+                                onChange={(e) => setSecretA(e.target.value)}
+                                required
+                              />
+
+                              {/* Secret B */}
+                              <label>Secret B:</label>
+                              <input
+                                type="password"
+                                className="form-control"
+                                placeholder="Nhập Secret B"
+                                value={secretB}
+                                onChange={(e) => setSecretB(e.target.value)}
+                                required
+                              />
+
+                              {/* Nút Submit */}
+                              <button
+                                type="submit"
+                                className="btn btn-primary mt-3"
+                              >
+                                Đăng ký cửa hàng
+                              </button>
+                            </form>
                           </div>
-                          <ul className="list-group list-group-flush">
-                            {/* List group item */}
-                            <li className="list-group-item py-5 px-0">
-                              <div className="d-flex justify-content-between">
-                                <div className="d-flex">
-                                  {/* img */}
-                                  <img src={visa} alt="payment" />
-                                  {/* text */}
-                                  <div className="ms-4">
-                                    <h5 className="mb-0 h6 h6">**** 1234</h5>
-                                    <p className="mb-0 small">
-                                      Expires in 10/2023
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  {/* button */}
-                                  <Link
-                                    to="#"
-                                    className="btn btn-outline-gray-400 disabled btn-sm"
-                                  >
-                                    Xóa
-                                  </Link>
-                                </div>
-                              </div>
-                            </li>
-                            {/* List group item */}
-                            <li className="list-group-item px-0 py-5">
-                              <div className="d-flex justify-content-between">
-                                <div className="d-flex">
-                                  {/* img */}
-                                  <img
-                                    src={mastercard}
-                                    alt="payment"
-                                    className="me-3"
-                                  />
-                                  <div>
-                                    <h5 className="mb-0 h6">
-                                      Mastercard ending in 1234
-                                    </h5>
-                                    <p className="mb-0 small">
-                                      Expires in 03/2026
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  {/* button*/}
-                                  <Link
-                                    to="#"
-                                    className="btn btn-outline-gray-400 text-muted btn-sm"
-                                  >
-                                    Xóa
-                                  </Link>
-                                </div>
-                              </div>
-                            </li>
-                            {/* List group item */}
-                            <li className="list-group-item px-0 py-5">
-                              <div className="d-flex justify-content-between">
-                                <div className="d-flex">
-                                  {/* img */}
-                                  <img
-                                    src={discover}
-                                    alt="payment"
-                                    className="me-3"
-                                  />
-                                  <div>
-                                    {/* text */}
-                                    <h5 className="mb-0 h6">
-                                      Discover ending in 1234
-                                    </h5>
-                                    <p className="mb-0 small">
-                                      Expires in 07/2020{" "}
-                                      <span className="badge bg-warning text-dark">
-                                        {" "}
-                                        This card is expired.
-                                      </span>
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  {/* btn */}
-                                  <Link
-                                    to="#"
-                                    className="btn btn-outline-gray-400 text-muted btn-sm"
-                                  >
-                                    Xóa
-                                  </Link>
-                                </div>
-                              </div>
-                            </li>
-                            {/* List group item */}
-                            <li className="list-group-item px-0 py-5">
-                              <div className="d-flex justify-content-between">
-                                <div className="d-flex">
-                                  {/* img */}
-                                  <img
-                                    src={amazonpay}
-                                    alt="payment"
-                                    className="me-3"
-                                  />
-                                  {/* text */}
-                                  <div>
-                                    <h5 className="mb-0 h6">
-                                      American Express ending in 1234
-                                    </h5>
-                                    <p className="mb-0 small">
-                                      Expires in 12/2021
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  {/* btn */}
-                                  <Link
-                                    to="#"
-                                    className="btn btn-outline-gray-400 text-muted btn-sm"
-                                  >
-                                    Xóa
-                                  </Link>
-                                </div>
-                              </div>
-                            </li>
-                            {/* List group item */}
-                            <li className="list-group-item px-0 py-5 border-bottom">
-                              <div className="d-flex justify-content-between">
-                                <div className="d-flex">
-                                  {/* img */}
-                                  <img
-                                    src={paypal}
-                                    alt="payment"
-                                    className="me-3"
-                                  />
-                                  <div>
-                                    {/* text */}
-                                    <h5 className="mb-0 h6">
-                                      Paypal Express ending in 1234
-                                    </h5>
-                                    <p className="mb-0 small">
-                                      Expires in 10/2021
-                                    </p>
-                                  </div>
-                                </div>
-                                <div>
-                                  {/* btn */}
-                                  <Link
-                                    to="#"
-                                    className="btn btn-outline-gray-400 text-muted btn-sm"
-                                  >
-                                    Xóa
-                                  </Link>
-                                </div>
-                              </div>
-                            </li>
-                          </ul>
                         </div>
                       </>
                     )}
@@ -243,190 +229,6 @@ const MyAcconutPaymentMethod = () => {
               </div>
             </div>
           </section>
-          {/* Payment Modal */}
-          <div
-            className="modal fade"
-            id="paymentModal"
-            tabIndex={-1}
-            role="dialog"
-            aria-labelledby="paymentModalLabel"
-            aria-hidden="true"
-          >
-            <div
-              className="modal-dialog modal-lg modal-dialog-centered"
-              role="document"
-            >
-              {/* modal content */}
-              <div className="modal-content">
-                {/* modal header */}
-                <div className="modal-header align-items-center d-flex">
-                  <h5 className="modal-title" id="paymentModalLabel">
-                    Thêm phương thức thanh toán
-                  </h5>
-                  {/* button */}
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                {/* Modal body */}
-                <div className="modal-body">
-                  <div>
-                    {/* Form */}
-                    <form className="row mb-4">
-                      <div className="mb-3 col-12 col-md-12 mb-4">
-                        <h5 className="mb-3">Credit / Debit card</h5>
-                        {/* Radio button */}
-                        <div className="d-inline-flex">
-                          <div className="form-check me-2">
-                            <input
-                              type="radio"
-                              id="paymentRadioOne"
-                              name="paymentRadioOne"
-                              className="form-check-input"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="paymentRadioOne"
-                            >
-                              <img src={american} alt="payment" />
-                            </label>
-                          </div>
-                          {/* Radio button */}
-                          <div className="form-check me-2">
-                            <input
-                              type="radio"
-                              id="paymentRadioTwo"
-                              name="paymentRadioOne"
-                              className="form-check-input"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="paymentRadioTwo"
-                            >
-                              <img src={mastercard} alt="payment" />
-                            </label>
-                          </div>
-                          {/* Radio button */}
-                          <div className="form-check">
-                            <input
-                              type="radio"
-                              id="paymentRadioFour"
-                              name="paymentRadioOne"
-                              className="form-check-input"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="paymentRadioFour"
-                            >
-                              <img src={visa} alt="payment" />
-                            </label>
-                          </div>
-                        </div>
-                      </div>
-                      {/* Name on card */}
-                      <div className="mb-3 col-12 col-md-4">
-                        <label htmlFor="nameoncard" className="form-label">
-                          Tên thẻ
-                        </label>
-                        <input
-                          id="nameoncard"
-                          type="text"
-                          className="form-control"
-                          name="nameoncard"
-                          placeholder="Name"
-                          required
-                        />
-                      </div>
-                      {/* Month */}
-                      <div className="mb-3 col-12 col-md-4">
-                        <label className="form-label">Tháng</label>
-                        <select className="form-select">
-                          <option value>Month</option>
-                          <option value="Jan">1</option>
-                          <option value="Feb">2</option>
-                          <option value="Mar">3</option>
-                          <option value="Apr">4</option>
-                          <option value="May">5</option>
-                          <option value="June">6</option>
-                          <option value="July">7</option>
-                          <option value="Aug">8</option>
-                          <option value="Sep">9</option>
-                          <option value="Oct">10</option>
-                          <option value="Nov">11</option>
-                          <option value="Dec">12</option>
-                        </select>
-                      </div>
-                      {/* Year */}
-                      <div className="mb-3 col-12 col-md-4">
-                        <label className="form-label">Năm</label>
-                        <select className="form-select">
-                          <option value>Year</option>
-                          <option value="August">2024</option>
-                          <option value="Sep">2025</option>
-                          <option value="Oct">2026</option>
-                          <option value="June">2027</option>
-                          <option value="July">2028</option>
-                        </select>
-                      </div>
-                      {/* Card number */}
-                      <div className="mb-3 col-md-8 col-12">
-                        <label htmlFor="cc-mask" className="form-label">
-                          Số thẻ
-                        </label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="cc-mask"
-                          placeholder="xxxx-xxxx-xxxx-xxxx"
-                          required
-                        />
-                      </div>
-                      {/* CVV */}
-                      <div className="mb-3 col-md-4 col-12">
-                        <div className="mb-3">
-                          <label htmlFor="cvv" className="form-label">
-                            CVV Code
-                            <i
-                              className="feather-icon icon-help-circle ms-1"
-                              data-bs-toggle="tooltip"
-                              data-placement="top"
-                              title="A 3 - digit number, typically printed on the back of a card."
-                            />
-                          </label>
-                          <input
-                            type="password"
-                            className="form-control"
-                            id="cvv"
-                            placeholder="xxx"
-                            required
-                          />
-                        </div>
-                      </div>
-                      {/* Button */}
-                      <div className="col-md-6 col-12">
-                        <button
-                          className="btn btn-warning text-dark"
-                          type="submit"
-                        >
-                          Thêm
-                        </button>
-                        <button
-                          className="btn btn-outline-gray-400 text-muted"
-                          type="button"
-                          data-bs-dismiss="modal"
-                        >
-                          Đóng
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </>
     </div>

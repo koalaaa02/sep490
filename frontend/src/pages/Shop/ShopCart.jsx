@@ -226,7 +226,7 @@ const ShopCart = () => {
                           {/* Ảnh sản phẩm */}
                           <div className="col-1 text-center">
                             <img
-                              src={img1}
+                              src={item.imageUrl ||   img1}
                               alt={item.productName}
                               className="img-fluid mt-2"
                               style={{

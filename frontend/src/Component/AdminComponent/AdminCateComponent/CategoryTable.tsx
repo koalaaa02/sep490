@@ -24,8 +24,8 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         <tr>
           <th>ID</th>
           <th>Ảnh</th>
-          <th>Phân loại</th>
-          <th>Phân loại cha</th>
+          <th>Danh mục</th>
+          <th>Thuộc danh mục</th>
           <th></th>
         </tr>
       </thead>
@@ -43,7 +43,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               />
             </td>
             <td>{category.name}</td>
-            <td>{category.parentName || "none"}</td>
+            <td>{category.parentName || "Không có"}</td>
             <td width={120}>
               <button
                 className="btn btn-outline-primary me-2"

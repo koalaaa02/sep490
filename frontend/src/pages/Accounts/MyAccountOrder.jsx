@@ -29,9 +29,10 @@ const MyAccountOrder = () => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 10,
+          size: 100,
           sortBy: "id",
           direction: "ASC",
+          paid: false,
         });
         const response = await fetch(
           `${BASE_URL}/api/dealer/orders?${params.toString()}`,

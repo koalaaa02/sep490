@@ -112,9 +112,9 @@ const ProviderPeriod = () => {
   const yearOptions = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i);
 
   return (
-    <div className="p-4 w-100 bg-white rounded shadow-sm">
+    <div className="p-4 w-100 bg-white">
       <div className="mb-4">
-        <h3 className="mb-3">Số liệu đơn theo ngày</h3>
+        <h4 className="mb-3">Số liệu đơn theo ngày</h4>
         <div className="row g-3">
           <div className="col-md-3">
             <label htmlFor="month" className="form-label">

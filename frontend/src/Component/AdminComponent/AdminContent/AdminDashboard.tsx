@@ -30,6 +30,7 @@ ChartJS.register(
 const AdminDashboard = () => {
   return (
     <div className={classNames("py-2", styles.adminDashBoardContainer)}>
+      <h2 className="text-center m-3">Thống kê</h2>
       <div className="d-flex align-items-center gap-3 justify-content-between">
         <div className={styles.leftSideCharts}>
           <div className="d-flex align-items-center gap-2">
@@ -256,7 +257,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-      <div className="d-flex align-items-center gap-2 py-2 justify-content-between">
+      <div className="d-flex align-items-center gap-2 py-2 justify-content-between mb-10">
         <div className={classNames(styles.lowerChart, "col-6")}>
           <Bar
             className={styles.barChartRightSide}

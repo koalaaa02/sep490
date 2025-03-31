@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BiTask } from "react-icons/bi";
 import { RiShoppingCart2Line } from "react-icons/ri";
-import { FaClipboardList } from "react-icons/fa";
+import { FaClipboardList, FaChartBar } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { TbMessageReport } from "react-icons/tb";
@@ -17,7 +17,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
   return (
     <div
       className="d-flex flex-column p-3 bg-light"
-      style={{ width: "250px", height: "100vh" }}
+      style={{ width: "250px", height: "100%" }}
     >
       <ul className="nav flex-column navbar-nav navbar-light">
         {/* Quản lý sản phẩm */}
@@ -26,7 +26,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
             className="nav-link"
             onClick={() => setSelectedComponent("ProviderDashBoardDetail")}
           >
-            <RiShoppingCart2Line size={30} className="ms-1" /> Dashboard
+            <FaChartBar size={30} className="ms-1" /> Thống kê
           </button>
         </li>
         {/* Quản lý sản phẩm */}
@@ -98,7 +98,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         </li>
 
         {/* Báo cáo */}
-        <li>
+        {/* <li>
           <button className="nav-link" onClick={() => toggleDropdown("report")}>
             <TbMessageReport size={30} className="ms-1" /> Báo cáo
           </button>
@@ -109,10 +109,10 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               </Link>
             </div>
           )}
-        </li>
+        </li> */}
 
         {/* Giao dịch */}
-        <li>
+        {/* <li>
           <button
             className="nav-link"
             onClick={() => toggleDropdown("transaction")}
@@ -126,7 +126,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               </Link>
             </div>
           )}
-        </li>
+        </li> */}
 
         {/* Chat */}
         <li>
