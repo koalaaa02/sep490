@@ -28,9 +28,9 @@ const OrderList = () => {
     try {
       const params = new URLSearchParams({
         page: 1,
-        size: 10,
+        size: 50,
         sortBy: "id",
-        direction: "ASC",
+        direction: "DESC",
       });
 
       const response = await fetch(

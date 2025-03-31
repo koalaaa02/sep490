@@ -98,7 +98,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         </li>
 
         {/* Báo cáo */}
-        <li>
+        {/* <li>
           <button className="nav-link" onClick={() => toggleDropdown("report")}>
             <TbMessageReport size={30} className="ms-1" /> Báo cáo
           </button>
@@ -109,10 +109,10 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               </Link>
             </div>
           )}
-        </li>
+        </li> */}
 
         {/* Giao dịch */}
-        <li>
+        {/* <li>
           <button
             className="nav-link"
             onClick={() => toggleDropdown("transaction")}
@@ -126,7 +126,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               </Link>
             </div>
           )}
-        </li>
+        </li> */}
 
         {/* Chat */}
         <li>

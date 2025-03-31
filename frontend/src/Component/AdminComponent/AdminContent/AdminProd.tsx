@@ -28,7 +28,7 @@ const AdminProd = () => {
   const [pagination, setPagination] = useState<PaginationState>({
     activePage: 1,
     inactivePage: 1,
-    itemsPerPage: 5,
+    itemsPerPage: 10,
   });
 
   useEffect(() => {

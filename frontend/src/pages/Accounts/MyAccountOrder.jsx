@@ -29,7 +29,7 @@ const MyAccountOrder = () => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 10,
+          size: 100,
           sortBy: "id",
           direction: "ASC",
         });

@@ -81,7 +81,7 @@ const ShopCheckOut = () => {
         totalAmount: totalAmount,
         paymentMethod: selectedPayment,
         deliveryMethod: hasBulkyItem ? "SELF_DELIVERY" : "GHN",
-        paid: true,
+        paid: false,
         shopId: cartItems[0]?.shopId || 0,
         addressId: selectedAddressId,
         deliveryCode: "string",
@@ -224,7 +224,7 @@ const ShopCheckOut = () => {
                               {/* Ảnh sản phẩm */}
                               <div className="col-2 text-center">
                                 <img
-                                  src={img1}
+                                  src={item.imageUrl || img1}
                                   alt={item.productName}
                                   className="img-fluid mt-2"
                                   style={{
