@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
+import { Modal, Button } from "react-bootstrap";
 
 const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -8,6 +9,7 @@ const OrderList = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
   const token = localStorage.getItem("access_token");
   const statusOptions = [
     "PENDING",
@@ -96,6 +98,17 @@ const OrderList = () => {
     }
   };
 
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    setShowOrderDetails(true);
+  };
+
+  const filteredOrders = data?.content?.filter((order) =>
+    order.address.recipientName
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="p-3 mb-10">
       <h3>Danh sách đặt hàng</h3>
@@ -127,15 +140,20 @@ const OrderList = () => {
           </tr>
         </thead>
         <tbody>
-          {data?.content?.map((order) => {
+          {filteredOrders?.map((order) => {
             const totalAmount = order.orderDetails.reduce(
               (sum, item) => sum + item.quantity * item.productSku.sellingPrice,
               0
             );
             return (
               <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                <td
+                  style={{ cursor: "pointer", color: "blue" }}
+                  onClick={() => handleOrderClick(order)}
+                >
+                  {order.id}
+                </td>
+                <td>{new Date(order.createdAt).toLocaleDateString("vi-VN")}</td>
                 <td>{order.address.recipientName || "Chưa có tên"}</td>
                 <td>{totalAmount.toLocaleString()} VND</td>
                 <td>
@@ -213,6 +231,65 @@ const OrderList = () => {
           </div>
         </div>
       )}
+
+      <Modal
+        show={showOrderDetails}
+        onHide={() => setShowOrderDetails(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Chi tiết đơn hàng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedOrder?.orderDetails?.length > 0 ? (
+            <table className="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>SKU Code</th>
+                  <th>Hình ảnh</th>
+                  <th>Số lượng</th>
+                  <th>Giá bán</th>
+                  <th>Tổng</th>
+                </tr>
+              </thead>
+              <tbody>
+                {selectedOrder.orderDetails.map((detail, index) => (
+                  <tr key={index}>
+                    <td>{detail.productSku.skuCode}</td>
+                    <td>
+                      <img
+                        src={detail.productSku.images}
+                        alt={detail.productSku.skuCode}
+                        style={{ width: "80px" }}
+                      />
+                    </td>
+                    <td>{detail.quantity}</td>
+                    <td>
+                      {detail.productSku.sellingPrice.toLocaleString()} VND
+                    </td>
+                    <td>
+                      {(
+                        detail.quantity * detail.productSku.sellingPrice
+                      ).toLocaleString()}{" "}
+                      VND
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>Không có chi tiết đơn hàng nào.</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowOrderDetails(false)}
+          >
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

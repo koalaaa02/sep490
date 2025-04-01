@@ -90,8 +90,10 @@ const MyAcconutSetting = () => {
 
       if (response.ok) {
         setMessage("Mật khẩu đã được thay đổi thành công.");
+        alert("Mật khẩu đã được thay đổi thành công.!");
       } else {
         setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+        alert("Đã xảy ra lỗi. Vui lòng thử lại.!");
       }
     } catch (err) {
       setError(

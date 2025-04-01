@@ -20,8 +20,6 @@ const MyAccountSignUp = () => {
     setLoading(true);
     setError(null);
 
-    const fullName = `${firstName}${lastName}`.trim();
-
     try {
       const response = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
@@ -29,7 +27,7 @@ const MyAccountSignUp = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ name: fullName, email, password }),
+        body: JSON.stringify({ firstName, lastName, email, password }),
       });
 
       const text = await response.text();
