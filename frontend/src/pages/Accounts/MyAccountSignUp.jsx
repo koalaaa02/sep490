@@ -87,7 +87,7 @@ const MyAccountSignUp = () => {
 
       setIsActivate(false);
 
-      navigate("/MyAccountOrder");
+      navigate("/");
     } catch (err) {
       setErrorMessage("Kích hoạt thất bại, vui lòng thử lại!");
     }

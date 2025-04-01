@@ -1,6 +1,7 @@
 import storeImg from "../../../images/stores-logo-1.svg";
 import { Image } from "react-bootstrap";
 import { BASE_URL } from "../../../Utils/config";
+
 const OrderDetail = ({ order, status }) => {
   const token = localStorage.getItem("access_token");
 
@@ -72,10 +73,10 @@ const OrderDetail = ({ order, status }) => {
           <span className="fw-bold ml-2">{order.shopName}</span>
 
           <div className="rounded-2">
-            <span className="ml-2 bg-warning border border-warning text-white py-1 px-2 border-end-0">
-              Chat
+            <span className="ml-2 bg-warning rounded me-1 border border-warning text-white py-1 px-2 border-end-0">
+              Nhắn tin
             </span>
-            <span className=" text-danger  radius-0 border border-danger py-1 px-2">
+            <span className=" text-danger rounded border border-danger py-1 px-2">
               Xem shop
             </span>
           </div>
@@ -90,7 +91,17 @@ const OrderDetail = ({ order, status }) => {
           {order.products.map((p) => (
             <div className="d-flex w-70">
               <div>
-                <img width={100} height={100} src={p.mage} alt="" srcset="" />
+                <img
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    overflow: "hidden",
+                  }}
+                  className="rounded"
+                  src={p.image}
+                  alt=""
+                  srcset=""
+                />
               </div>
               <div className="ml-2">
                 <div className="fw-bold">{p.productName}</div>
