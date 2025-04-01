@@ -291,7 +291,9 @@ const AdminProvider = () => {
               <p>
                 <strong>Địa chỉ:</strong> {selectedShop.address}
               </p>
-              <h5>Sản phẩm của cửa hàng:</h5>
+              <p>
+                <strong>Sản phẩm:</strong>
+              </p>
               <Table striped hover responsive>
                 <thead>
                   <tr>
