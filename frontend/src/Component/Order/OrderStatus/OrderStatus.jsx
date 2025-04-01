@@ -16,7 +16,7 @@ const OrderStatus = ({ setStatus }) => {
   ];
 
   return (
-    <div className="d-flex">
+    <div className={styles.orderStatusContainer}>
       {statusTab.map((status) => (
         <div
           key={status.code}

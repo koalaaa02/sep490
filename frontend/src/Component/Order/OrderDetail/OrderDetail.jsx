@@ -1,19 +1,10 @@
 import storeImg from "../../../images/stores-logo-1.svg";
-const OrderDetail = ({ order }) => {
+const OrderDetail = ({ order, status }) => {
   const totalSum = order.products.reduce((sum, product) => {
     return sum + product.price * product.quantity;
   }, 0);
-  console.log(order);
-  const statusTab = {
-    PENDING: "Đang chờ",
-    ACCEPTED: "Đã chấp nhận",
-    PACKAGING: "Đóng gói",
-    FINDINGTRUCK: "Tìm xe tải",
-    DELIVERING: "Đang giao",
-    DELIVERED: "Đã giao",
-    LOST: "Mất hàng",
-    CANCELLED: "Đã hủy",
-  };
+  console.log(status);
+
   return (
     <div className="d-flex p-2 border  mt-2 mb-5 rounded shadow-sm">
       <div className="order-info w-75 ">
@@ -80,10 +71,7 @@ const OrderDetail = ({ order }) => {
               {totalSum.toLocaleString()}
             </div>
           </div>
-          <div className={`my-3  py-2 rounded mx-auto w-60`}>
-            {" "}
-            Chờ xét duyệt
-          </div>
+          <div className={`my-3  py-2 rounded mx-auto w-60`}>Chờ xét duyệt</div>
           <div className="my-5 py-1 text-danger border border-danger rounde ">
             Huỷ yêu cầu
           </div>
