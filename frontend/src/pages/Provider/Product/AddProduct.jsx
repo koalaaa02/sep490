@@ -10,7 +10,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     specifications: "",
     unit: "PCS",
     images: "string",
-    active: false,
+    active: true,
     categoryId: "",
     supplierId: 1,
     shopId: 1,

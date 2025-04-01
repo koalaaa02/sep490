@@ -6,12 +6,23 @@ const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
+  const [products, setProducts] = useState(null);
 
   useEffect(() => {
-    fetchData();
+    fetchShopData();
   }, []);
 
-  const fetchData = async () => {
+  useEffect(() => {
+    if (data?.id) {
+      const delayDebounceFn = setTimeout(() => {
+        fetchProducts(searchTerm);
+      }, 500); 
+
+      return () => clearTimeout(delayDebounceFn); 
+    }
+  }, [searchTerm, data?.id]); 
+
+  const fetchShopData = async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
         method: "GET",
@@ -21,8 +32,47 @@ const ProductList = ({ setSelectedProductId }) => {
         },
         credentials: "include",
       });
+
       const result = await response.json();
       setData(result);
+
+      if (result?.id) {
+        fetchProducts(""); 
+      }
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu:", error);
+    }
+  };
+
+  const fetchProducts = async (search) => {
+    try {
+      const params = new URLSearchParams({
+        page: 1,
+        size: 100,
+        sortBy: "id",
+        direction: "ASC",
+        active: true,
+        shopId: data?.id,
+      });
+
+      if (search) {
+        params.append("name", search);
+      }
+
+      const responsePro = await fetch(
+        `${BASE_URL}/api/provider/products/?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      const resultPro = await responsePro.json();
+      setProducts(resultPro);
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu:", error);
     }
@@ -45,7 +95,8 @@ const ProductList = ({ setSelectedProductId }) => {
       );
       if (response.ok) {
         alert("Xóa sản phẩm thành công!");
-        fetchData();
+        fetchProducts(searchTerm);
+
       } else {
         alert("Xóa sản phẩm thất bại!");
       }
@@ -110,33 +161,31 @@ const ProductList = ({ setSelectedProductId }) => {
           </tr>
         </thead>
         <tbody>
-          {data?.products
-            ?.filter((product) => product.delete === false)
-            .map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td title={product.description}>
-                  {product.description.length > 50
-                    ? product.description.substring(0, 50) + "..."
-                    : product.description}
-                </td>
-                <td>{product.specifications}</td>
-                <td>{product.unit}</td>
-                <td>
-                  <FaEye
-                    className="mx-1 text-primary"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => setSelectedProductId(product.id)}
-                  />
-                  <FaTrash
-                    className="mx-1 text-danger"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => deleteProduct(product.id)}
-                  />
-                </td>
-              </tr>
-            ))}
+          {products?.content?.map((product) => (
+            <tr key={product.id}>
+              <td>{product.id}</td>
+              <td>{product.name}</td>
+              <td title={product.description}>
+                {product.description.length > 50
+                  ? product.description.substring(0, 50) + "..."
+                  : product.description}
+              </td>
+              <td>{product.specifications}</td>
+              <td>{product.unit}</td>
+              <td>
+                <FaEye
+                  className="mx-1 text-primary"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setSelectedProductId(product.id)}
+                />
+                <FaTrash
+                  className="mx-1 text-danger"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => deleteProduct(product.id)}
+                />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

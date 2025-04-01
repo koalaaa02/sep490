@@ -93,6 +93,10 @@ const AdminProd = () => {
   }, [rfkey, pagination.activePage, pagination.inactivePage]);
 
   const handleActive = async (id) => {
+    const confirmAction = window.confirm(
+      "Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm này không?"
+    );
+    if (!confirmAction) return;
     try {
       const response = await fetch(
         `${BASE_URL}/api/admin/products/activate/${id}`,
