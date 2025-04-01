@@ -19,7 +19,7 @@ const MyAccountSignUp = () => {
   const [isActivate, setIsActivate] = useState(false);
   const [otp, setOtp] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
+  const navigate = useNavigate();
   const handleInputChange = () => {
     setSuccessMessage("");
     setErrorMessage("");
@@ -86,6 +86,8 @@ const MyAccountSignUp = () => {
       );
 
       setIsActivate(false);
+
+      navigate("/MyAccountOrder");
     } catch (err) {
       setErrorMessage("Kích hoạt thất bại, vui lòng thử lại!");
     }
