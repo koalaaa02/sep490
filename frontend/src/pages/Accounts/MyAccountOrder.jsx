@@ -62,14 +62,17 @@ const MyAccountOrder = () => {
     ?.map((order) => ({
       shopName: order?.shop.name,
       id: order?.id,
+
       status: order?.status,
       products: order?.orderDetails?.map((detail) => ({
         price: detail?.price,
         quantity: detail?.quantity,
         image: detail?.productSku?.images,
+        productName: "BACKEND DEO TRA PRODUCT NAME",
       })),
     }))
     .filter((f) => f.status === status);
+
   return (
     <div>
       <>
