@@ -8,6 +8,7 @@ import {
   Tabs,
   Tab,
   Pagination,
+  Modal,
 } from "react-bootstrap";
 import { FiSearch } from "react-icons/fi";
 import { BASE_URL } from "../../../Utils/config";
@@ -19,6 +20,8 @@ const AdminProvider = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [rfkey, setRfKey] = useState(true);
+  const [showDetail, setShowDetail] = useState(false);
+  const [selectedShop, setSelectedShop] = useState(null);
   const [pagination, setPagination] = useState({
     activePage: 1,
     inactivePage: 1,
@@ -53,8 +56,17 @@ const AdminProvider = () => {
             id: rp.id,
             name: rp.name,
             manager: rp.manager.name,
+            registrationCertificateImages: rp.registrationCertificateImages,
+            address: rp.address.address,
             tin: rp.tin,
             status: rp.active,
+            products: rp.products?.map((product) => ({
+              id: product.id,
+              name: product.name,
+              description: product.description,
+              unit: product.unit,
+              specifications: product.specifications,
+            })),
           })),
           totalPages: result?.totalPages || 1,
         };
@@ -115,12 +127,20 @@ const AdminProvider = () => {
       [`${type}Page`]: page,
     }));
   };
+
   const filtered = (s) =>
     s.filter(
       (s) =>
-        s?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s?.manager?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        (typeof s?.name === "string" &&
+          s?.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (typeof s?.manager?.name === "string" &&
+          s?.manager?.name.toLowerCase().includes(searchTerm.toLowerCase()))
     );
+
+  const handleShowDetail = (shop) => {
+    setSelectedShop(shop);
+    setShowDetail(true);
+  };
 
   const current =
     activeTab === "active" ? filtered(activeShop) : filtered(inactiveShop);
@@ -170,7 +190,14 @@ const AdminProvider = () => {
               {filtered(activeShop).map((s) => (
                 <tr key={s.id}>
                   <td>{s.id}</td>
-                  <td>{s.name}</td>
+                  <td
+                    onClick={() => handleShowDetail(s)}
+                    style={{ cursor: "pointer", color: "blue" }}
+                  >
+                    {typeof s.name === "string"
+                      ? s.name
+                      : "Tên cửa hàng không hợp lệ"}
+                  </td>
                   <td>{s.manager}</td>
                   <td>{s.tin}</td>
                   <td onClick={() => handleActive(s.id)}>
@@ -207,7 +234,14 @@ const AdminProvider = () => {
               {filtered(inactiveShop).map((s) => (
                 <tr key={s.id}>
                   <td>{s.id}</td>
-                  <td>{s.name}</td>
+                  <td
+                    onClick={() => handleShowDetail(s)}
+                    style={{ cursor: "pointer", color: "blue" }}
+                  >
+                    {typeof s.name === "string"
+                      ? s.name
+                      : "Tên cửa hàng không hợp lệ"}
+                  </td>
                   <td>{s.manager}</td>
                   <td>{s.tin}</td>
                   <td onClick={() => handleActive(s.id)}>
@@ -230,6 +264,65 @@ const AdminProvider = () => {
           </Pagination>
         </Tab>
       </Tabs>
+      <Modal
+        show={showDetail}
+        onHide={() => setShowDetail(false)}
+        size="xl"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Chi tiết cửa hàng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedShop && (
+            <div>
+              <p>
+                <strong>Tên:</strong> {selectedShop.name}
+              </p>
+              <p>
+                <strong>Chủ cửa hàng:</strong> {selectedShop.manager}
+              </p>
+              <p>
+                <strong>Mã số:</strong> {selectedShop.tin}
+              </p>
+              <p>
+                <strong>Đăng ký:</strong>{" "}
+                {selectedShop.registrationCertificateImages}
+              </p>
+              <p>
+                <strong>Địa chỉ:</strong> {selectedShop.address}
+              </p>
+              <h5>Sản phẩm của cửa hàng:</h5>
+              <Table striped hover responsive>
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Mô tả</th>
+                    <th>Đơn vị</th>
+                    <th>Thông số</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectedShop.products?.map((product, index) => (
+                    <tr key={product.id}>
+                      <td>{index + 1}</td>
+                      <td>{product.name}</td>
+                      <td>{product.description}</td>
+                      <td>{product.unit}</td>
+                      <td>{product.specifications}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDetail(false)}>
+            Đóng
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
