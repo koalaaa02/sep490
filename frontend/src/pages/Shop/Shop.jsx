@@ -109,7 +109,7 @@ function Dropdown() {
     setSearchQuery(searchName); // Cập nhật giá trị tìm kiếm
   };
 
-  const totalPages = Math.ceil(products.totalElements / size);
+  const totalPages = Math.ceil(products?.totalElements / size);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {

@@ -4,7 +4,6 @@ import { BASE_URL } from "../../../Utils/config";
 import InvoiceDetails from "./InvoiceDetail";
 
 const InvoiceListComponent = () => {
-  const [filter, setFilter] = useState("Tất cả");
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -43,7 +42,7 @@ const InvoiceListComponent = () => {
         />
       ) : (
         <>
-          <h3>Danh sách hóa đơn</h3>
+          <h3>Danh sách khoản nợ</h3>
           <div className="mb-3 d-flex align-items-center">
             <input
               type="text"
@@ -56,41 +55,39 @@ const InvoiceListComponent = () => {
               <FaSearch />
             </button>
           </div>
-          <div className="border p-2 mb-3">
-            <strong>Thống kê nhanh:</strong>
-            <div>Tổng hóa đơn: {data?.length}</div>
-            <div>Tổng tiền: ...</div>
-          </div>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
-                <th>Mã khách hàng</th>
+                <th>STT</th>
+                <th>Mã đơn hàng</th>
+                <th>Ngày đặt hàng</th>
+                <th>Tên khách hàng</th>
+                <th>Số tiền cần thanh toán</th>
+                <th>Ngày giao hàng</th>
                 <th>Số tiền đã trả</th>
-                <th>Tổng tiền</th>
                 <th>Trạng thái</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
-              {data?.map((invoice) => (
+              {data?.map((invoice, index) => (
                 <tr key={invoice.id}>
-                  <td>{invoice.userId}</td>
-                  <td>{invoice.paidAmount}</td>
+                  <td>{index + 1}</td>
+                  <td className="text-primary cursor-pointer"
+                    onClick={() => {
+                      setSelectedInvoice(invoice.userId);
+                    }}
+                  >
+                    5KX3ELQ91V
+                  </td>
+                  <td>21:00 04/04/2025</td>
+                  <td>{invoice.firstName || "user"}</td>
                   <td>{invoice.totalAmount}</td>
+                  <td>21:00 04/04/2025</td>
+                  <td>{invoice.paidAmount}</td>
                   <td>
                     {invoice.paidPercentage > 100
                       ? "Đã thanh toán"
                       : `Đã thanh toán ${invoice.paidPercentage}%`}
-                  </td>
-                  <td>
-                    <FaEye
-                      className="mx-1 text-primary"
-                      onClick={() => {
-                        setSelectedInvoice(invoice.userId);
-                      }}
-                    />
-                    <FaEdit className="mx-1 text-warning" />
-                    <FaTrash className="mx-1 text-danger" />
                   </td>
                 </tr>
               ))}
@@ -99,7 +96,7 @@ const InvoiceListComponent = () => {
           <nav>
             <ul className="pagination">
               <li className="page-item">
-                <button className="page-link">Prev</button>
+                <button className="page-link">Trước</button>
               </li>
               <li className="page-item active">
                 <button className="page-link">1</button>
@@ -114,7 +111,7 @@ const InvoiceListComponent = () => {
                 <button className="page-link">4</button>
               </li>
               <li className="page-item">
-                <button className="page-link">Next</button>
+                <button className="page-link">Sau</button>
               </li>
             </ul>
           </nav>

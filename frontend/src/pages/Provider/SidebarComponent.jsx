@@ -60,7 +60,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
             className="nav-link"
             onClick={() => toggleDropdown("invoice")}
           >
-            <BiTask size={30} className="ms-1" /> Hóa đơn
+            <BiTask size={30} className="ms-1" /> Khoản nợ
           </button>
           {openDropdown === "invoice" && (
             <div className="dropdown-menu show">
@@ -68,7 +68,7 @@ const SidebarComponent = ({ setSelectedComponent }) => {
                 className="dropdown-item"
                 onClick={() => setSelectedComponent("InvoiceManagement")}
               >
-                Danh sách hóa đơn
+                Danh sách khoản nợ
               </button>
               <button
                 className="dropdown-item"
