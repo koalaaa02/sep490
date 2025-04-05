@@ -32,37 +32,6 @@ const Header = () => {
     window.location.reload();
   };
 
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const params = new URLSearchParams({
-          page: 1,
-          size: 100,
-          sortBy: "id",
-          direction: "ASC",
-        });
-
-        const response = await fetch(
-          `${BASE_URL}/api/public/categories?${params.toString()}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -190,39 +159,7 @@ const Header = () => {
                   Trang chủ
                 </Link>
               </li>
-              <li className="nav-item">
-                <li className="nav-item dmenu dropdown">
-                  <Link
-                    className="nav-link dropdown-toggle"
-                    to=""
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    Tất cả danh mục
-                  </Link>
-                  <div
-                    className="dropdown-menu sm-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((material, index) => (
-                        <Link
-                          key={index}
-                          className="dropdown-item"
-                          to={`/Shop/${material.id}`}
-                        >
-                          {material.name}
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="dropdown-item">Đang tải...</p>
-                    )}
-                  </div>
-                </li>
-              </li>
+             
 
               <li className="nav-item dmenu dropdown">
                 <Link

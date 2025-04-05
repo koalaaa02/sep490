@@ -10,6 +10,7 @@ import { BASE_URL } from "../../Utils/config";
 import image1 from "../../images/glass.jpg";
 import ShopProductDetail from "./ShopProductDetail";
 import { FaSearch } from "react-icons/fa";
+import Product from "../../Component/Public/Product";
 
 function Dropdown() {
   // loading
@@ -25,73 +26,34 @@ function Dropdown() {
   const [direction, setDirection] = useState("ASC");
   const [searchName, setSearchName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const params1 = new URLSearchParams({
-    page: page,
-    size: size,
-    sortBy: "id",
-    direction: direction,
-    active: true,
-    categoryId: cateId,
-    name: searchQuery,
-  });
-
-  const ratings = [
-    { id: "ratingFive", stars: 5 },
-    { id: "ratingFour", stars: 4 },
-    { id: "ratingThree", stars: 3 },
-    { id: "ratingTwo", stars: 2 },
-    { id: "ratingOne", stars: 1 },
-  ];
-
   useEffect(() => {
-    if (!cateId) return;
-
     const fetchData = async () => {
+      if (!cateId) return;
       try {
-        setLoaderStatus(true);
-        const params = new URLSearchParams({
-          page: 1,
-          size: 10,
-          sortBy: "id",
-          direction: "ASC",
-        });
+        const response = await fetch(
+          `${BASE_URL}/api/public/categories/${cateId}`,
+          {
+            method: "GET",
+            headers: {
+              // Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
-        const [shopResponse, cateResponse, proResponse] = await Promise.all([
-          fetch(`${BASE_URL}/api/public/shops?${params.toString()}`, {
-            method: "GET",
-            credentials: "include",
-          }),
-          fetch(`${BASE_URL}/api/public/categories/${cateId}`, {
-            method: "GET",
-            credentials: "include",
-          }),
-          fetch(`${BASE_URL}/api/public/products?${params1.toString()}`, {
-            method: "GET",
-            credentials: "include",
-          }),
-        ]);
+        const result = await response.json();
 
-        if (shopResponse.ok && cateResponse.ok && proResponse.ok) {
-          const [shopData, cateData, proData] = await Promise.all([
-            shopResponse.json(),
-            cateResponse.json(),
-            proResponse.json(),
-          ]);
-          setStores(shopData.content || []);
-          setCategories(cateData || {});
-          setProducts(proData || {});
-        } else {
-          throw new Error("Lỗi khi tải dữ liệu");
-        }
-      } catch (error) {
-        console.error("Lỗi khi tải dữ liệu:", error);
-      } finally {
+        setCategories(result);
         setLoaderStatus(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [cateId, size, page, direction, searchQuery]);
+  }, [cateId]);
+  console.log(categories);
 
   const handleChange = (event) => {
     setSize(event.target.value);
@@ -165,70 +127,24 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Danh sách cửa hàng</h5>
-                    <div className="my-4">
-                      {/* input */}
-                      <input
-                        type="search"
-                        className="form-control"
-                        placeholder="Tìm kiếm cửa hàng..."
-                      />
-                    </div>
-                    {stores.length > 0 ? (
-                      stores.map((stores, index) => (
-                        <div className="form-check mb-2" key={index}>
-                          {/* input */}
-                          <Link
-                            to={`/SingleShop/${stores.id}`}
-                            className="form-check-label text-decoration-none text-warning"
-                            htmlFor="eGrocery"
-                          >
-                            {stores.name}
-                          </Link>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="dropdown-item">Đang tải...</p>
-                    )}
-                    {/* form check */}
-                  </div>
-                  <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Danh mục</h5>
+                    <h5 className="mb-3">Danh mục con</h5>
                     <div>
-                      {/* range */}
-                      <div id="priceRange" className="mb-3" />
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Nhập số..."
-                      />
-                      <span id="priceRange-value" className="small" />
+                      {categories?.subCategories?.length ? (
+                        categories.subCategories.map((c) => (
+                          <Link
+                            key={c.id} // Don't forget to add a unique key for each item
+                            to={`/shop/${c.id}`}
+                            className="text-decoration-none text-black hover:text-primary"
+                          >
+                            <p className="mb-2">{c.name}</p>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-muted">Không có danh mục con</p>
+                      )}
                     </div>
                   </div>
-
-                  <div className="py-4">
-                    {/* Banner Design */}
-                    {/* Banner Content */}
-                    <div className="position-absolute p-5 py-8">
-                      <h3 className="mb-0">Sell Off </h3>
-                      <p className=" text-white">Get Upto 25%</p>
-                      <Link to="#" className="btn btn-warning">
-                        Shop Now
-                        <i className="feather-icon icon-arrow-right ms-1" />
-                      </Link>
-                    </div>
-                    {/* Banner Content */}
-                    {/* Banner Image */}
-                    {/* img */}
-                    <img
-                      src={assortment}
-                      alt="assortment"
-                      className="img-fluid rounded-3"
-                    />
-                    {/* Banner Image */}
-                  </div>
-                  {/* Banner Design */}
                 </div>
               </div>
               {/* Cards Column */}
@@ -276,7 +192,7 @@ function Dropdown() {
                           <span className="text-dark">
                             Có{" "}
                             {
-                              categories.products.filter((p) => !p.delete)
+                              categories?.products?.filter((p) => !p.delete)
                                 .length
                             }{" "}
                           </span>{" "}
@@ -319,168 +235,26 @@ function Dropdown() {
                     </div>
                     {/* row */}
                     <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
-                      {products.content
-                        .filter((p) => !p.delete)
-                        .map((p, index) => {
-                          const isInWishlist = storedWishlist.some(
-                            (item) => item.id === p.id
-                          );
-                          return (
-                            <div key={index} className="col">
-                              {/* card */}
-                              <div className="card card-product">
-                                <div
-                                  className="card-body d-flex flex-column justify-content-between"
-                                  style={{ height: "300px" }} // Đảm bảo chiều cao cố định
-                                >
-                                  {/* Ảnh - Cố định kích thước */}
-                                  <div className="text-center position-relative">
-                                    <Link>
-                                      <img
-                                        src={p.images || image1}
-                                        alt={p.images}
-                                        className="mb-3 img-fluid"
-                                        style={{
-                                          width: "150px",
-                                          height: "150px",
-                                          objectFit: "cover", // Giữ hình ảnh đúng tỉ lệ
-                                        }}
-                                      />
-                                    </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        className="btn-action"
-                                        onClick={() => setSelectedProduct(p)}
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        onClick={
-                                          isInWishlist
-                                            ? null
-                                            : () => handleAddWishList(p)
-                                        }
-                                        className={`btn-action ${
-                                          isInWishlist
-                                            ? "disabled text-warning"
-                                            : ""
-                                        }`}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i
-                                          className={`bi ${
-                                            isInWishlist
-                                              ? "bi-heart-fill"
-                                              : "bi-heart"
-                                          }`}
-                                        />
-                                      </Link>
-                                    </div>
-                                  </div>
-
-                                  {/* Thông tin sản phẩm */}
-                                  <div>
-                                    <h2
-                                      className="fs-6 text-truncate"
-                                      style={{
-                                        maxWidth: "100%", // Giữ trong vùng hiển thị
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                      }}
-                                    >
-                                      <Link
-                                        onClick={() => setSelectedProduct(p)}
-                                        className="text-inherit text-decoration-none"
-                                        title={p?.name} // Hiện tooltip khi hover
-                                      >
-                                        {p?.name}
-                                      </Link>
-                                    </h2>
-                                    <p
-                                      className="text-muted"
-                                      style={{
-                                        height: "40px",
-                                        overflow: "hidden",
-                                        display: "-webkit-box",
-                                        WebkitBoxOrient: "vertical",
-                                        WebkitLineClamp: 2,
-                                      }}
-                                      title={p.description}
-                                    >
-                                      {p.description}
-                                    </p>
-                                  </div>
-                                </div>
+                      {categories?.products?.filter((p) => !p.delete).length >
+                      0 ? (
+                        categories.products
+                          .filter((p) => !p.delete)
+                          .map((p, index) => {
+                            const isInWishlist = storedWishlist.some(
+                              (item) => item.id === p.id
+                            );
+                            return (
+                              <div key={index} className="col">
+                                {/* card */}
+                                <Product product={p} />
                               </div>
-                            </div>
-                          );
-                        })}
-                    </div>
-                    <div className="row mt-8">
-                      <div className="col">
-                        <nav>
-                          <ul className="pagination">
-                            {/* Nút Previous */}
-                            <li
-                              className={`page-item ${
-                                page === 1 ? "disabled" : ""
-                              }`}
-                            >
-                              <Link
-                                className="page-link mx-1 rounded-3"
-                                to="#"
-                                onClick={() => handlePageChange(page - 1)}
-                                aria-label="Previous"
-                              >
-                                <i className="fa fa-chevron-left" />
-                              </Link>
-                            </li>
-
-                            {/* Hiển thị số trang */}
-                            {[...Array(totalPages)].map((_, index) => {
-                              const pageNumber = index + 1;
-                              return (
-                                <li
-                                  key={pageNumber}
-                                  className={`page-item ${
-                                    page === pageNumber ? "active" : ""
-                                  }`}
-                                >
-                                  <Link
-                                    className="page-link mx-1 rounded-3 text-body"
-                                    to="#"
-                                    onClick={() => handlePageChange(pageNumber)}
-                                  >
-                                    {pageNumber}
-                                  </Link>
-                                </li>
-                              );
-                            })}
-
-                            {/* Nút Next */}
-                            <li
-                              className={`page-item ${
-                                page === totalPages ? "disabled" : ""
-                              }`}
-                            >
-                              <Link
-                                className="page-link mx-1 rounded-3"
-                                to="#"
-                                onClick={() => handlePageChange(page + 1)}
-                                aria-label="Next"
-                              >
-                                <i className="fa fa-chevron-right" />
-                              </Link>
-                            </li>
-                          </ul>
-                        </nav>
-                      </div>
+                            );
+                          })
+                      ) : (
+                        <div className="col-12">
+                          <p>No items found</p>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
