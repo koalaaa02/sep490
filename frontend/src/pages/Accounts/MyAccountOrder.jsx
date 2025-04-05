@@ -68,7 +68,7 @@ const MyAccountOrder = () => {
         price: detail?.price,
         quantity: detail?.quantity,
         image: detail?.productSku?.images,
-        productName: "BACKEND DEO TRA PRODUCT NAME",
+        productName: detail?.productSku?.skuCode,
       })),
     }))
     .filter((f) => f.status === status);

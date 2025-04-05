@@ -132,9 +132,25 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     }
   };
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   return (
     <div className="p-3 mb-10">
-      <h3 className="mb-3">Thêm sản phẩm mới</h3>
+      <h3 className="mb-3"> mới</h3>
       <div className="border p-3 rounded">
         {/* Hình ảnh sản phẩm */}
         <div className="mb-3">
@@ -230,24 +246,10 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
                 "TON",
               ].map((unit) => (
                 <option key={unit} value={unit}>
-                  {unit}
+                  {convertUnitToVietnamese(unit)}
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-
-        <div className="row mb-3">
-          <div className="col-md-6">
-            <label className="form-label fw-bold">Đơn giá:</label>
-            <input
-              type="text"
-              className="form-control"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              required
-            />
           </div>
         </div>
 

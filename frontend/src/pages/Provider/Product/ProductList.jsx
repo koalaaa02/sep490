@@ -1,17 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaEye, FaTrash, FaStore } from "react-icons/fa";
+import { FaSearch, FaStore } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
+import { Link } from "react-router-dom";
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
+  const [products, setProducts] = useState(null);
+  const [page, setPage] = useState(1);
+  const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (data?.id) {
+      const delayDebounceFn = setTimeout(() => {
+        fetchProducts(searchTerm);
+      }, 500);
 
-  const fetchData = async () => {
+      return () => clearTimeout(delayDebounceFn);
+    }
+  }, [searchTerm, data?.id, isActive]);
+
+  useEffect(() => {
+    fetchShopData();
+  }, [page]);
+
+  const fetchShopData = async () => {
     try {
       const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
         method: "GET",
@@ -21,37 +35,84 @@ const ProductList = ({ setSelectedProductId }) => {
         },
         credentials: "include",
       });
+
       const result = await response.json();
       setData(result);
+
+      if (result?.id) {
+        fetchProducts("");
+      }
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu:", error);
     }
   };
 
-  const deleteProduct = async (productId) => {
-    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
-      return;
-    }
+  const fetchProducts = async (search) => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/provider/products/${productId}`,
+      const params = new URLSearchParams({
+        page: page,
+        size: 15,
+        sortBy: "id",
+        direction: "ASC",
+        active: isActive,
+        shopId: data?.id,
+      });
+
+      if (search) {
+        params.append("name", search);
+      }
+
+      const responsePro = await fetch(
+        `${BASE_URL}/api/provider/products/?${params.toString()}`,
         {
-          method: "DELETE",
+          method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
+          credentials: "include",
         }
       );
-      if (response.ok) {
-        alert("Xóa sản phẩm thành công!");
-        fetchData();
-      } else {
-        alert("Xóa sản phẩm thất bại!");
-      }
+
+      const resultPro = await responsePro.json();
+      setProducts(resultPro);
     } catch (error) {
-      console.error("Lỗi khi xóa sản phẩm:", error);
+      console.error("Lỗi khi fetch dữ liệu:", error);
     }
+  };
+
+  const totalPages = products?.totalElements
+    ? Math.ceil(products?.totalElements / 15)
+    : 0;
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
+  const handleActive = () => {
+    setIsActive(true);
+  };
+
+  const handleInactive = () => {
+    setIsActive(false);
   };
 
   return (
@@ -97,48 +158,128 @@ const ProductList = ({ setSelectedProductId }) => {
           <FaSearch />
         </button>
       </div>
+      <div className="mb-2">
+        <label>Trạng thái:</label>
+        <div>
+          <button
+            className={`btn ${
+              isActive ? "btn-success" : "btn-outline-success"
+            } me-2`}
+            onClick={handleActive}
+          >
+            Kích hoạt
+          </button>
+          <button
+            className={`btn ${!isActive ? "btn-danger" : "btn-outline-danger"}`}
+            onClick={handleInactive}
+          >
+            Chưa kích hoạt
+          </button>
+        </div>
+      </div>
 
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
             <th>ID</th>
             <th>Tên sản phẩm</th>
+            <th>Ảnh</th>
+            <th>Danh mục</th>
             <th>Mô tả</th>
             <th>Thông số kỹ thuật</th>
             <th>Đơn vị</th>
-            <th></th>
+            <th>Ngày thêm</th>
           </tr>
         </thead>
         <tbody>
-          {data?.products
-            ?.filter((product) => product.delete === false)
-            .map((product) => (
-              <tr key={product.id}>
-                <td>{product.id}</td>
-                <td>{product.name}</td>
-                <td title={product.description}>
-                  {product.description.length > 50
-                    ? product.description.substring(0, 50) + "..."
-                    : product.description}
-                </td>
-                <td>{product.specifications}</td>
-                <td>{product.unit}</td>
-                <td>
-                  <FaEye
-                    className="mx-1 text-primary"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => setSelectedProductId(product.id)}
-                  />
-                  <FaTrash
-                    className="mx-1 text-danger"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => deleteProduct(product.id)}
-                  />
-                </td>
-              </tr>
-            ))}
+          {products?.content?.map((product, index) => (
+            <tr key={product.id}>
+              <td>{index + 1}</td>
+              <td
+                style={{ cursor: "pointer" }}
+                onClick={() => setSelectedProductId(product.id)}
+                className="text-primary"
+              >
+                {product.name}
+              </td>
+              <td>
+                <img
+                  src={product.images}
+                  alt=""
+                  style={{ height: "50px", width: "50px" }}
+                  className="rounded"
+                />
+              </td>
+              <td>{product.category.name || "Không có"}</td>
+              <td title={product.description}>
+                {product.description.length > 50
+                  ? product.description.substring(0, 50) + "..."
+                  : product.description}
+              </td>
+              <td>{product.specifications}</td>
+              <td>{convertUnitToVietnamese(product.unit)}</td>
+              <td>
+                {new Date(product.createdAt).toLocaleString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
+      <div className="row mt-8">
+        <div className="col">
+          <nav>
+            <ul className="pagination">
+              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                <Link
+                  className="page-link mx-1 rounded-3"
+                  to="#"
+                  onClick={() => handlePageChange(page - 1)}
+                  aria-label="Previous"
+                >
+                  <i className="fa fa-chevron-left" />
+                </Link>
+              </li>
+
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <li
+                    key={pageNumber}
+                    className={`page-item ${
+                      page === pageNumber ? "active" : ""
+                    }`}
+                  >
+                    <Link
+                      className="page-link mx-1 rounded-3 text-body"
+                      to="#"
+                      onClick={() => handlePageChange(pageNumber)}
+                    >
+                      {pageNumber}
+                    </Link>
+                  </li>
+                );
+              })}
+
+              <li
+                className={`page-item ${page === totalPages ? "disabled" : ""}`}
+              >
+                <Link
+                  className="page-link mx-1 rounded-3"
+                  to="#"
+                  onClick={() => handlePageChange(page + 1)}
+                  aria-label="Next"
+                >
+                  <i className="fa fa-chevron-right" />
+                </Link>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
     </div>
   );
 };

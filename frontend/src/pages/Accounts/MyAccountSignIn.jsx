@@ -246,7 +246,7 @@ const MyAccountSignIn = () => {
                         Đăng ký
                       </a>
                     </div>
-                    <div className="mt-2">
+                    {/* <div className="mt-2">
                       Tài khoản của bạn chưa được kích hoạt?{" "}
                       <span
                         onClick={() => {
@@ -260,7 +260,7 @@ const MyAccountSignIn = () => {
                       >
                         Kích hoạt
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </form>
               )}

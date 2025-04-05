@@ -24,6 +24,32 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     bulky: false,
   };
 
+  const deleteProduct = async (productId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        alert("Xóa sản phẩm thành công!");
+        setSelectedProductId(null);
+      } else {
+        alert("Xóa sản phẩm thất bại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -719,12 +745,20 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
         {/* Nút Chỉnh sửa, Lưu, Hủy */}
         {!isEditing ? (
-          <button
-            className="btn btn-primary"
-            onClick={() => setIsEditing(true)}
-          >
-            Chỉnh sửa
-          </button>
+          <>
+            <button
+              className="btn btn-primary ms-2"
+              onClick={() => setIsEditing(true)}
+            >
+              Chỉnh sửa
+            </button>
+            <button
+              className="btn btn-danger"
+              onClick={() => deleteProduct(product.id)}
+            >
+              Ẩn Sản Phẩm
+            </button>
+          </> 
         ) : (
           <>
             <button className="btn btn-success me-2" onClick={handleSave}>
