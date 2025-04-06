@@ -19,7 +19,7 @@ const ProductList = ({ setSelectedProductId }) => {
 
       return () => clearTimeout(delayDebounceFn);
     }
-  }, [searchTerm, data?.id, isActive]);
+  }, [searchTerm, data?.id, isActive, page]);
 
   useEffect(() => {
     fetchShopData();

@@ -78,7 +78,13 @@ const InvoiceDetails = ({ invoice, onClose }) => {
           <tbody>
             <tr>
               <td>{index + 1}</td>
-              <td>5KX3ELQ91V</td>
+              <td>
+                {`VN${
+                  u.deliveryMethod === "GHN" ? "GHN" : "DEB"
+                }${Math.floor(
+                  new Date(u.createdAt).getTime() / 1000
+                )}${u.agent.name?.slice(0, 2).toUpperCase()}`}
+              </td>
               <td>
                 {new Date(u.createdAt).toLocaleString("vi-VN", {
                   hour: "2-digit",

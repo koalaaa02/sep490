@@ -50,6 +50,22 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     }
   };
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -456,7 +472,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 "TON",
               ].map((unit) => (
                 <option key={unit} value={unit}>
-                  {unit}
+                  {convertUnitToVietnamese(unit)}
                 </option>
               ))}
             </select>
@@ -747,18 +763,18 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         {!isEditing ? (
           <>
             <button
-              className="btn btn-primary ms-2"
+              className="btn btn-primary"
               onClick={() => setIsEditing(true)}
             >
               Chỉnh sửa
             </button>
             <button
-              className="btn btn-danger"
+              className="btn btn-danger ms-2"
               onClick={() => deleteProduct(product.id)}
             >
               Ẩn Sản Phẩm
             </button>
-          </> 
+          </>
         ) : (
           <>
             <button className="btn btn-success me-2" onClick={handleSave}>
