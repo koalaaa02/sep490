@@ -129,7 +129,10 @@ const ProductList = ({ setSelectedProductId }) => {
           <p>Tên cửa hàng: {data?.name}</p>
         </div>
         <div className="d-flex align-items-center">
-          <p>Shop type: {data?.shopType}</p>
+          <p>
+            Hình thức kinh doanh:{" "}
+            {data?.shopType === "ENTERPRISE" ? "Doanh nghiệp lớn" : "Doanh nghiệp nhỏ"}
+          </p>
         </div>
         <div className="d-flex align-items-center">
           <p>Địa chỉ: {data?.address?.address}</p>
@@ -181,7 +184,7 @@ const ProductList = ({ setSelectedProductId }) => {
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>STT</th>
             <th>Tên sản phẩm</th>
             <th>Ảnh</th>
             <th>Danh mục</th>

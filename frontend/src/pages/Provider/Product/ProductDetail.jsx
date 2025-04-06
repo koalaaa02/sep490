@@ -195,7 +195,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           body: JSON.stringify({
             id: sku.id,
             skuCode: sku.skuCode,
-            stock: sku.stock,
+            stock: 999,
             costPrice: sku.costPrice || 0,
             listPrice: sku.listPrice || 0,
             sellingPrice: sku.sellingPrice,
@@ -487,7 +487,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 <th>ID</th>
                 <th>Ảnh</th>
                 <th>Mã SKU</th>
-                <th>Số lượng tồn kho</th>
+                {/* <th>Số lượng tồn kho</th> */}
                 <th>Giá bán (VNĐ)</th>
                 <th>Giá sỉ (VNĐ)</th>
               </tr>
@@ -566,7 +566,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                       }
                     />
                   </td>
-                  <td>
+                  {/* <td>
                     <input
                       type="number"
                       className="form-control"
@@ -575,7 +575,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                         handleSkuChange(index, "stock", e.target.value)
                       }
                     />
-                  </td>
+                  </td> */}
                   <td>
                     <input
                       type="number"

@@ -53,15 +53,22 @@ const InvoiceDetails = ({ invoice, onClose }) => {
   return (
     <div className="mt-4 p-3 border rounded shadow-lg">
       <div>
-        <div className="d-flex align-items-center mb-2">
-          <button className="btn btn-secondary me-2" onClick={onClose}>
-            Quay lại
-          </button>
-          <h3 className="mb-0">Chi tiết hóa đơn</h3>
+        <div>
+          <div className="d-flex align-items-center mb-2">
+            <button className="btn btn-secondary me-2" onClick={onClose}>
+              Quay lại
+            </button>
+            <h3 className="mb-0">Chi tiết khoản nợ</h3>
+          </div>
         </div>
       </div>
-      <h4>Tên khách hàng: {user?.content[0]?.agent.name}</h4>
-
+      <div>
+        <strong>Tên khách hàng:</strong>
+        <span className="ms-2">{user?.content[0]?.agent.name}</span>
+        <br />
+        <strong>Email:</strong>
+        <span className="ms-2">{user?.content[0]?.agent.email}</span>
+      </div>
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
@@ -79,9 +86,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
             <tr>
               <td>{index + 1}</td>
               <td>
-                {`VN${
-                  u.deliveryMethod === "GHN" ? "GHN" : "DEB"
-                }${Math.floor(
+                {`VN${u.deliveryMethod === "GHN" ? "GHN" : "DEB"}${Math.floor(
                   new Date(u.createdAt).getTime() / 1000
                 )}${u.agent.name?.slice(0, 2).toUpperCase()}`}
               </td>

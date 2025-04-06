@@ -22,10 +22,10 @@ const ProviderDashBoardDetail = () => {
           </Col>
         </Row>
         <Row>
-          <Col>
+          <Col xl={6}>
             <TopSellingProduct />
           </Col>
-          <Col>
+          <Col xl={6}>
             <ProviderPeriod />
           </Col>
         </Row>

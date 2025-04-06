@@ -157,6 +157,7 @@ const OrderList = () => {
             <th>Ngày tạo</th>
             <th>Khách hàng</th>
             <th>Địa chỉ nhận hàng</th>
+            <th>Số điện thoại người nhận</th>
             <th>Phương thức vận chuyển</th>
             <th>Phương thức thanh toán</th>
             <th>Trạng Thái</th>
@@ -188,6 +189,7 @@ const OrderList = () => {
                     {order.address.address}, {order.address.ward},{" "}
                     {order.address.province}
                   </td>
+                  <td>{order.address.phone}</td>
                   <td>
                     {order.deliveryMethod === "GHN"
                       ? "Giao hàng nhanh"
@@ -216,7 +218,7 @@ const OrderList = () => {
                               <th>Ảnh sản phẩm</th>
                               <th>Sản phẩm</th>
                               <th>Số lượng</th>
-                              <th>Số lượng trong kho</th>
+                              {/* <th>Số lượng trong kho</th> */}
                               <th>Giá</th>
                               <th>Tổng tiền</th>
                             </tr>
@@ -233,7 +235,7 @@ const OrderList = () => {
                                 </td>
                                 <td>{detail.productSku.skuCode}</td>
                                 <td>{detail.quantity}</td>
-                                <td>{detail.productSku.stock}</td>
+                                {/* <td>{detail.productSku.stock}</td> */}
                                 <td>
                                   {detail.productSku.sellingPrice.toLocaleString()}{" "}
                                   VND
@@ -247,7 +249,9 @@ const OrderList = () => {
                                 </td>
                               </tr>
                             ))}
-                            <strong className="ms-2">Thay đổi trạng thái: </strong>
+                            <strong className="ms-2">
+                              Thay đổi trạng thái:{" "}
+                            </strong>
                             <select
                               className="form-select m-2"
                               value={order.status}
