@@ -91,8 +91,6 @@ const Home = () => {
 
     fetchData();
   }, []);
-  console.log(materials);
-
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -360,12 +358,12 @@ const Home = () => {
                     </div>
                     <div className="row">
                       <Swiper
-                        slidesPerView={5} // Number of items visible at once
+                        slidesPerView={6} // Number of items visible at once
                         grid={{
                           rows: 2, // Display items in 2 rows
                           fill: "row",
                         }}
-                        spaceBetween={30}
+                        spaceBetween={20}
                         pagination={{
                           clickable: true,
                         }}
@@ -383,15 +381,15 @@ const Home = () => {
                                       alt={material.alt}
                                       className="card-image rounded-circle"
                                       style={{
-                                        height: "200px",
-                                        width: "200px",
+                                        height: "150px",
+                                        width: "150px",
                                       }}
                                     />
                                   </Link>
                                   <div className="mt-4">
                                     <h5 className="fs-6 mb-0">
                                       <Link to="#" className="text-inherit">
-                                        {material.label}
+                                        {material.name}
                                       </Link>
                                     </h5>
                                   </div>
