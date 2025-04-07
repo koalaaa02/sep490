@@ -150,7 +150,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
   return (
     <div className="p-3 mb-10">
-      <h3 className="mb-3"> mới</h3>
+      <h3 className="mb-3">Thêm sản phẩm mới</h3>
       <div className="border p-3 rounded">
         {/* Hình ảnh sản phẩm */}
         <div className="mb-3">

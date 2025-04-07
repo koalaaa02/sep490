@@ -59,7 +59,6 @@ const InvoiceListComponent = () => {
             <thead>
               <tr>
                 <th>STT</th>
-                <th>Mã đơn hàng</th>
                 <th>Ngày đặt hàng</th>
                 <th>Tên khách hàng</th>
                 <th>Số tiền cần thanh toán</th>
@@ -72,15 +71,15 @@ const InvoiceListComponent = () => {
               {data?.map((invoice, index) => (
                 <tr key={invoice.id}>
                   <td>{index + 1}</td>
-                  <td className="text-primary cursor-pointer"
+                  <td>21:00 04/04/2025</td>
+                  <td
+                    className="text-primary cursor-pointer"
                     onClick={() => {
                       setSelectedInvoice(invoice.userId);
                     }}
                   >
-                    5KX3ELQ91V
+                    {invoice.firstName || "user"}
                   </td>
-                  <td>21:00 04/04/2025</td>
-                  <td>{invoice.firstName || "user"}</td>
                   <td>{invoice.totalAmount}</td>
                   <td>21:00 04/04/2025</td>
                   <td>{invoice.paidAmount}</td>

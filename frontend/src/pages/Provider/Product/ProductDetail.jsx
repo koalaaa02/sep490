@@ -50,6 +50,22 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     }
   };
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -179,7 +195,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           body: JSON.stringify({
             id: sku.id,
             skuCode: sku.skuCode,
-            stock: sku.stock,
+            stock: 999,
             costPrice: sku.costPrice || 0,
             listPrice: sku.listPrice || 0,
             sellingPrice: sku.sellingPrice,
@@ -456,7 +472,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 "TON",
               ].map((unit) => (
                 <option key={unit} value={unit}>
-                  {unit}
+                  {convertUnitToVietnamese(unit)}
                 </option>
               ))}
             </select>
@@ -471,7 +487,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 <th>ID</th>
                 <th>Ảnh</th>
                 <th>Mã SKU</th>
-                <th>Số lượng tồn kho</th>
+                {/* <th>Số lượng tồn kho</th> */}
                 <th>Giá bán (VNĐ)</th>
                 <th>Giá sỉ (VNĐ)</th>
               </tr>
@@ -550,7 +566,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                       }
                     />
                   </td>
-                  <td>
+                  {/* <td>
                     <input
                       type="number"
                       className="form-control"
@@ -559,7 +575,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                         handleSkuChange(index, "stock", e.target.value)
                       }
                     />
-                  </td>
+                  </td> */}
                   <td>
                     <input
                       type="number"
@@ -747,18 +763,18 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         {!isEditing ? (
           <>
             <button
-              className="btn btn-primary ms-2"
+              className="btn btn-primary"
               onClick={() => setIsEditing(true)}
             >
               Chỉnh sửa
             </button>
             <button
-              className="btn btn-danger"
+              className="btn btn-danger ms-2"
               onClick={() => deleteProduct(product.id)}
             >
               Ẩn Sản Phẩm
             </button>
-          </> 
+          </>
         ) : (
           <>
             <button className="btn btn-success me-2" onClick={handleSave}>
