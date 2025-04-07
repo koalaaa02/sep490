@@ -3,8 +3,13 @@ package com.example.sep490.service;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entity.*;
 import com.example.sep490.repository.*;
+import com.example.sep490.repository.specifications.ProductFilterDTO;
+import com.example.sep490.repository.specifications.ProductSKUFilterDTO;
+import com.example.sep490.repository.specifications.ProductSKUSpecification;
+import com.example.sep490.repository.specifications.ProductSpecification;
 import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.sep490.dto.ProductSKURequest;
@@ -44,6 +50,14 @@ public class ProductSKUService {
         Page<ProductSKU> productSKUPage = productSKURepo.findByProductIdAndIsDeleteFalse(productId,pageable);
         Page<ProductSKUResponse> productSKUResponsePage = productSKUPage.map(productSKUMapper::EntityToResponse);
         return pagination.createPageResponse(productSKUResponsePage);
+    }
+
+    public PageResponse<ProductSKUResponse> getProductSKUsByFilter(ProductSKUFilterDTO filter) {
+        Specification<ProductSKU> spec = ProductSKUSpecification.filterProductSKUs(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<ProductSKU> productPage = productSKURepo.findAll(spec, pageable);
+        Page<ProductSKUResponse> productResponsePage = productPage.map(productSKUMapper::EntityToResponse);
+        return pagination.createPageResponse(productResponsePage);
     }
 
     public ProductSKUResponse getProductSKUById(Long id) {

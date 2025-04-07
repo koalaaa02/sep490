@@ -64,7 +64,8 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/api/cart/**",
-                                "/html/**"
+                                "/html/**",
+                                "/actuator/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**"
@@ -102,7 +103,8 @@ public class SecurityConfig {
                 "https://sep490.vuvu15202.shop",
                 "http://sep490.vuvu15202.shop",
                 "https://130.33.3.21:8088",
-                "http://130.33.3.21:8088"));
+                "http://130.33.3.21:8088",
+                "http://127.0.0.1:5500"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

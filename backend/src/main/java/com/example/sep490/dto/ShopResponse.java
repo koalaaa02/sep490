@@ -39,9 +39,8 @@ public class ShopResponse {
     private User manager;
     @JsonIgnoreProperties({"shop", "user"})
     private Address address;
-    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
-    private List<Product> products;
-
+//    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
+//    private List<Product> products;
 
     private boolean isDelete;
     private Long createdBy;

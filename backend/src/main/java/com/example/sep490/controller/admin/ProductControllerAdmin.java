@@ -18,7 +18,7 @@ public class ProductControllerAdmin {
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getProducts(@Valid ProductFilterDTO filter) {
-        return ResponseEntity.ok(productService.getProductsByFilterForAdminForAdmin(filter));
+        return ResponseEntity.ok(productService.getProductsByFilterForAdmin(filter));
     }
 
     @PutMapping("/activate/{id}")

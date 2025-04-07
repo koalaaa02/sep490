@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import com.example.sep490.dto.OrderRequest;
 import com.example.sep490.service.OrderService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -54,15 +55,26 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.updateOrder(id, order));
     }
 
-    private static class OrderStatusUpdate{
+    private static class UpdateOrderStatus{
         public List<Long> ids;
         public OrderStatus status;
     }
 
-    @PutMapping("/status")
-    public ResponseEntity<String> updateOrderStatus(@RequestBody OrderStatusUpdate orderStatusUpdate) {
+    private static class UpdateOrderStatusAndCreateInvoice{
+        public Long id;
+        public BigDecimal amount;
+        public OrderStatus status;
+    }
 
-        orderService.changeStatusOrders(orderStatusUpdate.ids, orderStatusUpdate.status);
+    @PutMapping("/change-status")
+    public ResponseEntity<String> updateOrderStatus(@RequestBody UpdateOrderStatus orderStatusUpdate) {
+        orderService.changeStatusOrdersForProvider(orderStatusUpdate.ids, orderStatusUpdate.status);
+        return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
+    }
+
+    @PutMapping("/change-status-and_create-invoice")
+    public ResponseEntity<String> updateOrderStatusAndCreateInvoice(@RequestBody UpdateOrderStatusAndCreateInvoice orderStatusUpdate) {
+        orderService.changeStatusOrderForProvider(orderStatusUpdate.id, orderStatusUpdate.amount, orderStatusUpdate.status);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 

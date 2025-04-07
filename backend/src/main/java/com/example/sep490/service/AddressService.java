@@ -62,8 +62,13 @@ public class AddressService {
     }
 
     public AddressResponse createAddress(AddressRequest addressRequest) {
-        User user = getUser(addressRequest.getUserId());
-        Shop shop = getShop(addressRequest.getShopId());
+        User user = null;
+        Shop shop = null;
+        if(addressRequest.getUserId() != null && addressRequest.getShopId() == null)
+            user = getUser(addressRequest.getUserId());
+        else if(addressRequest.getUserId() == null && addressRequest.getShopId() != null)
+            shop = getShop(addressRequest.getShopId());
+        else throw new RuntimeException("Không xác định được địa chỉ của cá nhân hay shop");
 
         Address entity = addressMapper.RequestToEntity(addressRequest);
         entity.setUser(user);
@@ -76,10 +81,16 @@ public class AddressService {
         Long checkUserId = userService.getContextUser().getId();
         Address address = addressRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
-        if(!Objects.equals(checkUserId, address.getCreatedBy())) throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Bạn không có quyền sửa địa chỉ này.");
+        if(!Objects.equals(checkUserId, address.getCreatedBy()))
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Bạn không có quyền sửa địa chỉ này.");
 
-        User user = getUser(addressRequest.getUserId());
-        Shop shop = getShop(addressRequest.getShopId());
+        User user = null;
+        Shop shop = null;
+        if(addressRequest.getUserId() != null && addressRequest.getShopId() == null)
+            user = getUser(addressRequest.getUserId());
+        else if(addressRequest.getUserId() == null && addressRequest.getShopId() != null)
+            shop = getShop(addressRequest.getShopId());
+        else throw new RuntimeException("Không xác định được địa chỉ của cá nhân hay shop");
 
         try {
             objectMapper.updateValue(address, addressRequest);

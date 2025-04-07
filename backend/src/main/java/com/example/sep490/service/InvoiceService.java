@@ -6,9 +6,11 @@ import java.util.Optional;
 import com.example.sep490.dto.ShopInvoiceSummary;
 import com.example.sep490.dto.UserInvoiceSummary;
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.InvoiceSpecification;
+import com.example.sep490.utils.CommonUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,8 @@ public class InvoiceService {
     private InvoiceMapper invoiceMapper;
     @Autowired
     private BasePagination pagination;
-
+    @Autowired
+    private CommonUtils commonUtils;
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -97,12 +100,17 @@ public class InvoiceService {
     }
 
     public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
-        User user = getUser(invoiceRequest.getAgentId());
         Order order = getOrder(invoiceRequest.getOrderId());
-        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
         if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
+        User user = getUser(order.getAddress().getUser().getId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
 
+        if(order.getPaymentMethod() == PaymentMethod.COD){
+            order.setPaymentMethod(PaymentMethod.DEBT);
+            orderRepo.save(order);
+        }
         Invoice entity = invoiceMapper.RequestToEntity(invoiceRequest);
+        entity.setInvoiceCode(commonUtils.randomString(10));
         entity.setAgent(user);
         entity.setOrder(order);
         return invoiceMapper.EntityToResponse(invoiceRepo.save(entity));
@@ -112,10 +120,10 @@ public class InvoiceService {
         Invoice invoice = invoiceRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        User user = getUser(invoiceRequest.getAgentId());
         Order order = getOrder(invoiceRequest.getOrderId());
-        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
         if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
+        User user = getUser(invoice.getAgent().getId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
 
         try {
             objectMapper.updateValue(invoice, invoiceRequest);

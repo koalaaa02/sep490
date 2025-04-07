@@ -1,14 +1,14 @@
 package com.example.sep490.repository.specifications;
 
-import com.example.sep490.entity.enums.InvoiceStatus;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
-public class InvoiceFilterDTO {
+public class ProductSKUFilterDTO {
     @Schema(defaultValue = "1")
     private int page = 1;
     @Schema(defaultValue = "10")
@@ -18,14 +18,7 @@ public class InvoiceFilterDTO {
     @Schema(defaultValue = "ASC")
     private String direction = "ASC";
 
-    private String invoiceCode;
-    private String agentName;
-    @Schema(defaultValue = "UNPAID")
-    private InvoiceStatus status;
-    @JsonIgnore
-    private Long agentId;
-    @JsonIgnore
-    private Long createdBy;
-
+    @Schema(description = "Product ID (null nếu không lọc)", nullable = true)
+    private Long productId;
 }
 

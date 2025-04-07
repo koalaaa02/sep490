@@ -81,7 +81,7 @@ const ShopCheckOut = () => {
         totalAmount: totalAmount,
         paymentMethod: selectedPayment,
         deliveryMethod: hasBulkyItem ? "SELF_DELIVERY" : "GHN",
-        paid: true,
+        paid: false,
         shopId: cartItems[0]?.shopId || 0,
         addressId: selectedAddressId,
         deliveryCode: "string",

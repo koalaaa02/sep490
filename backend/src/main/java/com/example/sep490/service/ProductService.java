@@ -1,7 +1,9 @@
 package com.example.sep490.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.sep490.dto.publicdto.ProductResponsePublic;
 import com.example.sep490.entity.*;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -58,7 +61,16 @@ public class ProductService {
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
 		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
 		Page<Product> productPage = productRepository.findAll(spec, pageable);
-		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+//		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+		// Ánh xạ từng sản phẩm và gọi phương thức @AfterMapping
+		List<ProductResponsePublic> productResponses = productPage.getContent().stream()
+				.map(product -> {
+					ProductResponsePublic response = productMapper.EntityToResponsePublic(product);
+					productMapper.setPriceRange(response,product ); // Gọi phương thức @AfterMapping
+					return response;
+				})
+				.collect(Collectors.toList());
+		Page<ProductResponsePublic> productResponsePage = new PageImpl<>(productResponses, pageable, productPage.getTotalElements());
 		return pagination.createPageResponse(productResponsePage);
 	}
 	public PageResponse<ProductResponse> getProducts(int page, int size, String sortBy, String direction) {
@@ -68,7 +80,7 @@ public class ProductService {
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}
-	public PageResponse<ProductResponse> getProductsByFilterForAdminForAdmin(ProductFilterDTO filter) {
+	public PageResponse<ProductResponse> getProductsByFilterForAdmin(ProductFilterDTO filter) {
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
 		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
 		Page<Product> productPage = productRepository.findAll(spec, pageable);
@@ -146,7 +158,7 @@ public class ProductService {
 	public void deleteProduct(Long id) {
 		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
 				.map(existingProduct -> {
-					existingProduct.setDelete(true);
+					existingProduct.setActive(false);
 					return productRepo.save(existingProduct);
 				})
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));

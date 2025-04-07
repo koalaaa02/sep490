@@ -65,6 +65,14 @@ public class ShopService {
         return pagination.createPageResponse(shopResponsePage);
     }
 
+    public PageResponse<ShopResponse> getShopsForAdmin(ShopFilterDTO filter) {
+        Specification<Shop> spec = ShopSpecification.filterShops(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Shop> shopPage = shopRepo.findAll(spec, pageable);
+        Page<ShopResponse> shopResponsePage = shopPage.map(shopMapper::EntityToResponse);
+        return pagination.createPageResponse(shopResponsePage);
+    }
+
     public PageResponse<ShopResponse> getShops(ShopFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
         Specification<Shop> spec = ShopSpecification.filterShops(filter);

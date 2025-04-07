@@ -45,8 +45,8 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     @Query("SELECT COALESCE(SUM(o.totalPlatformFee), 0) FROM Order o " +
             "WHERE o.shop.id = :shopId " +
             "AND o.status = 'DELIVERED' " +
-            "AND FUNCTION('YEAR', o.shippedDate) = :year " +
-            "AND FUNCTION('MONTH', o.shippedDate) = :month")
+            "AND FUNCTION('YEAR', o.deliveryDate) = :year " +
+            "AND FUNCTION('MONTH', o.deliveryDate) = :month")
     BigDecimal getTotalPlatformFeeByShopAndMonth(@Param("shopId") Long shopId,
                                                  @Param("year") int year,
                                                  @Param("month") int month);

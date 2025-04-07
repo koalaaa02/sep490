@@ -7,12 +7,14 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.DeliveryMethod;
 import com.example.sep490.entity.enums.InvoiceStatus;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
 import com.example.sep490.repository.specifications.OrderSpecification;
+import com.example.sep490.utils.CommonUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +54,8 @@ public class OrderService {
     private InvoiceService invoiceService;
     @Autowired
     private InvoiceRepository invoiceRepository;
+    @Autowired
+    private CommonUtils commonUtils;
 
     public PageResponse<OrderResponse> getOrdersPublicFilter(OrderFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
@@ -110,13 +114,13 @@ public class OrderService {
 //    }
 
     public Order createOrder(OrderRequest orderRequest) {
-//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address address = getShippingAddres(orderRequest.getAddressId());
         if(shop == null) throw new RuntimeException("Thiếu thông tin shop.");
         if(address == null) throw new RuntimeException("Thiếu thông tin giao hàng.");
         Order entity = orderMapper.RequestToEntity(orderRequest);
-//        entity.setTransaction(transaction);
+        entity.setOrderCode(commonUtils.randomString(10));
+        entity.setOrderDate(LocalDateTime.now());
         entity.setShop(shop);
         entity.setAddress(address);
         return orderRepo.save(entity);
@@ -126,7 +130,6 @@ public class OrderService {
         Order order = orderRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
 
-//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address Address = getShippingAddres(orderRequest.getAddressId());
 
@@ -135,45 +138,88 @@ public class OrderService {
         } catch (JsonMappingException e) {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
-//        order.setTransaction(transaction);
         order.setShop(shop);
         order.setAddress(Address);
         return orderMapper.EntityToResponse(orderRepo.save(order));
     }
 
-    public OrderResponse changeOrderStatusCustomer(Long orderId, OrderStatus orderStatus) {
+    public OrderResponse changeOrderStatusForDealer(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepo.findByIdAndIsDeleteFalse(orderId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
+            .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
         order.setStatus(orderStatus);
         Order updatedOrder = orderRepo.save(order);
         return orderMapper.EntityToResponse(updatedOrder);
     }
 
     @Transactional
-    public void changeStatusOrders(List<Long> orderIds, OrderStatus orderStatus) {
-        List<Invoice> invoices = new ArrayList<>();
+    public void changeStatusOrdersForProvider(List<Long> orderIds, OrderStatus orderStatus) {
+//        List<Invoice> invoices = new ArrayList<>();
         List<Order> orders = orderRepo.findAllById(orderIds).stream()
                 .filter(order -> !order.isDelete())
-                .peek(order -> processOrder(order, orderStatus, invoices))
+//                .peek(order -> processOrder(order, orderStatus, invoices))
+                .peek(order -> {
+                    order.setStatus(orderStatus);
+                    if(order.getStatus() == OrderStatus.DELIVERED)
+                        order.setDeliveryDate(LocalDateTime.now());
+                })
                 .toList();
         if (orders.isEmpty()) {
             throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với danh sách ID đã cung cấp");
         }
-        if (!invoices.isEmpty()) {
-            invoiceRepository.saveAll(invoices);
-        }
+//        if (!invoices.isEmpty()) {
+//            invoiceRepository.saveAll(invoices);
+//        }
         orderRepo.saveAll(orders);
+    }
+
+    @Transactional
+    public void changeStatusOrderForProvider(Long orderId, BigDecimal amount , OrderStatus orderStatus) {
+        Order order = getOrder(orderId);
+        if (order == null) {
+            throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với ID đã cung cấp");
+        }
+
+        if (orderStatus == OrderStatus.DELIVERED) {
+            Invoice invoice = Invoice.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.UNPAID)
+                    .agent(order.getAddress().getUser())
+                    .order(order)
+                    .paidAmount(amount == null ? BigDecimal.ZERO: amount)
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryDate(LocalDateTime.now())
+                    .build();
+            if(order.getDeliveryMethod() == DeliveryMethod.SELF_DELIVERY){
+                if(amount.compareTo(order.getTotalAmount()) < 0) {
+                    invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+                    if(order.getPaymentMethod() == PaymentMethod.COD)
+                        order.setPaymentMethod(PaymentMethod.DEBT);
+                }
+                if(amount.compareTo(order.getTotalAmount()) == 0) {
+                    invoice.setStatus(InvoiceStatus.PAID);
+                    order.setPaid(true);
+                }
+                invoiceRepository.save(invoice);
+            }else if(order.getDeliveryMethod() == DeliveryMethod.GHN){
+//                invoice.setPaidAmount(order.getTotalAmount()); neu = GHN, set ve orderPaymentMethod = debt
+                order.setPaid(true);
+                invoiceRepository.save(invoice);
+            }
+            order.setDeliveryDate(LocalDateTime.now());
+        }
+        orderRepo.save(order);
     }
 
 
     private void processOrder(Order order, OrderStatus orderStatus, List<Invoice> invoices) {
         order.setStatus(orderStatus);
         if (orderStatus == OrderStatus.DELIVERED) {
-            order.setShippedDate(LocalDateTime.now());
+            order.setDeliveryDate(LocalDateTime.now());
         }
         if (orderStatus == OrderStatus.ACCEPTED && order.getPaymentMethod() == PaymentMethod.DEBT) {
             invoices.add(
                     Invoice.builder()
+                    .invoiceCode(commonUtils.randomString(10))
                     .status(InvoiceStatus.UNPAID)
                     .agent(order.getAddress().getUser())
                     .order(order)

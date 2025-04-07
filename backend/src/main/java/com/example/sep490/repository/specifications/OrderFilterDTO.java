@@ -21,6 +21,7 @@ public class OrderFilterDTO {
     private String direction = "ASC";
 
     private Long Id;
+    private String orderCode;
     private String deliveryCode;
     @JsonIgnore
     private Long shopId;

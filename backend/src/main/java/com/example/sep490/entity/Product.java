@@ -58,7 +58,7 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
 //    @JsonBackReference
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product")
-    @SQLRestriction("is_delete = false AND active = true")
+//    @SQLRestriction("is_delete = false")
     private List<ProductSKU> skus;
     
     @ManyToOne

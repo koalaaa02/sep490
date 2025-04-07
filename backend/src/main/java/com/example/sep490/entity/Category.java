@@ -59,7 +59,7 @@ public class Category extends Auditable{//danh mục sản phẩm
     
     @JsonIgnoreProperties("category")
     @OneToMany(mappedBy = "category")
-    @SQLRestriction("is_delete = false AND active = true")
+//    @SQLRestriction("is_delete = false AND active = true")
     private List<Product> products;
 }
 
