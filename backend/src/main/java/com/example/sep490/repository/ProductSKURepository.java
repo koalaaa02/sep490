@@ -4,17 +4,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.sep490.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.sep490.entity.ProductSKU;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>{
+public interface ProductSKURepository extends JpaRepository<ProductSKU, Long>, JpaSpecificationExecutor<ProductSKU> {
     Page<ProductSKU> findByIsDeleteFalse(Pageable pageable);
-	Optional<ProductSKU> findByIdAndIsDeleteFalse(Long id);
+    @Query("SELECT p FROM ProductSKU p WHERE p.isDelete = false AND p.product.id = :productId")
+    Page<ProductSKU> findByProductIdAndIsDeleteFalse(@Param("productId") Long productId, Pageable pageable);
+
+    Optional<ProductSKU> findByIdAndIsDeleteFalse(Long id);
     @Query(value = "SELECT stock FROM tbl_productsku WHERE id = :productSKUId", nativeQuery = true)
     Integer getAvailableQuantity(@Param("productSKUId") Long productSKUId);
 

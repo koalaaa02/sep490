@@ -13,4 +13,13 @@ public class CommonUtils {
         }
         return otp.toString();
     }
+
+    public String randomString(int length) {
+        Random random = new Random();
+        StringBuilder otp = new StringBuilder();
+        for (int i = 0; i < length; i++) { // Tạo OTP 6 chữ số
+            otp.append(random.nextInt(10));
+        }
+        return otp.toString();
+    }
 }

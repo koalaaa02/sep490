@@ -1,5 +1,6 @@
 package com.example.sep490.service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import com.example.sep490.entity.*;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import com.example.sep490.dto.AddressRequest;
@@ -20,6 +22,8 @@ import com.example.sep490.mapper.AddressMapper;
 import com.example.sep490.entity.Address;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AddressService {
@@ -58,8 +62,13 @@ public class AddressService {
     }
 
     public AddressResponse createAddress(AddressRequest addressRequest) {
-        User user = getUser(addressRequest.getUserId());
-        Shop shop = getShop(addressRequest.getShopId());
+        User user = null;
+        Shop shop = null;
+        if(addressRequest.getUserId() != null && addressRequest.getShopId() == null)
+            user = getUser(addressRequest.getUserId());
+        else if(addressRequest.getUserId() == null && addressRequest.getShopId() != null)
+            shop = getShop(addressRequest.getShopId());
+        else throw new RuntimeException("Không xác định được địa chỉ của cá nhân hay shop");
 
         Address entity = addressMapper.RequestToEntity(addressRequest);
         entity.setUser(user);
@@ -67,12 +76,21 @@ public class AddressService {
         return addressMapper.EntityToResponse(addressRepo.save(entity));
     }
 
+    @Transactional
     public AddressResponse updateAddress(Long id, AddressRequest addressRequest) {
+        Long checkUserId = userService.getContextUser().getId();
         Address address = addressRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+        if(!Objects.equals(checkUserId, address.getCreatedBy()))
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Bạn không có quyền sửa địa chỉ này.");
 
-        User user = getUser(addressRequest.getUserId());
-        Shop shop = getShop(addressRequest.getShopId());
+        User user = null;
+        Shop shop = null;
+        if(addressRequest.getUserId() != null && addressRequest.getShopId() == null)
+            user = getUser(addressRequest.getUserId());
+        else if(addressRequest.getUserId() == null && addressRequest.getShopId() != null)
+            shop = getShop(addressRequest.getShopId());
+        else throw new RuntimeException("Không xác định được địa chỉ của cá nhân hay shop");
 
         try {
             objectMapper.updateValue(address, addressRequest);
@@ -81,8 +99,25 @@ public class AddressService {
         }
         address.setUser(user);
         address.setShop(shop);
+
+        if(addressRequest.isDefaultAddress()){
+            addressRepo.resetDefaultAddressForUser(userService.getContextUser().getId());
+        }
         return addressMapper.EntityToResponse(addressRepo.save(address));
     }
+
+    @Transactional
+    public void setDefaultAddress(Long addressId) {
+        Long checkUserId = userService.getContextUser().getId();
+        addressRepo.resetDefaultAddressForUser(checkUserId);
+
+        Address address = addressRepo.findByIdAndIsDeleteFalse(addressId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy địa chỉ"));
+
+        address.setDefaultAddress(true);
+        addressRepo.save(address);
+    }
+
 
     public void deleteAddress(Long id) {
         Address updatedAddress = addressRepo.findByIdAndIsDeleteFalse(id)

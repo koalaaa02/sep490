@@ -1,5 +1,7 @@
 package com.example.sep490.dto.cart;
 
+import com.example.sep490.dto.ProductSKUResponse;
+import com.example.sep490.entity.ProductSKU;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,6 @@ public class ItemCart {
     private String imageUrl;
     private BigDecimal price;
     private int quantity;
+    //flexible
+    private ProductSKUResponse productSKUResponse;
 }

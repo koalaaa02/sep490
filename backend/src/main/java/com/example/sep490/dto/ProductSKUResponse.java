@@ -39,7 +39,6 @@ public class ProductSKUResponse{
     private BigDecimal wholesalePrice;
     
     private String images;
-    
     private boolean bulky;
     @JsonIgnoreProperties({ "skus","category","shop","supplier"})
     private Product product;

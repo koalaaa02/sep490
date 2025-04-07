@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class InvoiceResponse{
 	private Long id;
+    private String invoiceCode;
 
     @JsonIgnoreProperties({ "invoices", "addresses", "shop"})
     private User agent; // người Đại lý/customer nợ
@@ -30,6 +31,9 @@ public class InvoiceResponse{
     private BigDecimal totalAmount; //tổng nợ phải trả
     private BigDecimal paidAmount ; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
     private InvoiceStatus status = InvoiceStatus.UNPAID; // UNPAID, PARTIALLY_PAID, PAID
+    private LocalDateTime deliveryDate;
+    private String deliveryProofImage;
+    private String deliveryNote;
 
     @JsonIgnoreProperties({ "invoice"})
     private List<DebtPayment> debtPayments;

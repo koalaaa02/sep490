@@ -29,8 +29,8 @@ public class ShopRequest {
     private String citizenIdentificationCard;
     @NotNull(message = "Status được để trống.")
     private ShopType shopType;
-    @Schema(defaultValue = "true")
-    private boolean active = true;
+    @Schema(defaultValue = "false")
+    private boolean active = false;
     @Schema(defaultValue = "false")
     private boolean close = false;
 

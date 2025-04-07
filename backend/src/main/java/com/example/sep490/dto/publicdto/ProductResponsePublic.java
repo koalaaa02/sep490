@@ -19,12 +19,12 @@ public class ProductResponsePublic{
     private Long id; 
     private String name;
     private String description;
+    private String images;
     private String specifications;
-    
+    private String priceRange;
+
     @JsonIgnoreProperties({"products","parentCategory","subCategories"})
     private Category category;
-    @JsonIgnoreProperties({"product"})
-    private List<ProductSKU> skus;
     @JsonIgnoreProperties({"products"})
     private Supplier supplier;
 }

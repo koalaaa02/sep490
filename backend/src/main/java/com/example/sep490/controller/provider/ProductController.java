@@ -5,12 +5,9 @@ import com.example.sep490.dto.ProductRequest;
 import com.example.sep490.repository.ProductRepository;
 import com.example.sep490.repository.specifications.ProductFilterDTO;
 import com.example.sep490.service.ProductService;
-import com.example.sep490.strategy.ProductStrategy;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +22,7 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
-    private List<ProductStrategy> strategies;
+//    private List<ProductStrategy> strategies;
     private ProductRepository productRepository;
 
 //    @GetMapping({"/admin/","/seller/"})
@@ -110,16 +107,26 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
-    	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
-        for (ProductStrategy strategy : strategies) {
-            if (strategy.supports(role)) {
-            	strategy.deleteProduct(id);
-                return ResponseEntity.ok("Xóa thành công.");
-            }
+        try {
+            productService.deleteProduct(id);
+            return ResponseEntity.ok().body("Xóa sản phẩm thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi trong quá trình xóa sản phẩm.");
         }
-//        return ResponseEntity.noContent().build();
-        return ResponseEntity.badRequest().body("Lỗi trong quá trình xóa sản phẩm.");
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+//    	String role = SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString();
+//        for (ProductStrategy strategy : strategies) {
+//            if (strategy.supports(role)) {
+//            	strategy.deleteProduct(id);
+//                return ResponseEntity.ok("Xóa thành công.");
+//            }
+//        }
+////        return ResponseEntity.noContent().build();
+//        return ResponseEntity.badRequest().body("Lỗi trong quá trình xóa sản phẩm.");
+//    }
 }
 //
 //@GetMapping("/")

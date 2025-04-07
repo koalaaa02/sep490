@@ -1,0 +1,95 @@
+/* .myDebt_container {
+    margin-left: auto !important;
+} */
+
+.statistic {
+    margin-top: 20px;
+    border: 1px rgba(0, 0, 0, 0.171) solid;
+    border-radius: 5px;
+    padding: 3px 5px;
+    box-shadow: 5px 7px rgba(0, 0, 0, 0.137);
+}
+
+.debtOrderCard {
+    border: 1px rgba(0, 0, 0, 0.171) solid;
+    border-radius: 5px;
+    padding: 3px 5px;
+    box-shadow: 5px 7px rgba(0, 0, 0, 0.137);
+    display: flex;
+    flex-direction: column;
+    gap: 10px
+}
+
+.itemCard {
+    border: 1px rgba(0, 0, 0, 0.171) solid;
+    border-radius: 3px;
+    padding: 7px;
+    display: flex;
+    gap: 5px;
+
+    img {
+        width: 100px;
+        aspect-ratio: 1;
+        border-radius: 3px;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    .infoCard {
+        flex-grow: 1;
+        height: 100px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
+    }
+}
+
+.statistic p {
+    margin-bottom: 0px !important;
+}
+
+.sectionHeader {
+    font-size: 18px;
+}
+
+.inputNumber {
+    height: 30px;
+}
+
+.middlePart {
+    width: 200px;
+}
+
+.itemsList {
+    overflow-y: scroll;
+    height: 500px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.total {
+    border: 1px rgba(0, 0, 0, 0.247) solid;
+    border-radius: 5px;
+    padding: 5px;
+    height: 200px !important;
+    position: sticky;
+    top: 10px;
+}
+
+.secondaryHeader {
+    font-size: 12px;
+}
+
+.totalPrice {
+    border: 1px rgba(255, 1, 1) solid;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.cashOutButton {
+    border-radius: 5px;
+    padding: 3px 10px;
+}

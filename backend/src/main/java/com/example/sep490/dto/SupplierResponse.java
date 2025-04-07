@@ -29,8 +29,8 @@ public class SupplierResponse {
     private String phone;
     private String address;
 
-    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
-    private List<Product> products;
+//    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
+//    private List<Product> products;
 
 
     private boolean isDelete;

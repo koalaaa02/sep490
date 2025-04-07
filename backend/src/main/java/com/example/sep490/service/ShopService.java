@@ -50,6 +50,8 @@ public class ShopService {
     @Autowired
     private AddressRepository addressRepo;
     @Autowired
+    private RoleRepository roleRepo;
+    @Autowired
     private UserService userService;
     @Value("${env.backendBaseURL}")
     private String baseURL;
@@ -60,6 +62,14 @@ public class ShopService {
                 ? shopRepo.findByIsDeleteFalse(pageable)
                 : shopRepo.findByNameContainingIgnoreCaseAndIsDeleteFalse(name,pageable);
         Page<ShopResponsePublic> shopResponsePage = shopPage.map(shopMapper::EntityToResponsePublic);
+        return pagination.createPageResponse(shopResponsePage);
+    }
+
+    public PageResponse<ShopResponse> getShopsForAdmin(ShopFilterDTO filter) {
+        Specification<Shop> spec = ShopSpecification.filterShops(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Shop> shopPage = shopRepo.findAll(spec, pageable);
+        Page<ShopResponse> shopResponsePage = shopPage.map(shopMapper::EntityToResponse);
         return pagination.createPageResponse(shopResponsePage);
     }
 
@@ -78,6 +88,15 @@ public class ShopService {
             return shopMapper.EntityToResponse(Shop.get());
         } else {
             throw new RuntimeException("Shop không tồn tại với ID: " + id);
+        }
+    }
+
+    public ShopResponse getShopByContextUser() {
+        Shop shop = userService.getShopByContextUser();
+        if (shop != null) {
+            return shopMapper.EntityToResponse(shop);
+        } else {
+            throw new RuntimeException("Không tìm thấy cửa hàng, vui lòng đăng ký cửa hàng mới.");
         }
     }
 
@@ -156,6 +175,20 @@ public class ShopService {
         Shop updatedShop = shopRepo.findByIdAndIsDeleteFalse(id)
                 .map(existingShop -> {
                     existingShop.setActive(!existingShop.isActive());
+                    if (existingShop.isActive()) {
+                        Long creatorId = existingShop.getCreatedBy();
+                        Optional<User> shopManager = userRepo.findById(creatorId);
+                        if (shopManager.isPresent()) {
+                            User user = shopManager.get();
+                            Role providerRole = roleRepo.findByName("ROLE_PROVIDER")
+                                    .orElseThrow(() -> new RuntimeException("Không tìm thấy role PROVIDER"));
+                            if (!user.getRoles().contains(providerRole)) {
+                                user.getRoles().add(providerRole);
+                                userRepo.save(user);
+                            }
+                        }
+                    }
+
                     return shopRepo.save(existingShop);
                 })
                 .orElseThrow(() -> new RuntimeException("Shop không tồn tại với ID: " + id));

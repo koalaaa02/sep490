@@ -77,7 +77,7 @@ const StoreList = () => {
             </>
             <>
               {/* section */}
-              <section className="mt-8">
+              <section>
                 {/* container */}
                 <div className="container">
                   {/* row */}
@@ -85,9 +85,9 @@ const StoreList = () => {
                     <div className="col-12">
                       {/* heading */}
                       <div className="bg-light rounded-3 d-flex justify-content-between">
-                        <div className="d-flex align-items-center  p-10">
+                        <div className="d-flex align-items-center p-10">
                           <Slide direction="down">
-                            <h1 className="mb-0 fw-bold">Danh sách cửa hàng</h1>
+                            <h2 className="mb-0 fw-bold">Danh sách cửa hàng</h2>
                           </Slide>
                         </div>
                         <div className="p-6">
@@ -149,11 +149,11 @@ const StoreList = () => {
                                     to={`/SingleShop/${stores.id}`}
                                     className="text-inherit"
                                   >
-                                    {stores.shopType}
+                                    {stores.name}
                                   </Link>
                                 </h5>
                                 <div className="small text-muted">
-                                  <span>{stores.address.recipientName}</span>
+                                  <span>{stores.shopType}</span>
                                   <span className="mx-1">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
@@ -170,7 +170,7 @@ const StoreList = () => {
                                 <div className="py-3">
                                   <ul className="list-unstyled mb-0 small">
                                     <li>
-                                      <span className="text-primary">
+                                      <span className="text-muted">
                                         {stores.address.address},{" "}
                                         {stores.address.ward},{" "}
                                         {stores.address.district},{" "}

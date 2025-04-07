@@ -134,10 +134,10 @@ function Dropdown() {
                           {/* input */}
                           <Link
                             to={`/SingleShop/${stores.id}`}
-                            className="form-check-label"
+                            className="form-check-label text-decoration-none text-warning"
                             htmlFor="eGrocery"
                           >
-                            {stores.shopType}
+                            {stores.name}
                           </Link>
                         </div>
                       ))
@@ -160,35 +160,7 @@ function Dropdown() {
                       <span id="priceRange-value" className="small" />
                     </div>
                   </div>
-                  {/* rating */}
-                  <div className="py-4">
-                    <h5 className="mb-3">Đánh giá</h5>
-                    <div>
-                      {ratings.map((rating, index) => (
-                        <div className="form-check mb-2" key={index}>
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id={rating.id}
-                            defaultChecked={rating.stars === 5}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor={rating.id}
-                          >
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <i
-                                key={i}
-                                className={`bi ${
-                                  i < rating.stars ? "bi-star-fill" : "bi-star"
-                                } text-warning`}
-                              />
-                            ))}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+
                   <div className="py-4">
                     {/* Banner Design */}
                     {/* Banner Content */}
@@ -218,8 +190,8 @@ function Dropdown() {
                 {/* card */}
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
-                  <div className=" card-body p-9">
-                    <h1 className="mb-0">{categories.name}</h1>
+                  <div className=" card-body p-4">
+                    <h4 className="mb-0">{categories.name}</h4>
                   </div>
                 </div>
                 {/* list icon */}
@@ -236,14 +208,14 @@ function Dropdown() {
                         <p className="mb-3 mb-md-0">
                           {" "}
                           <span className="text-dark">
-                            Có {categories.products.length}{" "}
+                            Có {categories.products.filter((p) => !p.delete).length}{" "}
                           </span>{" "}
                           sản phẩm{" "}
                         </p>
                       </div>
                       {/* icon */}
                       <div className="d-flex justify-content-between align-items-center">
-                        <Link
+                        {/* <Link
                           to={`/ShopListCol/${cateId}`}
                           className="text-muted me-3"
                         >
@@ -257,7 +229,7 @@ function Dropdown() {
                         </Link>
                         <Link to={`/Shop/${cateId}`} className="me-3 active">
                           <i className="bi bi-grid-3x3-gap" />
-                        </Link>
+                        </Link> */}
                         <div className="me-2">
                           {/* select option */}
                           <select
@@ -299,96 +271,108 @@ function Dropdown() {
                     </div>
                     {/* row */}
                     <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
-                      {categories.products.map((p, index) => {
-                        const isInWishlist = storedWishlist.some(
-                          (item) => item.id === p.id
-                        );
-                        return (
-                          <div key={index} className="col">
-                            {/* card */}
-                            <div className="card card-product">
-                              <div className="card-body">
-                                {/* Badge */}
-                                <div className="text-center position-relative">
-                                  <Link>
-                                    <img
-                                      src={image1}
-                                      alt={p.images}
-                                      className="mb-3 img-fluid"
-                                      style={{
-                                        width: "150px",
-                                        height: "150px",
-                                      }}
-                                    />
-                                  </Link>
-                                  {/* Action Buttons */}
-                                  <div className="card-product-action">
-                                    <Link
-                                      className="btn-action"
-                                      onClick={() => setSelectedProduct(p)}
-                                    >
-                                      <i
-                                        className="bi bi-eye"
-                                        title="Quick View"
+                      {categories.products
+                        .filter((p) => !p.delete)
+                        .map((p, index) => {
+                          const isInWishlist = storedWishlist.some(
+                            (item) => item.id === p.id
+                          );
+                          return (
+                            <div key={index} className="col">
+                              {/* card */}
+                              <div className="card card-product">
+                                <div
+                                  className="card-body d-flex flex-column justify-content-between"
+                                  style={{ height: "300px" }} // Đảm bảo chiều cao cố định
+                                >
+                                  {/* Ảnh - Cố định kích thước */}
+                                  <div className="text-center position-relative">
+                                    <Link>
+                                      <img
+                                        src={p.images || image1}
+                                        alt={p.images}
+                                        className="mb-3 img-fluid"
+                                        style={{
+                                          width: "150px",
+                                          height: "150px",
+                                          objectFit: "cover", // Giữ hình ảnh đúng tỉ lệ
+                                        }}
                                       />
                                     </Link>
-                                    <Link
-                                      onClick={
-                                        isInWishlist
-                                          ? null
-                                          : () => handleAddWishList(p)
-                                      }
-                                      className={`btn-action ${
-                                        isInWishlist
-                                          ? "disabled text-warning"
-                                          : ""
-                                      }`}
-                                      data-bs-toggle="tooltip"
-                                      data-bs-html="true"
-                                      title="Wishlist"
-                                    >
-                                      <i
-                                        className={`bi ${
+                                    <div className="card-product-action">
+                                      <Link
+                                        className="btn-action"
+                                        onClick={() => setSelectedProduct(p)}
+                                      >
+                                        <i
+                                          className="bi bi-eye"
+                                          title="Quick View"
+                                        />
+                                      </Link>
+                                      <Link
+                                        onClick={
                                           isInWishlist
-                                            ? "bi-heart-fill"
-                                            : "bi-heart"
+                                            ? null
+                                            : () => handleAddWishList(p)
+                                        }
+                                        className={`btn-action ${
+                                          isInWishlist
+                                            ? "disabled text-warning"
+                                            : ""
                                         }`}
-                                      />
-                                    </Link>
+                                        data-bs-toggle="tooltip"
+                                        data-bs-html="true"
+                                        title="Wishlist"
+                                      >
+                                        <i
+                                          className={`bi ${
+                                            isInWishlist
+                                              ? "bi-heart-fill"
+                                              : "bi-heart"
+                                          }`}
+                                        />
+                                      </Link>
+                                    </div>
                                   </div>
-                                </div>
-                                {/* Heading */}
-                                <div className="text-small mb-1"></div>
-                                <h2 className="fs-6">
-                                  <Link
-                                    to="#!"
-                                    className="text-inherit text-decoration-none"
-                                  >
-                                    {p?.name}
-                                  </Link>
-                                  <br />
-                                  <small>{p.description}</small>
-                                  <br />
-                                  <small>{p.specifications}</small>
-                                </h2>
-                                <div>
-                                  <small className="text-warning">
-                                    <i className="bi bi-star-fill" />
-                                    <i className="bi bi-star-fill" />
-                                    <i className="bi bi-star-fill" />
-                                    <i className="bi bi-star-fill" />
-                                    <i className="bi bi-star-half" />
-                                  </small>
-                                  <span className="text-muted small">
-                                    {" "}
-                                    4.5(149)
-                                  </span>
+
+                                  {/* Thông tin sản phẩm */}
+                                  <div>
+                                    <h2
+                                      className="fs-6 text-truncate"
+                                      style={{
+                                        maxWidth: "100%", // Giữ trong vùng hiển thị
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                      }}
+                                    >
+                                      <Link
+                                        to="#!"
+                                        className="text-inherit text-decoration-none"
+                                        title={p?.name} // Hiện tooltip khi hover
+                                      >
+                                        {p?.name}
+                                      </Link>
+                                    </h2>
+                                    <p
+                                      className="text-muted"
+                                      style={{
+                                        height: "40px",
+                                        overflow: "hidden",
+                                        display: "-webkit-box",
+                                        WebkitBoxOrient: "vertical",
+                                        WebkitLineClamp: 2
+                                      }}
+                                      title={p.description}
+                                    >
+                                      {p.description}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
                     </div>
                     <div className="row mt-8">
                       <div className="col">

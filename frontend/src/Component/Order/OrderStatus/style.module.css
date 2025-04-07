@@ -1,0 +1,19 @@
+.orderStatusContainer {
+  display: flex;
+  justify-content: space-between;
+}
+.orderStatusItem {
+  text-align: center;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-right: 1px solid grey;
+  font-weight: 600;
+}
+.orderStatusItem:hover {
+  background-color: aliceblue;
+}
+.activeStatus {
+  background-color: rgb(255, 193, 7) !important;
+  color: white;
+  border-radius: 5px;
+}

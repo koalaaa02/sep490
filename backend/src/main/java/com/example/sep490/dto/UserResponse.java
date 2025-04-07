@@ -27,15 +27,14 @@ public class UserResponse {
     @Email(message = "Email không hợp lệ")
     private String email;
     private boolean active = true;
-    private String roles = "ROLE_DEALER";
-    private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
+    private List<Role> roles;
+    private UserType userType = UserType.ROLE_DEALER;
 
-//    private List<Order> orders;
-    @JsonIgnoreProperties({"debtPayments","agent","order"})
-    private List<Invoice> invoices;
-
-    @JsonIgnoreProperties({"user","shop"})
-    private List<Address> addresses;
+//    @JsonIgnoreProperties({"debtPayments","agent","order"})
+//    private List<Invoice> invoices;
+//
+//    @JsonIgnoreProperties({"user","shop"})
+//    private List<Address> addresses;
 
     @JsonIgnoreProperties({"manager","address","products","orders"})
     private Shop shop;

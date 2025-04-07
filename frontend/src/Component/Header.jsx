@@ -7,6 +7,7 @@ import { logout } from "../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
 import img from "../images/glass.jpg";
+import { FaStore } from "react-icons/fa";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,8 +16,9 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const role = useSelector((state) => state.auth.roles);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.user?.roles);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -217,36 +219,6 @@ const Header = () => {
                   </div>
                 </li>
               </li>
-              <li className="nav-item dmenu dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Thông tin
-                </Link>
-                <div
-                  className="dropdown-menu sm-menu"
-                  aria-labelledby="navbarDropdown"
-                >
-                  <Link class="dropdown-item" to="/Blog">
-                    Bài viết
-                  </Link>
-                  <Link className="dropdown-item" to="/BlogCategory">
-                    Bài viết danh mục
-                  </Link>
-                  <Link className="dropdown-item" to="/AboutUs">
-                    Thông tin về chúng tôi
-                  </Link>
-                  <Link className="dropdown-item" to="/Contact">
-                    Liên hệ
-                  </Link>
-                </div>
-              </li>
 
               <li className="nav-item dmenu dropdown">
                 <Link
@@ -295,6 +267,37 @@ const Header = () => {
                   </Link>
                 </div>
               </li>
+
+              <li className="nav-item dmenu dropdown">
+                <Link
+                  className="nav-link dropdown-toggle"
+                  to="#"
+                  id="navbarDropdown"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  Thông tin
+                </Link>
+                <div
+                  className="dropdown-menu sm-menu"
+                  aria-labelledby="navbarDropdown"
+                >
+                  <Link class="dropdown-item" to="/Blog">
+                    Bài viết
+                  </Link>
+                  <Link className="dropdown-item" to="/BlogCategory">
+                    Bài viết danh mục
+                  </Link>
+                  <Link className="dropdown-item" to="/AboutUs">
+                    Thông tin về chúng tôi
+                  </Link>
+                  <Link className="dropdown-item" to="/Contact">
+                    Liên hệ
+                  </Link>
+                </div>
+              </li>
               <li className="nav-item dmenu dropdown">
                 <Link
                   className="nav-link dropdown-toggle"
@@ -313,19 +316,10 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      {role && token ? (
+                      {token ? (
                         <>
                           <div className="dropdown-item disabled text-dark">
-                            Xin chào{" "}
-                            {role === "ROLE_DEALER"
-                              ? "Dealer"
-                              : role === "ROLE_SELLER"
-                              ? "Seller"
-                              : role === "ROLE_PROVIDER"
-                              ? "Provider"
-                              : role === "ROLE_ADMIN"
-                              ? "Admin"
-                              : "User"}
+                            Xin chào {name}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">
                             Đơn hàng
@@ -350,9 +344,12 @@ const Header = () => {
                           </Link>
                           <Link
                             className="dropdown-item"
-                            to="/MyAcconutNotification"
+                            to="/MyAcconutInvoice"
                           >
-                            Thông báo
+                            Hóa đơn của tôi
+                          </Link>
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
                           </Link>
                           <button
                             className="dropdown-item"
@@ -412,6 +409,16 @@ const Header = () => {
                     )}
                   </span>
                 </Link>
+                {role === "ROLE_PROVIDER" && (
+                  <Link
+                    className="text-muted position-relative"
+                    to="/ProviderDashBoard"
+                    role="button"
+                    aria-controls="storeOffcanvas"
+                  >
+                    <FaStore size={20} className="mt-2 ms-3" />
+                  </Link>
+                )}
               </li>
             </ul>
           </div>
@@ -499,7 +506,7 @@ const Header = () => {
                             </div>
                             <div className="col-3 text-end">
                               <span className="fw-bold">
-                                {item.quantity * 100} VNĐ
+                                {(item.quantity * 100).toFixed(3)} VNĐ
                               </span>
                             </div>
                           </div>
@@ -511,7 +518,7 @@ const Header = () => {
                 <div className="d-grid mt-1">
                   <Link
                     className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
-                    to="/ShopCheckout"
+                    to="/ShopCart"
                   >
                     Thanh toán
                     <span className="fw-bold">{calculateTotal()} VNĐ</span>

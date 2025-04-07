@@ -27,14 +27,18 @@ public class ProductSpecification {
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy()));
             }
-            Join<Product, ProductSKU> skuJoin = root.join("skus", JoinType.INNER);
 
-            if (filter.getMinPrice() != null) {
-                predicates.add(cb.greaterThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMinPrice()));
+            if (filter.getMinPrice() != null || filter.getMaxPrice() != null) {
+                Join<Product, ProductSKU> skuJoin = root.join("skus", JoinType.LEFT);
+
+                if (filter.getMinPrice() != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMinPrice()));
+                }
+                if (filter.getMaxPrice() != null) {
+                    predicates.add(cb.lessThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMaxPrice()));
+                }
             }
-            if (filter.getMaxPrice() != null) {
-                predicates.add(cb.lessThanOrEqualTo(skuJoin.get("sellingPrice"), filter.getMaxPrice()));
-            }
+
             predicates.add(cb.equal(root.get("active"), filter.isActive()));
             predicates.add(cb.equal(root.get("isDelete"), false));
             return cb.and(predicates.toArray(new Predicate[0]));

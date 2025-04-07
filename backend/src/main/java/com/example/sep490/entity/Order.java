@@ -38,10 +38,8 @@ public class Order  extends Auditable{//đơn hàng nè
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", nullable = false)
-//    private User user; // Một đơn hàng thuộc về một customer
+    @Column(nullable = false, length = 10, unique = true)
+    private String orderCode;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -50,15 +48,16 @@ public class Order  extends Auditable{//đơn hàng nè
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod; // CARD, COD, DEBT // chỉ đơn có địa chỉ cùng tỉnh vs shop mới được nợ
+    private PaymentMethod paymentMethod; // CARD, COD, DEBT
 
     @ColumnDefault("'GHN'")
     @Enumerated(EnumType.STRING)
-    private DeliveryMethod deliveryMethod; // GHN, SELF_DELIVERY // chỉ đơn có địa chỉ cùng tỉnh vs shop mới được SELF_DELIVERY
+    private DeliveryMethod deliveryMethod; // GHN, SELF_DELIVERY
 
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
-    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
+    private LocalDateTime orderDate; // Ngày order đơn hàng
+    private LocalDateTime deliveryDate; // Ngày hoàn thành đơn hàng
     private boolean paid; // Đơn hàng này đã thanh toán hết chưa
 
     private BigDecimal commissionFee;  // Phí hoa hồng sàn

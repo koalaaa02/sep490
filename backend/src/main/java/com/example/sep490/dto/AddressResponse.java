@@ -39,9 +39,7 @@ public class AddressResponse{
     private String province;
     private String district;
     private String ward;
-
     private String postalCode;
-
     private boolean defaultAddress;
 
     private boolean isDelete;

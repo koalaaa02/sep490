@@ -22,7 +22,7 @@ public class ProductFilterDTO {
 
     private String name;
     @Schema(description = "Category ID (null nếu không lọc)", nullable = true)
-    private Long categoryId = null;
+    private Long categoryId;
     @Schema(defaultValue = "null")
     private Long shopId;
     @Schema(defaultValue = "null")
