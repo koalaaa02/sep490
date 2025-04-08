@@ -28,8 +28,6 @@ const ShopWishList = () => {
     localStorage.setItem("wishList", JSON.stringify(updatedWishList));
   };
 
-  console.log(wishItems);
-
   const handleAddCart = async () => {
     try {
       const response = await fetch(

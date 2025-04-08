@@ -137,7 +137,7 @@ function Dropdown() {
       timer: 2000,
     });
   };
-  console.log(categories);
+
 
   return (
     <div>
@@ -285,7 +285,7 @@ function Dropdown() {
                           <span className="text-dark">
                             Có{" "}
                             {
-                              categories.products.filter((p) => !p.delete)
+                              categories.products?.filter((p) => !p.delete)
                                 .length
                             }{" "}
                           </span>{" "}

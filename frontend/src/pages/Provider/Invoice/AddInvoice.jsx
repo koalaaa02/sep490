@@ -38,8 +38,6 @@ const AddInvoice = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Invoice:", invoice);
-    console.log("Products:", products);
     alert("Hóa đơn đã được lưu!");
   };
 

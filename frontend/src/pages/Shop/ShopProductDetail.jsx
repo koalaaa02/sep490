@@ -26,11 +26,12 @@ const ShopProductDetail = ({ id, onBack }) => {
         }
 
         const data = await response.json();
-        const validSkus = data.skus.filter((sku) => sku.delete === false);
+        const validSkus = data?.skus?.filter((sku) => sku.delete === false);
 
         if (validSkus.length === 0) {
           throw new Error("Không có SKU hợp lệ.");
         }
+        console.log({ ...data, skus: validSkus });
 
         setProduct({ ...data, skus: validSkus });
         setSelectedSku(validSkus[0]);
