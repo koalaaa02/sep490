@@ -1,21 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
-const AddInvoice = () => {
+const AddInvoice = ({ orderData, closeAddInvoice }) => {
   const [invoice, setInvoice] = useState({
-    invoiceId: "",
-    createdDate: "",
-    customer: "",
-    totalAmount: "",
-    shippingFee: "",
-    address: "",
-    phone: "",
-    status: "",
+    invoiceId: orderData?.orderCode || "",
+    createdDate: orderData?.createdAt || "",
+    customer: orderData?.address?.recipientName || "",
+    totalAmount: orderData?.totalAmount || "",
+    address: orderData?.address?.address || "",
+    phone: orderData?.address?.phone || "",
+    status: orderData?.status || "",
   });
 
-  const [products, setProducts] = useState([
-    { productName: "", quantity: "", price: "" },
-  ]);
+  const statusTranslations = {
+    PENDING: "Đang chờ",
+    CANCELLED: "Hủy",
+    FINDINGTRUCK: "Đang tìm xe",
+    ACCEPTED: "Chấp nhận",
+    PACKAGING: "Đóng gói",
+    DELIVERING: "Đang giao",
+    DELIVERED: "Đã giao",
+  };
+
+  const [products, setProducts] = useState(
+    orderData?.orderDetails.map((item) => ({
+      productName: item.productSku?.skuCode || "",
+      quantity: item.quantity || "",
+      price: item.price || "",
+    })) || [{ productName: "", quantity: "", price: "" }]
+  );
+
+  useEffect(() => {
+    setInvoice({
+      invoiceId: orderData?.orderCode || "",
+      createdDate:
+        new Date(orderData?.createdAt).toLocaleDateString("vi-VN") || "",
+      customer: orderData?.address?.recipientName || "",
+      totalAmount: orderData?.totalAmount || "",
+      address: orderData?.address?.address || "",
+      phone: orderData?.address?.phone || "",
+      status: statusTranslations[orderData?.status] || "",
+    });
+
+    setProducts(
+      orderData?.orderDetails.map((item) => ({
+        productName: item.productSku?.skuCode || "",
+        quantity: item.quantity || "",
+        price: item.price || "",
+        isEditable: false,
+      })) || [{ productName: "", quantity: "", price: "" }]
+    );
+  }, [orderData]);
 
   const handleInvoiceChange = (e) => {
     setInvoice({ ...invoice, [e.target.name]: e.target.value });
@@ -28,7 +65,10 @@ const AddInvoice = () => {
   };
 
   const addProduct = () => {
-    setProducts([...products, { productName: "", quantity: "", price: "" }]);
+    setProducts([
+      ...products,
+      { productName: "", quantity: "", price: "", isEditable: true },
+    ]);
   };
 
   const removeProduct = (index) => {
@@ -38,24 +78,58 @@ const AddInvoice = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Invoice:", invoice);
-    console.log("Products:", products);
     alert("Hóa đơn đã được lưu!");
   };
 
+  const generateExcelFile = () => {
+    const productsData = products.map((product) => [
+      product.productName,
+      product.quantity,
+      product.price,
+    ]);
+
+    const invoiceData = [
+      ["Mã hóa đơn", invoice.invoiceId],
+      ["Ngày tạo", invoice.createdDate],
+      ["Khách hàng", invoice.customer],
+      ["Địa chỉ", invoice.address],
+      ["Số điện thoại", invoice.phone],
+      ["Tổng tiền", invoice.totalAmount],
+      ["Trạng thái", invoice.status],
+    ];
+
+    const combinedData = [
+      ...invoiceData,
+      [],
+      ["Danh sách sản phẩm"],
+      ["Tên sản phẩm", "Số lượng", "Giá thành"],
+      ...productsData,
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(combinedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Hóa đơn");
+    const excelFile = XLSX.write(wb, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const blob = new Blob([excelFile], { type: "application/octet-stream" });
+    saveAs(blob, `PhiếuGiaoHàng-${invoice.invoiceId}.xlsx`);
+  };
+
   return (
-    <div className="p-3 mb-10 container">
-      <h3>Thêm hóa đơn</h3>
+    <div className="p-3 mb-10">
+      <h3>In phiếu giao hàng</h3>
       <form onSubmit={handleSubmit}>
         <div className="border p-3 mb-3">
-          <h5>Thông tin hóa đơn</h5>
+          <h5>Thông tin</h5>
           <div className="row">
             {[
               { label: "Mã hóa đơn", name: "invoiceId" },
-              { label: "Ngày tạo", name: "createdDate", type: "date" },
+              { label: "Ngày tạo", name: "createdDate" },
               { label: "Khách hàng", name: "customer" },
               { label: "Tổng tiền", name: "totalAmount", type: "number" },
-              { label: "Phí vận chuyển", name: "shippingFee", type: "number" },
               { label: "Địa chỉ", name: "address" },
               { label: "Số điện thoại", name: "phone" },
               { label: "Trạng thái", name: "status" },
@@ -68,7 +142,7 @@ const AddInvoice = () => {
                   className="form-control"
                   value={invoice[name]}
                   onChange={handleInvoiceChange}
-                  required
+                  disabled
                 />
               </div>
             ))}
@@ -78,7 +152,11 @@ const AddInvoice = () => {
         <div className="border p-3 mb-3">
           <h5>
             Sản phẩm
-            <button type="button" className="btn btn-sm btn-primary ms-2" onClick={addProduct}>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary ms-2"
+              onClick={addProduct}
+            >
               <FaPlus />
             </button>
           </h5>
@@ -98,7 +176,7 @@ const AddInvoice = () => {
                       className="form-control"
                       value={product[name]}
                       onChange={(e) => handleProductChange(index, e)}
-                      required
+                      disabled={!product.isEditable}
                     />
                   </div>
                 ))}
@@ -107,7 +185,7 @@ const AddInvoice = () => {
                     type="button"
                     className="btn btn-danger btn-sm"
                     onClick={() => removeProduct(index)}
-                    disabled={products.length === 1}
+                    disabled={product.isEditable}
                   >
                     Xóa sản phẩm
                   </button>
@@ -118,11 +196,19 @@ const AddInvoice = () => {
         </div>
 
         <div className="text-end">
-          <button type="button" className="btn btn-secondary me-2">
+          <button
+            type="button"
+            className="btn btn-secondary me-2"
+            onClick={closeAddInvoice}
+          >
             Hủy bỏ
           </button>
-          <button type="submit" className="btn btn-success">
-            Lưu
+          <button
+            type="button"
+            className="btn btn-success"
+            onClick={generateExcelFile}
+          >
+            In Excel
           </button>
         </div>
       </form>

@@ -2,23 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
-import { useDispatch } from "react-redux";
-import { logout } from "../../Redux/slice/authSlice";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../Utils/config";
+import { useSelector } from "react-redux";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAccountAddress = () => {
   const token = localStorage.getItem("access_token");
+  const userId = useSelector((state) => state.auth.user?.uid || []);
   const [formData, setFormData] = useState({
-    userId: 30,
-    shopId: 0,
+    userId: userId,
+    shopId: "",
     recipientName: "",
     phone: "",
     address: "",
-    provinceId: "string",
-    districtId: "string",
-    wardId: "string",
+    provinceId: "",
+    districtId: "",
+    wardId: "",
     province: "",
     district: "",
     ward: "",
@@ -38,6 +37,9 @@ const MyAccountAddress = () => {
     province: "",
     phone: "",
   });
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
 
   const handleEdit = (p, index) => {
     setEditIndex(index);
@@ -53,10 +55,46 @@ const MyAccountAddress = () => {
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "provinceId") {
+      const selectedProvince = provinces.find(
+        (province) => province.ProvinceID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        provinceId: value,
+        province: selectedProvince ? selectedProvince.ProvinceName : "",
+      }));
+    }
+
+    if (name === "districtId") {
+      const selectedDistrict = districts.find(
+        (district) => district.DistrictID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        districtId: value,
+        district: selectedDistrict ? selectedDistrict.DistrictName : "",
+      }));
+    }
+
+    if (name === "wardId") {
+      const selectedWard = wards.find(
+        (ward) => ward.WardCode === String(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        wardId: value,
+        ward: selectedWard ? selectedWard.WardName : "",
+      }));
+      console.log(value);
+    }
+
     if (editIndex !== null) {
-      setEditData({ ...editData, [e.target.name]: e.target.value });
+      setEditData((prevData) => ({ ...prevData, [name]: value }));
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
@@ -202,13 +240,39 @@ const MyAccountAddress = () => {
     }, 1500);
   }, []);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
+      const data = await response.json();
+      setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
 
-  const handleLogOut = () => {
-    dispatch(logout());
-    navigate("/");
-  };
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!formData.provinceId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/districts?provinceId=${formData.provinceId}`
+      );
+      const data = await response.json();
+      setDistricts(data);
+    };
+    fetchDistricts();
+  }, [formData.provinceId]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      if (!formData.districtId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/wards?districtId=${formData.districtId}`
+      );
+      const data = await response.json();
+      setWards(data);
+    };
+    fetchWards();
+  }, [formData.districtId]);
+
   return (
     <div>
       <>
@@ -269,7 +333,7 @@ const MyAccountAddress = () => {
                               {notification.message}
                             </p>
                           )}
-                          {!data.content ? (
+                          {data.content.length === 0 ? (
                             <span className={`alert alert-info`}>
                               Bạn chưa có địa chỉ. Thêm mới địa chỉ ngay
                             </span>
@@ -530,35 +594,67 @@ const MyAccountAddress = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="ward"
-                        placeholder="Phường"
-                        value={formData.ward}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="district"
-                        placeholder="Huyện"
-                        value={formData.district}
-                        onChange={handleChange}
-                      />
-                    </div>
                     <div className="col-12">
-                      <input
-                        type="text"
+                      <label className="me-2">Tỉnh: </label>
+                      <select
                         className="form-control"
-                        name="province"
-                        placeholder="Tỉnh"
-                        value={formData.province}
+                        name="provinceId"
+                        value={formData.provinceId}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="">Chọn thành phố</option>
+                        {provinces.map((province) => (
+                          <option
+                            key={province.ProvinceID}
+                            value={province.ProvinceID}
+                          >
+                            {province.ProvinceName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <label> Huyện: </label>
+                      <select
+                        className="form-control"
+                        name="districtId"
+                        value={
+                          editIndex !== null
+                            ? editData.districtId
+                            : formData.districtId
+                        }
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn huyện</option>
+                        {districts.map((district) => (
+                          <option
+                            key={district.DistrictID}
+                            value={district.DistrictID}
+                          >
+                            {district.DistrictName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <label>Phường: </label>
+                      <select
+                        className="form-control"
+                        name="wardId"
+                        value={
+                          editIndex !== null
+                            ? editData.WardCode
+                            : formData.WardCode
+                        }
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn phường</option>
+                        {wards.map((ward) => (
+                          <option key={ward.WardCode} value={ward.WardCode}>
+                            {ward.WardName}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-12 text-end">
                       <button

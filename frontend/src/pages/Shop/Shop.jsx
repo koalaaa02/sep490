@@ -285,7 +285,7 @@ function Dropdown() {
                           <span className="text-dark">
                             Có{" "}
                             {
-                              categories.products.filter((p) => !p.delete)
+                              categories.products?.filter((p) => !p.delete)
                                 .length
                             }{" "}
                           </span>{" "}

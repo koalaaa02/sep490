@@ -198,12 +198,12 @@ const MyDebt = () => {
                                 </h5>
                                 <p className="fw-bold">
                                   Tổng đơn hàng còn nợ:{" "}
-                                  <span className="fw-normal">3</span>
+                                  <span className="fw-normal">2</span>
                                 </p>
                                 <p className="fw-bold">
                                   Tổng tiền nợ:{" "}
                                   <span className="fw-normal">
-                                    3.000.000 vnđ
+                                    6 vnđ
                                   </span>
                                 </p>
                               </div>

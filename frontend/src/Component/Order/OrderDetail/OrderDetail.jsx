@@ -20,7 +20,7 @@ const OrderDetail = ({ order, status }) => {
   const handleCanceled = async (id) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/dealer/${id}/status?status=CANCELLED`,
+        `${BASE_URL}/api/dealer/change-status/${id}?status=CANCELLED`,
         {
           method: "PUT",
           headers: {

@@ -2,17 +2,24 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
+import AddInvoice from "../Invoice/AddInvoice";
 
 const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const token = localStorage.getItem("access_token");
   const [page, setPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
+  const [filterDirection, setFilterDirection] = useState("DESC");
+  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [showInvoiceForm, setShowInvoiceForm] = useState(false);
   const statusOptions = [
     "PENDING",
     "CANCELLED",
@@ -26,15 +33,17 @@ const OrderList = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page]);
+  }, [page, filterStatus, filterPaymentMethod, filterDirection]);
 
   const fetchData = async () => {
     try {
       const params = new URLSearchParams({
         page: page,
-        size: 15, // Số lượng đơn hàng trên một trang
+        size: 15,
         sortBy: "id",
-        direction: "DESC",
+        status: filterStatus,
+        paymentMethod: filterPaymentMethod,
+        direction: filterDirection,
       });
 
       const response = await fetch(
@@ -55,27 +64,46 @@ const OrderList = () => {
     }
   };
 
+  const handleStatusClick = (status) => {
+    if (status === " ") {
+      setFilterStatus(" ");
+    }
+    setFilterStatus(status === filterStatus ? null : status);
+  };
+
   const handleStatusChange = (orderId, newStatus) => {
     setSelectedOrder(orderId);
     setSelectedStatus(newStatus);
-    setShowPopup(true);
+    if (newStatus === "DELIVERED") {
+      const order = data.content.find((order) => order.id === orderId);
+      if (order && order.paymentMethod === "COD") {
+        setShowPaymentPopup(true);
+      } else {
+        setShowPopup(true);
+      }
+    } else {
+      setShowPopup(true);
+    }
   };
 
   const confirmStatusChange = async () => {
     if (!selectedOrder || !selectedStatus) return;
 
     try {
-      const response = await fetch(`${BASE_URL}/api/provider/orders/status`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ids: [selectedOrder],
-          status: selectedStatus,
-        }),
-      });
+      const response = await fetch(
+        `${BASE_URL}/api/provider/orders/change-status`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ids: [selectedOrder],
+            status: selectedStatus,
+          }),
+        }
+      );
 
       if (response.ok) {
         setData((prevData) => ({
@@ -97,6 +125,49 @@ const OrderList = () => {
       setShowPopup(false);
       setSelectedOrder(null);
       setSelectedStatus("");
+      setShowPaymentPopup(false);
+    }
+  };
+
+  const confirmPaymentAndCreateInvoice = async () => {
+    if (!paymentAmount || paymentAmount <= 0) {
+      alert("Số tiền thanh toán phải lớn hơn 0.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/orders/change-status-and_create-invoice`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: selectedOrder,
+            amount: paymentAmount,
+            status: "DELIVERED",
+          }),
+        }
+      );
+
+      if (response.ok) {
+        setData((prevData) => ({
+          ...prevData,
+          content: prevData.content.map((order) =>
+            order.id === selectedOrder
+              ? { ...order, status: selectedStatus }
+              : order
+          ),
+        }));
+        alert("Đơn nợ đã được tạo thành công!");
+        setShowPaymentPopup(false);
+      } else {
+        alert("Có lỗi khi tạo đơn nợ. Vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo đơn nợ:", error);
+      alert("Có lỗi xảy ra!");
     }
   };
 
@@ -122,12 +193,20 @@ const OrderList = () => {
 
   const statusTranslations = {
     PENDING: "Đang chờ",
-    CANCELLED: "Đã hủy",
+    CANCELLED: "Hủy",
     FINDINGTRUCK: "Đang tìm xe",
-    ACCEPTED: "Đã chấp nhận",
+    ACCEPTED: "Chấp nhận",
     PACKAGING: "Đóng gói",
     DELIVERING: "Đang giao",
     DELIVERED: "Đã giao",
+  };
+
+  const toggleInvoiceForm = () => {
+    setShowInvoiceForm(true);
+  };
+
+  const closeAddInvoice = () => {
+    setShowInvoiceForm(false);
   };
 
   return (
@@ -145,6 +224,62 @@ const OrderList = () => {
           <FaSearch />
         </button>
       </div>
+      <div className="mb-3 d-flex">
+        {/* Status Dropdown */}
+        <div className="me-3">
+          <label>Trạng thái:</label>
+
+          <select
+            className="form-select"
+            value={filterStatus}
+            onChange={(e) => handleStatusClick(e.target.value)}
+          >
+            <option value="">Tất cả</option>
+            {statusOptions.map((status) => (
+              <option key={status} value={status}>
+                {statusTranslations[status] || status}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Payment Method Dropdown */}
+        <div className="me-3">
+          <label>Phương thức thanh toán: </label>
+          <select
+            className="form-select"
+            value={filterPaymentMethod}
+            onChange={(e) => setFilterPaymentMethod(e.target.value)}
+          >
+            <option value="">Tất cả</option>
+            <option value="COD">Thanh toán khi nhận hàng</option>
+            <option value="DEBT">Trả góp</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Sắp xếp theo: </label>
+          <select
+            className="form-select"
+            value={filterDirection}
+            onChange={(e) => setFilterDirection(e.target.value)}
+          >
+            <option value="DESC">Mới nhất</option>
+            <option value="ASC">Cũ nhất</option>
+          </select>
+        </div>
+
+        <div>
+          <br />
+          <button
+            className="btn btn-primary mt-2 ms-2"
+            onClick={toggleInvoiceForm}
+          >
+            In phiếu giao hàng
+          </button>
+        </div>
+      </div>
+
       <div className="border p-2 mb-3">
         <strong>Thống kê nhanh:</strong>
         <div>Tổng hóa đơn: {data?.totalElements || 0}</div>
@@ -152,13 +287,14 @@ const OrderList = () => {
       <table className="table table-bordered table-striped">
         <thead>
           <tr>
+            <th></th>
             <th>STT</th>
             <th>Mã đơn</th>
             <th>Ngày tạo</th>
             <th>Khách hàng</th>
             <th>Địa chỉ nhận hàng</th>
             <th>Số điện thoại người nhận</th>
-            <th>Phương thức vận chuyển</th>
+            {/* <th>Phương thức vận chuyển</th> */}
             <th>Phương thức thanh toán</th>
             <th>Trạng Thái</th>
           </tr>
@@ -168,18 +304,23 @@ const OrderList = () => {
             return (
               <React.Fragment key={order.id}>
                 <tr>
+                  <td>
+                    {" "}
+                    <input
+                      type="checkbox"
+                      onClick={() => handleOrderClick(order)}
+                    />
+                  </td>
                   <td>{index + 1}</td>
-                  <td
-                    style={{ cursor: "pointer", color: "blue" }}
-                    onClick={() => handleOrderClick(order)}
-                  >
-                    {`VN${
+                  <td>
+                    {/* {`VN${
                       order.deliveryMethod === "GHN" ? "GHN" : "DEB"
                     }${Math.floor(
                       new Date(order.createdAt).getTime() / 1000
                     )}${order.address.recipientName
                       ?.slice(0, 2)
-                      .toUpperCase()}`}
+                      .toUpperCase()}`} */}
+                    {order.orderCode}
                   </td>
                   <td>
                     {new Date(order.createdAt).toLocaleDateString("vi-VN")}
@@ -190,11 +331,11 @@ const OrderList = () => {
                     {order.address.province}
                   </td>
                   <td>{order.address.phone}</td>
-                  <td>
+                  {/* <td>
                     {order.deliveryMethod === "GHN"
                       ? "Giao hàng nhanh"
                       : "Liên hệ với người bán"}
-                  </td>
+                  </td> */}
                   <td>
                     {order.paymentMethod === "COD"
                       ? "Thanh toán khi nhận hàng"
@@ -302,6 +443,12 @@ const OrderList = () => {
                                 ));
                               })()}
                             </select>
+                            {showInvoiceForm && (
+                              <AddInvoice
+                                closeAddInvoice={closeAddInvoice}
+                                orderData={order}
+                              />
+                            )}
                           </tbody>
                         </table>
                       </div>
@@ -380,6 +527,66 @@ const OrderList = () => {
           </Button>
           <Button variant="danger" onClick={() => setShowPopup(false)}>
             Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Payment Popup */}
+      <Modal show={showPaymentPopup} onHide={() => setShowPaymentPopup(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Xác nhận thanh toán</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group>
+            <Form.Label>Số tiền đơn hàng của bạn</Form.Label>
+            <Form.Control
+              type="number"
+              value={
+                selectedOrder
+                  ? data.content.find((order) => order.id === selectedOrder)
+                      ?.totalAmount || 0
+                  : 0
+              }
+              readOnly
+            />
+          </Form.Group>
+          <Form.Group>
+            <Form.Label>Số tiền người mua đã thanh toán</Form.Label>
+            <Form.Control
+              type="number"
+              value={paymentAmount}
+              onChange={(e) => setPaymentAmount(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowPaymentPopup(false)}
+          >
+            Hủy
+          </Button>
+          <Button
+            variant="primary"
+            onClick={() => {
+              const selectedOrderTotalAmount = selectedOrder
+                ? data.content.find((order) => order.id === selectedOrder)
+                    ?.totalAmount
+                : 0;
+              console.log(selectedOrderTotalAmount);
+              if (paymentAmount > selectedOrderTotalAmount) {
+                alert("Số tiền thanh toán không vượt quá số tiền đơn hàng");
+                return;
+              }
+
+              if (paymentAmount < selectedOrderTotalAmount) {
+                confirmPaymentAndCreateInvoice();
+              } else {
+                confirmStatusChange();
+              }
+            }}
+          >
+            Xác nhận
           </Button>
         </Modal.Footer>
       </Modal>

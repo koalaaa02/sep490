@@ -97,7 +97,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
-                })}
+                })} 
               </td>
               <td>{u.totalAmount}</td>
               <td>21:00 04/04/2025</td>
