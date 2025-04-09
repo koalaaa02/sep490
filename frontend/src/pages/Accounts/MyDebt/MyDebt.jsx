@@ -138,7 +138,6 @@ const MyDebt = () => {
           }
         );
         const result = await response.json();
-        console.log(result);
         setOrders(result);
       } catch (error) {
         console.error("Lỗi khi fetch dữ liệu:", error);

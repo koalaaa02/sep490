@@ -32,8 +32,8 @@ const AdminProvider = () => {
     const fetchData = async (activeStatus, page) => {
       try {
         const params = new URLSearchParams({
-          page: page,
-          size: pagination.itemsPerPage,
+          page: page.toString(),
+          size: pagination.itemsPerPage.toString(),
           sortBy: "id",
           direction: "ASC",
           active: activeStatus,
@@ -102,6 +102,7 @@ const AdminProvider = () => {
     const confirmAction = window.confirm(
       "Bạn có chắc chắn muốn thay đổi trạng thái cửa hàng này không?"
     );
+
     if (!confirmAction) return;
     try {
       const response = await fetch(`${BASE_URL}/api/admin/shops/${id}/active`, {
@@ -142,17 +143,6 @@ const AdminProvider = () => {
     setShowDetail(true);
   };
 
-  const current =
-    activeTab === "active" ? filtered(activeShop) : filtered(inactiveShop);
-
-  const currentTotalPages =
-    activeTab === "active"
-      ? pagination.activeTotalPages
-      : pagination.inactiveTotalPages;
-
-  const currentPage =
-    activeTab === "active" ? pagination.activePage : pagination.inactivePage;
-
   return (
     <div className="p-4">
       <h2 className="mb-4">Danh sách cửa hàng</h2>
@@ -181,6 +171,7 @@ const AdminProvider = () => {
               <tr>
                 <th>STT</th>
                 <th>Tên cửa hàng</th>
+                <th>Địa chỉ</th>
                 <th>Chủ cửa hàng</th>
                 <th>Mã số</th>
                 <th>Trạng thái</th>
@@ -198,6 +189,7 @@ const AdminProvider = () => {
                       ? s.name
                       : "Tên cửa hàng không hợp lệ"}
                   </td>
+                  <td>{s.address}</td>
                   <td>{s.manager}</td>
                   <td>{s.tin}</td>
                   <td onClick={() => handleActive(s.id)}>
@@ -225,6 +217,7 @@ const AdminProvider = () => {
               <tr>
                 <th>STT</th>
                 <th>Tên cửa hàng</th>
+                <th>Địa chỉ</th>
                 <th>Chủ cửa hàng</th>
                 <th>Mã số</th>
                 <th>Trạng thái</th>
@@ -242,6 +235,7 @@ const AdminProvider = () => {
                       ? s.name
                       : "Tên cửa hàng không hợp lệ"}
                   </td>
+                  <td>{s.address}</td>
                   <td>{s.manager}</td>
                   <td>{s.tin}</td>
                   <td onClick={() => handleActive(s.id)}>
@@ -264,11 +258,7 @@ const AdminProvider = () => {
           </Pagination>
         </Tab>
       </Tabs>
-      <Modal
-        show={showDetail}
-        onHide={() => setShowDetail(false)}
-        size="xl"
-      >
+      <Modal show={showDetail} onHide={() => setShowDetail(false)} size="xl">
         <Modal.Header closeButton>
           <Modal.Title>Chi tiết cửa hàng</Modal.Title>
         </Modal.Header>

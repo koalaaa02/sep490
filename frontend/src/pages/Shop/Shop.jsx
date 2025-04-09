@@ -137,7 +137,7 @@ function Dropdown() {
       timer: 2000,
     });
   };
-  console.log(categories);
+
 
   return (
     <div>

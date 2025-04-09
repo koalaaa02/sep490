@@ -4,6 +4,7 @@ import ScrollToTop from "../ScrollToTop";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 import { BASE_URL } from "../../Utils/config";
 import { useSelector } from "react-redux";
+import { Col, Image, Modal, Row } from "react-bootstrap";
 
 const MyAcconutPaymentMethod = () => {
   const [storeName, setStoreName] = useState("");
@@ -16,6 +17,7 @@ const MyAcconutPaymentMethod = () => {
   const [secretB, setSecretB] = useState("");
   const [error, setError] = useState("");
   const [notification, setNotification] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const token = useSelector((state) => state.auth.token);
 
@@ -48,31 +50,31 @@ const MyAcconutPaymentMethod = () => {
       secretA: secretA,
       secretB: secretB,
     };
+    setShowModal(true);
+    // try {
+    //   const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //     body: JSON.stringify(storeData),
+    //   });
 
-    try {
-      const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(storeData),
-      });
+    //   const data = await response.json();
 
-      const data = await response.json();
-
-      if (response.ok) {
-        showNotification("Bạn đã mở cửa hàng thành công!", "success");
-      } else {
-        const errorMessage =
-          data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
-        showNotification(errorMessage, "danger");
-      }
-    } catch (err) {
-      setError(
-        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
-      );
-    }
+    //   if (response.ok) {
+    //     showNotification("Bạn đã mở cửa hàng thành công!", "success");
+    //   } else {
+    //     const errorMessage =
+    //       data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
+    //     showNotification(errorMessage, "danger");
+    //   }
+    // } catch (err) {
+    //   setError(
+    //     "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+    //   );
+    // }
   };
 
   return (
@@ -231,6 +233,66 @@ const MyAcconutPaymentMethod = () => {
           </section>
         </div>
       </>
+      <Modal
+        size="lg"
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Quét QR để hoàn tất đăng ký</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          <Row>
+            <Col className="text-start" xs={6}>
+              <h5>Thông tin đăng ký:</h5>
+              <ul className="list-unstyled">
+                <li>
+                  <strong>Tên cửa hàng:</strong> {storeName}
+                </li>
+                <li>
+                  <strong>CCCD chủ cửa hàng:</strong> {citizenId}
+                </li>
+                <li>
+                  <strong>Loại cửa hàng:</strong>{" "}
+                  {shopType === "ENTERPRISE" ? "Doanh nghiệp" : "Cá nhân"}
+                </li>
+                <li>
+                  <strong>Mã số thuế:</strong> {taxCode}
+                </li>
+              </ul>
+            </Col>
+            <Col xs={6}>
+              <Image
+                height={350}
+                src="https://img.vietqr.io/image/MB-113366668888-compact.png"
+              />
+            </Col>
+          </Row>{" "}
+          <div className="text-danger text-start">
+            <p className=" fw-bold">Lưu ý</p>
+            <ol className="fs-6">
+              <li>
+                • Vui lòng điền chính xác nội dung chuyển khoản để thực hiện nạp
+                tiền tự động.
+              </li>
+              <li>
+                • Không chấp nhận giao dịch nạp tiền từ tài khoản công ty. Chỉ
+                các giao dịch được thực hiện từ tài khoản cá nhân, đúng với
+                thông tin đã đăng ký với ngân hàng, mới đươc xử lý
+              </li>
+            </ol>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setShowModal(false)}
+          >
+            Đóng
+          </button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

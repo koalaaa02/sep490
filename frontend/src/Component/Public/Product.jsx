@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
-  console.log(product);
 
   return (
     <div key={product.id} className="col fade-zoom">

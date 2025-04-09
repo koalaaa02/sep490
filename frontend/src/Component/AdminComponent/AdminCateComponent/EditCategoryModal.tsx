@@ -34,7 +34,6 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
     setHasParent(!!category.parentName);
     setPreviewImage(category.image || null);
     setSelectedFile(null);
-    console.log("Category changed", category.id);
   }, [category]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,7 +106,6 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
           body: formData,
         }
       );
-      console.log(response);
 
       if (!response.ok) {
         throw new Error("Upload ảnh lỗi");

@@ -8,11 +8,10 @@ import { Carousel } from "react-bootstrap";
 
 const ShopProductDetail = ({ id, onBack }) => {
   const [product, setProduct] = useState(null);
-  const [skus, setSkus] = useState([]); 
-  const [selectedSku, setSelectedSku] = useState(null); 
+  const [skus, setSkus] = useState([]);
+  const [selectedSku, setSelectedSku] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const shopId = 1;
-
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -36,9 +35,8 @@ const ShopProductDetail = ({ id, onBack }) => {
     fetchProduct();
   }, [id]);
 
-
   useEffect(() => {
-    if (!product) return; 
+    if (!product) return;
 
     const params = new URLSearchParams({
       page: 1,
@@ -54,9 +52,9 @@ const ShopProductDetail = ({ id, onBack }) => {
           `${BASE_URL}/api/public/productskus?${params.toString()}`
         );
         const data = await response.json();
-        setSkus(data.content); 
+        setSkus(data.content);
         if (data.content.length > 0) {
-          setSelectedSku(data.content[0]); 
+          setSelectedSku(data.content[0]);
         }
       } catch (error) {
         console.error("Error fetching SKUs:", error);
@@ -75,7 +73,7 @@ const ShopProductDetail = ({ id, onBack }) => {
   };
 
   const handleSkuChange = (sku) => {
-    setSelectedSku(sku); 
+    setSelectedSku(sku);
   };
 
   const handleAddCart = async () => {
@@ -153,7 +151,7 @@ const ShopProductDetail = ({ id, onBack }) => {
                         : ""
                     }`}
                     style={{ width: "90px", height: "90px", cursor: "pointer" }}
-                    onClick={() => handleSkuChange(sku)} 
+                    onClick={() => handleSkuChange(sku)}
                   />
                 ))}
               </div>
