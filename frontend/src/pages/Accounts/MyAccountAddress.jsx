@@ -558,7 +558,7 @@ const MyAccountAddress = () => {
                         className="form-control"
                         name="recipientName"
                         placeholder="Họ và Tên"
-                        value={formData.recipientName.trim()}
+                        value={formData.recipientName}
                         onChange={handleChange}
                         required
                       />
