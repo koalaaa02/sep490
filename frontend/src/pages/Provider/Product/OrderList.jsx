@@ -26,7 +26,7 @@ const OrderList = () => {
     "CANCELLED",
     "FINDINGTRUCK",
     "ACCEPTED",
-    "PACKAGING",
+    // "PACKAGING",
     "DELIVERING",
     "DELIVERED",
     // "LOST",
@@ -204,8 +204,8 @@ const OrderList = () => {
     CANCELLED: "Hủy",
     FINDINGTRUCK: "Đang tìm xe",
     ACCEPTED: "Chấp nhận",
-    PACKAGING: "Đóng gói",
-    DELIVERING: "Đang giao",
+    // PACKAGING: "Đóng gói",
+    DELIVERING: "Chưa giao",
     DELIVERED: "Đã giao",
   };
 
@@ -423,12 +423,10 @@ const OrderList = () => {
                                 } else if (order.status === "ACCEPTED") {
                                   filteredOptions = [
                                     "ACCEPTED",
-                                    "PACKAGING",
+                                    // "PACKAGING",
                                     "DELIVERING",
                                     "DELIVERED",
                                   ];
-                                } else if (order.status === "PACKAGING") {
-                                  filteredOptions = ["PACKAGING", "DELIVERING"];
                                 } else if (order.status === "DELIVERING") {
                                   filteredOptions = ["DELIVERING", "DELIVERED"];
                                 } else {

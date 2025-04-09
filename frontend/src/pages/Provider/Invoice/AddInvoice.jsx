@@ -104,6 +104,17 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       ["Danh sách sản phẩm"],
       ["Tên sản phẩm", "Số lượng", "Giá thành"],
       ...productsData,
+      [],
+      ["Ghi chú:"],
+      [
+        " - Đề nghị Quý khách kiểm tra hàng khi nhận hàng ký xác nhận và thanh toán.",
+      ],
+      [
+        " - Chứng từ này là căn cứ để đối chiếu hàng hóa và công nợ phát sinh.",
+      ],
+      [
+        " - Có nhầm lẫn vui lòng báo lại trong 48h kể từ khi nhận hàng.",
+      ],
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(combinedData);
@@ -117,8 +128,6 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
     const blob = new Blob([excelFile], { type: "application/octet-stream" });
     saveAs(blob, `PhiếuGiaoHàng-${invoice.invoiceId}.xlsx`);
   };
-
-  const isDelivering = invoice.status === "Đang giao";
 
   return (
     <div className="p-3 mb-10">
@@ -209,7 +218,6 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
             type="button"
             className="btn btn-success"
             onClick={generateExcelFile}
-            disabled={!isDelivering}
           >
             In Excel
           </button>
