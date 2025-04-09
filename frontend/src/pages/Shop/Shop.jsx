@@ -195,7 +195,7 @@ function Dropdown() {
                   </div>
                   <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Danh mục con</h5>
+                    <h5 className="mb-3">{categories?.name}</h5>
                     <div>
                       {categories?.subCategories.length > 0 ? (
                         categories?.subCategories.map((cate, index) => (
@@ -446,8 +446,7 @@ function Dropdown() {
 
                                   <div className="d-flex justify-content-between align-items-center mt-3">
                                     <div>
-                                      <span className="text-dark">
-                                        {p.price} VNĐ
+                                      <span className="text-danger">Còn hàng
                                       </span>
                                       {p.originalPrice && (
                                         <span className="text-decoration-line-through text-muted ms-2">

@@ -118,6 +118,8 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
     saveAs(blob, `PhiếuGiaoHàng-${invoice.invoiceId}.xlsx`);
   };
 
+  const isDelivering = invoice.status === "Đang giao";
+
   return (
     <div className="p-3 mb-10">
       <h3>In phiếu giao hàng</h3>
@@ -207,6 +209,7 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
             type="button"
             className="btn btn-success"
             onClick={generateExcelFile}
+            disabled={!isDelivering}
           >
             In Excel
           </button>

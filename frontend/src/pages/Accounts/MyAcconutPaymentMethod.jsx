@@ -178,8 +178,8 @@ const MyAcconutPaymentMethod = () => {
                                 value={shopType}
                                 onChange={(e) => setShopType(e.target.value)}
                               >
-                                <option value="ENTERPRISE">Doanh nghiệp</option>
-                                <option value="BUSINESS">Cá nhân</option>
+                                <option value="ENTERPRISE">Doanh nghiệp lớn</option>
+                                <option value="BUSINESS">Doanh nghiệp nhỏ</option>
                               </select>
 
                               {/* Mã số thuế */}

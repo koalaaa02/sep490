@@ -20,6 +20,7 @@ const OrderList = () => {
   const [filterDirection, setFilterDirection] = useState("DESC");
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [showConfrim, setShowConfrim] = useState(false);
   const statusOptions = [
     "PENDING",
     "CANCELLED",
@@ -74,6 +75,12 @@ const OrderList = () => {
   const handleStatusChange = (orderId, newStatus) => {
     setSelectedOrder(orderId);
     setSelectedStatus(newStatus);
+
+    if (newStatus === "DELIVERING") {
+      setShowPopup(false);
+      setShowConfrim(true);
+    }
+
     if (newStatus === "DELIVERED") {
       const order = data.content.find((order) => order.id === orderId);
       if (order && order.paymentMethod === "COD") {
@@ -126,6 +133,7 @@ const OrderList = () => {
       setSelectedOrder(null);
       setSelectedStatus("");
       setShowPaymentPopup(false);
+      setShowConfrim(false);
     }
   };
 
@@ -414,20 +422,15 @@ const OrderList = () => {
                                   ];
                                 } else if (order.status === "ACCEPTED") {
                                   filteredOptions = [
+                                    "ACCEPTED",
                                     "PACKAGING",
                                     "DELIVERING",
                                     "DELIVERED",
                                   ];
-                                } else if (
-                                  order.status === "PACKAGING" ||
-                                  order.status === "DELIVERING" ||
-                                  order.status === "DELIVERED"
-                                ) {
-                                  filteredOptions = [
-                                    "PACKAGING",
-                                    "DELIVERING",
-                                    "DELIVERED",
-                                  ];
+                                } else if (order.status === "PACKAGING") {
+                                  filteredOptions = ["PACKAGING", "DELIVERING"];
+                                } else if (order.status === "DELIVERING") {
+                                  filteredOptions = ["DELIVERING", "DELIVERED"];
                                 } else {
                                   filteredOptions = statusOptions;
                                 }
@@ -526,6 +529,34 @@ const OrderList = () => {
             Xác nhận
           </Button>
           <Button variant="danger" onClick={() => setShowPopup(false)}>
+            Hủy
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={showConfrim} onHide={() => setShowConfrim(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            Bạn có chắc muốn đổi trạng thái đơn hàng không?
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Bạn cần tạo phiếu giao hàng trước khi chuyển đổi sang trạng thái đã
+            giao hàng
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="success" onClick={confirmStatusChange}>
+            Xác nhận
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              setShowConfrim(false);
+              setShowPopup(false);
+            }}
+          >
             Hủy
           </Button>
         </Modal.Footer>
