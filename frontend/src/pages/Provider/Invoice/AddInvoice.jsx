@@ -12,6 +12,7 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
     address: orderData?.address?.address || "",
     phone: orderData?.address?.phone || "",
     status: orderData?.status || "",
+    deliveryDate: "",
   });
 
   const statusTranslations = {
@@ -88,6 +89,10 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       product.price,
     ]);
 
+    const formattedDeliveryDate = invoice.deliveryDate
+      ? new Date(invoice.deliveryDate).toLocaleDateString("vi-VN")
+      : "";
+
     const invoiceData = [
       ["Mã hóa đơn", invoice.invoiceId],
       ["Ngày tạo", invoice.createdDate],
@@ -96,6 +101,7 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       ["Số điện thoại", invoice.phone],
       ["Tổng tiền", invoice.totalAmount],
       ["Trạng thái", invoice.status],
+      ["Ngày giao hàng", formattedDeliveryDate],
     ];
 
     const combinedData = [
@@ -109,12 +115,8 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       [
         " - Đề nghị Quý khách kiểm tra hàng khi nhận hàng ký xác nhận và thanh toán.",
       ],
-      [
-        " - Chứng từ này là căn cứ để đối chiếu hàng hóa và công nợ phát sinh.",
-      ],
-      [
-        " - Có nhầm lẫn vui lòng báo lại trong 48h kể từ khi nhận hàng.",
-      ],
+      [" - Chứng từ này là căn cứ để đối chiếu hàng hóa và công nợ phát sinh."],
+      [" - Có nhầm lẫn vui lòng báo lại trong 48h kể từ khi nhận hàng."],
     ];
 
     const ws = XLSX.utils.aoa_to_sheet(combinedData);
@@ -157,6 +159,16 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
                 />
               </div>
             ))}
+            <div className="col-md-6 mb-2">
+              <label>Ngày giao hàng:</label>
+              <input
+                type="date"
+                name="deliveryDate"
+                className="form-control"
+                value={invoice.deliveryDate}
+                onChange={handleInvoiceChange}
+              />
+            </div>
           </div>
         </div>
 
@@ -191,6 +203,7 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
                     />
                   </div>
                 ))}
+
                 <div className="col-md-12 text-end">
                   <button
                     type="button"
