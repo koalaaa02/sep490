@@ -86,9 +86,10 @@ const InvoiceDetails = ({ invoice, onClose }) => {
             <tr>
               <td>{index + 1}</td>
               <td>
-                {`VN${u.deliveryMethod === "GHN" ? "GHN" : "DEB"}${Math.floor(
+                {/* {`VN${u.deliveryMethod === "GHN" ? "GHN" : "DEB"}${Math.floor(
                   new Date(u.createdAt).getTime() / 1000
-                )}${u.agent.name?.slice(0, 2).toUpperCase()}`}
+                )}${u.agent.name?.slice(0, 2).toUpperCase()}`} */}
+                {u.invoiceCode}
               </td>
               <td>
                 {new Date(u.createdAt).toLocaleString("vi-VN", {
@@ -97,10 +98,18 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                   day: "2-digit",
                   month: "2-digit",
                   year: "numeric",
-                })} 
+                })}
               </td>
               <td>{u.totalAmount}</td>
-              <td>21:00 04/04/2025</td>
+              <td>
+                {new Date(u.deliveryDate).toLocaleString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })}
+              </td>
               <td
                 onClick={() => toggleHistory(index)}
                 style={{ cursor: "pointer", color: "blue" }}
