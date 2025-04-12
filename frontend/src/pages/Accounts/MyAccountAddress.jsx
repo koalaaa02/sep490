@@ -88,7 +88,6 @@ const MyAccountAddress = () => {
         wardId: value,
         ward: selectedWard ? selectedWard.WardName : "",
       }));
-      console.log(value);
     }
 
     if (editIndex !== null) {

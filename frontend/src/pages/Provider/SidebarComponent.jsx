@@ -67,12 +67,6 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               >
                 Danh sách khoản nợ
               </button>
-              {/* <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("AddInvoice")}
-              >
-                In phiếu giao hàng
-              </button> */}
             </div>
           )}
         </li>
@@ -89,6 +83,12 @@ const SidebarComponent = ({ setSelectedComponent }) => {
                 onClick={() => setSelectedComponent("OrderList")}
               >
                 Danh sách đặt hàng
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("DeliveryList")}
+              >
+                Phiếu giao hàng
               </button>
             </div>
           )}

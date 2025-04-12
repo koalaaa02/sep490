@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
+import { BASE_URL } from "../../../Utils/config";
 
 const AddInvoice = ({ orderData, closeAddInvoice }) => {
   const [invoice, setInvoice] = useState({
@@ -30,7 +28,15 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       productName: item.productSku?.skuCode || "",
       quantity: item.quantity || "",
       price: item.price || "",
-    })) || [{ productName: "", quantity: "", price: "" }]
+      imageUrl: item.productSku?.images || "",
+    })) || [
+      {
+        productName: "",
+        quantity: "",
+        price: "",
+        imageUrl: "",
+      },
+    ]
   );
 
   useEffect(() => {
@@ -50,8 +56,9 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
         productName: item.productSku?.skuCode || "",
         quantity: item.quantity || "",
         price: item.price || "",
+        imageUrl: item.productSku?.images || "",
         isEditable: false,
-      })) || [{ productName: "", quantity: "", price: "" }]
+      })) || [{ productName: "", quantity: "", price: "", imageUrl: "" }]
     );
   }, [orderData]);
 
@@ -65,100 +72,147 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
     setProducts(newProducts);
   };
 
-  const addProduct = () => {
-    setProducts([
-      ...products,
-      { productName: "", quantity: "", price: "", isEditable: true },
-    ]);
-  };
+  const createDeliveryNote = async () => {
+    if (!invoice.deliveryDate) {
+      alert("Vui lòng nhập ngày giao hàng trước khi tạo phiếu.");
+      return;
+    }
+    const token = localStorage.getItem("access_token");
 
-  const removeProduct = (index) => {
-    const newProducts = products.filter((_, i) => i !== index);
-    setProducts(newProducts);
-  };
+    const totalAmount = products.reduce((sum, p) => {
+      const price = parseFloat(p.price) || 0;
+      const qty = parseInt(p.quantity) || 0;
+      return sum + price * qty;
+    }, 0);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert("Hóa đơn đã được lưu!");
-  };
+    const body = {
+      deliveredDate: new Date(invoice.deliveryDate).toISOString(),
+      totalAmount,
+      delivered: false,
+      paid: false,
+      orderId: orderData.id,
+      deliveryDetails: orderData.orderDetails.map((item) => ({
+        productName: item.productSku?.productName || "",
+        productSKUCode: item.productSku?.skuCode || "",
+        unit: item.productSku?.unit || "Cái",
+        quantity: item.quantity,
+        price: item.price,
+        deliveryNoteId: 0,
+        orderDetailId: {
+          orderId: orderData.id,
+          skuId: item.productSku?.id,
+        },
+      })),
+    };
 
-  const generateExcelFile = () => {
-    const productsData = products.map((product) => [
-      product.productName,
-      product.quantity,
-      product.price,
-    ]);
+    try {
+      const res = await fetch(`${BASE_URL}/api/provider/deliverynotes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
 
-    const formattedDeliveryDate = invoice.deliveryDate
-      ? new Date(invoice.deliveryDate).toLocaleDateString("vi-VN")
-      : "";
+      if (!res.ok) throw new Error("Tạo phiếu giao hàng thất bại!");
 
-    const invoiceData = [
-      ["Mã hóa đơn", invoice.invoiceId],
-      ["Ngày tạo", invoice.createdDate],
-      ["Khách hàng", invoice.customer],
-      ["Địa chỉ", invoice.address],
-      ["Số điện thoại", invoice.phone],
-      ["Tổng tiền", invoice.totalAmount],
-      ["Trạng thái", invoice.status],
-      ["Ngày giao hàng", formattedDeliveryDate],
-    ];
-
-    const combinedData = [
-      ...invoiceData,
-      [],
-      ["Danh sách sản phẩm"],
-      ["Tên sản phẩm", "Số lượng", "Giá thành"],
-      ...productsData,
-      [],
-      ["Ghi chú:"],
-      [
-        " - Đề nghị Quý khách kiểm tra hàng khi nhận hàng ký xác nhận và thanh toán.",
-      ],
-      [" - Chứng từ này là căn cứ để đối chiếu hàng hóa và công nợ phát sinh."],
-      [" - Có nhầm lẫn vui lòng báo lại trong 48h kể từ khi nhận hàng."],
-    ];
-
-    const ws = XLSX.utils.aoa_to_sheet(combinedData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Hóa đơn");
-    const excelFile = XLSX.write(wb, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const blob = new Blob([excelFile], { type: "application/octet-stream" });
-    saveAs(blob, `PhiếuGiaoHàng-${invoice.invoiceId}.xlsx`);
+      const result = await res.json();
+      alert("Tạo phiếu giao hàng thành công!");
+      const printWindow = window.open("/in-phieu.html", "_blank");
+      printWindow.onload = () => {
+        printWindow.postMessage(
+          {
+            ...orderData,
+            deliveryDate: invoice.deliveryDate,
+          },
+          window.location.origin
+        );
+      };
+      closeAddInvoice();
+    } catch (err) {
+      console.error("Lỗi:", err);
+      alert("Có lỗi xảy ra khi tạo phiếu giao hàng!");
+    }
   };
 
   return (
-    <div className="p-3 mb-10">
-      <h3>In phiếu giao hàng</h3>
-      <form onSubmit={handleSubmit}>
+    <div className="p-3 mb-10 container">
+      <h4>Tạo phiếu giao hàng</h4>
+      <form>
         <div className="border p-3 mb-3">
           <h5>Thông tin</h5>
           <div className="row">
-            {[
-              { label: "Mã hóa đơn", name: "invoiceId" },
-              { label: "Ngày tạo", name: "createdDate" },
-              { label: "Khách hàng", name: "customer" },
-              { label: "Tổng tiền", name: "totalAmount", type: "number" },
-              { label: "Địa chỉ", name: "address" },
-              { label: "Số điện thoại", name: "phone" },
-              { label: "Trạng thái", name: "status" },
-            ].map(({ label, name, type = "text" }, index) => (
-              <div className="col-md-6 mb-2" key={index}>
-                <label>{label}:</label>
-                <input
-                  type={type}
-                  name={name}
-                  className="form-control"
-                  value={invoice[name]}
-                  onChange={handleInvoiceChange}
-                  disabled
-                />
-              </div>
-            ))}
+            <div className="col-md-6 mb-2">
+              <label>Mã hóa đơn:</label>
+              <input
+                type="text"
+                name="invoiceId"
+                className="form-control"
+                value={invoice.invoiceId}
+                disabled
+              />
+            </div>
+            <div className="col-md-6 mb-2">
+              <label>Ngày tạo:</label>
+              <input
+                type="text"
+                name="createdDate"
+                className="form-control"
+                value={invoice.createdDate}
+                disabled
+              />
+            </div>
+            <div className="col-12 mb-2">
+              <label>Khách hàng:</label>
+              <input
+                type="text"
+                name="customer"
+                className="form-control"
+                value={invoice.customer}
+                disabled
+              />
+            </div>
+            <div className="col-md-6 mb-2">
+              <label>Tổng tiền:</label>
+              <input
+                type="number"
+                name="totalAmount"
+                className="form-control"
+                value={invoice.totalAmount}
+                disabled
+              />
+            </div>
+            <div className="col-md-6 mb-2">
+              <label>Số điện thoại:</label>
+              <input
+                type="text"
+                name="phone"
+                className="form-control"
+                value={invoice.phone}
+                disabled
+              />
+            </div>
+            <div className="col-12 mb-2">
+              <label>Địa chỉ:</label>
+              <input
+                type="text"
+                name="address"
+                className="form-control"
+                value={invoice.address}
+                disabled
+              />
+            </div>
+            <div className="col-md-6 mb-2">
+              <label>Trạng thái:</label>
+              <input
+                type="text"
+                name="status"
+                className="form-control"
+                value={invoice.status}
+                disabled
+              />
+            </div>
             <div className="col-md-6 mb-2">
               <label>Ngày giao hàng:</label>
               <input
@@ -167,25 +221,33 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
                 className="form-control"
                 value={invoice.deliveryDate}
                 onChange={handleInvoiceChange}
+                required
               />
             </div>
           </div>
         </div>
 
         <div className="border p-3 mb-3">
-          <h5>
-            Sản phẩm
-            <button
-              type="button"
-              className="btn btn-sm btn-primary ms-2"
-              onClick={addProduct}
-            >
-              <FaPlus />
-            </button>
-          </h5>
+          <h5>Sản phẩm</h5>
           {products.map((product, index) => (
-            <div key={index} className="border p-2 mb-2">
-              <div className="row">
+            <div className="row mb-2">
+              <div className="col-md-2 d-flex flex-column align-items-center">
+                {product.imageUrl ? (
+                  <>
+                    <label className="mb-1">Ảnh sản phẩm:</label>
+                    <img
+                      src={product.imageUrl}
+                      alt="product"
+                      className="img-thumbnail"
+                      style={{ maxHeight: "100px", objectFit: "contain" }}
+                    />
+                  </>
+                ) : (
+                  <span className="text-muted">Không có ảnh</span>
+                )}
+              </div>
+
+              <div className="col-md-9 d-flex">
                 {[
                   { label: "Tên sản phẩm", name: "productName" },
                   { label: "Số lượng", name: "quantity", type: "number" },
@@ -203,17 +265,6 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
                     />
                   </div>
                 ))}
-
-                <div className="col-md-12 text-end">
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={() => removeProduct(index)}
-                    disabled={product.isEditable}
-                  >
-                    Xóa sản phẩm
-                  </button>
-                </div>
               </div>
             </div>
           ))}
@@ -230,9 +281,9 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
           <button
             type="button"
             className="btn btn-success"
-            onClick={generateExcelFile}
+            onClick={createDeliveryNote}
           >
-            In Excel
+            Tạo phiếu giao hàng
           </button>
         </div>
       </form>
