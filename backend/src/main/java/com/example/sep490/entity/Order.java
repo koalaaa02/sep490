@@ -82,4 +82,7 @@ public class Order  extends Auditable{//đơn hàng nè
 
     @OneToMany(mappedBy = "order")
     private List<OrderDetail> orderDetails;
+
+    @OneToMany(mappedBy = "order")
+    private List<DeliveryNote> deliveryNotes;
 }

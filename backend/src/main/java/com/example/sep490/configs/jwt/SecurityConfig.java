@@ -65,7 +65,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/api/cart/**",
                                 "/html/**",
-                                "/actuator/**"
+                                "/actuator/**",
+                                "/api/ghn/**"
                         ).permitAll()
                         .requestMatchers(
                                 "/api/admin/**"
@@ -78,7 +79,8 @@ public class SecurityConfig {
                         ).hasAnyAuthority("ROLE_DEALER")
                         .requestMatchers(
                                 "/api/myprofile/**",
-                                "/api/chat/**"
+                                "/api/chat/**",
+                                "/api/bankaccounts/**"
                         ).hasAnyAuthority("ROLE_ADMIN", "ROLE_PROVIDER", "ROLE_DEALER")
                         .anyRequest().authenticated()
                 )

@@ -50,6 +50,8 @@ public class ShopService {
     @Autowired
     private AddressRepository addressRepo;
     @Autowired
+    private BankAccountRepository bankAccountRepo;
+    @Autowired
     private RoleRepository roleRepo;
     @Autowired
     private UserService userService;
@@ -106,11 +108,14 @@ public class ShopService {
             UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
             User user = getUser(userInfo.getId());
             Address address = getAddress(shopRequest.getAddressId());
+            BankAccount bankAccount = getBankAccount(shopRequest.getBankAccountId());
+
             if(user.getShop() != null) throw new RuntimeException("Bạn đã có shop " + user.getShop().getName());
 
             Shop entity = shopMapper.RequestToEntity(shopRequest);
             entity.setManager(user);
             entity.setAddress(address);
+            entity.setBankAccount(bankAccount);
             return shopMapper.EntityToResponse(shopRepo.save(entity));
         }else throw new RuntimeException("");
 
@@ -125,6 +130,7 @@ public class ShopService {
             UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
             User user = getUser(userInfo.getId());
             Address address = getAddress(shopRequest.getAddressId());
+            BankAccount bankAccount = getBankAccount(shopRequest.getBankAccountId());
             try {
                 objectMapper.updateValue(address, shopRequest);
             } catch (JsonMappingException e) {
@@ -132,6 +138,7 @@ public class ShopService {
             }
             shop.setManager(user);
             shop.setAddress(address);
+            shop.setBankAccount(bankAccount);
             return shopMapper.EntityToResponse(shopRepo.save(shop));
         }else throw new RuntimeException("");
 
@@ -215,6 +222,10 @@ public class ShopService {
     private Address getAddress(Long id) {
         return id == null ? null
                 : addressRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
+    private BankAccount getBankAccount(Long id) {
+        return id == null ? null
+                : bankAccountRepo.findByIdAndIsDeleteFalse(id).orElse(null);
     }
 
 }
