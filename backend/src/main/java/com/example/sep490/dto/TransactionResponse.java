@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class TransactionResponse{
 	private Long id;
 
-    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop","deliveryNotes"})
     private Order order;
     @JsonIgnoreProperties({ "transaction","invoice"})
     private DebtPayment debtPayment;

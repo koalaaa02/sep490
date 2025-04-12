@@ -26,7 +26,7 @@ public class InvoiceResponse{
 
     @JsonIgnoreProperties({ "invoices", "addresses", "shop"})
     private User agent; // người Đại lý/customer nợ
-    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop","deliveryNotes"})
     private Order order;
     private BigDecimal totalAmount; //tổng nợ phải trả
     private BigDecimal paidAmount ; // Ban đầu = 0, khi đại lý trả sẽ tăng lên

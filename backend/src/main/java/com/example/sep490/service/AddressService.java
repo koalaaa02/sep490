@@ -70,6 +70,9 @@ public class AddressService {
             shop = getShop(addressRequest.getShopId());
         else throw new RuntimeException("Không xác định được địa chỉ của cá nhân hay shop");
 
+        if(addressRequest.isDefaultAddress()){
+            addressRepo.resetDefaultAddressForUser(userService.getContextUser().getId());
+        }
         Address entity = addressMapper.RequestToEntity(addressRequest);
         entity.setUser(user);
         entity.setShop(shop);
@@ -97,12 +100,11 @@ public class AddressService {
         } catch (JsonMappingException e) {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
-        address.setUser(user);
-        address.setShop(shop);
-
         if(addressRequest.isDefaultAddress()){
             addressRepo.resetDefaultAddressForUser(userService.getContextUser().getId());
         }
+        address.setUser(user);
+        address.setShop(shop);
         return addressMapper.EntityToResponse(addressRepo.save(address));
     }
 

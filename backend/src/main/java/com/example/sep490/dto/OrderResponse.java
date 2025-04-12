@@ -50,7 +50,8 @@ public class OrderResponse {
     private Shop shop;
     @JsonIgnoreProperties({"debtPayments","agent","order"})
     private Invoice invoice;
-
+    @JsonIgnoreProperties({"address","order","deliveryDetails"})
+    private List<DeliveryNote> deliveryNotes;
 
     private boolean isDelete;
     private Long createdBy;

@@ -23,7 +23,7 @@ public class ShopRequest {
 
 //    @NotNull
 //    private Long managerId;
-    private Long addressId;
+
     private String registrationCertificateImages;
     private String TIN;
     private String citizenIdentificationCard;
@@ -41,5 +41,7 @@ public class ShopRequest {
     private String secretB;
 
     // Relationship
+    private Long addressId;
+    private Long bankAccountId;
 }
 //*

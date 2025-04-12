@@ -41,6 +41,8 @@ public class ShopResponse {
     private Address address;
 //    @JsonIgnoreProperties({"shop", "category","supplier","skus"})
 //    private List<Product> products;
+    private BankAccount bankAccount;
+
 
     private boolean isDelete;
     private Long createdBy;
