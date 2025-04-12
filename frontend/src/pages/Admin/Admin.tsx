@@ -7,6 +7,7 @@ import AdminCate from "../../Component/AdminComponent/AdminContent/AdminCate.tsx
 import AdminProd from "../../Component/AdminComponent/AdminContent/AdminProd.tsx";
 // import AdminDealer from "../../Component/AdminComponent/AdminContent/AdminDealer.tsx";
 import AdminProvider from "../../Component/AdminComponent/AdminContent/AdminProvider.tsx";
+import AdminBankAccount from "../../Component/AdminComponent/AdminContent/AdminBankAccount.tsx";
 
 const Admin = () => {
   const [active, setActive] = useState("Dashboard");
@@ -22,6 +23,8 @@ const Admin = () => {
       //   return <AdminDealer />;
       case "Cửa hàng":
         return <AdminProvider />;
+      case "Tài Khoản":
+        return <AdminBankAccount />;
       default:
         return <AdminDashboard />;
     }
