@@ -122,15 +122,16 @@ const TopSellingProduct = () => {
             <label htmlFor="limit" className="form-label">
               Số lượng sản phẩm
             </label>
-            <input
-              type="number"
+            <select
               id="limit"
-              className="form-control"
-              min="1"
-              max="20"
+              className="form-select"
               value={limit}
               onChange={(e) => setLimit(parseInt(e.target.value))}
-            />
+            >
+              <option value="5">Top 5</option>
+              <option value="10">Top 10</option>
+              <option value="15">Top 15</option>
+            </select>
           </div>
           <div className="col-md-6 d-flex align-items-end">
             <div className="form-group">
