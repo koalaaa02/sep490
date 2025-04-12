@@ -9,6 +9,7 @@ import com.example.sep490.entity.enums.DeliveryMethod;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.entity.enums.PaymentMethod;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 
@@ -27,6 +28,8 @@ import org.hibernate.annotations.ColumnDefault;
 @Builder
 public class OrderRequest {
 	private Long id;
+    @JsonIgnore
+    private String orderCode;
 
     @NotNull(message = "Trạng thái đơn hàng không được để trống.")
     private OrderStatus status;
@@ -39,10 +42,10 @@ public class OrderRequest {
     private PaymentMethod paymentMethod; // VNPAY, MOMO, COD,DEBT
 
     private DeliveryMethod deliveryMethod = DeliveryMethod.GHN;
-
+    private LocalDateTime orderDate; // Ngày order đơn hàng
+    private LocalDateTime deliveryDate; // Ngày hoàn thành đơn hàng
     @Schema(defaultValue = "false")
     private boolean paid = false;
-
 
     // Relationship
     private Long shopId;

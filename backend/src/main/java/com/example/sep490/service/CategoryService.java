@@ -40,6 +40,8 @@ public class CategoryService {
 	private BasePagination pagination;
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private StorageService storageService;
 	@Value("${env.backendBaseURL}")
 	private String baseURL;
 	
@@ -103,14 +105,16 @@ public class CategoryService {
 		Category category = categoryRepo.findByIdAndIsDeleteFalse(id)
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 		try {
-			String imageURL = FileUtils.uploadFile(image);
-			category.setImages(baseURL + "/" + imageURL);
+//			String imageURL = FileUtils.uploadFile(image);
+//			category.setImages(baseURL + "/" + imageURL);
+			category.setImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
 			return categoryMapper.EntityToResponse(categoryRepo.save(category));
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e.getMessage());
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
 		}
+//		catch (IOException e) {
+//			throw new RuntimeException(e.getMessage());
+//		}
 	}
 	
 	public void deleteCategory(Long id) {

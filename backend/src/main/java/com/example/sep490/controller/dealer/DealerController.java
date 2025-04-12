@@ -108,11 +108,11 @@ public class DealerController {
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 
-    @PutMapping("/{id}/status")
+    @PutMapping("/change-status/{id}")
     public ResponseEntity<String> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam OrderStatus status) {
-        orderService.changeOrderStatusCustomer(id, status);
+        orderService.changeOrderStatusForDealer(id, status);
         return ResponseEntity.ok("Cập nhật trạng thái đơn hàng thành công!");
     }
 

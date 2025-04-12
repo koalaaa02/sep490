@@ -55,6 +55,10 @@ public class Shop  extends Auditable{//Shop mà admin tạo cho user(sau đó đ
     @JoinColumn(name = "address_id")
     private Address address;
 
+    @OneToOne
+    @JoinColumn(name = "bank_account_id")
+    private BankAccount bankAccount;
+
     @JsonIgnoreProperties("shop")
     @OneToMany(mappedBy = "shop")
     private List<Product> products;

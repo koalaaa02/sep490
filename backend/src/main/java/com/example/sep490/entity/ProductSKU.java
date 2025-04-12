@@ -32,7 +32,7 @@ public class ProductSKU  extends Auditable{//SKU (Stock Keeping Unit) or phân l
     private String skuCode;
     
     @Column(nullable = false)
-    @Min(value = 1, message = "Số lượng phải lớn hơn hoặc bằng 1")
+    @Min(value = 0, message = "Số lượng phải lớn hơn hoặc bằng 0")
     @Max(value = 10000, message = "Số lượng tối đa là 10000")
     private int stock;
     

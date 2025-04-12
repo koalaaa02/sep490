@@ -29,8 +29,6 @@ public class ChatMessageController {
     @Autowired
     private UserService userService;
     @Autowired
-    private RabbitTemplate rabbitTemplate;
-    @Autowired
     private ObjectMapper objectMapper;
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -46,11 +44,9 @@ public class ChatMessageController {
         chatMessageRequest.setSenderId(user.getId());
         //save db
         ChatMessageResponse chatMessageResponse = chatMessageService.sendMessage(chatMessageRequest);
-        //send to exchange
-        //rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, "message.routing.key", chatMessageRequest);
         // redis pub/sub
         try {
-            String json = objectMapper.writeValueAsString(chatMessageRequest);
+            String json = objectMapper.writeValueAsString(chatMessageResponse);
             redisTemplate.convertAndSend(redisChannel, json);
         } catch (JsonProcessingException e) {
             e.printStackTrace();

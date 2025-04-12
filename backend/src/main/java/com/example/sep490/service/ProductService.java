@@ -1,7 +1,9 @@
 package com.example.sep490.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.example.sep490.dto.publicdto.ProductResponsePublic;
 import com.example.sep490.entity.*;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,8 @@ public class ProductService {
 	private UserService userService;
     @Autowired
     private ProductRepository productRepository;
+	@Autowired
+	private StorageService storageService;
 	@Value("${env.backendBaseURL}")
 	private String baseURL;
 
@@ -56,7 +61,16 @@ public class ProductService {
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
 		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
 		Page<Product> productPage = productRepository.findAll(spec, pageable);
-		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+//		Page<ProductResponsePublic> productResponsePage = productPage.map(productMapper::EntityToResponsePublic);
+		// Ánh xạ từng sản phẩm và gọi phương thức @AfterMapping
+		List<ProductResponsePublic> productResponses = productPage.getContent().stream()
+				.map(product -> {
+					ProductResponsePublic response = productMapper.EntityToResponsePublic(product);
+					productMapper.setPriceRange(response,product ); // Gọi phương thức @AfterMapping
+					return response;
+				})
+				.collect(Collectors.toList());
+		Page<ProductResponsePublic> productResponsePage = new PageImpl<>(productResponses, pageable, productPage.getTotalElements());
 		return pagination.createPageResponse(productResponsePage);
 	}
 	public PageResponse<ProductResponse> getProducts(int page, int size, String sortBy, String direction) {
@@ -66,7 +80,13 @@ public class ProductService {
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}
-
+	public PageResponse<ProductResponse> getProductsByFilterForAdmin(ProductFilterDTO filter) {
+		Specification<Product> spec = ProductSpecification.filterProducts(filter);
+		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+		Page<Product> productPage = productRepository.findAll(spec, pageable);
+		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
+		return pagination.createPageResponse(productResponsePage);
+	}
 	public PageResponse<ProductResponse> getProductsByFilter(ProductFilterDTO filter) {
 		filter.setCreatedBy(userService.getContextUser().getId());
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
@@ -75,7 +95,6 @@ public class ProductService {
 		Page<ProductResponse> productResponsePage = productPage.map(productMapper::EntityToResponse);
 		return pagination.createPageResponse(productResponsePage);
 	}
-
 	public ProductResponse getProductById(Long id) {
 		Optional<Product> Product = productRepo.findByIdAndIsDeleteFalse(id);
 		if (Product.isPresent()) {
@@ -124,20 +143,22 @@ public class ProductService {
 		Product product = productRepo.findByIdAndIsDeleteFalse(id)
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
 		try {
-			String imageURL = FileUtils.uploadFile(image);
-			product.setImages(baseURL + "/" + imageURL);
+//			String imageURL = FileUtils.uploadFile(image);
+//			product.setImages(baseURL + "/" + imageURL);
+			product.setImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
 			return productMapper.EntityToResponse(productRepo.save(product));
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e.getMessage());
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
 		}
+//		catch (IOException e) {
+//			throw new RuntimeException(e.getMessage());
+//		}
 	}
 
 	public void deleteProduct(Long id) {
 		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
 				.map(existingProduct -> {
-					existingProduct.setDelete(true);
+					existingProduct.setActive(false);
 					return productRepo.save(existingProduct);
 				})
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));

@@ -83,7 +83,7 @@ public class CheckoutService {
             if (productIds.contains(item.getProductSKUId())) {
                 Optional<ProductSKU> productSKU = productSKURepository.findByIdAndIsDeleteFalse(item.getProductSKUId());
                 //kiểm tra exist
-                if(!productSKU.isPresent()) throw new RuntimeException("Không tìm thấy sản phẩm có ID " + item.getProductSKUId());
+                if(!productSKU.isPresent()) throw new RuntimeException("Không tìm thấy phân loại sản phẩm có ID " + item.getProductSKUId());
                 ProductSKU proSKU = productSKU.get();
                 //check sp cùng 1 shop
                 if(!proSKU.getProduct().getShop().getId().equals(shopId)) throw new RuntimeException("Bạn chỉ được đặt đơn hàng trong cùng 1 shop.");
