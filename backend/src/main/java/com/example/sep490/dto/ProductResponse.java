@@ -27,8 +27,8 @@ public class ProductResponse {
 
     @JsonIgnoreProperties({"products","parentCategory","subCategories"})
     private Category category;
-    @JsonIgnoreProperties({"product"})
-    private List<ProductSKU> skus;
+//    @JsonIgnoreProperties({"product"})
+//    private List<ProductSKU> skus;
     @JsonIgnoreProperties({"products"})
     private Supplier supplier;
 

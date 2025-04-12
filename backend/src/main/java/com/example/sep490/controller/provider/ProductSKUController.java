@@ -1,5 +1,7 @@
 package com.example.sep490.controller.provider;
 
+import com.example.sep490.repository.specifications.ProductFilterDTO;
+import com.example.sep490.repository.specifications.ProductSKUFilterDTO;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,16 +22,21 @@ public class ProductSKUController {
     @Autowired
     private ProductSKUService productSKUService;
 
-    @GetMapping("/")
-    public ResponseEntity<?> getProductSKUes(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String direction,
-            @RequestParam(defaultValue = "productId") Long productId
-    ) {
-        logger.info("Fetching addresses with pagination, sort, and filter options.");
-        return ResponseEntity.ok(productSKUService.getProductSKUs(page, size, sortBy, direction, productId));
+//    @GetMapping("/")
+//    public ResponseEntity<?> getProductSKUes(
+//            @RequestParam(defaultValue = "1") int page,
+//            @RequestParam(defaultValue = "10") int size,
+//            @RequestParam(defaultValue = "id") String sortBy,
+//            @RequestParam(defaultValue = "ASC") String direction,
+//            @RequestParam(defaultValue = "productId") Long productId
+//    ) {
+//        logger.info("Fetching addresses with pagination, sort, and filter options.");
+//        return ResponseEntity.ok(productSKUService.getProductSKUs(page, size, sortBy, direction, productId));
+//    }
+
+    @GetMapping({"/"})
+    public ResponseEntity<?> getProductSKUsFilter(@Valid ProductSKUFilterDTO filter) {
+        return ResponseEntity.ok().body(productSKUService.getProductSKUsByFilter(filter));
     }
 
     @GetMapping("/{id}")

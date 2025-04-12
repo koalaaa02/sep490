@@ -100,19 +100,7 @@ const Header = () => {
   return (
     <div>
       <>
-        <div className="container  displaydesign">
-          <div className="row g-4">
-            <div className="col-8 col-sm-4 col-lg-9 py-2">
-              <input
-                className="form-control "
-                style={{ width: "100%" }}
-                list="datalistOptions"
-                id="exampleDataList"
-                placeholder="Tìm kiếm..."
-              />
-            </div>
-          </div>
-        </div>
+        <div className="container  displaydesign"></div>
       </>
       <nav className="navbar navbar-expand-lg navbar-light sticky-top">
         <div className="container">
@@ -123,14 +111,6 @@ const Header = () => {
               alt="eCommerce HTML Template"
             />
           </Link>
-          <input
-            className="form-control responsivesearch "
-            list="datalistOptions"
-            id="exampleDataList"
-            placeholder="Tìm kiếm..."
-            fdprocessedid="9icrif"
-            style={{ width: "35%" }}
-          />
 
           <button
             className="navbar-toggler"
@@ -159,7 +139,6 @@ const Header = () => {
                   Trang chủ
                 </Link>
               </li>
-             
 
               <li className="nav-item dmenu dropdown">
                 <Link

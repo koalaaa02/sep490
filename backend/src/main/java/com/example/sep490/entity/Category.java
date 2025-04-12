@@ -27,6 +27,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
+
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "tbl_category")
@@ -57,6 +59,7 @@ public class Category extends Auditable{//danh mục sản phẩm
     
     @JsonIgnoreProperties("category")
     @OneToMany(mappedBy = "category")
+//    @SQLRestriction("is_delete = false AND active = true")
     private List<Product> products;
 }
 

@@ -23,6 +23,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OrderResponse {
 	private Long id;
+    private String orderCode;
+
     private OrderStatus status;
     private BigDecimal shippingFee;
     private BigDecimal totalAmount;
@@ -30,7 +32,8 @@ public class OrderResponse {
     private DeliveryMethod deliveryMethod;
     @Nullable
     private String deliveryCode;//mã vận chuyển để tra cứu tình trạng đơn hàng
-    private LocalDateTime shippedDate; // Ngày hoàn thành đơn hàng
+    private LocalDateTime orderDate; // Ngày order đơn hàng
+    private LocalDateTime deliveryDate; // Ngày hoàn thành đơn hàng
     private boolean paid;
 
     private BigDecimal commissionFee;  // Phí hoa hồng sàn
@@ -47,7 +50,8 @@ public class OrderResponse {
     private Shop shop;
     @JsonIgnoreProperties({"debtPayments","agent","order"})
     private Invoice invoice;
-
+    @JsonIgnoreProperties({"address","order","deliveryDetails"})
+    private List<DeliveryNote> deliveryNotes;
 
     private boolean isDelete;
     private Long createdBy;

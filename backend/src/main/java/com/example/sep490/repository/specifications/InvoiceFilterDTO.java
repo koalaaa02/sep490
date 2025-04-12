@@ -18,6 +18,7 @@ public class InvoiceFilterDTO {
     @Schema(defaultValue = "ASC")
     private String direction = "ASC";
 
+    private String invoiceCode;
     private String agentName;
     @Schema(defaultValue = "UNPAID")
     private InvoiceStatus status;

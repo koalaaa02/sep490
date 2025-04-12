@@ -33,6 +33,7 @@ const MyAccountOrder = () => {
           sortBy: "id",
           direction: "ASC",
           paid: false,
+          // status: "DELIVERED"
         });
         const response = await fetch(
           `${BASE_URL}/api/dealer/orders?${params.toString()}`,

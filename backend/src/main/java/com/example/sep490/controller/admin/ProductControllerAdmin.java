@@ -18,7 +18,7 @@ public class ProductControllerAdmin {
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> getProducts(@Valid ProductFilterDTO filter) {
-        return ResponseEntity.ok(productService.getProductsByFilter(filter));
+        return ResponseEntity.ok(productService.getProductsByFilterForAdmin(filter));
     }
 
     @PutMapping("/activate/{id}")
@@ -26,7 +26,7 @@ public class ProductControllerAdmin {
     public ResponseEntity<?> activateProduct(@PathVariable Long id) {
         try {
             productService.activateProduct(id);
-            return ResponseEntity.ok().body("Kích hoạt sản phẩm thành công.");
+            return ResponseEntity.ok().body("Cập nhật trạng thái sản phẩm thành công.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Lỗi trong quá trình kích hoạt sản phẩm.");
         }

@@ -16,7 +16,8 @@ public class CorsConfig {
                     .allowedOrigins(
                             "http://localhost:3000",
                             "https://sep490.vuvu15202.shop",
-                            "http://sep490.vuvu15202.shop")
+                            "http://sep490.vuvu15202.shop",
+                            "http://127.0.0.1:5500")
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);

@@ -25,7 +25,6 @@ public class OrderDetail  extends Auditable{//lưu chi tiết đơn hàng
     private int quantity;
     private BigDecimal price;
 
-
     // Relationship
 	@NotNull
     @ManyToOne

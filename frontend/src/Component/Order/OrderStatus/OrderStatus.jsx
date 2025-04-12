@@ -11,7 +11,7 @@ const OrderStatus = ({ setStatus }) => {
     { code: "FINDINGTRUCK", label: "Tìm xe tải" },
     { code: "DELIVERING", label: "Đang giao" },
     { code: "DELIVERED", label: "Đã giao" },
-    { code: "LOST", label: "Mất hàng" },
+    // { code: "LOST", label: "Mất hàng" },
     { code: "CANCELLED", label: "Đã hủy" },
   ];
 

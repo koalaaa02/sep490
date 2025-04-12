@@ -17,7 +17,6 @@ public class RedisReceiver {
             ChatMessageRequest myMessage = objectMapper.readValue(message, ChatMessageRequest.class);
             System.out.println("Got Message: " + myMessage);
             messagingTemplate.convertAndSend("/topic/chat/" + myMessage.getChatRoomId(), myMessage);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

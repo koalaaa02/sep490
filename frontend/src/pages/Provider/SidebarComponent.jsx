@@ -1,11 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { BiTask } from "react-icons/bi";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaClipboardList, FaChartBar } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { TbMessageReport } from "react-icons/tb";
 
 const SidebarComponent = ({ setSelectedComponent }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -70,12 +67,6 @@ const SidebarComponent = ({ setSelectedComponent }) => {
               >
                 Danh sách khoản nợ
               </button>
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("AddInvoice")}
-              >
-                Thêm hóa đơn
-              </button>
             </div>
           )}
         </li>
@@ -92,6 +83,12 @@ const SidebarComponent = ({ setSelectedComponent }) => {
                 onClick={() => setSelectedComponent("OrderList")}
               >
                 Danh sách đặt hàng
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => setSelectedComponent("DeliveryList")}
+              >
+                Phiếu giao hàng
               </button>
             </div>
           )}

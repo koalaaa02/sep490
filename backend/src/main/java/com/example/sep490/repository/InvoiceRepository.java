@@ -56,7 +56,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>, JpaSpec
 
     @Query(value = """
         SELECT iv.*
-        FROM sep490v3.tbl_order o
+        FROM tbl_order o
         INNER JOIN tbl_invoice iv ON o.id = iv.order_id AND iv.agent_id = :agent_id
         INNER JOIN tbl_shop s ON s.id = o.shop_id AND o.shop_id = :shop_id
     """, nativeQuery = true)

@@ -42,9 +42,9 @@ public class CartService {
         //Lấy thông tin sp từ db
         ProductSKU proSKU = productSKURepository.findById(productSKUId).orElse(null);
         if(proSKU == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Phân loại sản phẩm này không tồn tại.");
-
-        //Lấy thông tin dealer
-
+        //check product
+        if(proSKU.getProduct() != null && !proSKU.getProduct().isActive()) throw new RuntimeException("Sản phẩm này hiện tạm khóa.");
+        if(proSKU.getProduct() != null && proSKU.getProduct().isDelete()) throw new RuntimeException("Sản phẩm này hiện không tồn tại.");
 
         // Kiểm tra số lượng còn lại của sản phẩm
         int availableQuantity = productSKURepository.getAvailableQuantity(productSKUId);
@@ -65,9 +65,6 @@ public class CartService {
                     cart.getShops().add(newShop);
                     return newShop;
                 });
-
-        //check product
-        if(proSKU.getProduct() != null && !proSKU.getProduct().isActive()) throw new RuntimeException("Sản phẩm này hiện tạm khóa.");
 
         // Tìm sản phẩm trong giỏ hàng của shop
         ItemCart itemCart = shopCart.getItems().stream()

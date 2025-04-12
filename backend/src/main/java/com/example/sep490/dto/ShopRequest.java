@@ -23,14 +23,14 @@ public class ShopRequest {
 
 //    @NotNull
 //    private Long managerId;
-    private Long addressId;
+
     private String registrationCertificateImages;
     private String TIN;
     private String citizenIdentificationCard;
     @NotNull(message = "Status được để trống.")
     private ShopType shopType;
-    @Schema(defaultValue = "true")
-    private boolean active = true;
+    @Schema(defaultValue = "false")
+    private boolean active = false;
     @Schema(defaultValue = "false")
     private boolean close = false;
 
@@ -41,5 +41,7 @@ public class ShopRequest {
     private String secretB;
 
     // Relationship
+    private Long addressId;
+    private Long bankAccountId;
 }
 //*

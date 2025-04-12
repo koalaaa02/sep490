@@ -56,6 +56,7 @@ public class AuthController {
     public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         User checkUser = service.getUserByEmailIgnoreCase(authRequest.getEmail());
         if(checkUser == null) return  ResponseEntity.badRequest().body("Email không tồn tại.");
+        if(!checkUser.isActive()) return  ResponseEntity.badRequest().body("Tài khoản chưa được kích hoạt.");
         if (!passwordEncoder.matches(authRequest.getPassword(), checkUser.getPassword())) {
             throw new RuntimeException("Mật khẩu không chính xác");
         }
@@ -64,6 +65,7 @@ public class AuthController {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwtService.generateToken(checkUser.getName()));
+            response.put("uid", checkUser.getId());
             response.put("roles", user.getRoles());
             response.put("lastName", checkUser.getLastName());
             response.put("firstName", checkUser.getFirstName());
