@@ -48,7 +48,7 @@ const DeliveryList = () => {
 
   const handlePageSizeChange = (e) => {
     setPageSize(Number(e.target.value));
-    setPage(1); 
+    setPage(1);
   };
 
   const handleOrderClick = async (item) => {
@@ -73,7 +73,7 @@ const DeliveryList = () => {
       }
 
       const result = await response.json();
-      setSelectedOrder(result);       
+      setSelectedOrder(result);
       setCurrentView("details");
     } catch (error) {
       console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
@@ -88,7 +88,7 @@ const DeliveryList = () => {
   return (
     <>
       {currentView === "list" ? (
-        <Container className="mt-4">
+        <Container className="mt-4" style={{ height: "100vh" }}>
           <h3 className="mb-4">Phiếu giao hàng</h3>
 
           {/* Dropdown chọn page size - căn phải */}
@@ -210,7 +210,11 @@ const DeliveryList = () => {
           </div>
         </Container>
       ) : (
-        <OrderDetails order={selectedOrder} onBack={handleBackToList} fromDeliveryList={true}/>
+        <OrderDetails
+          order={selectedOrder}
+          onBack={handleBackToList}
+          fromDeliveryList={true}
+        />
       )}
     </>
   );

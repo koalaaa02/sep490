@@ -34,7 +34,7 @@ const InvoiceListComponent = () => {
   };
 
   return (
-    <div className="p-3 mb-10">
+    <div className="p-3 mb-10" style={{ height: "100vh" }}>
       {selectedInvoice ? (
         <InvoiceDetails
           invoice={selectedInvoice}
