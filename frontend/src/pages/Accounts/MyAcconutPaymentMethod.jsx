@@ -18,12 +18,43 @@ const MyAcconutPaymentMethod = () => {
   const [error, setError] = useState("");
   const [notification, setNotification] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [account, setAccount] = useState({
+    id: 1,
+    bankName: "",
+    accountNumber: "",
+    accountHolderName: "",
+    defaultBankAccount: false,
+    createdAt: "",
+    updatedAt: "",
+  });
 
   const token = useSelector((state) => state.auth.token);
 
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/bankaccounts/1`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
+
+        const data = await response.json();
+        console.log(data);
+        setAccount(data);
+      } catch (error) {
+        console.error("Lỗi khi fetch API:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
@@ -178,8 +209,12 @@ const MyAcconutPaymentMethod = () => {
                                 value={shopType}
                                 onChange={(e) => setShopType(e.target.value)}
                               >
-                                <option value="ENTERPRISE">Doanh nghiệp lớn</option>
-                                <option value="BUSINESS">Doanh nghiệp nhỏ</option>
+                                <option value="ENTERPRISE">
+                                  Doanh nghiệp lớn
+                                </option>
+                                <option value="BUSINESS">
+                                  Doanh nghiệp nhỏ
+                                </option>
                               </select>
 
                               {/* Mã số thuế */}
@@ -265,7 +300,7 @@ const MyAcconutPaymentMethod = () => {
             <Col xs={6}>
               <Image
                 height={350}
-                src="https://img.vietqr.io/image/MB-113366668888-compact.png"
+                src={`https://img.vietqr.io/image/${account.bankName}-${account.accountNumber}-print.png?amount=150000&addInfo=MCH2025`}
               />
             </Col>
           </Row>{" "}

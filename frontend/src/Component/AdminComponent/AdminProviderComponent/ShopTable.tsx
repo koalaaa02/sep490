@@ -43,7 +43,7 @@ const ShopTable: React.FC<ShopTableProps> = ({
             <td>{shop.address?.address || "N/A"}</td>
             <td>{shop.manager?.name || "N/A"}</td>
             <td>{shop.tin || "N/A"}</td>
-            <td onClick={(e) => onStatusToggle(shop.id, e)}>
+            <td >
               <Badge bg={statusType === "active" ? "success" : "secondary"}>
                 {statusType === "active" ? "Hoạt động" : "Dừng hoạt động"}
               </Badge>

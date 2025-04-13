@@ -73,7 +73,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             <td>{product.name}</td>
             <td>{product.category.name}</td>
             <td>{product.supplier.name}</td>
-            <td onClick={(e) => onStatusToggle(product.id, e)}>
+            <td>
               <Badge bg={statusType === "active" ? "success" : "secondary"}>
                 {statusType === "active" ? "Kích hoạt" : "Ngừng kích hoạt"}
               </Badge>
