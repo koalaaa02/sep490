@@ -12,6 +12,21 @@ const DeliveryList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const token = localStorage.getItem("access_token");
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+    return unitMap[unit] || unit;
+  };
+
   const fetchData = async (currentPage) => {
     try {
       const response = await fetch(
@@ -137,7 +152,7 @@ const DeliveryList = () => {
                   </td>
                   <td>{item.productName}</td>
                   <td>{item.productSKUCode}</td>
-                  <td>{item.unit}</td>
+                  <td>{convertUnitToVietnamese(item.unit)}</td>
                   <td>{(item.quantity * item.price).toLocaleString()}</td>
                   <td>
                     <Badge

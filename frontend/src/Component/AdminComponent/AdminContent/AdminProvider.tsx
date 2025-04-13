@@ -135,7 +135,7 @@ const ShopList = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Danh sách cửa hàng</h2>
+      <h2 className="mb-4">Danh sách nhà cung cấp</h2>
 
       <ShopSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 

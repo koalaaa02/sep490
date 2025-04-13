@@ -78,7 +78,7 @@ const MyAccountSideBar = ({ activeKey }) => {
               to="/MyAcconutPaymentMethod"
             >
               <i className="fas fa-shop me-2" />
-              Mở cửa hàng
+              Đăng ký bán hàng
             </Link>
           </li>
           {/* nav item */}

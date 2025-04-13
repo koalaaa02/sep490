@@ -166,7 +166,7 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Danh sách cửa hàng</h5>
+                    <h5 className="mb-3">Danh sách nhà cung cấp</h5>
                     <div className="my-4">
                       {/* input */}
                       <input

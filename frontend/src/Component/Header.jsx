@@ -176,14 +176,14 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Cửa hàng
+                  Nhà cung cấp
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
                   <Link className="dropdown-item" to="/StoreList">
-                    Danh sách cửa hàng
+                    Danh sách nhà cung cấp
                   </Link>
                 </div>
               </li>
@@ -265,12 +265,6 @@ const Header = () => {
                           <Link className="dropdown-item" to="/MyDebt">
                             Khoản nợ
                           </Link>
-                          <Link
-                            className="dropdown-item"
-                            to="/MyAcconutPaymentMethod"
-                          >
-                            Mở cửa hàng
-                          </Link>
                           <button
                             className="dropdown-item"
                             onClick={handleLogOut}
@@ -298,6 +292,14 @@ const Header = () => {
                   </div>
                 </div>
               </li>
+              {token && (
+                <li className="nav-item">
+                  <Link className="nav-link text-danger" to="/MyAcconutPaymentMethod">
+                    Đăng ký bán hàng
+                  </Link>
+                </li>
+              )}
+
               <li className="nav-item dmenu dropdown ml-3">
                 {/* <Link
                   className="text-muted position-relative"

@@ -95,7 +95,7 @@ const MyAcconutPaymentMethod = () => {
       const data = await response.json();
 
       if (response.ok) {
-        showNotification("Bạn đã mở cửa hàng thành công!", "success");
+        showNotification("Bạn đã đăng ký bán hàng thành công!", "success");
       } else {
         const errorMessage =
           data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
@@ -149,7 +149,7 @@ const MyAcconutPaymentMethod = () => {
                         <div className="p-6 p-lg-10">
                           {/* heading */}
                           <div className="container">
-                            <h2>Đăng ký cửa hàng</h2>
+                            <h2>Đăng ký bán hàng</h2>
                             {notification && (
                               <p className={`alert alert-${notification.type}`}>
                                 {notification.message}
