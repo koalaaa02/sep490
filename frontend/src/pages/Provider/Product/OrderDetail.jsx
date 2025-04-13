@@ -138,7 +138,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
       {showInvoiceForm ? (
         <AddInvoice closeAddInvoice={closeAddInvoice} orderData={data} />
       ) : (
-        <div className="p-3">
+        <div className="p-3" style={{ height: "100%"}}>
           <div className="d-flex align-items-center mb-2">
             <button className="btn btn-secondary me-2" onClick={onBack}>
               Quay lại
@@ -256,14 +256,14 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           <div className="mb-10">
             <h5>Chi tiết đơn hàng</h5>
             <div className="d-flex flex-column">
-              <div>
-                <strong>Tên cửa hàng: </strong>
-                <span>{data.shop.name}</span>
-              </div>
-              <div>
-                <strong>Mã số thuế: </strong>
-                <span>{data.shop.tin}</span>
-              </div>
+              <Form.Group className="mb-3">
+                <Form.Label>Tên cửa hàng</Form.Label>
+                <Form.Control value={data.shop.name} readOnly />
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>Mã số thuế</Form.Label>
+                <Form.Control value={data.shop.tin} readOnly />
+              </Form.Group>
               <div>
                 <strong>Danh sách sản phẩm: </strong>
               </div>

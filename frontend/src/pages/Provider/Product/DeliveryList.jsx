@@ -112,6 +112,7 @@ const DeliveryList = () => {
               <tr>
                 <th>STT</th>
                 <th>Mã giao hàng</th>
+                <th>Ngày tạo phiếu</th>
                 <th>Tên sản phẩm</th>
                 <th>Mã sản phẩm</th>
                 <th>Đơn vị</th>
@@ -129,6 +130,11 @@ const DeliveryList = () => {
                 >
                   <td>{(page - 1) * pageSize + index + 1}</td>
                   <td>{item.deliveryNote.deliveryCode}</td>
+                  <td>
+                    {new Date(item.deliveryNote.createdAt).toLocaleDateString(
+                      "vi-VN"
+                    )}
+                  </td>
                   <td>{item.productName}</td>
                   <td>{item.productSKUCode}</td>
                   <td>{item.unit}</td>

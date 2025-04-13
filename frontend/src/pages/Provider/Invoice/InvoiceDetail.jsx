@@ -58,7 +58,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
     setSelectedOrder(null);
   };
 
-  const handleOrderClick = async (item) => {    
+  const handleOrderClick = async (item) => {
     try {
       const orderId = item.order.id;
       if (!orderId) return;
@@ -122,12 +122,12 @@ const InvoiceDetails = ({ invoice, onClose }) => {
             </thead>
             {user?.content?.map((u, index) => (
               <tbody>
-                <tr
-                  onClick={() => handleOrderClick(u)}
-                  style={{ cursor: "pointer" }}
-                >
+                <tr>
                   <td>{index + 1}</td>
-                  <td>
+                  <td
+                    onClick={() => handleOrderClick(u)}
+                    style={{ cursor: "pointer" }}
+                  >
                     {/* {`VN${u.deliveryMethod === "GHN" ? "GHN" : "DEB"}${Math.floor(
                   new Date(u.createdAt).getTime() / 1000
                 )}${u.agent.name?.slice(0, 2).toUpperCase()}`} */}
@@ -267,7 +267,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
         <OrderDetails
           order={selectedOrder}
           onBack={handleBackToList}
-          fromDeliveryList={false}
+          fromDeliveryList={true}
         />
       )}
     </>

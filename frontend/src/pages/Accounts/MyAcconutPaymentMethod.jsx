@@ -78,34 +78,34 @@ const MyAcconutPaymentMethod = () => {
       close: false,
       totalFeeDueAmount: 0,
       tin: taxCode,
-      secretA: secretA,
-      secretB: secretB,
+      secretA: "string",
+      secretB: "string",
     };
     setShowModal(true);
-    // try {
-    //   const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(storeData),
-    //   });
+    try {
+      const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(storeData),
+      });
 
-    //   const data = await response.json();
+      const data = await response.json();
 
-    //   if (response.ok) {
-    //     showNotification("Bạn đã mở cửa hàng thành công!", "success");
-    //   } else {
-    //     const errorMessage =
-    //       data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
-    //     showNotification(errorMessage, "danger");
-    //   }
-    // } catch (err) {
-    //   setError(
-    //     "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
-    //   );
-    // }
+      if (response.ok) {
+        showNotification("Bạn đã mở cửa hàng thành công!", "success");
+      } else {
+        const errorMessage =
+          data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
+        showNotification(errorMessage, "danger");
+      }
+    } catch (err) {
+      setError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+      );
+    }
   };
 
   return (
@@ -228,7 +228,7 @@ const MyAcconutPaymentMethod = () => {
                               />
 
                               {/* Secret A */}
-                              <label>Secret A:</label>
+                              {/* <label>Secret A:</label>
                               <input
                                 type="password"
                                 className="form-control"
@@ -236,10 +236,10 @@ const MyAcconutPaymentMethod = () => {
                                 value={secretA}
                                 onChange={(e) => setSecretA(e.target.value)}
                                 required
-                              />
+                              /> */}
 
                               {/* Secret B */}
-                              <label>Secret B:</label>
+                              {/* <label>Secret B:</label>
                               <input
                                 type="password"
                                 className="form-control"
@@ -247,7 +247,7 @@ const MyAcconutPaymentMethod = () => {
                                 value={secretB}
                                 onChange={(e) => setSecretB(e.target.value)}
                                 required
-                              />
+                              /> */}
 
                               {/* Nút Submit */}
                               <button
@@ -294,6 +294,12 @@ const MyAcconutPaymentMethod = () => {
                 </li>
                 <li>
                   <strong>Mã số thuế:</strong> {taxCode}
+                </li>
+                <li>
+                  <strong>Số tiền:</strong> 150.000 VNĐ
+                </li>
+                <li>
+                  <strong>Nội dung chuyển khoản:</strong> MCH2025
                 </li>
               </ul>
             </Col>

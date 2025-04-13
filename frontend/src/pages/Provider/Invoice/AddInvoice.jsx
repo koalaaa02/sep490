@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BASE_URL } from "../../../Utils/config";
+import {Form } from "react-bootstrap";
 
 const AddInvoice = ({ orderData, closeAddInvoice }) => {
   const [invoice, setInvoice] = useState({
@@ -11,6 +12,8 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
     phone: orderData?.address?.phone || "",
     status: orderData?.status || "",
     deliveryDate: "",
+    shopName: orderData?.shop?.name || "",
+    shopTin: orderData?.shop?.tin || "",
   });
 
   const statusTranslations = {
@@ -228,6 +231,18 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
         </div>
 
         <div className="border p-3 mb-3">
+          <h5>Chi tiết đơn hàng</h5>
+          <div className="d-flex flex-column">
+            <Form.Group className="mb-3">
+              <Form.Label>Tên cửa hàng</Form.Label>
+              <Form.Control value={invoice.shopName} readOnly />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Mã số thuế</Form.Label>
+              <Form.Control value={invoice.shopTin} readOnly />
+            </Form.Group>
+          </div>
+
           <h5>Sản phẩm</h5>
           {products.map((product, index) => (
             <div className="row mb-2">
