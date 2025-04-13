@@ -90,7 +90,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
   return (
     <>
       {currentView === "list" ? (
-        <div className="mt-4 p-3 border rounded shadow-lg">
+        <div className="p-3 border rounded shadow-lg">
           <div>
             <div>
               <div className="d-flex align-items-center mb-2">
