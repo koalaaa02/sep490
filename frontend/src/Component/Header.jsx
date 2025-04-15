@@ -176,14 +176,14 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Cửa hàng
+                  Nhà cung cấp
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
                   <Link className="dropdown-item" to="/StoreList">
-                    Danh sách cửa hàng
+                    Danh sách nhà cung cấp
                   </Link>
                 </div>
               </li>

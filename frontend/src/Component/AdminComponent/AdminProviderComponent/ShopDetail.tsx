@@ -22,6 +22,16 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
   onBack,
   onStatusToggle,
 }) => {
+  function getShop(type: string) {
+    switch (type) {
+      case "ENTERPRISE":
+        return "Doanh Nghiệp";
+      case "BUSINESS":
+        return "Kinh Doanh";
+      default:
+        return "Không rõ";
+    }
+  }
   return (
     <div className="p-4">
       <Button variant="outline-primary" onClick={onBack} className="mb-3">
@@ -30,7 +40,7 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
 
       <Card>
         <Card.Header className="d-flex justify-content-between align-items-center">
-          <h4>Chi tiết cửa hàng: {shop.name}</h4>
+          <h4>Chi tiết nhà cung cấp: {shop.name}</h4>
           <div>
             <Badge bg={shop.close ? "danger" : "primary"}>
               {shop.close ? "Đã đóng cửa" : "Đang mở cửa"}
@@ -49,10 +59,11 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
                       <strong>ID:</strong> {shop.id}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <strong>Tên cửa hàng:</strong> {shop.name}
+                      <strong>Tên nhà cung cấp:</strong> {shop.name}
                     </ListGroup.Item>
                     <ListGroup.Item>
-                      <strong>Loại cửa hàng:</strong> {shop.shopType}
+                      <strong>Loại nhà cung cấp:</strong>{" "}
+                      {getShop(shop.shopType)}
                     </ListGroup.Item>
                     <ListGroup.Item>
                       <strong>Mã số thuế:</strong> {shop.tin || "N/A"}
@@ -73,7 +84,7 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
               </Card>
 
               <Card className="mb-3">
-                <Card.Header>Thông tin chủ cửa hàng</Card.Header>
+                <Card.Header>Thông tin chủ nhà cung cấp</Card.Header>
                 <Card.Body>
                   <ListGroup variant="flush">
                     <ListGroup.Item>
@@ -107,7 +118,7 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
 
             <Col md={6}>
               <Card className="mb-3">
-                <Card.Header>Địa chỉ cửa hàng</Card.Header>
+                <Card.Header>Địa chỉ nhà cung cấp</Card.Header>
                 <Card.Body>
                   <ListGroup variant="flush">
                     <ListGroup.Item>

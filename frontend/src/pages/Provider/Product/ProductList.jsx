@@ -126,12 +126,14 @@ const ProductList = ({ setSelectedProductId }) => {
             width="80"
             height="80"
           />
-          <p>Tên cửa hàng: {data?.name}</p>
+          <p>Tên nhà cung cấp: {data?.name}</p>
         </div>
         <div className="d-flex align-items-center">
           <p>
             Hình thức kinh doanh:{" "}
-            {data?.shopType === "ENTERPRISE" ? "Doanh nghiệp lớn" : "Doanh nghiệp nhỏ"}
+            {data?.shopType === "ENTERPRISE"
+              ? "Doanh nghiệp lớn"
+              : "Doanh nghiệp nhỏ"}
           </p>
         </div>
         <div className="d-flex align-items-center">

@@ -79,7 +79,7 @@ const ShopList = () => {
   const handleActive = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     const confirmAction = window.confirm(
-      "Bạn có chắc chắn muốn thay đổi trạng thái cửa hàng này không?"
+      "Bạn có chắc chắn muốn thay đổi trạng thái nhà cung cấp này không?"
     );
 
     if (!confirmAction) return;
@@ -135,7 +135,7 @@ const ShopList = () => {
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Danh sách cửa hàng</h2>
+      <h2 className="mb-4">Danh sách nhà cung cấp</h2>
 
       <ShopSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 

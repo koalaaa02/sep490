@@ -166,13 +166,13 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Danh sách cửa hàng</h5>
+                    <h5 className="mb-3">Danh sách nhà cung cấp</h5>
                     <div className="my-4">
                       {/* input */}
                       <input
                         type="search"
                         className="form-control"
-                        placeholder="Tìm kiếm cửa hàng..."
+                        placeholder="Tìm kiếm nhà cung cấp..."
                       />
                     </div>
                     {stores?.length > 0 ? (
@@ -446,7 +446,8 @@ function Dropdown() {
 
                                   <div className="d-flex justify-content-between align-items-center mt-3">
                                     <div>
-                                      <span className="text-danger">Còn hàng
+                                      <span className="text-danger">
+                                        Còn hàng
                                       </span>
                                       {p.originalPrice && (
                                         <span className="text-decoration-line-through text-muted ms-2">

@@ -87,7 +87,9 @@ const StoreList = () => {
                       <div className="bg-light rounded-3 d-flex justify-content-between">
                         <div className="d-flex align-items-center p-10">
                           <Slide direction="down">
-                            <h2 className="mb-0 fw-bold">Danh sách cửa hàng</h2>
+                            <h2 className="mb-0 fw-bold">
+                              Danh sách nhà cung cấp
+                            </h2>
                           </Slide>
                         </div>
                         <div className="p-6">
@@ -119,7 +121,7 @@ const StoreList = () => {
                         <h6>
                           Có{" "}
                           <span className="text-primary">{stores.length}</span>{" "}
-                          cửa hàng
+                          nhà cung cấp
                         </h6>
                       </div>
                     </div>

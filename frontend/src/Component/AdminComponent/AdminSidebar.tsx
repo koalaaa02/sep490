@@ -12,7 +12,7 @@ const AdminSideBar = ({ setActive, active }) => {
     "Sản phẩm",
     // "Khách hàng",
     "Tài Khoản",
-    "Cửa hàng",
+    "Nhà cung cấp",
   ];
   const dispatch = useDispatch();
   const navigate = useNavigate();
