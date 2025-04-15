@@ -30,11 +30,11 @@ public class UserResponse {
     private List<Role> roles;
     private UserType userType = UserType.ROLE_DEALER;
 
-//    @JsonIgnoreProperties({"debtPayments","agent","order"})
-//    private List<Invoice> invoices;
-//
-//    @JsonIgnoreProperties({"user","shop"})
-//    private List<Address> addresses;
+    private String TIN;//mã số thuế
+    private String citizenIdentificationCard;//CCCD
+    private String citizenIdentificationCardImageUp;//CCCDImageUp
+    private String citizenIdentificationCardImageDown;//CCCDImageDown
+    private String shopName;
 
     @JsonIgnoreProperties({"manager","address","products","orders"})
     private Shop shop;

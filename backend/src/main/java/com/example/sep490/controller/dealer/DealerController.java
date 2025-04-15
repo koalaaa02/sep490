@@ -3,6 +3,7 @@ package com.example.sep490.controller.dealer;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.entity.enums.OrderStatus;
+import com.example.sep490.repository.specifications.FilterDTO;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
 import com.example.sep490.service.InvoiceService;
@@ -16,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/dealer")
@@ -62,8 +64,8 @@ public class DealerController {
 //    }
 
     @GetMapping("/ShopInvoiceSummary")
-    public ResponseEntity<?> getShopInvoiceSummary() {
-        return ResponseEntity.ok(invoiceService.getShopsWithInvoices());
+    public ResponseEntity<?> getShopInvoiceSummary(FilterDTO filter) {
+        return ResponseEntity.ok(invoiceService.getShopsWithInvoices(filter));
     }
 
     @GetMapping("/GetInvoicesByShopId/{shopId}")
@@ -119,5 +121,19 @@ public class DealerController {
     @PostMapping(value = "/shop/create")
     public ResponseEntity<?> createShop(@Valid @RequestBody ShopRequest shopRequest) {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
+    }
+
+    @PostMapping(value = "/shop/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadRegistrationCertificateImages(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
+    }
+
+    @PostMapping(value = "/shop/{id}/uploadLogoShop", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadLogoShop(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadLogoShop(id, file)) ;
     }
 }

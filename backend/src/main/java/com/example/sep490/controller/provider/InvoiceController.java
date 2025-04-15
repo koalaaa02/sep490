@@ -1,5 +1,6 @@
 package com.example.sep490.controller.provider;
 
+import com.example.sep490.repository.specifications.FilterDTO;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.service.UserService;
 import jakarta.validation.Valid;
@@ -30,8 +31,8 @@ public class InvoiceController {
 //    }
 
     @GetMapping("/UserInvoiceSummary")
-    public ResponseEntity<?> getUserInvoiceSummary() {
-        return ResponseEntity.ok(invoiceService.getUsersWithInvoicesCreatedBy());
+    public ResponseEntity<?> getUserInvoiceSummary(FilterDTO filter) {
+        return ResponseEntity.ok(invoiceService.getUsersWithInvoicesCreatedBy(filter));
     }
 
     @GetMapping("/GetAllByDealerId/{id}")

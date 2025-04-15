@@ -51,7 +51,7 @@ public class CheckoutService {
         }
 
         // Lấy giỏ hàng từ cookie
-        Cart cart = cartService.getCartFromCookies(request);
+        Cart cart = cartService.getCartFromCookiesToChange(request);
 
         if (cart.getShops() == null || cart.getShops().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng trống.");

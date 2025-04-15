@@ -29,4 +29,26 @@ public class ShopControllerProvider {
             @RequestPart("file") MultipartFile file) {
         return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
     }
+
+    @PostMapping(value = "/{id}/uploadLogoShop", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadLogoShop(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadLogoShop(id, file)) ;
+    }
+
+    @PostMapping(value = "/shop/{id}/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardUp(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadCCCD(id, file, true)) ;
+    }
+
+    @PostMapping(value = "/shop/{id}/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardDown(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadCCCD(id, file, false)) ;
+    }
+
 }
