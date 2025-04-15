@@ -12,6 +12,21 @@ const DeliveryList = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const token = localStorage.getItem("access_token");
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+    return unitMap[unit] || unit;
+  };
+
   const fetchData = async (currentPage) => {
     try {
       const response = await fetch(
@@ -48,7 +63,7 @@ const DeliveryList = () => {
 
   const handlePageSizeChange = (e) => {
     setPageSize(Number(e.target.value));
-    setPage(1); 
+    setPage(1);
   };
 
   const handleOrderClick = async (item) => {
@@ -73,7 +88,7 @@ const DeliveryList = () => {
       }
 
       const result = await response.json();
-      setSelectedOrder(result);       
+      setSelectedOrder(result);
       setCurrentView("details");
     } catch (error) {
       console.error("Lỗi khi lấy chi tiết đơn hàng:", error);
@@ -88,7 +103,7 @@ const DeliveryList = () => {
   return (
     <>
       {currentView === "list" ? (
-        <Container className="mt-4">
+        <Container className="mt-4" style={{ height: "100vh" }}>
           <h3 className="mb-4">Phiếu giao hàng</h3>
 
           {/* Dropdown chọn page size - căn phải */}
@@ -112,6 +127,7 @@ const DeliveryList = () => {
               <tr>
                 <th>STT</th>
                 <th>Mã giao hàng</th>
+                <th>Ngày tạo phiếu</th>
                 <th>Tên sản phẩm</th>
                 <th>Mã sản phẩm</th>
                 <th>Đơn vị</th>
@@ -129,9 +145,14 @@ const DeliveryList = () => {
                 >
                   <td>{(page - 1) * pageSize + index + 1}</td>
                   <td>{item.deliveryNote.deliveryCode}</td>
+                  <td>
+                    {new Date(item.deliveryNote.createdAt).toLocaleDateString(
+                      "vi-VN"
+                    )}
+                  </td>
                   <td>{item.productName}</td>
                   <td>{item.productSKUCode}</td>
-                  <td>{item.unit}</td>
+                  <td>{convertUnitToVietnamese(item.unit)}</td>
                   <td>{(item.quantity * item.price).toLocaleString()}</td>
                   <td>
                     <Badge
@@ -210,7 +231,11 @@ const DeliveryList = () => {
           </div>
         </Container>
       ) : (
-        <OrderDetails order={selectedOrder} onBack={handleBackToList} fromDeliveryList={true}/>
+        <OrderDetails
+          order={selectedOrder}
+          onBack={handleBackToList}
+          fromDeliveryList={true}
+        />
       )}
     </>
   );

@@ -13,29 +13,43 @@ const AdminBankAccount = () => {
     updatedAt: "",
   });
   const [editMode, setEditMode] = useState(false);
-  const [originalAccount, setOriginalAccount] = useState({});
+  const [originalAccount, setOriginalAccount] = useState({
+    id: 0,
+    bankName: "",
+    accountNumber: "",
+    accountHolderName: "",
+    defaultBankAccount: false,
+    createdAt: "",
+    updatedAt: "",
+  });
   const [isLoading, setIsLoading] = useState(true);
   const token = localStorage.getItem("access_token");
+  const [banks, setBanks] = useState([]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/bankaccounts/1`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const [response, banksRes] = await Promise.all([
+          fetch(`${BASE_URL}/api/bankaccounts/1`, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }),
+          fetch("https://api.vietqr.io/v2/banks"),
+        ]);
 
         if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
-
+        if (!banksRes.ok) throw new Error(`Lỗi ngân hàng: ${banksRes.status}`);
         const data = await response.json();
-        console.log(data);
+        const banksData = await banksRes.json();
 
         setAccount(data);
         setOriginalAccount(data);
         setIsLoading(false);
+        setBanks(banksData.data);
       } catch (error) {
         console.error("Lỗi khi fetch API:", error);
         setIsLoading(false);
@@ -75,6 +89,7 @@ const AdminBankAccount = () => {
         },
         credentials: "include",
         body: JSON.stringify({
+          id: 1,
           bankName: account.bankName,
           accountNumber: account.accountNumber,
           accountHolderName: account.accountHolderName,
@@ -88,6 +103,7 @@ const AdminBankAccount = () => {
       setAccount(updatedData);
       setEditMode(false);
       setOriginalAccount(updatedData);
+      alert("Thay đổi thông tin thành công !");
     } catch (error) {
       console.error("Lỗi khi cập nhật tài khoản:", error);
     } finally {
@@ -110,13 +126,19 @@ const AdminBankAccount = () => {
             <Row className="mb-3">
               <Form.Group as={Col} md={6} controlId="bankName">
                 <Form.Label>Tên ngân hàng</Form.Label>
-                <Form.Control
-                  type="text"
+                <Form.Select
                   name="bankName"
-                  value={account.bankName}
+                  value={account.bankName} 
                   onChange={handleChange}
                   disabled={!editMode}
-                />
+                >
+                  <option value="">-- Chọn ngân hàng --</option>
+                  {banks.map((bank) => (
+                    <option key={bank.code} value={bank.code}>
+                      {bank.name}
+                    </option>
+                  ))}
+                </Form.Select>
               </Form.Group>
 
               <Form.Group as={Col} md={6} controlId="accountNumber">

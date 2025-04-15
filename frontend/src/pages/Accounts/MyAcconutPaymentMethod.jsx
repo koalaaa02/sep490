@@ -18,12 +18,43 @@ const MyAcconutPaymentMethod = () => {
   const [error, setError] = useState("");
   const [notification, setNotification] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [account, setAccount] = useState({
+    id: 1,
+    bankName: "",
+    accountNumber: "",
+    accountHolderName: "",
+    defaultBankAccount: false,
+    createdAt: "",
+    updatedAt: "",
+  });
 
   const token = useSelector((state) => state.auth.token);
 
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/bankaccounts/1`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
+
+        const data = await response.json();
+        console.log(data);
+        setAccount(data);
+      } catch (error) {
+        console.error("Lỗi khi fetch API:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
@@ -47,34 +78,34 @@ const MyAcconutPaymentMethod = () => {
       close: false,
       totalFeeDueAmount: 0,
       tin: taxCode,
-      secretA: secretA,
-      secretB: secretB,
+      secretA: "string",
+      secretB: "string",
     };
     setShowModal(true);
-    // try {
-    //   const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //     body: JSON.stringify(storeData),
-    //   });
+    try {
+      const response = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(storeData),
+      });
 
-    //   const data = await response.json();
+      const data = await response.json();
 
-    //   if (response.ok) {
-    //     showNotification("Bạn đã mở cửa hàng thành công!", "success");
-    //   } else {
-    //     const errorMessage =
-    //       data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
-    //     showNotification(errorMessage, "danger");
-    //   }
-    // } catch (err) {
-    //   setError(
-    //     "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
-    //   );
-    // }
+      if (response.ok) {
+        showNotification("Bạn đã đăng ký bán hàng thành công!", "success");
+      } else {
+        const errorMessage =
+          data?.message || "Đã xảy ra lỗi, vui lòng thử lại!";
+        showNotification(errorMessage, "danger");
+      }
+    } catch (err) {
+      setError(
+        "Không thể kết nối với máy chủ. Vui lòng kiểm tra lại kết nối mạng."
+      );
+    }
   };
 
   return (
@@ -118,7 +149,7 @@ const MyAcconutPaymentMethod = () => {
                         <div className="p-6 p-lg-10">
                           {/* heading */}
                           <div className="container">
-                            <h2>Đăng ký cửa hàng</h2>
+                            <h2>Đăng ký bán hàng</h2>
                             {notification && (
                               <p className={`alert alert-${notification.type}`}>
                                 {notification.message}
@@ -178,8 +209,12 @@ const MyAcconutPaymentMethod = () => {
                                 value={shopType}
                                 onChange={(e) => setShopType(e.target.value)}
                               >
-                                <option value="ENTERPRISE">Doanh nghiệp lớn</option>
-                                <option value="BUSINESS">Doanh nghiệp nhỏ</option>
+                                <option value="ENTERPRISE">
+                                  Doanh nghiệp lớn
+                                </option>
+                                <option value="BUSINESS">
+                                  Doanh nghiệp nhỏ
+                                </option>
                               </select>
 
                               {/* Mã số thuế */}
@@ -193,7 +228,7 @@ const MyAcconutPaymentMethod = () => {
                               />
 
                               {/* Secret A */}
-                              <label>Secret A:</label>
+                              {/* <label>Secret A:</label>
                               <input
                                 type="password"
                                 className="form-control"
@@ -201,10 +236,10 @@ const MyAcconutPaymentMethod = () => {
                                 value={secretA}
                                 onChange={(e) => setSecretA(e.target.value)}
                                 required
-                              />
+                              /> */}
 
                               {/* Secret B */}
-                              <label>Secret B:</label>
+                              {/* <label>Secret B:</label>
                               <input
                                 type="password"
                                 className="form-control"
@@ -212,7 +247,7 @@ const MyAcconutPaymentMethod = () => {
                                 value={secretB}
                                 onChange={(e) => setSecretB(e.target.value)}
                                 required
-                              />
+                              /> */}
 
                               {/* Nút Submit */}
                               <button
@@ -260,12 +295,18 @@ const MyAcconutPaymentMethod = () => {
                 <li>
                   <strong>Mã số thuế:</strong> {taxCode}
                 </li>
+                <li>
+                  <strong>Số tiền:</strong> 150.000 VNĐ
+                </li>
+                <li>
+                  <strong>Nội dung chuyển khoản:</strong> MCH2025
+                </li>
               </ul>
             </Col>
             <Col xs={6}>
               <Image
                 height={350}
-                src="https://img.vietqr.io/image/MB-113366668888-compact.png"
+                src={`https://img.vietqr.io/image/${account.bankName}-${account.accountNumber}-print.png?amount=150000&addInfo=MCH2025`}
               />
             </Col>
           </Row>{" "}

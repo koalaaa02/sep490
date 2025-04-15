@@ -141,6 +141,7 @@ const ChatBox = () => {
   return (
     <div className="container p-3" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="row mt-2">
+        <h4>Đoạn chat</h4>
         <div className="col-md-4">
           {data?.map((d) => (
             <div className="list-group mb-1" key={d.id}>
