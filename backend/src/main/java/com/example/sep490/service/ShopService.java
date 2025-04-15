@@ -6,8 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.sep490.dto.ShopInvoiceSummary;
-import com.example.sep490.dto.UserInvoiceSummary;
+import com.example.sep490.dto.*;
 import com.example.sep490.dto.publicdto.ShopResponsePublic;
 import com.example.sep490.entity.*;
 import com.example.sep490.repository.*;
@@ -26,8 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
-import com.example.sep490.dto.ShopRequest;
-import com.example.sep490.dto.ShopResponse;
 import com.example.sep490.mapper.ShopMapper;
 import com.example.sep490.entity.Shop;
 import com.example.sep490.utils.BasePagination;
@@ -113,11 +110,22 @@ public class ShopService {
             if(user.getShop() != null) throw new RuntimeException("Bạn đã có shop " + user.getShop().getName());
 
             Shop entity = shopMapper.RequestToEntity(shopRequest);
+            if(shopRequest.getCitizenIdentificationCard() == null)
+                entity.setCitizenIdentificationCard(user.getCitizenIdentificationCard());
+            if(shopRequest.getCitizenIdentificationCardImageUp() == null)
+                entity.setCitizenIdentificationCardImageUp(user.getCitizenIdentificationCardImageUp());
+            if(shopRequest.getCitizenIdentificationCardImageDown() == null)
+                entity.setCitizenIdentificationCardImageDown(user.getCitizenIdentificationCardImageDown());
+            if(shopRequest.getTIN() == null)
+                entity.setTIN(user.getTIN());
+            if(shopRequest.getName() == null)
+                entity.setName(user.getShopName());
+
             entity.setManager(user);
             entity.setAddress(address);
             entity.setBankAccount(bankAccount);
             return shopMapper.EntityToResponse(shopRepo.save(entity));
-        }else throw new RuntimeException("");
+        }else throw new RuntimeException("Lỗi tạo shop.");
 
     }
 
@@ -150,6 +158,37 @@ public class ShopService {
         try {
             String imageURL = FileUtils.uploadFile(image);
             shop.setRegistrationCertificateImages(baseURL + "/" + imageURL);
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public ShopResponse uploadLogoShop(Long id, MultipartFile image) {
+        Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
+                .orElseThrow(() -> new RuntimeException("Shop không tồn tại với ID: " + id));
+        try {
+            String imageURL = FileUtils.uploadFile(image);
+            shop.setLogoImage(baseURL + "/" + imageURL);
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public ShopResponse uploadCCCD(Long id, MultipartFile image, boolean imageUp) {
+        Shop shop = userService.getShopByContextUser();
+        try {
+            String imageURL = FileUtils.uploadFile(image);
+            if (imageUp)
+                shop.setCitizenIdentificationCardImageUp(baseURL + "/" + imageURL);
+            else
+                shop.setCitizenIdentificationCardImageDown(baseURL + "/" + imageURL);
+
             return shopMapper.EntityToResponse(shopRepo.save(shop));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());

@@ -8,6 +8,7 @@ import com.example.sep490.dto.UserInvoiceSummary;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
+import com.example.sep490.repository.specifications.FilterDTO;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.InvoiceSpecification;
 import com.example.sep490.utils.CommonUtils;
@@ -77,12 +78,14 @@ public class InvoiceService {
         return pagination.createPageResponse(invoiceResponsePage);
     }
 
-    public List<UserInvoiceSummary> getUsersWithInvoicesCreatedBy() {
-        return invoiceRepo.findAllUserAndCountInvoiceByCreatedBy(userService.getContextUser().getId());
+    public List<UserInvoiceSummary> getUsersWithInvoicesCreatedBy(FilterDTO filter) {
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        return invoiceRepo.findAllUserAndCountInvoiceByCreatedBy(userService.getContextUser().getId(), pageable);
     }
 
-    public List<ShopInvoiceSummary> getShopsWithInvoices() {
-        return invoiceRepo.findAllShopAndCountInvoiceByAgentID(userService.getContextUser().getId());
+    public List<ShopInvoiceSummary> getShopsWithInvoices(FilterDTO filter) {
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        return invoiceRepo.findAllShopAndCountInvoiceByAgentID(userService.getContextUser().getId(), pageable);
     }
 
     public List<InvoiceResponse> getShopsInvoicesByShopIdAndDealerId(Long shopId) {
