@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  Button,
-  Card,
-  Badge,
-  Row,
-  Col,
-  Table,
-  ListGroup,
-} from "react-bootstrap";
+import { Button, Card, Badge, Row, Col, ListGroup } from "react-bootstrap";
 import { FiArrowLeft } from "react-icons/fi";
 import { Shop } from "./type.ts";
 
@@ -160,6 +152,7 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
                       {shop.registrationCertificateImages ? (
                         <div className="mt-2">
                           <img
+                            alt=""
                             src={shop.registrationCertificateImages}
                             className="img-thumbnail me-2"
                             style={{ maxHeight: "150px" }}
