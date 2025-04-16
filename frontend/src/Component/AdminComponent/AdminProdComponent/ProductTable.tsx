@@ -55,7 +55,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
     <Table striped hover responsive className="mt-3">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Tên sản phẩm</th>
           <th>Phân loại</th>
           <th>Nhà cung cấp</th>
@@ -63,13 +63,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {products.map((product) => (
+        {products.map((product, index) => (
           <tr
             key={product.id}
             onClick={() => onRowClick(product)}
             style={{ cursor: "pointer" }}
           >
-            <td>{product.id}</td>
+            <td>{index + 1}</td>
             <td>{product.name}</td>
             <td>{product.category.name}</td>
             <td>{product.supplier.name}</td>

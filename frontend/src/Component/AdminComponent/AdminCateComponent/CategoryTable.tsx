@@ -22,7 +22,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
     <Table striped hover responsive>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Ảnh</th>
           <th>Danh mục</th>
           <th>Thuộc danh mục</th>
@@ -30,9 +30,9 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {categories.map((category) => (
+        {categories.map((category, index) => (
           <tr key={category.id}>
-            <td width={20}>{category.id}</td>
+            <td width={20}>{index + 1}</td>
             <td width={200}>
               <img
                 height={150}
