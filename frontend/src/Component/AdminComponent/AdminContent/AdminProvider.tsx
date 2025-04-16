@@ -79,7 +79,7 @@ const ShopList = () => {
   const handleActive = async (id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     const confirmAction = window.confirm(
-      "Bạn có chắc chắn muốn thay đổi trạng thái cửa hàng này không?"
+      "Bạn có chắc chắn muốn thay đổi trạng thái nhà cung cấp này không?"
     );
 
     if (!confirmAction) return;

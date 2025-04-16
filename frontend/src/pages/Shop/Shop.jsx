@@ -171,7 +171,7 @@ function Dropdown() {
                       <input
                         type="search"
                         className="form-control"
-                        placeholder="Tìm kiếm..."
+                        placeholder="Tìm kiếm nhà cung cấp..."
                       />
                     </div>
                     {stores?.length > 0 ? (

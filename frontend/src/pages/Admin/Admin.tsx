@@ -21,7 +21,7 @@ const Admin = () => {
         return <AdminProd />;
       // case "Khách hàng":
       //   return <AdminDealer />;
-      case "Cửa hàng":
+      case "Nhà cung cấp":
         return <AdminProvider />;
       case "Tài Khoản":
         return <AdminBankAccount />;

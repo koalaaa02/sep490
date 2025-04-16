@@ -22,10 +22,10 @@ const ShopTable: React.FC<ShopTableProps> = ({
       <thead>
         <tr>
           <th>STT</th>
-          <th>Tên cửa hàng</th>
+          <th>Tên nhà cung cấp</th>
           <th>Địa chỉ</th>
-          <th>Chủ cửa hàng</th>
-          <th>Mã số</th>
+          <th>Chủ nhà cung cấp</th>
+          <th>Mã số thuế</th>
           <th>Trạng thái</th>
         </tr>
       </thead>
@@ -38,7 +38,7 @@ const ShopTable: React.FC<ShopTableProps> = ({
           >
             <td>{shop.id}</td>
             <td style={{ color: "blue" }}>
-              {shop.name || "Tên cửa hàng không hợp lệ"}
+              {shop.name || "Tên nhà cung cấp không hợp lệ"}
             </td>
             <td>{shop.address?.address || "N/A"}</td>
             <td>{shop.manager?.name || "N/A"}</td>

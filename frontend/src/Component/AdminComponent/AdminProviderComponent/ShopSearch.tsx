@@ -18,7 +18,7 @@ const ShopSearch: React.FC<ShopSearchProps> = ({
           <FiSearch />
         </InputGroup.Text>
         <Form.Control
-          placeholder="Tìm kiếm cửa hàng..."
+          placeholder="Tìm kiếm nhà cung cấp..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
         />

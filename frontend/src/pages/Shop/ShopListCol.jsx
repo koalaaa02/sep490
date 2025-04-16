@@ -117,13 +117,13 @@ function Dropdown() {
               {/* Vertical Dropdowns Column */}
               <div className="col-md-3">
                 <div className="py-4">
-                  <h5 className="mb-3">Danh sách cửa hàng</h5>
+                  <h5 className="mb-3">Danh sách nhà cung cấp</h5>
                   <div className="my-4">
                     {/* input */}
                     <input
                       type="search"
                       className="form-control"
-                      placeholder="Tìm kiếm cửa hàng..."
+                      placeholder="Tìm kiếm nhà cung cấp..."
                     />
                   </div>
                   {stores.length > 0 ? (

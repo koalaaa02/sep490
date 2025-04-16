@@ -121,7 +121,7 @@ const StoreList = () => {
                         <h6>
                           Có{" "}
                           <span className="text-primary">{stores.length}</span>{" "}
-                          cửa hàng
+                          nhà cung cấp
                         </h6>
                       </div>
                     </div>

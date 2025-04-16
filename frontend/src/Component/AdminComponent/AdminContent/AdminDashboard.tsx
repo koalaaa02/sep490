@@ -62,7 +62,7 @@ const AdminDashboard = () => {
                 styles.itemsChart
               )}
             >
-              <span className={styles.title}>Số cửa hàng</span>
+              <span className={styles.title}>Số nhà cung cấp</span>
               <span className={classNames(styles.amount, "text-success")}>
                 50
               </span>
