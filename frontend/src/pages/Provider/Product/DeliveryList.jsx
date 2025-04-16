@@ -3,6 +3,7 @@ import { Table, Container, Badge, Row, Col, Form } from "react-bootstrap";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
 import OrderDetails from "./OrderDetail";
+import { FaSearch } from "react-icons/fa";
 
 const DeliveryList = () => {
   const [data, setData] = useState(null);
@@ -11,7 +12,7 @@ const DeliveryList = () => {
   const [currentView, setCurrentView] = useState("list");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const token = localStorage.getItem("access_token");
-
+  const [searchTerm, setSearchTerm] = useState("");
   const convertUnitToVietnamese = (unit) => {
     const unitMap = {
       PCS: "Chiếc",
@@ -100,6 +101,12 @@ const DeliveryList = () => {
     setSelectedOrder(null);
   };
 
+  const filteredData = data?.content?.filter((item) =>
+    item.deliveryNote.deliveryCode
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       {currentView === "list" ? (
@@ -108,6 +115,18 @@ const DeliveryList = () => {
 
           {/* Dropdown chọn page size - căn phải */}
           <Row className="mb-3 justify-content-end">
+            <Col className="d-flex align-items-center">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm kiếm mã giao hàng..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-dark">
+                <FaSearch />
+              </button>
+            </Col>
             <Col xs="auto" className="d-flex align-items-center">
               <Form.Select
                 size="sm"
@@ -133,11 +152,10 @@ const DeliveryList = () => {
                 <th>Đơn vị</th>
                 <th>Tổng tiền</th>
                 <th>Giao hàng</th>
-                <th>Thanh toán</th>
               </tr>
             </thead>
             <tbody>
-              {data?.content?.map((item, index) => (
+              {filteredData?.map((item, index) => (
                 <tr
                   key={item.id}
                   style={{ cursor: "pointer" }}
@@ -157,19 +175,19 @@ const DeliveryList = () => {
                   <td>
                     <Badge
                       bg={
-                        item.deliveryNote?.delivered ? "success" : "secondary"
+                        item.deliveryNote?.delivered ? "secondary" : "success"
                       }
                     >
-                      {item.deliveryNote?.delivered ? "Đã giao" : "Chưa giao"}
+                      {item.deliveryNote?.delivered ? "Chưa giao" : "Đã giao"}
                     </Badge>
                   </td>
-                  <td>
+                  {/* <td>
                     <Badge bg={item.deliveryNote?.paid ? "success" : "warning"}>
                       {item.deliveryNote?.paid
                         ? "Đã thanh toán"
                         : "Chưa thanh toán"}
                     </Badge>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

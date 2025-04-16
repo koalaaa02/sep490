@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
 import OrderDetails from "./OrderDetail";
+import { Badge } from "react-bootstrap";
 
 const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,7 +15,7 @@ const OrderList = () => {
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
   const [filterDirection, setFilterDirection] = useState("DESC");
   const [selectedOrder, setSelectedOrder] = useState(null);
-
+  const [size, setSize] = useState(10);
   const statusOptions = [
     "PENDING",
     "CANCELLED",
@@ -28,13 +29,13 @@ const OrderList = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, filterStatus, filterPaymentMethod, filterDirection]);
+  }, [page, filterStatus, filterPaymentMethod, filterDirection, size]);
 
   const fetchData = async () => {
     try {
       const params = new URLSearchParams({
         page: page,
-        size: 15,
+        size: size,
         sortBy: "id",
         status: filterStatus,
         paymentMethod: filterPaymentMethod,
@@ -102,6 +103,16 @@ const OrderList = () => {
     setSelectedOrder(null);
   };
 
+  const statusColors = {
+    PENDING: "secondary",
+    CANCELLED: "danger",
+    FINDINGTRUCK: "info",
+    ACCEPTED: "primary",
+    PACKAGING: "dark",
+    DELIVERING: "warning",
+    DELIVERED: "success",
+  };
+
   return (
     <>
       {currentView === "list" ? (
@@ -152,7 +163,7 @@ const OrderList = () => {
               </select>
             </div>
 
-            <div>
+            <div className="me-3">
               <label>Sắp xếp theo: </label>
               <select
                 className="form-select"
@@ -161,6 +172,20 @@ const OrderList = () => {
               >
                 <option value="DESC">Mới nhất</option>
                 <option value="ASC">Cũ nhất</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Số sản phẩm: </label>
+              <select
+                className="form-select"
+                value={filterDirection}
+                onChange={(e) => setSize(e.target.value)}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
               </select>
             </div>
           </div>
@@ -208,9 +233,9 @@ const OrderList = () => {
                           : "Trả góp"}
                       </td>
                       <td>
-                        <span>
+                        <Badge bg={statusColors[order.status] || "secondary"}>
                           {statusTranslations[order.status] || order.status}
-                        </span>
+                        </Badge>
                       </td>
                     </tr>
                   </React.Fragment>
@@ -274,7 +299,11 @@ const OrderList = () => {
           </div>
         </div>
       ) : (
-        <OrderDetails order={selectedOrder} onBack={handleBackToList} fromDeliveryList={false}/>
+        <OrderDetails
+          order={selectedOrder}
+          onBack={handleBackToList}
+          fromDeliveryList={false}
+        />
       )}
     </>
   );

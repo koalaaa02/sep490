@@ -16,7 +16,7 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const name = useSelector((state) => state.auth.user?.firstName);
+  const name = useSelector((state) => state.auth.user?.lastthonngName);
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.user?.roles || []);
   const normalizedRoles = typeof role === "string" ? role.split(",") : [];
@@ -189,7 +189,7 @@ const Header = () => {
               </li>
 
               <li className="nav-item dmenu dropdown">
-                <Link
+                {/* <Link
                   className="nav-link dropdown-toggle"
                   to="#"
                   id="navbarDropdown"
@@ -199,7 +199,7 @@ const Header = () => {
                   aria-expanded="false"
                 >
                   Thông tin
-                </Link>
+                </Link> */}
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"

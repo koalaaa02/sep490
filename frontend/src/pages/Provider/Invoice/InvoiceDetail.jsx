@@ -90,7 +90,10 @@ const InvoiceDetails = ({ invoice, onClose }) => {
   return (
     <>
       {currentView === "list" ? (
-        <div className="p-3 border rounded shadow-lg">
+        <div
+          className="p-3"
+          style={{ height: "100vh" }}
+        >
           <div>
             <div>
               <div className="d-flex align-items-center mb-2">
@@ -101,7 +104,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
               </div>
             </div>
           </div>
-          <div>
+          <div className="mb-2">
             <strong>Tên khách hàng:</strong>
             <span className="ms-2">{user?.content[0]?.agent.name}</span>
             <br />

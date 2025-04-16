@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaSearch, FaStore } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
+import { Row, Col, Form } from "react-bootstrap";
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,6 +11,10 @@ const ProductList = ({ setSelectedProductId }) => {
   const [products, setProducts] = useState(null);
   const [page, setPage] = useState(1);
   const [isActive, setIsActive] = useState(true);
+  const [pageSize, setPageSize] = useState(10);
+  const [editableUser, setEditableUser] = useState({
+    citizenIdentificationCard: "",
+  });
 
   useEffect(() => {
     if (data?.id) {
@@ -19,7 +24,7 @@ const ProductList = ({ setSelectedProductId }) => {
 
       return () => clearTimeout(delayDebounceFn);
     }
-  }, [searchTerm, data?.id, isActive, page]);
+  }, [searchTerm, data?.id, isActive, page, pageSize]);
 
   useEffect(() => {
     fetchShopData();
@@ -51,7 +56,7 @@ const ProductList = ({ setSelectedProductId }) => {
     try {
       const params = new URLSearchParams({
         page: page,
-        size: 15,
+        size: pageSize,
         sortBy: "id",
         direction: "ASC",
         active: isActive,
@@ -115,52 +120,192 @@ const ProductList = ({ setSelectedProductId }) => {
     setIsActive(false);
   };
 
+  const handlePageSizeChange = (e) => {
+    setPageSize(Number(e.target.value));
+    setPage(1);
+  };
+
+  const handleUploadImage = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const url = `${BASE_URL}/api/provider/shops/uploadRegistrationCertificate`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setEditableUser((prev) => ({
+          ...prev,
+          citizenIdentificationCardImageDown: data.url,
+        }));
+      } else {
+        alert("Upload thất bại. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Không thể upload ảnh.");
+    }
+  };
+
+  const handleUploadShopLogo = async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const url = `${BASE_URL}/api/provider/shops//uploadLogoShop`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setEditableUser((prev) => ({
+          ...prev,
+          citizenIdentificationCardImageDown: data.url,
+        }));
+      } else {
+        alert("Upload thất bại. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Không thể upload ảnh.");
+    }
+  };
+
   return (
     <div className="p-3 mb-10">
       <div className="p-3 shadow bg-light rounded">
-        <div className="d-flex align-items-center">
-          <img
-            // src={data.registrationCertificateImages}
-            alt="Shop Logo"
-            className="rounded-circle me-3"
-            width="80"
-            height="80"
-          />
-          <p>Tên cửa hàng: {data?.name}</p>
-        </div>
-        <div className="d-flex align-items-center">
-          <p>
-            Hình thức kinh doanh:{" "}
-            {data?.shopType === "ENTERPRISE" ? "Doanh nghiệp lớn" : "Doanh nghiệp nhỏ"}
-          </p>
-        </div>
-        <div className="d-flex align-items-center">
-          <p>Địa chỉ: {data?.address?.address}</p>
-        </div>
-        <div className="d-flex align-items-center">
-          <p>Số điện thoại: {data?.address?.phone}</p>
+        <div className="row">
+          {/* Cột trái: Thông tin cơ bản */}
+          <div className="col-md-6 mb-3">
+            <div className="d-flex align-items-center mb-3">
+              <label
+                htmlFor="uploadShopLogoInput"
+                style={{ cursor: "pointer", marginBottom: 0 }}
+              >
+                <img
+                  src={data?.logoImageda}
+                  alt="Shop Logo"
+                  className="rounded-circle me-3"
+                  width="80"
+                  height="80"
+                />
+              </label>
+
+              <input
+                id="uploadShopLogoInput"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleUploadShopLogo(e.target.files[0])}
+                style={{ display: "none" }}
+              />
+
+              <p className="mb-0">
+                <strong>Tên cửa hàng:</strong> {data?.name}
+              </p>
+            </div>
+
+            <p>
+              <strong>Hình thức kinh doanh:</strong>{" "}
+              {data?.shopType === "ENTERPRISE"
+                ? "Doanh nghiệp lớn"
+                : "Doanh nghiệp nhỏ"}
+            </p>
+
+            <p>
+              <strong>Địa chỉ:</strong> {data?.address?.address},
+              {data?.address?.ward},{data?.address?.district},
+              {data?.address?.province}
+            </p>
+
+            <p>
+              <strong>Số điện thoại:</strong> {data?.address?.phone}
+            </p>
+          </div>
+
+          {/* Cột phải: Giấy phép + Thống kê */}
+          <div className="col-md-6 mb-3">
+            <div className="d-flex flex-column align-items-start mb-3">
+              <p>
+                <strong>Mã số thuế:</strong> {data?.tin}
+              </p>
+              <label className="form-label mb-2">
+                <strong>Giấy phép kinh doanh:</strong>
+              </label>
+
+              <label htmlFor="uploadImageInput" style={{ cursor: "pointer" }}>
+                <img
+                  src={
+                    data?.registrationCertificateImages || "default-image.jpg"
+                  }
+                  alt="Giấy phép kinh doanh"
+                  style={{
+                    width: "100px",
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                  }}
+                />
+              </label>
+
+              <input
+                id="uploadImageInput"
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleUploadImage(e.target.files[0])}
+                style={{ display: "none" }}
+              />
+            </div>
+          </div>
         </div>
         <hr />
-
         <div className="d-flex flex-wrap justify-content-between">
-          <p>
-            <FaStore /> Sản Phẩm: <strong>{data?.products?.length}</strong>
+          <p className="mb-0">
+            <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
           </p>
         </div>
       </div>
+
       <h5 className="mb-3 mt-3">Danh sách sản phẩm</h5>
-      <div className="d-flex mb-3">
-        <input
-          type="text"
-          className="form-control me-2"
-          placeholder="Tìm kiếm sản phẩm"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button className="btn btn-dark">
-          <FaSearch />
-        </button>
-      </div>
+      <Row className="mb-3 justify-content-end">
+        <Col className="d-flex align-items-center">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Tìm kiếm mã giao hàng..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className="btn btn-dark">
+            <FaSearch />
+          </button>
+        </Col>
+        <Col xs="auto" className="d-flex align-items-center">
+          <Form.Select
+            size="sm"
+            value={pageSize}
+            onChange={handlePageSizeChange}
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </Form.Select>
+        </Col>
+      </Row>
       <div className="mb-2">
         <label>Trạng thái:</label>
         <div>
