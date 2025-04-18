@@ -23,32 +23,28 @@ public class ShopControllerProvider {
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
     }
 
-    @PostMapping(value = "/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
+    @PostMapping(value = "/uploadRegistrationCertificate", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadRegistrationCertificateImages(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
+        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(file)) ;
     }
 
-    @PostMapping(value = "/{id}/uploadLogoShop", consumes = "multipart/form-data")
+    @PostMapping(value = "/uploadLogoShop", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadLogoShop(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadLogoShop(id, file)) ;
+        return ResponseEntity.ok().body(shopService.uploadLogoShop(file)) ;
     }
 
-    @PostMapping(value = "/shop/{id}/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
+    @PostMapping(value = "/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCitizenIdentificationCardUp(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadCCCD(id, file, true)) ;
+        return ResponseEntity.ok().body(shopService.uploadCCCD(file, true)) ;
     }
 
-    @PostMapping(value = "/shop/{id}/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
+    @PostMapping(value = "/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCitizenIdentificationCardDown(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadCCCD(id, file, false)) ;
+        return ResponseEntity.ok().body(shopService.uploadCCCD(file, false)) ;
     }
 
 }

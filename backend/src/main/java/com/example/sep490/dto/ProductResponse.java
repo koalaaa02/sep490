@@ -22,6 +22,7 @@ public class ProductResponse {
     private String description;
     private String specifications;
     private UnitType unit;
+    private String unitAdvance;
     private String images;
     private boolean active;
 

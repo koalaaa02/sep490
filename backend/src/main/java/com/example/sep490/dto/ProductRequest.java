@@ -17,6 +17,7 @@ public class ProductRequest {
     private String description;
     private String specifications;
     private UnitType unit = UnitType.PCS;
+    private String unitAdvance;
     private String images;
     private boolean active = false;
 

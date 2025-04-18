@@ -123,17 +123,15 @@ public class DealerController {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }
 
-    @PostMapping(value = "/shop/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
+    @PostMapping(value = "/shop/uploadRegistrationCertificate", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadRegistrationCertificateImages(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
+        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(file)) ;
     }
 
-    @PostMapping(value = "/shop/{id}/uploadLogoShop", consumes = "multipart/form-data")
+    @PostMapping(value = "/shop/uploadLogoShop", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadLogoShop(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadLogoShop(id, file)) ;
+        return ResponseEntity.ok().body(shopService.uploadLogoShop(file)) ;
     }
 }

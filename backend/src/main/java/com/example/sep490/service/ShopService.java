@@ -54,6 +54,8 @@ public class ShopService {
     private UserService userService;
     @Value("${env.backendBaseURL}")
     private String baseURL;
+    @Autowired
+    private StorageService storageService;
 
     public PageResponse<ShopResponsePublic> getShopsPublic(int page, int size, String sortBy, String direction, String name) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -152,47 +154,43 @@ public class ShopService {
 
     }
 
-    public ShopResponse uploadRegistrationCertificate(Long id, MultipartFile image) {
-        Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
-                .orElseThrow(() -> new RuntimeException("Shop không tồn tại với ID: " + id));
-        try {
-            String imageURL = FileUtils.uploadFile(image);
-            shop.setRegistrationCertificateImages(baseURL + "/" + imageURL);
-            return shopMapper.EntityToResponse(shopRepo.save(shop));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    public ShopResponse uploadLogoShop(Long id, MultipartFile image) {
-        Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
-                .orElseThrow(() -> new RuntimeException("Shop không tồn tại với ID: " + id));
-        try {
-            String imageURL = FileUtils.uploadFile(image);
-            shop.setLogoImage(baseURL + "/" + imageURL);
-            return shopMapper.EntityToResponse(shopRepo.save(shop));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
-        }
-    }
-
-    public ShopResponse uploadCCCD(Long id, MultipartFile image, boolean imageUp) {
+    public ShopResponse uploadRegistrationCertificate(MultipartFile image) {
         Shop shop = userService.getShopByContextUser();
+        if(shop == null) throw new RuntimeException("Bạn chưa có cửa hàng.");
         try {
-            String imageURL = FileUtils.uploadFile(image);
-            if (imageUp)
-                shop.setCitizenIdentificationCardImageUp(baseURL + "/" + imageURL);
-            else
-                shop.setCitizenIdentificationCardImageDown(baseURL + "/" + imageURL);
-
+//            String imageURL = FileUtils.uploadFile(image);
+//            shop.setRegistrationCertificateImages(baseURL + "/" + imageURL);
+              shop.setRegistrationCertificateImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
             return shopMapper.EntityToResponse(shopRepo.save(shop));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
+        }
+//        catch (IOException e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+    }
+
+    public ShopResponse uploadLogoShop(MultipartFile image) {
+        Shop shop = userService.getShopByContextUser();
+        if(shop == null) throw new RuntimeException("Bạn chưa có cửa hàng.");
+        try {
+              shop.setLogoImage("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public ShopResponse uploadCCCD(MultipartFile image, boolean imageUp) {
+        Shop shop = userService.getShopByContextUser();
+        if(shop == null) throw new RuntimeException("Bạn chưa có cửa hàng.");
+        try {
+            if (imageUp)
+              shop.setCitizenIdentificationCardImageUp("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
+            else
+                shop.setCitizenIdentificationCardImageDown("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
