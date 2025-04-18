@@ -4,8 +4,10 @@ import com.example.sep490.dto.cart.Cart;
 import com.example.sep490.dto.cart.ItemCart;
 import com.example.sep490.dto.cart.ShopCart;
 import com.example.sep490.entity.ProductSKU;
+import com.example.sep490.entity.Shop;
 import com.example.sep490.mapper.ProductSKUMapper;
 import com.example.sep490.repository.ProductSKURepository;
+import com.example.sep490.repository.ShopRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +33,7 @@ public class CartService {
     private final ObjectMapper objectMapper;
     private final UserService userService;
     private final ProductSKURepository productSKURepository;
+    private final ShopRepository shopRepo;
     private final ProductSKUMapper productSKUMapper;
     private static final Logger logger = LoggerFactory.getLogger(Cart.class);
 
@@ -61,8 +64,11 @@ public class CartService {
                 .filter(shop -> shop.getShopId().equals(shopId))
                 .findFirst()
                 .orElseGet(() -> {
-                    ShopCart newShop = new ShopCart(shopId, "Shop Name", new java.util.ArrayList<>());
-                    cart.getShops().add(newShop);
+                    Shop shop = getShop(shopId);
+                    ShopCart newShop = new ShopCart(shopId, shop.getName(), new java.util.ArrayList<>());
+                    List<ShopCart> oldShops = cart.getShops();
+                    oldShops.add(newShop);
+                    cart.setShops(oldShops);
                     return newShop;
                 });
 
@@ -84,6 +90,7 @@ public class CartService {
         if (!shopCart.getItems().contains(itemCart)) {
             shopCart.getItems().add(itemCart);
         }
+        cart.getShops().add(shopCart);
         saveCartToCookies(cart, response);
     }
 
@@ -230,4 +237,9 @@ public class CartService {
     //         throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     //     }
     // }
+
+    private Shop getShop(Long id) {
+        return id == null ? null
+                : shopRepo.findByIdAndIsDeleteFalse(id).orElse(null);
+    }
 }
