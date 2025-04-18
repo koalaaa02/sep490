@@ -23,10 +23,28 @@ public class ShopControllerProvider {
         return ResponseEntity.ok("Cập nhật trạng thái cửa hàng thành công!");
     }
 
-    @PostMapping(value = "/{id}/uploadRegistrationCertificate", consumes = "multipart/form-data")
+    @PostMapping(value = "/uploadRegistrationCertificate", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadRegistrationCertificateImages(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
-        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(id, file)) ;
+        return ResponseEntity.ok().body(shopService.uploadRegistrationCertificate(file)) ;
     }
+
+    @PostMapping(value = "/uploadLogoShop", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadLogoShop(
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadLogoShop(file)) ;
+    }
+
+    @PostMapping(value = "/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardUp(
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadCCCD(file, true)) ;
+    }
+
+    @PostMapping(value = "/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardDown(
+            @RequestPart("file") MultipartFile file) {
+        return ResponseEntity.ok().body(shopService.uploadCCCD(file, false)) ;
+    }
+
 }

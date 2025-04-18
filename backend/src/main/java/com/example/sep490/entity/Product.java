@@ -40,6 +40,8 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @Column(nullable = false)
     private UnitType unit;
 
+    private String unitAdvance;
+
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean active = false;

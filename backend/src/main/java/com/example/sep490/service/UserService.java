@@ -2,10 +2,7 @@ package com.example.sep490.service;
 
 import com.example.sep490.configs.RabbitMQConfig;
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
-import com.example.sep490.dto.AuthRegisterRequest;
-import com.example.sep490.dto.MailRequest;
-import com.example.sep490.dto.UserRequest;
-import com.example.sep490.dto.UserResponse;
+import com.example.sep490.dto.*;
 import com.example.sep490.entity.Role;
 import com.example.sep490.entity.User;
 import com.example.sep490.entity.Shop;
@@ -16,10 +13,7 @@ import com.example.sep490.repository.UserRepository;
 import com.example.sep490.repository.ShopRepository;
 import com.example.sep490.repository.specifications.UserFilterDTO;
 import com.example.sep490.repository.specifications.UserSpecification;
-import com.example.sep490.utils.BasePagination;
-import com.example.sep490.utils.CommonUtils;
-import com.example.sep490.utils.MailUtils;
-import com.example.sep490.utils.PageResponse;
+import com.example.sep490.utils.*;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -35,7 +29,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,7 +55,10 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
+    @Value("${env.backendBaseURL}")
+    private String baseURL;
+    @Autowired
+    private StorageService storageService;
 
     public User addUser(AuthRegisterRequest userInfo) {
         String otp = commonUtils.generateOtp();
@@ -135,16 +134,31 @@ public class UserService {
     public UserResponse updateUser(Long id, UserRequest userRequest) {
         User user = userRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
-
-//        Shop shop = getShop(userRequest.getShopId());
-
-        try {
-            objectMapper.updateValue(user, userRequest);
-        } catch (JsonMappingException e) {
-            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
-        }
-//        user.setShop(shop);
+//        try {
+//            objectMapper.updateValue(user, userRequest);
+//        } catch (JsonMappingException e) {
+//            throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
+//        }
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setTIN(userRequest.getTIN());
+        user.setCitizenIdentificationCard(userRequest.getCitizenIdentificationCard());
+        user.setShopName(userRequest.getShopName());
         return userMapper.EntityToResponse(userRepo.save(user));
+    }
+
+    public UserResponse uploadCCCD(MultipartFile image, boolean imageUp) {
+        User user = getContextUser();
+        try {
+            if (imageUp)
+                user.setCitizenIdentificationCardImageUp("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
+            else
+                user.setCitizenIdentificationCardImageDown("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
+
+            return userMapper.EntityToResponse(userRepo.save(user));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     public void deleteUser(Long id) {

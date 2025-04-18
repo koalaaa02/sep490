@@ -21,4 +21,11 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     Optional<User> findByEmailAndIsDeleteFalse(String email);
     Optional<User> findByEmailIgnoreCase(String email);
     Optional<User> findByEmailOrNameContainingIgnoreCase(String email, String Name);
+
+    //admin statictic
+    long count();
+    @Query("SELECT r.name, COUNT(u) FROM User u JOIN u.roles r GROUP BY r.name")
+    List<Object[]> countUsersByRole();
+    @Query("SELECT COUNT(u) FROM User u WHERE MONTH(u.createdAt) = :month AND YEAR(u.createdAt) = :year")
+    long countNewUsersInMonth(@Param("month") int month, @Param("year") int year);
 }

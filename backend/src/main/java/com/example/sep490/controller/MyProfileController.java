@@ -2,6 +2,7 @@ package com.example.sep490.controller;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
 import com.example.sep490.dto.ShopRequest;
+import com.example.sep490.dto.UserRequest;
 import com.example.sep490.dto.publicdto.ChangePasswordRequest;
 import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.mapper.UserMapper;
@@ -16,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/myprofile")
@@ -35,6 +37,18 @@ public class MyProfileController {
         return ResponseEntity.badRequest().body("No authenticated user");
     }
 
+    @PutMapping("/updateMyProfile")
+    public ResponseEntity<?> updateMyProfile(@RequestBody UserRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            if(!user.getId().equals(request.getId()))
+                throw new RuntimeException("Bạn không có quyền thay đổi profile này.");
+            return ResponseEntity.ok().body(userService.updateUser(user.getId(), request));
+        }
+        return ResponseEntity.badRequest().body("No authenticated user");
+    }
+
     @PostMapping("/change-password")
     public String changePassword(@RequestBody ChangePasswordRequest request) {
         // Lấy email người dùng từ authentication context
@@ -46,5 +60,25 @@ public class MyProfileController {
         throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
     }
 
+    @PostMapping(value = "/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardUp(
+            @RequestPart("file") MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            return ResponseEntity.ok().body(userService.uploadCCCD(file, true)) ;
+        }
+        throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
+    }
 
+    @PostMapping(value = "/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
+    public ResponseEntity<?> uploadCitizenIdentificationCardDown(
+            @RequestPart("file") MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+            UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
+            return ResponseEntity.ok().body(userService.uploadCCCD(file, false)) ;
+        }
+        throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
+    }
 }

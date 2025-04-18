@@ -34,8 +34,13 @@ public class UserRequest {
     private boolean active = true;
     
     private List<Role> roles;
-
     private UserType userType = UserType.ROLE_DEALER; // DEALER, PROVIDER, AGENT
+
+    private String TIN;//mã số thuế
+    private String citizenIdentificationCard;//CCCD
+    private String citizenIdentificationCardImageUp;//CCCDImageUp
+    private String citizenIdentificationCardImageDown;//CCCDImageDown
+    private String shopName;
 
 
     // Relationship
