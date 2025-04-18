@@ -57,6 +57,8 @@ public class UserService {
     private RabbitTemplate rabbitTemplate;
     @Value("${env.backendBaseURL}")
     private String baseURL;
+    @Autowired
+    private StorageService storageService;
 
     public User addUser(AuthRegisterRequest userInfo) {
         String otp = commonUtils.generateOtp();
@@ -145,19 +147,16 @@ public class UserService {
         return userMapper.EntityToResponse(userRepo.save(user));
     }
 
-    public UserResponse uploadCCCD(Long id, MultipartFile image, boolean imageUp) {
+    public UserResponse uploadCCCD(MultipartFile image, boolean imageUp) {
         User user = getContextUser();
         try {
-            String imageURL = FileUtils.uploadFile(image);
             if (imageUp)
-                user.setCitizenIdentificationCardImageUp(baseURL + "/" + imageURL);
+                user.setCitizenIdentificationCardImageUp("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
             else
-                user.setCitizenIdentificationCardImageDown(baseURL + "/" + imageURL);
+                user.setCitizenIdentificationCardImageDown("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
 
             return userMapper.EntityToResponse(userRepo.save(user));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }

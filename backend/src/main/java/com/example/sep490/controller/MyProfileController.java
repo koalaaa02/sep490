@@ -62,24 +62,22 @@ public class MyProfileController {
 
     @PostMapping(value = "/uploadCitizenIdentityCardUp", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCitizenIdentificationCardUp(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(userService.uploadCCCD(id, file, true)) ;
+            return ResponseEntity.ok().body(userService.uploadCCCD(file, true)) ;
         }
         throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
     }
 
     @PostMapping(value = "/uploadCitizenIdentityCardDown", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCitizenIdentificationCardDown(
-            @PathVariable Long id,
             @RequestPart("file") MultipartFile file) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
             UserInfoUserDetails user = (UserInfoUserDetails) authentication.getPrincipal();
-            return ResponseEntity.ok().body(userService.uploadCCCD(id, file, false)) ;
+            return ResponseEntity.ok().body(userService.uploadCCCD(file, false)) ;
         }
         throw new RuntimeException("Không thể xác thực người dùng. Vui lòng đăng nhập lại.");
     }
