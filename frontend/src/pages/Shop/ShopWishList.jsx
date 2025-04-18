@@ -28,21 +28,19 @@ const ShopWishList = () => {
     localStorage.setItem("wishList", JSON.stringify(updatedWishList));
   };
 
-  console.log(wishItems);
-
   const handleAddCart = async () => {
     try {
-      const response = await fetch(
-        `${BASE_URL}/api/cart/add?shopId=1&productSKUId=1&quantity=1`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      // const response = await fetch(
+      //   `${BASE_URL}/api/cart/add?shopId=1&productSKUId=1&quantity=1`,
+      //   {
+      //     method: "POST",
+      //     credentials: "include",
+      //     headers: { "Content-Type": "application/json" },
+      //   }
+      // );
 
-      if (!response.ok)
-        throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
+      // if (!response.ok)
+      //   throw new Error("Không thể thêm sản phẩm vào giỏ hàng.");
 
       Swal.fire({
         icon: "success",
@@ -86,7 +84,7 @@ const ShopWishList = () => {
             <>
               {/* section */}
               <section className="my-14">
-                <div className="container">
+                <div>
                   {/* row */}
                   <div className="row">
                     <div className="offset-lg-1 col-lg-10">
@@ -115,9 +113,10 @@ const ShopWishList = () => {
                                           ></label>
                                         </div>
                                       </th>
-                                      <th />
+                                      <th>Ảnh sản phẩm</th>
                                       <th>Sản phẩm</th>
-                                      <th>Thành Tiền</th>
+                                      <th>Mô tả</th>
+                                      <th>Thông số</th>
                                       <th>Trạng Thái</th>
                                       <th> </th>
                                       <th> </th>
@@ -138,9 +137,14 @@ const ShopWishList = () => {
                                         <td className="align-middle">
                                           <Link to="#">
                                             <img
-                                              src={productimage18}
-                                              className="img-fluid icon-shape icon-xxl"
+                                              src={item?.images}
+                                              className="img-fluid icon-shape icon-xxl rounded"
                                               alt="product"
+                                              style={{
+                                                height: "50px",
+                                                width: "50px",
+                                                objectFit: "cover",
+                                              }}
                                             />
                                           </Link>
                                         </td>
@@ -157,7 +161,16 @@ const ShopWishList = () => {
                                           </div>
                                         </td>
                                         <td className="align-middle">
-                                          100.000 VNĐ
+                                          {item?.description?.length > 50
+                                            ? item.description.substring(
+                                                0,
+                                                50
+                                              ) + "..."
+                                            : item.description}
+                                        </td>
+
+                                        <td className="align-middle">
+                                          {item?.specifications}
                                         </td>
                                         <td className="align-middle">
                                           <span className="badge bg-success">

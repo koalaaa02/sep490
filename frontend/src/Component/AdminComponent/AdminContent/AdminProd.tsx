@@ -1,39 +1,50 @@
 import React, { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  Form,
-  InputGroup,
-  Badge,
-  Tabs,
-  Tab,
-  Pagination,
-} from "react-bootstrap";
-import { FiSearch } from "react-icons/fi";
+import { Tabs, Tab } from "react-bootstrap";
+import ProductTable from "../AdminProdComponent/ProductTable.tsx";
+import ProductSearch from "../AdminProdComponent/ProductSearch.tsx";
 import { BASE_URL } from "../../../Utils/config";
+import ProductDetail from "../AdminProdComponent/ProductDetail.tsx";
+import ProductPagination from "../AdminProdComponent/ProductPagination.tsx";
 
-const AdminProd = () => {
+interface Product {
+  id: number;
+  name: string;
+  category: string;
+  supplier: string;
+  status: boolean;
+}
+
+interface PaginationState {
+  activePage: number;
+  inactivePage: number;
+  itemsPerPage: number;
+  activeTotalPages?: number;
+  inactiveTotalPages?: number;
+}
+
+const ProductList = () => {
   const token = localStorage.getItem("access_token");
-  const [activeProducts, setActiveProducts] = useState([]);
-  const [inactiveProducts, setInactiveProducts] = useState([]);
+  const [activeProducts, setActiveProducts] = useState<Product[]>([]);
+  const [inactiveProducts, setInactiveProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("active");
   const [rfkey, setRfKey] = useState(true);
-  const [pagination, setPagination] = useState({
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [pagination, setPagination] = useState<PaginationState>({
     activePage: 1,
     inactivePage: 1,
     itemsPerPage: 10,
   });
 
   useEffect(() => {
-    const fetchProducts = async (activeStatus, page) => {
+    const fetchProducts = async (activeStatus: boolean, page: number) => {
       try {
         const params = new URLSearchParams({
-          page: page,
-          size: pagination.itemsPerPage,
+          page: String(page),
+          size: String(pagination.itemsPerPage),
           sortBy: "id",
           direction: "ASC",
-          active: activeStatus,
+          active: String(activeStatus),
         });
 
         const response = await fetch(
@@ -49,13 +60,7 @@ const AdminProd = () => {
         );
         const result = await response.json();
         return {
-          data: result?.content.map((rp) => ({
-            id: rp.id,
-            name: rp.name,
-            category: rp.category.name,
-            supplier: rp.supplier.name,
-            status: rp.active,
-          })),
+          data: result?.content || [],
           totalPages: result?.totalPages || 1,
         };
       } catch (error) {
@@ -84,9 +89,14 @@ const AdminProd = () => {
     };
 
     fetchAllProducts();
-  }, [rfkey, pagination.activePage, pagination.inactivePage]);
+  }, [rfkey, pagination.activePage, pagination.inactivePage, token]);
 
-  const handleActive = async (id) => {
+  const handleActive = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const confirmAction = window.confirm(
+      "Bạn có chắc chắn muốn thay đổi trạng thái sản phẩm này không?"
+    );
+    if (!confirmAction) return;
     try {
       const response = await fetch(
         `${BASE_URL}/api/admin/products/activate/${id}`,
@@ -108,14 +118,14 @@ const AdminProd = () => {
     }
   };
 
-  const handlePageChange = (page, type) => {
+  const handlePageChange = (page: number, type: string) => {
     setPagination((prev) => ({
       ...prev,
       [`${type}Page`]: page,
     }));
   };
 
-  const filteredProducts = (products) =>
+  const filteredProducts = (products: Product[]) =>
     products.filter(
       (product) =>
         product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -123,118 +133,65 @@ const AdminProd = () => {
         product?.supplier?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-  const currentProducts =
-    activeTab === "active"
-      ? filteredProducts(activeProducts)
-      : filteredProducts(inactiveProducts);
+  const handleRowClick = (product: Product) => {
+    setSelectedProduct(product);
+  };
 
-  const currentTotalPages =
-    activeTab === "active"
-      ? pagination.activeTotalPages
-      : pagination.inactiveTotalPages;
+  const handleBackToList = () => {
+    setSelectedProduct(null);
+  };
+  console.log(selectedProduct);
 
-  const currentPage =
-    activeTab === "active" ? pagination.activePage : pagination.inactivePage;
+  if (selectedProduct) {
+    return (
+      <ProductDetail
+        product={selectedProduct}
+        onBack={handleBackToList}
+        onStatusToggle={handleActive}
+      />
+    );
+  }
 
   return (
     <div className="p-4">
-      <h2 className="mb-4">Products List</h2>
+      <h2 className="mb-4 text-center">Danh sách sản phẩm</h2>
 
-      <div className="d-flex justify-content-between mb-4">
-        <InputGroup style={{ width: "300px" }}>
-          <InputGroup.Text>
-            <FiSearch />
-          </InputGroup.Text>
-          <Form.Control
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </InputGroup>
-      </div>
+      <ProductSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />
 
       <Tabs
         activeKey={activeTab}
-        onSelect={(k) => setActiveTab(k)}
+        onSelect={(k) => setActiveTab(k as string)}
         className="mb-3"
       >
-        <Tab eventKey="active" title="Active Products">
-          <Table striped hover responsive className="mt-3">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts(activeProducts).map((product) => (
-                <tr key={product.id}>
-                  <td>{product.id}</td>
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>{product.supplier}</td>
-                  <td onClick={() => handleActive(product.id)}>
-                    <Badge bg="success">active</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-          <Pagination className="justify-content-center">
-            {Array.from({ length: pagination.activeTotalPages }, (_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={i + 1 === pagination.activePage}
-                onClick={() => handlePageChange(i + 1, "active")}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-          </Pagination>
+        <Tab eventKey="active" title="Sản phẩm kích hoạt">
+          <ProductTable
+            products={filteredProducts(activeProducts)}
+            onRowClick={handleRowClick}
+            onStatusToggle={handleActive}
+            statusType="active"
+          />
+          <ProductPagination
+            currentPage={pagination.activePage}
+            totalPages={pagination.activeTotalPages || 1}
+            onPageChange={(page) => handlePageChange(page, "active")}
+          />
         </Tab>
-        <Tab eventKey="inactive" title="Inactive Products">
-          <Table striped hover responsive className="mt-3">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Supplier</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts(inactiveProducts).map((product) => (
-                <tr key={product.id}>
-                  <td>{product.id}</td>
-                  <td>{product.name}</td>
-                  <td>{product.category}</td>
-                  <td>{product.supplier}</td>
-                  <td onClick={() => handleActive(product.id)}>
-                    <Badge bg="secondary">inactive</Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-          <Pagination className="justify-content-center">
-            {Array.from({ length: pagination.inactiveTotalPages }, (_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={i + 1 === pagination.inactivePage}
-                onClick={() => handlePageChange(i + 1, "inactive")}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-          </Pagination>
+        <Tab eventKey="inactive" title="Sản phẩm ngừng kích hoạt">
+          <ProductTable
+            products={filteredProducts(inactiveProducts)}
+            onRowClick={handleRowClick}
+            onStatusToggle={handleActive}
+            statusType="inactive"
+          />
+          <ProductPagination
+            currentPage={pagination.inactivePage}
+            totalPages={pagination.inactiveTotalPages || 1}
+            onPageChange={(page) => handlePageChange(page, "inactive")}
+          />
         </Tab>
       </Tabs>
     </div>
   );
 };
 
-export default AdminProd;
+export default ProductList;
