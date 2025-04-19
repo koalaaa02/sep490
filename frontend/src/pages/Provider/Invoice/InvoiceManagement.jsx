@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import InvoiceDetails from "./InvoiceDetail";
+import { Row, Col, Form } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const InvoiceListComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(page);
+  }, [page, pageSize]);
 
-  const fetchData = async () => {
+  const fetchData = async (currentPage) => {
     try {
       const response = await fetch(
-        `${BASE_URL}/api/provider/invoices/UserInvoiceSummary`,
+        `${BASE_URL}/api/provider/invoices/UserInvoiceSummary?page=${currentPage}&size=${pageSize}&sortBy=id&direction=ASC`,
         {
           method: "GET",
           headers: {
@@ -33,8 +37,30 @@ const InvoiceListComponent = () => {
     }
   };
 
+  const filteredData = data?.filter((invoice) =>
+    invoice.firstName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = data?.totalElements
+    ? Math.ceil(data.totalElements / pageSize)
+    : 0;
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(Number(e.target.value));
+    setPage(1);
+  };
+
   return (
-    <div className="p-3 mb-10" style={{ height: "100%" }}>
+    <div
+      className="p-3 mb-10"
+      style={{ height: selectedInvoice ? "100%" : "100vh" }}
+    >
       {selectedInvoice ? (
         <InvoiceDetails
           invoice={selectedInvoice}
@@ -43,18 +69,32 @@ const InvoiceListComponent = () => {
       ) : (
         <>
           <h3>Danh sách khoản nợ</h3>
-          <div className="mb-3 d-flex align-items-center">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Tìm kiếm..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button className="btn btn-dark">
-              <FaSearch />
-            </button>
-          </div>
+          <Row className="mb-3 justify-content-end">
+            <Col className="d-flex align-items-center">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm kiếm tên khách hàng..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-dark">
+                <FaSearch />
+              </button>
+            </Col>
+            <Col xs="auto" className="d-flex align-items-center">
+              <Form.Select
+                size="sm"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </Form.Select>
+            </Col>
+          </Row>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -68,7 +108,7 @@ const InvoiceListComponent = () => {
               </tr>
             </thead>
             <tbody>
-              {data?.map((invoice, index) => (
+              {filteredData?.map((invoice, index) => (
                 <tr key={invoice.id}>
                   <td>{index + 1}</td>
                   <td>21:00 04/04/2025</td>
@@ -92,28 +132,59 @@ const InvoiceListComponent = () => {
               ))}
             </tbody>
           </table>
-          <nav>
-            <ul className="pagination">
-              <li className="page-item">
-                <button className="page-link">Trước</button>
-              </li>
-              <li className="page-item active">
-                <button className="page-link">1</button>
-              </li>
-              <li className="page-item">
-                <button className="page-link">2</button>
-              </li>
-              <li className="page-item">
-                <button className="page-link">3</button>
-              </li>
-              <li className="page-item">
-                <button className="page-link">4</button>
-              </li>
-              <li className="page-item">
-                <button className="page-link">Sau</button>
-              </li>
-            </ul>
-          </nav>
+          <div className="row mt-4">
+            <div className="col">
+              <nav>
+                <ul className="pagination">
+                  <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page - 1)}
+                      aria-label="Previous"
+                    >
+                      <i className="fa fa-chevron-left" />
+                    </Link>
+                  </li>
+
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <li
+                        key={pageNumber}
+                        className={`page-item ${
+                          page === pageNumber ? "active" : ""
+                        }`}
+                      >
+                        <Link
+                          className="page-link mx-1 rounded-3 text-body"
+                          to="#"
+                          onClick={() => handlePageChange(pageNumber)}
+                        >
+                          {pageNumber}
+                        </Link>
+                      </li>
+                    );
+                  })}
+
+                  <li
+                    className={`page-item ${
+                      page === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page + 1)}
+                      aria-label="Next"
+                    >
+                      <i className="fa fa-chevron-right" />
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
         </>
       )}
     </div>

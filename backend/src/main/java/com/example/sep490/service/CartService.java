@@ -37,7 +37,7 @@ public class CartService {
 
     // Thêm sản phẩm vào giỏ hàng
     public void addToCart(Long shopId, Long productSKUId, int quantity, HttpServletRequest request, HttpServletResponse response) {
-        Cart cart = getCartFromCookies(request);
+        Cart cart = getCartFromCookiesToChange(request);
 
         //Lấy thông tin sp từ db
         ProductSKU proSKU = productSKURepository.findById(productSKUId).orElse(null);
@@ -89,7 +89,7 @@ public class CartService {
 
     // Sửa sản phẩm trong giỏ hàng
     public void updateCart(Long shopId, Long productSKUId, int quantity, HttpServletRequest request, HttpServletResponse response) {
-        Cart cart = getCartFromCookies(request);
+        Cart cart = getCartFromCookiesToChange(request);
 
         // Kiểm tra số lượng còn lại của sản phẩm
         int availableQuantity = productSKURepository.getAvailableQuantity(productSKUId);
@@ -165,6 +165,24 @@ public class CartService {
                             }
                         }
                     }
+                    return cart;
+                } catch (Exception e) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart cookie is invalid");
+                }
+            }
+        }
+        return new Cart(); // Trả về giỏ hàng trống nếu không có cookie
+    }
+
+    public Cart getCartFromCookiesToChange(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            Optional<Cookie> cartCookie =
+                    java.util.Arrays.stream(cookies).filter(cookie -> CART_COOKIE_NAME.equals(cookie.getName())).findFirst();
+            if (cartCookie.isPresent()) {
+                try {
+                    String cartJson = decodeCartData(cartCookie.get().getValue());
+                    Cart cart = objectMapper.readValue(cartJson, Cart.class);
                     return cart;
                 } catch (Exception e) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cart cookie is invalid");

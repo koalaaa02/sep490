@@ -35,7 +35,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>, JpaSpec
         INNER JOIN tbl_shop s ON s.id = o.shop_id
         GROUP BY o.shop_id
     """, nativeQuery = true)
-    List<ShopInvoiceSummary> findAllShopAndCountInvoiceByAgentID(@Param("agent_id") Long agent_id);
+    List<ShopInvoiceSummary> findAllShopAndCountInvoiceByAgentID(@Param("agent_id") Long agent_id, Pageable pageable);
 
 
     @Query(value = """
@@ -50,9 +50,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>, JpaSpec
                END) AS paidPercentage
         FROM tbl_user u
         INNER JOIN tbl_invoice iv ON u.id = iv.agent_id AND iv.created_by = :created_by
-        GROUP BY u.id, u.lastName, u.firstName;
+        GROUP BY u.id, u.lastName, u.firstName
     """, nativeQuery = true)
-    List<UserInvoiceSummary> findAllUserAndCountInvoiceByCreatedBy(@Param("created_by") Long created_by);
+    List<UserInvoiceSummary> findAllUserAndCountInvoiceByCreatedBy(@Param("created_by") Long created_by, Pageable pageable);
 
     @Query(value = """
         SELECT iv.*

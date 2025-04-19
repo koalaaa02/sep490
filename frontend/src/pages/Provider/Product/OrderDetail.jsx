@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Card } from "react-bootstrap";
 import AddInvoice from "../Invoice/AddInvoice";
 
 const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
@@ -138,219 +138,214 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
       {showInvoiceForm ? (
         <AddInvoice closeAddInvoice={closeAddInvoice} orderData={data} />
       ) : (
-        <div className="p-3" style={{ height: "100%"}}>
+        <div className="p-3 mb-10" style={{ height: "100%" }}>
           <div className="d-flex align-items-center mb-2">
             <button className="btn btn-secondary me-2" onClick={onBack}>
               Quay lại
             </button>
             <h4>Chi tiết đơn hàng:</h4>
           </div>
-          <div></div>
-          <div className="mt-4">
-            <h5>Thông tin đơn hàng</h5>
-            <div className="row">
-              {/* Cột trái */}
-              <div className="col-md-3 pe-1">
-                <Form.Group className="mb-3">
-                  <Form.Label>Mã đơn hàng</Form.Label>
-                  <Form.Control value={data.orderCode} readOnly />
-                </Form.Group>
+          <div className="mt-2">
+            <Card>
+              <Card.Header>Thông tin nhà cung cấp</Card.Header>
+              <Card.Body>
+                <div className="row">
+                  <div className="row">
+                    <div className="col-12 d-flex align-items-center mb-2">
+                      <strong className="me-2">Tên nhà cung cấp:</strong>
+                      <span className="text-muted">{data.shop.name}</span>
+                    </div>
+                  </div>
+                  <div className="row">
+                    <div className="col-12 d-flex align-items-center mb-2">
+                      <strong className="me-2">Mã số thuế:</strong>
+                      <span className="text-muted">{data.shop.tin}</span>
+                    </div>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Ngày tạo</Form.Label>
-                  <Form.Control
-                    value={new Date(data.createdAt).toLocaleString("vi-VN")}
-                    readOnly
-                  />
-                </Form.Group>
-              </div>
+            <Card className="mt-2">
+              <Card.Header>Danh sách sản phẩm</Card.Header>
+              <Card.Body>
+                <table className="table table-bordered table-striped mt-3">
+                  <thead>
+                    <tr>
+                      <th>Ảnh sản phẩm</th>
+                      <th>Tên sản phẩm</th>
+                      <th>Số lượng</th>
+                      <th>Giá</th>
+                      <th>Tổng tiền</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.orderDetails.map((detail, idx) => (
+                      <tr key={idx}>
+                        <td>
+                          <img
+                            src={detail.productSku.images}
+                            alt=""
+                            style={{ height: "50px", width: "50px" }}
+                          />
+                        </td>
+                        <td>{detail.productSku.skuCode}</td>
+                        <td>{detail.quantity}</td>
+                        <td>
+                          {detail.productSku.sellingPrice.toLocaleString()} VND
+                        </td>
+                        <td>
+                          {(
+                            detail.quantity * detail.productSku.sellingPrice
+                          ).toLocaleString()}{" "}
+                          VND
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card.Body>
+            </Card>
+          </div>
+          <Card className="mt-4">
+            <Card.Header>Thông tin đơn hàng</Card.Header>
+            <Card.Body>
+              <div className="row">
+                {/* Cột trái */}
+                <div className="col-md-4 mb-2">
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Mã đơn hàng:</strong>
+                    <span className="text-muted">{data.orderCode}</span>
+                  </div>
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Ngày tạo:</strong>
+                    <span className="text-muted">
+                      {new Date(data.createdAt).toLocaleString("vi-VN")}
+                    </span>
+                  </div>
+                </div>
 
-              {/* Cột giữa */}
-              <div className="col-md-6 px-1">
-                <Form.Group className="mb-3">
-                  <Form.Label>Người nhận</Form.Label>
-                  <Form.Control value={data.address?.recipientName} readOnly />
-                </Form.Group>
+                {/* Cột giữa */}
+                <div className="col-md-4 mb-2">
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Người nhận:</strong>
+                    <span className="text-muted">
+                      {data.address?.recipientName}
+                    </span>
+                  </div>
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Số điện thoại:</strong>
+                    <span className="text-muted">{data.address?.phone}</span>
+                  </div>
+                </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Số điện thoại</Form.Label>
-                  <Form.Control value={data.address?.phone} readOnly />
-                </Form.Group>
-              </div>
-
-              {/* Cột phải */}
-              <div className="col-md-3 ps-1">
-                <Form.Group className="mb-3">
-                  <Form.Label>Ngày giao</Form.Label>
-                  <Form.Control
-                    value={
-                      data?.deliveryNotes && data.deliveryNotes.length > 0
+                {/* Cột phải */}
+                <div className="col-md-4 mb-2">
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Ngày giao:</strong>
+                    <span className="text-muted">
+                      {data?.deliveryNotes &&
+                      data.deliveryNotes.length > 0 &&
+                      data.deliveryNotes[0].deliveredDate
                         ? new Date(
                             data.deliveryNotes[0].deliveredDate
                           ).toLocaleDateString("vi-VN")
-                        : ""
-                    }
-                    readOnly
-                  />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Phí giao hàng</Form.Label>
-                  <Form.Control
-                    value={`${data.shippingFee.toLocaleString()} VND`}
-                    readOnly
-                  />
-                </Form.Group>
+                        : ""}
+                    </span>
+                  </div>
+                  <div className="mb-2 d-flex align-items-center">
+                    <strong className="me-2">Phí giao hàng:</strong>
+                    <span className="text-muted">
+                      {`${data.shippingFee.toLocaleString()} VND`}
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Địa chỉ giao (full row) */}
-            <div className="row">
-              <div className="col-12">
-                <Form.Group className="mb-3">
-                  <Form.Label>Địa chỉ giao</Form.Label>
-                  <Form.Control
-                    value={`${data.address?.address}, ${data.address?.ward}, ${data.address?.province}`}
-                    readOnly
-                  />
-                </Form.Group>
+              {/* Địa chỉ giao */}
+              <div className="row">
+                <div className="col-12 d-flex align-items-center mb-2">
+                  <strong className="me-2">Địa chỉ giao:</strong>
+                  <span className="text-muted">
+                    {`${data.address?.address}, ${data.address?.ward}, ${data.address?.province}`}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {/* Hoa hồng & Tổng tiền */}
-            <div className="row">
-              <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Mã giao dịch</Form.Label>
-                  <Form.Control value={data.deliveryCode} readOnly />
-                </Form.Group>
+              {/* Tổng tiền */}
+              <div className="row">
+                <div className="col-md-12 d-flex align-items-center mb-2">
+                  <strong className="me-2">Tổng tiền:</strong>
+                  <span className="text-muted">
+                    {`${data.totalAmount.toLocaleString()} VND`}
+                  </span>
+                </div>
               </div>
-              <div className="col-md-6">
-                <Form.Group className="mb-3">
-                  <Form.Label>Tổng tiền</Form.Label>
-                  <Form.Control
-                    value={`${data.totalAmount.toLocaleString()} VND`}
-                    readOnly
-                  />
-                </Form.Group>
+
+              {/* Phương thức thanh toán */}
+              <div className="row">
+                <div className="col-12 d-flex align-items-center mb-2">
+                  <strong className="me-2">Phương thức:</strong>
+                  <span className="text-muted">
+                    {data.paymentMethod === "COD"
+                      ? "Thanh toán khi nhận hàng"
+                      : "Trả góp"}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            {/* Phương thức (full row cuối) */}
-            <div className="row">
-              <div className="col-12">
-                <Form.Group className="mb-3">
-                  <Form.Label>Phương thức</Form.Label>
-                  <Form.Control
-                    value={
-                      data.paymentMethod === "COD"
-                        ? "Thanh toán khi nhận hàng"
-                        : "Trả góp"
-                    }
-                    readOnly
-                  />
-                </Form.Group>
-              </div>
-            </div>
-          </div>
-          <div className="mb-10">
-            <h5>Chi tiết đơn hàng</h5>
-            <div className="d-flex flex-column">
-              <Form.Group className="mb-3">
-                <Form.Label>Tên cửa hàng</Form.Label>
-                <Form.Control value={data.shop.name} readOnly />
-              </Form.Group>
-              <Form.Group className="mb-3">
-                <Form.Label>Mã số thuế</Form.Label>
-                <Form.Control value={data.shop.tin} readOnly />
-              </Form.Group>
-              <div>
-                <strong>Danh sách sản phẩm: </strong>
-              </div>
-            </div>
+              {/* Trạng thái và nút hành động */}
+              {!fromDeliveryList && data.status !== "DELIVERED" && (
+                <div className="row">
+                  <div className="col-12 d-flex align-items-center mb-2">
+                    <strong>Thay đổi trạng thái:</strong>
+                    <div className="d-flex flex-wrap m-2">
+                      {(() => {
+                        let filteredOptions = [];
 
-            <table className="table table-bordered table-striped mt-3">
-              <thead>
-                <tr>
-                  <th>Ảnh sản phẩm</th>
-                  <th>Tên sản phẩm</th>
-                  <th>Số lượng</th>
-                  <th>Giá</th>
-                  <th>Tổng tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.orderDetails.map((detail, idx) => (
-                  <tr key={idx}>
-                    <td>
-                      <img
-                        src={detail.productSku.images}
-                        alt=""
-                        style={{ height: "50px", width: "50px" }}
-                      />
-                    </td>
-                    <td>{detail.productSku.skuCode}</td>
-                    <td>{detail.quantity}</td>
-                    <td>
-                      {detail.productSku.sellingPrice.toLocaleString()} VND
-                    </td>
-                    <td>
-                      {(
-                        detail.quantity * detail.productSku.sellingPrice
-                      ).toLocaleString()}{" "}
-                      VND
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {!fromDeliveryList && (
-              <div className="col-2">
-                <strong>Thay đổi trạng thái:</strong>
-                <select
-                  className="form-select m-2"
-                  value={data.status}
-                  onChange={(e) => handleStatusChange(data.id, e.target.value)}
-                >
-                  {(() => {
-                    let filteredOptions = [];
+                        if (
+                          data.status === "PENDING" ||
+                          data.status === "FINDINGTRUCK"
+                        ) {
+                          filteredOptions = ["ACCEPTED", "CANCELLED"];
+                        } else if (data.status === "ACCEPTED") {
+                          filteredOptions = ["DELIVERING", "DELIVERED"];
+                        } else if (data.status === "DELIVERING") {
+                          filteredOptions = ["DELIVERED"];
+                        } else {
+                          filteredOptions = statusOptions;
+                        }
 
-                    if (
-                      data.status === "PENDING" ||
-                      data.status === "FINDINGTRUCK"
-                    ) {
-                      filteredOptions = ["PENDING", "ACCEPTED", "CANCELLED"];
-                    } else if (data.status === "ACCEPTED") {
-                      filteredOptions = ["ACCEPTED", "DELIVERING", "DELIVERED"];
-                    } else if (data.status === "DELIVERING") {
-                      filteredOptions = ["DELIVERING", "DELIVERED"];
-                    } else {
-                      filteredOptions = statusOptions;
-                    }
+                        return filteredOptions.map((status) => (
+                          <button
+                            key={status}
+                            className={`btn m-1 ${
+                              status === data.status
+                                ? "btn-secondary"
+                                : status === "CANCELLED" ||
+                                  status === "DELIVERED"
+                                ? "btn-danger"
+                                : "btn-success"
+                            }`}
+                            disabled={status === data.status}
+                            onClick={() => handleStatusChange(data.id, status)}
+                          >
+                            {statusTranslations[status]}
+                          </button>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              )}
+              {!fromDeliveryList && data.status === "DELIVERING" && (
+                <button className="btn btn-primary" onClick={toggleInvoiceForm}>
+                  In phiếu giao hàng
+                </button>
+              )}
+            </Card.Body>
+          </Card>
 
-                    return filteredOptions.map((status) => (
-                      <option
-                        key={status}
-                        value={status}
-                        disabled={status === data.status}
-                      >
-                        {statusTranslations[status]}
-                      </option>
-                    ));
-                  })()}
-                </select>
-              </div>
-            )}
-
-            {!fromDeliveryList && data.status === "DELIVERING" && (
-              <button
-                className="btn btn-primary mt-4 ms-2"
-                onClick={toggleInvoiceForm}
-              >
-                In phiếu giao hàng
-              </button>
-            )}
-          </div>
           {/* Popup xác nhận */}
           <Modal show={showPopup} onHide={() => setShowPopup(false)} centered>
             <Modal.Header closeButton>

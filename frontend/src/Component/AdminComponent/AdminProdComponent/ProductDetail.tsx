@@ -50,6 +50,21 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   onBack,
   onStatusToggle,
 }) => {
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+    return unitMap[unit] || unit;
+  };
+
   return (
     <div className="p-4">
       <Button variant="outline-primary" onClick={onBack} className="mb-3">
@@ -63,9 +78,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
         <Card.Body>
           <Row>
             <Col md={6}>
-              <div className="mb-3">
+              {/* <div className="mb-3">
                 <strong>ID:</strong> {product.id}
-              </div>
+              </div> */}
               <div className="mb-3">
                 <strong>Tên sản phẩm:</strong> {product.name}
               </div>
@@ -77,7 +92,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
                 {product.specifications || "N/A"}
               </div>
               <div className="mb-3">
-                <strong>Đơn vị tính:</strong> {product.unit || "N/A"}
+                <strong>Đơn vị tính:</strong> {convertUnitToVietnamese(product.unit) || "N/A"}
               </div>
               <div className="mb-3">
                 <strong>Trạng thái:</strong>{" "}
@@ -112,9 +127,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
                   <div>
                     <strong>Tên:</strong> {product.category?.name}
                   </div>
-                  <div>
+                  {/* <div>
                     <strong>ID:</strong> {product.category?.id}
-                  </div>
+                  </div> */}
                   {product.category?.images && (
                     <div className="mt-2">
                       <Image
@@ -135,9 +150,9 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
                   <div>
                     <strong>Tên:</strong> {product.supplier?.name}
                   </div>
-                  <div>
+                  {/* <div>
                     <strong>ID:</strong> {product.supplier?.id}
-                  </div>
+                  </div> */}
                   <div>
                     <strong>Email:</strong> {product.supplier?.contactEmail}
                   </div>
@@ -174,7 +189,6 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               {product.active ? "Ngừng kích hoạt" : "Kích hoạt"}
             </Button>
           </div>
-         
         </Card.Footer>
       </Card>
     </div>

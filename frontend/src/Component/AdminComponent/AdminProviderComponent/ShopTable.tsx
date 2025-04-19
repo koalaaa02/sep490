@@ -30,13 +30,13 @@ const ShopTable: React.FC<ShopTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {shops.map((shop) => (
+        {shops.map((shop, index) => (
           <tr
             key={shop.id}
             onClick={() => onRowClick(shop)}
             style={{ cursor: "pointer" }}
           >
-            <td>{shop.id}</td>
+            <td>{index + 1}</td>
             <td style={{ color: "blue" }}>
               {shop.name || "Tên nhà cung cấp không hợp lệ"}
             </td>

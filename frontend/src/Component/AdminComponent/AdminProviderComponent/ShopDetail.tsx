@@ -49,9 +49,9 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
                 <Card.Header>Thông tin cơ bản</Card.Header>
                 <Card.Body>
                   <ListGroup variant="flush">
-                    <ListGroup.Item>
+                    {/* <ListGroup.Item>
                       <strong>ID:</strong> {shop.id}
-                    </ListGroup.Item>
+                    </ListGroup.Item> */}
                     <ListGroup.Item>
                       <strong>Tên nhà cung cấp:</strong> {shop.name}
                     </ListGroup.Item>

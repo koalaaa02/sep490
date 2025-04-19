@@ -287,7 +287,7 @@ const ShopCheckOut = () => {
                     </div>
                     <div className="card-body">
                       {/* Trả góp - DEBT */}
-                      <div className="form-check border-bottom border-1 pb-3">
+                      {/* <div className="form-check border-bottom border-1 pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -303,10 +303,10 @@ const ShopCheckOut = () => {
                         >
                           Trả góp
                         </label>
-                      </div>
+                      </div> */}
 
                       {/* Thanh toán khi nhận hàng - COD */}
-                      <div className="form-check border-bottom border-1 pb-3">
+                      <div className="form-check pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -322,7 +322,7 @@ const ShopCheckOut = () => {
                       </div>
 
                       {/* Thanh toán qua VNPay - VNPAY */}
-                      <div className="form-check pt-3">
+                      {/* <div className="form-check pt-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -335,7 +335,7 @@ const ShopCheckOut = () => {
                         <label className="form-check-label" htmlFor="vnpay">
                           Thanh toán qua ví VNPay
                         </label>
-                      </div>
+                      </div> */}
 
                       {/* Hiển thị PaymentMethod nếu chọn VNPay */}
                       {selectedPayment === "VNPAY" && <PaymentMethod />}

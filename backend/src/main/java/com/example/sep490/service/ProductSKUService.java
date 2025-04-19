@@ -97,16 +97,11 @@ public class ProductSKUService {
         ProductSKU productSKU = productSKURepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
         try {
-//            String imageURL = FileUtils.uploadFile(image);
-//            productSKU.setImages(baseURL + "/" + imageURL);
             productSKU.setImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
             return productSKUMapper.EntityToResponse(productSKURepo.save(productSKU));
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e.getMessage());
         }
-//        catch (IOException e) {
-//            throw new RuntimeException(e.getMessage());
-//        }
     }
 
     public void deleteProductSKU(Long id) {
