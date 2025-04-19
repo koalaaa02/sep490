@@ -13,6 +13,7 @@ export const uploadCertificate = async (shopId, file, token, BASE_URL) => {
 
   try {
     const response = await fetch(
+      ///api/provider/shops/{id}/uploadRegistrationCertificate
       `${BASE_URL}/api/provider/shops/${shopId}/uploadRegistrationCertificate`,
       {
         method: "POST",

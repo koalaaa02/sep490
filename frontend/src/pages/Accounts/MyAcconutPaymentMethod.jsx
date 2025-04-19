@@ -91,7 +91,6 @@ const MyAcconutPaymentMethod = () => {
     };
 
     try {
-      // First API call to create the shop
       const createResponse = await fetch(`${BASE_URL}/api/dealer/shop/create`, {
         method: "POST",
         headers: {
@@ -111,7 +110,6 @@ const MyAcconutPaymentMethod = () => {
         return;
       }
 
-      // Second API call to upload the certificate if file was selected
       if (registrationCertificate) {
         await uploadCertificate(
           createData.id,

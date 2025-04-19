@@ -138,7 +138,6 @@ function Dropdown() {
     });
   };
 
-
   return (
     <div>
       {loaderStatus ? (

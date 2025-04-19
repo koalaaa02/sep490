@@ -30,7 +30,6 @@ const UploadCertificate = ({ handleFileChange }) => {
     }
     handleFileChange({ target: { files: [] } }); // Clear file in parent
   };
-  console.log(preview);
 
   return (
     <div className="mb-3">
