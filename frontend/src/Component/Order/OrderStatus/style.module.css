@@ -1,9 +1,9 @@
 .orderStatusContainer {
   display: flex;
   justify-content: space-between;
-  border-inline-bottom: 3px solid rgb(213, 213, 213);
+  /* border-inline-bottom: 3px solid rgb(213, 213, 213); */
 }
-.orderStatusItem {
+.orderStatusItem { width: 100%;
   text-align: center;
   margin-top: 1rem;
   padding: 1rem;
