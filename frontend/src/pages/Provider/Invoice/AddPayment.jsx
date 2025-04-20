@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { Modal, Button } from "react-bootstrap";
 
-const AddPayment = ({ orderData, closeAddPayment }) => {
+const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
   const [paymentData, setPaymentData] = useState({
-    invoiceId: 6,
+    invoiceId: orderData.invoice.id,
     amountPaid: 0,
     paymentDate: new Date().toISOString(),
   });
@@ -25,9 +25,12 @@ const AddPayment = ({ orderData, closeAddPayment }) => {
       if (!response.ok) {
         throw new Error("Có lỗi khi tạo phiếu thanh toán");
       }
+      if (typeof onInvoiceCreated === "function") {
+       await onPaymentCreated();
+      }
+      setShowConfirm(false);
 
       alert("Tạo phiếu thanh toán thành công!");
-      setShowConfirm(false);
       closeAddPayment();
     } catch (error) {
       setError(error.message);

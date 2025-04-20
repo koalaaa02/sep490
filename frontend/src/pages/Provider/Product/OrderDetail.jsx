@@ -132,6 +132,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           status: "DELIVERED",
         }));
         alert("Đơn nợ đã được tạo thành công!");
+        refreshOrderDetails();
         setShowPaymentPopup(false);
       } else {
         alert("Có lỗi khi tạo đơn nợ. Vui lòng thử lại!");
@@ -143,10 +144,10 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   };
 
   const toggleInvoiceForm = () => setShowInvoiceForm(true);
-  const closeAddInvoice = () => setShowInvoiceForm(false);
+  const closeAddInvoice = () =>  onBack();
 
   const togglePaymetForm = () => setShowAddPayment(true);
-  const closeAddPayment = () => setShowAddPayment(false);
+  const closeAddPayment = () => onBack();
 
   useEffect(() => {
     const fetchNoteDetails = async () => {
@@ -176,12 +177,67 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     fetchNoteDetails();
   }, [showNotePopup, selectedNote]);
 
+  const refreshOrderDetails = async () => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10000,
+          sortBy: "id",
+          paymentMethod: "",
+          direction: "DESC",
+        });
+
+        const response = await fetch(
+          `${BASE_URL}/api/provider/orders/?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+    fetchData();
+  };
+
+  const totalDeliveredQuantity = data.deliveryNotes?.reduce((sum, note) => {
+    return (
+      sum +
+      note.deliveryDetails?.reduce((subSum, item) => subSum + item.quantity, 0)
+    );
+  }, 0);
+
+  const totalOrderQuantity = data.orderDetails?.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
   return (
     <>
       {showInvoiceForm ? (
-        <AddInvoice closeAddInvoice={closeAddInvoice} orderData={data} />
+        <AddInvoice
+          closeAddInvoice={closeAddInvoice}
+          orderData={data}
+          onInvoiceCreated={async () => {
+            await refreshOrderDetails();
+          }}
+        />
       ) : showAddPayment ? (
-        <AddPayment closeAddPayment={closeAddPayment} orderData={data} />
+        <AddPayment
+          closeAddPayment={closeAddPayment}
+          orderData={data}
+          onPaymentCreated={async () => {
+            await refreshOrderDetails();
+          }}
+        />
       ) : (
         <div className="p-3 mb-10" style={{ height: "100%" }}>
           <div className="d-flex align-items-center mb-2">
@@ -259,11 +315,11 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                 <div className="row">
                   <div className="col-6 d-flex align-items-center mb-2">
                     <strong className="me-2">Tên nhà cung cấp:</strong>
-                    <span className="text-muted">{data.shop.name}</span>
+                    <span className="text-muted">{data.shop?.name}</span>
                   </div>
                   <div className="col-6 d-flex align-items-center mb-2">
                     <strong className="me-2">Mã số thuế:</strong>
-                    <span className="text-muted">{data.shop.tin}</span>
+                    <span className="text-muted">{data.shop?.tin}</span>
                   </div>
                 </div>
               </div>
@@ -280,7 +336,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {data.orderDetails.map((detail, idx) => (
+                  {data?.orderDetails?.map((detail, idx) => (
                     <tr key={idx}>
                       <td>{idx + 1}</td>
                       <td>
@@ -310,7 +366,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                 Tổng tiền:{" "}
                 <strong className="text-danger">
                   {data.orderDetails
-                    .reduce(
+                    ?.reduce(
                       (sum, detail) =>
                         sum + detail.quantity * detail.productSku.sellingPrice,
                       0
@@ -326,11 +382,16 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             <Card.Header className="d-flex justify-content-between align-items-center">
               <strong>Lịch sử giao hàng </strong>
 
-              {!fromDeliveryList && data.status === "DELIVERING" && (
-                <button className="btn btn-primary" onClick={toggleInvoiceForm}>
-                  Thêm phiếu giao hàng
-                </button>
-              )}
+              {!fromDeliveryList &&
+                data.status === "DELIVERING" &&
+                totalDeliveredQuantity < totalOrderQuantity && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={toggleInvoiceForm}
+                  >
+                    Thêm phiếu giao hàng
+                  </button>
+                )}
             </Card.Header>
             {!order.deliveryNotes || order.deliveryNotes.length === 0 ? (
               <strong className="m-2 text-danger">
@@ -351,7 +412,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.deliveryNotes.map((detail, idx) => (
+                    {data?.deliveryNotes?.map((detail, idx) => (
                       <tr
                         key={idx}
                         style={{ cursor: "pointer" }}
@@ -403,6 +464,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                   <thead>
                     <tr>
                       <th>STT</th>
+                      <th>Mã giao dịch</th>
                       <th>Ngày giao dịch</th>
                       <th>Người trả tiền</th>
                       <th>Số điện thoại người trả</th>
@@ -411,9 +473,10 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.orderDetails.map((detail, idx) => (
+                    {data?.orderDetails?.map((detail, idx) => (
                       <tr key={idx}>
                         <td>{idx + 1}</td>
+                        <td>{data?.invoice?.invoiceCode}</td>
                         <td>
                           {new Date(order?.invoice?.createdAt).toLocaleString(
                             "vi-VN"
@@ -443,7 +506,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             Tổng tiền toàn bộ đơn hàng:{" "}
             <strong className="text-danger">
               {data.orderDetails
-                .reduce(
+                ?.reduce(
                   (sum, detail) =>
                     sum + detail.quantity * detail.productSku.sellingPrice,
                   0
@@ -481,7 +544,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                         filteredOptions = statusOptions;
                       }
 
-                      return filteredOptions.map((status) => (
+                      return filteredOptions?.map((status) => (
                         <button
                           key={status}
                           className={`btn m-1 ${
@@ -729,7 +792,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                         Tổng tiền:{" "}
                         <strong className="text-danger">
                           {data.orderDetails
-                            .reduce(
+                            ?.reduce(
                               (sum, detail) =>
                                 sum +
                                 detail.quantity *

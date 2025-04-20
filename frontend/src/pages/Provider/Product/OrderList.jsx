@@ -99,6 +99,7 @@ const OrderList = () => {
   };
 
   const handleBackToList = () => {
+    fetchData();
     setCurrentView("list");
     setSelectedOrder(null);
   };

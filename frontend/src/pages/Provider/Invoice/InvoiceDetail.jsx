@@ -22,7 +22,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
 
   useEffect(() => {
     getUser();
-  }, []);
+  }, [page]);
 
   const getUser = async (id) => {
     try {

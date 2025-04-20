@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { Card, Modal, Button } from "react-bootstrap";
 
-const AddInvoice = ({ orderData, closeAddInvoice }) => {
+const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [invoice, setInvoice] = useState({
     invoiceId: orderData?.orderCode || "",
@@ -202,6 +202,10 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
       }
 
       alert("Tạo phiếu và chi tiết giao hàng thành công!");
+
+      if (typeof onInvoiceCreated === "function") {
+        await onInvoiceCreated();
+      }
       closeAddInvoice();
     } catch (err) {
       console.error("Lỗi:", err);
@@ -286,11 +290,11 @@ const AddInvoice = ({ orderData, closeAddInvoice }) => {
             <div className="row mb-3">
               <div className="col-md-6 d-flex align-items-center mb-2">
                 <strong className="me-2">Tên nhà cung cấp:</strong>
-                <span className="text-muted">{orderData.shop.name}</span>
+                <span className="text-muted">{orderData?.shop.name}</span>
               </div>
               <div className="col-md-6 d-flex align-items-center mb-2">
                 <strong className="me-2">Mã số thuế:</strong>
-                <span className="text-muted">{orderData.shop.tin}</span>
+                <span className="text-muted">{orderData?.shop.tin}</span>
               </div>
             </div>
 
