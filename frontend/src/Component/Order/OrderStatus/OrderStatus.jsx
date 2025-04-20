@@ -5,7 +5,7 @@ const OrderStatus = ({ setStatus }) => {
   const [statusActive, setStatusActive] = useState("PENDING");
 
   const statusTab = [
-    // { code: "PENDING", label: "Đang chờ" },
+    { code: "PENDING", label: "Đang chờ" },
     { code: "ACCEPTED", label: "Đã chấp nhận" },
     // { code: "PACKAGING", label: "Đóng gói" },
     // { code: "FINDINGTRUCK", label: "Tìm xe tải" },
