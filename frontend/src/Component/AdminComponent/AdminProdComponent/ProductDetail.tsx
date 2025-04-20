@@ -50,6 +50,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
   onBack,
   onStatusToggle,
 }) => {
+  console.log(product);
+
   const convertUnitToVietnamese = (unit) => {
     const unitMap = {
       PCS: "Chiếc",
@@ -92,7 +94,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
                 {product.specifications || "N/A"}
               </div>
               <div className="mb-3">
-                <strong>Đơn vị tính:</strong> {convertUnitToVietnamese(product.unit) || "N/A"}
+                <strong>Đơn vị tính:</strong>{" "}
+                {convertUnitToVietnamese(product.unit) || "N/A"}
               </div>
               <div className="mb-3">
                 <strong>Trạng thái:</strong>{" "}

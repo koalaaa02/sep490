@@ -356,7 +356,7 @@ const Home = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="row">
+                    <div className="row ">
                       <Swiper
                         slidesPerView={6} // Number of items visible at once
                         grid={{
@@ -372,7 +372,7 @@ const Home = () => {
                       >
                         {materials.map((material, index) => (
                           <SwiperSlide key={index}>
-                            <div className="fade-zoom">
+                            <div className="fade-zoom p-2">
                               <Zoom>
                                 <div className="text-center mb-10">
                                   <Link to={`/Shop/${material.id}`}>
