@@ -53,9 +53,10 @@ deploy-vps:
   script:
     # - apk add --no-cache openssh # Cài đặt SSH client nếu không có sẵn
     - sshpass -p "$VPS_PASSWORD" ssh -o StrictHostKeyChecking=no $VPS_USER@$VPS_HOST "
-        docker pull $IMAGE_NAME:1.0 && 
         docker stop $CONTAINER_NAME || true && 
         docker rm $CONTAINER_NAME || true && 
+        docker rmi $IMAGE_NAME:1.0 || true && 
+        docker pull $IMAGE_NAME:1.0 || true && 
         docker run -d --name $CONTAINER_NAME --network sep490 -p 8088:8088 -e SPRING_PROFILES_ACTIVE=staging $IMAGE_NAME:1.0
       "
   only:
