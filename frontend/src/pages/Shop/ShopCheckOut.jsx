@@ -287,7 +287,7 @@ const ShopCheckOut = () => {
                                   {item.productSKUResponse.sellingPrice.toLocaleString(
                                     "vi-VN"
                                   )}
-                                  VNĐ
+                                  đ
                                 </strong>
                               </div>
 
@@ -303,7 +303,7 @@ const ShopCheckOut = () => {
                                     item.quantity *
                                     item.productSKUResponse.sellingPrice
                                   ).toLocaleString("vi-VN")}
-                                  VNĐ
+                                  đ
                                 </strong>
                               </div>
                             </div>
