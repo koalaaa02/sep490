@@ -9,15 +9,31 @@ import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
 import image1 from "../../images/glass.jpg";
 import ShopProductDetail from "./ShopProductDetail";
+import { FaSearch } from "react-icons/fa";
 
 function Dropdown() {
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [stores, setStores] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
   const { cateId } = useParams();
   const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(6);
+  const [direction, setDirection] = useState("ASC");
+  const [searchName, setSearchName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const params1 = new URLSearchParams({
+    page: page,
+    size: size,
+    sortBy: "id",
+    direction: direction,
+    active: true,
+    categoryId: cateId,
+    name: searchQuery,
+  });
 
   const ratings = [
     { id: "ratingFive", stars: 5 },
@@ -40,7 +56,7 @@ function Dropdown() {
           direction: "ASC",
         });
 
-        const [shopResponse, cateResponse] = await Promise.all([
+        const [shopResponse, cateResponse, proResponse] = await Promise.all([
           fetch(`${BASE_URL}/api/public/shops?${params.toString()}`, {
             method: "GET",
             credentials: "include",
@@ -49,15 +65,21 @@ function Dropdown() {
             method: "GET",
             credentials: "include",
           }),
+          fetch(`${BASE_URL}/api/public/products?${params1.toString()}`, {
+            method: "GET",
+            credentials: "include",
+          }),
         ]);
 
-        if (shopResponse.ok && cateResponse.ok) {
-          const [shopData, cateData] = await Promise.all([
+        if (shopResponse.ok && cateResponse.ok && proResponse.ok) {
+          const [shopData, cateData, proData] = await Promise.all([
             shopResponse.json(),
             cateResponse.json(),
+            proResponse.json(),
           ]);
           setStores(shopData.content || []);
           setCategories(cateData || {});
+          setProducts(proData || {});
         } else {
           throw new Error("Lỗi khi tải dữ liệu");
         }
@@ -69,7 +91,31 @@ function Dropdown() {
     };
 
     fetchData();
-  }, [cateId]);
+  }, [cateId, size, page, direction, searchQuery]);
+
+  const handleChange = (event) => {
+    setSize(event.target.value);
+  };
+
+  const handleChangeDirection = (event) => {
+    setDirection(event.target.value);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchName(event.target.value);
+  };
+
+  const handleSearchClick = () => {
+    setSearchQuery(searchName); // Cập nhật giá trị tìm kiếm
+  };
+
+  const totalPages = Math.ceil(products?.totalElements / size);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
 
   const handleAddWishList = (product) => {
     const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
@@ -119,16 +165,16 @@ function Dropdown() {
               <div className="col-md-3">
                 <div>
                   <div className="py-4">
-                    <h5 className="mb-3">Danh sách cửa hàng</h5>
+                    <h5 className="mb-3">Danh sách nhà cung cấp</h5>
                     <div className="my-4">
                       {/* input */}
                       <input
                         type="search"
                         className="form-control"
-                        placeholder="Tìm kiếm cửa hàng..."
+                        placeholder="Tìm kiếm nhà cung cấp..."
                       />
                     </div>
-                    {stores.length > 0 ? (
+                    {stores?.length > 0 ? (
                       stores.map((stores, index) => (
                         <div className="form-check mb-2" key={index}>
                           {/* input */}
@@ -148,16 +194,24 @@ function Dropdown() {
                   </div>
                   <div className="py-4">
                     {/* price */}
-                    <h5 className="mb-3">Giá thành</h5>
+                    <h5 className="mb-3">{categories?.name}</h5>
                     <div>
-                      {/* range */}
-                      <div id="priceRange" className="mb-3" />
-                      <input
-                        type="number"
-                        className="form-control"
-                        placeholder="Nhập số..."
-                      />
-                      <span id="priceRange-value" className="small" />
+                      {categories?.subCategories.length > 0 ? (
+                        categories?.subCategories.map((cate, index) => (
+                          <div className="form-check mb-2" key={index}>
+                            {/* input */}
+                            <Link
+                              to={`/shop/${cate.id}`}
+                              className="form-check-label text-decoration-none text-warning"
+                              htmlFor="eGrocery"
+                            >
+                              {cate.name}
+                            </Link>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="dropdown-item">Không có</p>
+                      )}
                     </div>
                   </div>
 
@@ -191,7 +245,27 @@ function Dropdown() {
                 <div className="card mb-4 bg-light border-0">
                   {/* card body */}
                   <div className=" card-body p-4">
-                    <h4 className="mb-0">{categories.name}</h4>
+                    <div style={{ position: "relative", width: "35%" }}>
+                      <input
+                        className="form-control responsivesearch"
+                        list="datalistOptions"
+                        id="exampleDataList"
+                        placeholder={`Tìm kiếm trong ${categories.name}...`}
+                        value={searchName}
+                        onChange={handleSearchChange}
+                        style={{ paddingRight: "35px" }}
+                      />
+                      <FaSearch
+                        style={{
+                          position: "absolute",
+                          right: "10px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          color: "#aaa",
+                        }}
+                        onClick={handleSearchClick}
+                      />
+                    </div>
                   </div>
                 </div>
                 {/* list icon */}
@@ -206,40 +280,26 @@ function Dropdown() {
                     <div className="d-md-flex justify-content-between align-items-center">
                       <div>
                         <p className="mb-3 mb-md-0">
-                          {" "}
                           <span className="text-dark">
-                            Có {categories.products.filter((p) => !p.delete).length}{" "}
-                          </span>{" "}
-                          sản phẩm{" "}
+                            Có {products.content?.length} sản phẩm
+                          </span>
                         </p>
                       </div>
                       {/* icon */}
                       <div className="d-flex justify-content-between align-items-center">
-                        {/* <Link
-                          to={`/ShopListCol/${cateId}`}
-                          className="text-muted me-3"
-                        >
-                          <i className="bi bi-list-ul" />
-                        </Link>
-                        <Link
-                          to={`/ShopGridCol3/${cateId}`}
-                          className="text-muted me-3"
-                        >
-                          <i className="bi bi-grid" />
-                        </Link>
-                        <Link to={`/Shop/${cateId}`} className="me-3 active">
-                          <i className="bi bi-grid-3x3-gap" />
-                        </Link> */}
                         <div className="me-2">
                           {/* select option */}
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            value={size}
+                            onChange={handleChange}
                           >
-                            <option selected>50</option>
-                            <option value={10}>10</option>
-                            <option value={20}>20</option>
-                            <option value={30}>30</option>
+                            <option selected value={6}>
+                              6
+                            </option>
+                            <option value={12}>12</option>
+                            <option value={18}>18</option>
                           </select>
                         </div>
                         <div>
@@ -247,183 +307,202 @@ function Dropdown() {
                           <select
                             className="form-select"
                             aria-label="Default select example"
+                            value={direction}
+                            onChange={handleChangeDirection}
                           >
-                            <option selected> Sắp xếp theo: Nổi bật </option>
-                            <option value="Low to High">
+                            <option value={"ASC"} selected>
                               {" "}
-                              Giá: Từ thấp đến cao{" "}
+                              Mới nhất{" "}
                             </option>
-                            <option value="High to Low">
-                              {" "}
-                              Giá: Từ cao đến thấp{" "}
-                            </option>
-                            <option value="Release Date">
-                              {" "}
-                              Ngày phát hành{" "}
-                            </option>
-                            <option value="Avg. Rating">
-                              {" "}
-                              Đánh giá trung bình{" "}
-                            </option>
+                            <option value={"DESC"}> Cũ nhất </option>
                           </select>
                         </div>
                       </div>
                     </div>
                     {/* row */}
                     <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
-                      {categories.products
-                        .filter((p) => !p.delete)
-                        .map((p, index) => {
-                          const isInWishlist = storedWishlist.some(
-                            (item) => item.id === p.id
-                          );
-                          return (
-                            <div key={index} className="col">
-                              {/* card */}
-                              <div className="card card-product">
-                                <div
-                                  className="card-body d-flex flex-column justify-content-between"
-                                  style={{ height: "300px" }} // Đảm bảo chiều cao cố định
-                                >
-                                  {/* Ảnh - Cố định kích thước */}
-                                  <div className="text-center position-relative">
-                                    <Link>
-                                      <img
-                                        src={p.images || image1}
-                                        alt={p.images}
-                                        className="mb-3 img-fluid"
-                                        style={{
-                                          width: "150px",
-                                          height: "150px",
-                                          objectFit: "cover", // Giữ hình ảnh đúng tỉ lệ
-                                        }}
+                      {products.content.map((p, index) => {
+                        const isInWishlist = storedWishlist.some(
+                          (item) => item.id === p.id
+                        );
+                        return (
+                          <div key={p.id} className="col fade-zoom">
+                            <div className="card card-product">
+                              <div className="card-body">
+                                <div className="text-center position-relative">
+                                  <Link onClick={() => setSelectedProduct(p)}>
+                                    <img
+                                      src={p.images || image1}
+                                      alt={p.images}
+                                      className="mb-3 img-fluid"
+                                      style={{
+                                        height: "200px",
+                                        width: "200px",
+                                        objectFit: "cover",
+                                      }}
+                                    />
+                                  </Link>
+                                  <div className="card-product-action">
+                                    <Link
+                                      className="btn-action"
+                                      onClick={() => setSelectedProduct(p)}
+                                    >
+                                      <i
+                                        className="bi bi-eye"
+                                        title="Quick View"
                                       />
                                     </Link>
-                                    <div className="card-product-action">
-                                      <Link
-                                        className="btn-action"
-                                        onClick={() => setSelectedProduct(p)}
-                                      >
-                                        <i
-                                          className="bi bi-eye"
-                                          title="Quick View"
-                                        />
-                                      </Link>
-                                      <Link
-                                        onClick={
+                                    <Link
+                                      onClick={
+                                        isInWishlist
+                                          ? null
+                                          : () => handleAddWishList(p)
+                                      }
+                                      className={`btn-action ${
+                                        isInWishlist
+                                          ? "disabled text-warning"
+                                          : ""
+                                      }`}
+                                      data-bs-toggle="tooltip"
+                                      data-bs-html="true"
+                                      title="Wishlist"
+                                    >
+                                      <i
+                                        className={`bi ${
                                           isInWishlist
-                                            ? null
-                                            : () => handleAddWishList(p)
-                                        }
-                                        className={`btn-action ${
-                                          isInWishlist
-                                            ? "disabled text-warning"
-                                            : ""
+                                            ? "bi-heart-fill"
+                                            : "bi-heart"
                                         }`}
-                                        data-bs-toggle="tooltip"
-                                        data-bs-html="true"
-                                        title="Wishlist"
-                                      >
-                                        <i
-                                          className={`bi ${
-                                            isInWishlist
-                                              ? "bi-heart-fill"
-                                              : "bi-heart"
-                                          }`}
-                                        />
-                                      </Link>
-                                    </div>
+                                      />
+                                    </Link>
                                   </div>
+                                </div>
 
-                                  {/* Thông tin sản phẩm */}
+                                <h2 className="fs-6">
+                                  <Link
+                                    onClick={() => setSelectedProduct(p)}
+                                    className="text-inherit text-decoration-none"
+                                    title={p?.name}
+                                    style={{
+                                      display: "inline-block",
+                                      maxWidth: "100%",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                    }}
+                                  >
+                                    {p?.name}
+                                  </Link>
+                                </h2>
+
+                                {p.rating && (
                                   <div>
-                                    <h2
-                                      className="fs-6 text-truncate"
-                                      style={{
-                                        maxWidth: "100%", // Giữ trong vùng hiển thị
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                      }}
-                                    >
-                                      <Link
-                                        to="#!"
-                                        className="text-inherit text-decoration-none"
-                                        title={p?.name} // Hiện tooltip khi hover
-                                      >
-                                        {p?.name}
-                                      </Link>
-                                    </h2>
-                                    <p
-                                      className="text-muted"
-                                      style={{
-                                        height: "40px",
-                                        overflow: "hidden",
-                                        display: "-webkit-box",
-                                        WebkitBoxOrient: "vertical",
-                                        WebkitLineClamp: 2
-                                      }}
-                                      title={p.description}
-                                    >
-                                      {p.description}
-                                    </p>
+                                    <small className="text-warning">
+                                      {[...Array(5)].map((_, index) => (
+                                        <i
+                                          key={index}
+                                          className={
+                                            index < Math.floor(p.rating)
+                                              ? "bi bi-star-fill"
+                                              : "bi bi-star"
+                                          }
+                                        />
+                                      ))}
+                                    </small>
+                                    <span className="text-muted small">
+                                      {p.rating} {p.reviews && `(${p.reviews})`}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {/* Description - added back from original */}
+                                {p.description && (
+                                  <p
+                                    className="text-muted mt-2"
+                                    style={{
+                                      height: "30px",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      display: "-webkit-box",
+                                      WebkitBoxOrient: "vertical",
+                                      WebkitLineClamp: 1,
+                                      whiteSpace: "normal",
+                                    }}
+                                    title={p.description}
+                                  >
+                                    {p.description}
+                                  </p>
+                                )}
+
+                                <div className="d-flex justify-content-between align-items-center mt-3">
+                                  <div>
+                                    <span className="text-danger">
+                                      Còn hàng
+                                    </span>
+                                    {p.originalPrice && (
+                                      <span className="text-decoration-line-through text-muted ms-2">
+                                        {p.originalPrice}
+                                      </span>
+                                    )}
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          );
-                        })}
+                          </div>
+                        );
+                      })}
                     </div>
                     <div className="row mt-8">
                       <div className="col">
-                        {/* nav */}
                         <nav>
                           <ul className="pagination">
-                            <li className="page-item disabled">
+                            {/* Nút Previous */}
+                            <li
+                              className={`page-item ${
+                                page === 1 ? "disabled" : ""
+                              }`}
+                            >
                               <Link
-                                className="page-link  mx-1 rounded-3 "
+                                className="page-link mx-1 rounded-3"
                                 to="#"
+                                onClick={() => handlePageChange(page - 1)}
                                 aria-label="Previous"
                               >
                                 <i className="fa fa-chevron-left" />
                               </Link>
                             </li>
-                            <li className="page-item ">
+
+                            {/* Hiển thị số trang */}
+                            {[...Array(totalPages)].map((_, index) => {
+                              const pageNumber = index + 1;
+                              return (
+                                <li
+                                  key={pageNumber}
+                                  className={`page-item ${
+                                    page === pageNumber ? "active" : ""
+                                  }`}
+                                >
+                                  <Link
+                                    className="page-link mx-1 rounded-3 text-body"
+                                    to="#"
+                                    onClick={() => handlePageChange(pageNumber)}
+                                  >
+                                    {pageNumber}
+                                  </Link>
+                                </li>
+                              );
+                            })}
+
+                            {/* Nút Next */}
+                            <li
+                              className={`page-item ${
+                                page === totalPages ? "disabled" : ""
+                              }`}
+                            >
                               <Link
-                                className="page-link  mx-1 rounded-3 active"
+                                className="page-link mx-1 rounded-3"
                                 to="#"
-                              >
-                                1
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                2
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                ...
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
-                              >
-                                12
-                              </Link>
-                            </li>
-                            <li className="page-item">
-                              <Link
-                                className="page-link mx-1 rounded-3 text-body"
-                                to="#"
+                                onClick={() => handlePageChange(page + 1)}
                                 aria-label="Next"
                               >
                                 <i className="fa fa-chevron-right" />

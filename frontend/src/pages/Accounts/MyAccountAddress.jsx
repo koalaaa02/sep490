@@ -2,28 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
-import { useDispatch } from "react-redux";
-import { logout } from "../../Redux/slice/authSlice";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../Utils/config";
+import { useSelector } from "react-redux";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAccountAddress = () => {
   const token = localStorage.getItem("access_token");
+  const userId = useSelector((state) => state.auth.user?.uid || []);
   const [formData, setFormData] = useState({
-    userId: 30,
-    shopId: 0,
+    id: "",
+    userId: userId,
+    shopId: "",
     recipientName: "",
     phone: "",
     address: "",
-    provinceId: "string",
-    districtId: "string",
-    wardId: "string",
+    provinceId: "",
+    districtId: "",
+    wardId: "",
     province: "",
     district: "",
     ward: "",
     postalCode: "",
-    defaultAddress: true,
+    defaultAddress: false,
   });
   const [data, setData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -31,6 +31,8 @@ const MyAccountAddress = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [editData, setEditData] = useState({
     id: "",
+    userId: userId,
+    shopId: "",
     recipientName: "",
     address: "",
     ward: "",
@@ -38,25 +40,108 @@ const MyAccountAddress = () => {
     province: "",
     phone: "",
   });
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
 
   const handleEdit = (p, index) => {
     setEditIndex(index);
     setEditData({
       id: p.id,
+      userId: userId,
+      shopId: "",
       recipientName: p.recipientName,
       address: p.address,
-      ward: p.ward,
-      district: p.district,
-      province: p.province,
+      province:
+        provinces.find((pv) => pv.ProvinceName === p.province)?.ProvinceID ||
+        "",
+      district:
+        districts.find((dt) => dt.DistrictName === p.district)?.DistrictID ||
+        "",
+      ward: wards.find((w) => w.WardName === p.ward)?.WardCode || "",
       phone: p.phone,
     });
   };
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     if (editIndex !== null) {
-      setEditData({ ...editData, [e.target.name]: e.target.value });
+      if (name === "provinceId") {
+        const selectedProvince = provinces.find(
+          (province) => province.ProvinceID === Number(value)
+        );
+        setEditData((prev) => ({
+          ...prev,
+          provinceId: value,
+          province: selectedProvince?.ProvinceName || "",
+          districtId: "",
+          wardId: "",
+          district: "",
+          ward: "",
+        }));
+      } else if (name === "districtId") {
+        const selectedDistrict = districts.find(
+          (district) => district.DistrictID === Number(value)
+        );
+        setEditData((prev) => ({
+          ...prev,
+          districtId: value,
+          district: selectedDistrict?.DistrictName || "",
+          wardId: "",
+          ward: "",
+        }));
+      } else if (name === "wardId") {
+        const selectedWard = wards.find(
+          (ward) => ward.WardCode === String(value)
+        );
+        setEditData((prev) => ({
+          ...prev,
+          wardId: value,
+          ward: selectedWard?.WardName || "",
+        }));
+      } else {
+        setEditData((prev) => ({ ...prev, [name]: value }));
+      }
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      if (name === "provinceId") {
+        const selectedProvince = provinces.find(
+          (province) => province.ProvinceID === Number(value)
+        );
+        setFormData((prevData) => ({
+          ...prevData,
+          provinceId: value,
+          province: selectedProvince ? selectedProvince.ProvinceName : "",
+        }));
+      }
+
+      if (name === "districtId") {
+        const selectedDistrict = districts.find(
+          (district) => district.DistrictID === Number(value)
+        );
+        setFormData((prevData) => ({
+          ...prevData,
+          districtId: value,
+          district: selectedDistrict ? selectedDistrict.DistrictName : "",
+        }));
+      }
+
+      if (name === "wardId") {
+        const selectedWard = wards.find(
+          (ward) => ward.WardCode === String(value)
+        );
+        setFormData((prevData) => ({
+          ...prevData,
+          wardId: value,
+          ward: selectedWard ? selectedWard.WardName : "",
+        }));
+      }
+    }
+
+    if (editIndex !== null) {
+      setEditData((prevData) => ({ ...prevData, [name]: value }));
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
     }
   };
 
@@ -202,13 +287,63 @@ const MyAccountAddress = () => {
     }, 1500);
   }, []);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
+      const data = await response.json();
+      setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
 
-  const handleLogOut = () => {
-    dispatch(logout());
-    navigate("/");
-  };
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!formData.provinceId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/districts?provinceId=${formData.provinceId}`
+      );
+      const data = await response.json();
+      setDistricts(data);
+    };
+    fetchDistricts();
+  }, [formData.provinceId]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      if (!formData.districtId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/wards?districtId=${formData.districtId}`
+      );
+      const data = await response.json();
+      setWards(data);
+    };
+    fetchWards();
+  }, [formData.districtId]);
+
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!editData.provinceId) return;
+      const res = await fetch(
+        `${BASE_URL}/api/ghn/districts?provinceId=${editData.provinceId}`
+      );
+      const data = await res.json();
+      setDistricts(data);
+    };
+    if (editIndex !== null) fetchDistricts();
+  }, [editData.provinceId]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      if (!editData.districtId) return;
+      const res = await fetch(
+        `${BASE_URL}/api/ghn/wards?districtId=${editData.districtId}`
+      );
+      const data = await res.json();
+      setWards(data);
+    };
+    if (editIndex !== null) fetchWards();
+  }, [editData.districtId]);
+
   return (
     <div>
       <>
@@ -269,14 +404,14 @@ const MyAccountAddress = () => {
                               {notification.message}
                             </p>
                           )}
-                          {!data.content ? (
+                          {data?.content?.length === 0 ? (
                             <span className={`alert alert-info`}>
                               Bạn chưa có địa chỉ. Thêm mới địa chỉ ngay
                             </span>
                           ) : (
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                              {data.content.map((p, index) => (
-                                <div key={index} className="col">
+                              {data?.content?.map((p, index) => (
+                                <div key={index} className="col w-30">
                                   <div className="border p-6 rounded-3">
                                     <div className="form-check mb-4">
                                       <input
@@ -310,27 +445,61 @@ const MyAccountAddress = () => {
                                           onChange={handleChange}
                                           placeholder="Địa chỉ"
                                         />
-                                        <input
+                                        <select
                                           className="form-control mb-2"
-                                          name="ward"
-                                          value={editData.ward}
+                                          name="provinceId"
+                                          value={editData.provinceId}
                                           onChange={handleChange}
-                                          placeholder="Phường/Xã"
-                                        />
-                                        <input
+                                        >
+                                          <option value="">Chọn Tỉnh/TP</option>
+                                          {provinces.map((province) => (
+                                            <option
+                                              key={province.ProvinceID}
+                                              value={province.ProvinceID}
+                                            >
+                                              {province.ProvinceName}
+                                            </option>
+                                          ))}
+                                        </select>
+
+                                        <select
                                           className="form-control mb-2"
-                                          name="district"
-                                          value={editData.district}
+                                          name="districtId"
+                                          value={editData.districtId}
                                           onChange={handleChange}
-                                          placeholder="Quận/Huyện"
-                                        />
-                                        <input
+                                        >
+                                          <option value="">
+                                            Chọn Quận/Huyện
+                                          </option>
+                                          {districts.map((district) => (
+                                            <option
+                                              key={district.DistrictID}
+                                              value={district.DistrictID}
+                                            >
+                                              {district.DistrictName}
+                                            </option>
+                                          ))}
+                                        </select>
+
+                                        <select
                                           className="form-control mb-2"
-                                          name="province"
-                                          value={editData.province}
+                                          name="wardId"
+                                          value={editData.wardId}
                                           onChange={handleChange}
-                                          placeholder="Tỉnh/Thành phố"
-                                        />
+                                        >
+                                          <option value="">
+                                            Chọn Phường/Xã
+                                          </option>
+                                          {wards.map((ward) => (
+                                            <option
+                                              key={ward.WardCode}
+                                              value={ward.WardCode}
+                                            >
+                                              {ward.WardName}
+                                            </option>
+                                          ))}
+                                        </select>
+
                                         <input
                                           className="form-control mb-2"
                                           name="phone"
@@ -357,10 +526,15 @@ const MyAccountAddress = () => {
                                       <p className="mb-6">
                                         {p.recipientName}
                                         <br />
-                                        {p.address}, {p.ward} <br />
-                                        {p.district}, {p.province}
-                                        <br />
                                         {p.phone}
+                                        <br />
+                                        {p.address},
+                                        <br />
+                                        {p.ward},
+                                        <br />
+                                        {p.district},
+                                        <br />
+                                        {p.province}
                                       </p>
                                     )}
 
@@ -494,7 +668,7 @@ const MyAccountAddress = () => {
                         className="form-control"
                         name="recipientName"
                         placeholder="Họ và Tên"
-                        value={formData.recipientName.trim()}
+                        value={formData.recipientName}
                         onChange={handleChange}
                         required
                       />
@@ -530,35 +704,67 @@ const MyAccountAddress = () => {
                         onChange={handleChange}
                       />
                     </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="ward"
-                        placeholder="Phường"
-                        value={formData.ward}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-6">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="district"
-                        placeholder="Huyện"
-                        value={formData.district}
-                        onChange={handleChange}
-                      />
-                    </div>
                     <div className="col-12">
-                      <input
-                        type="text"
+                      <label className="me-2">Tỉnh: </label>
+                      <select
                         className="form-control"
-                        name="province"
-                        placeholder="Tỉnh"
-                        value={formData.province}
+                        name="provinceId"
+                        value={formData.provinceId}
                         onChange={handleChange}
-                      />
+                      >
+                        <option value="">Chọn thành phố</option>
+                        {provinces.map((province) => (
+                          <option
+                            key={province.ProvinceID}
+                            value={province.ProvinceID}
+                          >
+                            {province.ProvinceName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <label> Huyện: </label>
+                      <select
+                        className="form-control"
+                        name="districtId"
+                        value={
+                          editIndex !== null
+                            ? editData.districtId
+                            : formData.districtId
+                        }
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn huyện</option>
+                        {districts.map((district) => (
+                          <option
+                            key={district.DistrictID}
+                            value={district.DistrictID}
+                          >
+                            {district.DistrictName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-6">
+                      <label>Phường: </label>
+                      <select
+                        className="form-control"
+                        name="wardId"
+                        value={
+                          editIndex !== null
+                            ? editData.WardCode
+                            : formData.WardCode
+                        }
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn phường</option>
+                        {wards.map((ward) => (
+                          <option key={ward.WardCode} value={ward.WardCode}>
+                            {ward.WardName}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div className="col-12 text-end">
                       <button

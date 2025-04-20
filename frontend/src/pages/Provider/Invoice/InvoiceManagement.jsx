@@ -1,131 +1,192 @@
-import React, { useState } from "react";
-import { FaSearch, FaEye, FaEdit, FaTrash } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaSearch } from "react-icons/fa";
+import { BASE_URL } from "../../../Utils/config";
+import InvoiceDetails from "./InvoiceDetail";
+import { Row, Col, Form } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const InvoiceListComponent = () => {
-  const [filter, setFilter] = useState("Tất cả");
   const [searchTerm, setSearchTerm] = useState("");
+  const token = localStorage.getItem("access_token");
+  const [data, setData] = useState(null);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
-  const invoices = [
-    {
-      id: "001",
-      date: "10/03/2021",
-      customer: "Công ty A",
-      amount: "5.000.000.000",
-      status: "Đã thanh toán",
-    },
-    {
-      id: "002",
-      date: "15/08/2022",
-      customer: "Anh Nguyễn Văn A",
-      amount: "1.000.000.000",
-      status: "Đã cọc 50%",
-    },
-    {
-      id: "003",
-      date: "22/01/2024",
-      customer: "Công ty B",
-      amount: "200.000.000",
-      status: "Đã thanh toán",
-    },
-  ];
+  useEffect(() => {
+    fetchData(page);
+  }, [page, pageSize]);
 
-  const filteredInvoices = invoices.filter(
-    (i) =>
-      (filter === "Tất cả" || i.status.includes(filter)) &&
-      (i.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        i.id.includes(searchTerm))
+  const fetchData = async (currentPage) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/invoices/UserInvoiceSummary?page=${currentPage}&size=${pageSize}&sortBy=id&direction=ASC`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error("Lỗi khi fetch dữ liệu:", error);
+    }
+  };
+
+  const filteredData = data?.filter((invoice) =>
+    invoice.firstName?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = data?.totalElements
+    ? Math.ceil(data.totalElements / pageSize)
+    : 0;
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(Number(e.target.value));
+    setPage(1);
+  };
+
   return (
-    <div className="p-3 mb-10">
-      <h3>Danh sách hóa đơn</h3>
-      <div className="mb-3 d-flex align-items-center">
-        <input
-          type="text"
-          className="form-control mx-2"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+    <div
+      className="p-3 mb-10"
+      style={{ height: selectedInvoice ? "100%" : "100vh" }}
+    >
+      {selectedInvoice ? (
+        <InvoiceDetails
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
         />
-        <button className="btn btn-dark">
-          <FaSearch />
-        </button>
-      </div>
-      <div className="mb-3">
-        <button
-          className="btn btn-outline-secondary mx-1"
-          onClick={() => setFilter("Tất cả")}
-        >
-          Tất cả
-        </button>
-        <button
-          className="btn btn-outline-warning mx-1"
-          onClick={() => setFilter("Chưa thanh toán")}
-        >
-          Chưa thanh toán
-        </button>
-        <button
-          className="btn btn-outline-success mx-1"
-          onClick={() => setFilter("Đã thanh toán")}
-        >
-          Đã thanh toán
-        </button>
-      </div>
-      <div className="border p-2 mb-3">
-        <strong>Thống kê nhanh:</strong>
-        <div>Tổng hóa đơn: {filteredInvoices.length}</div>
-        <div>Tổng tiền: ...</div>
-      </div>
-      <table className="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Mã</th>
-            <th>Ngày tạo</th>
-            <th>Khách hàng</th>
-            <th>Tổng tiền</th>
-            <th>Trạng thái</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredInvoices.map((invoice) => (
-            <tr key={invoice.id}>
-              <td>{invoice.id}</td>
-              <td>{invoice.date}</td>
-              <td>{invoice.customer}</td>
-              <td>{invoice.amount}</td>
-              <td>{invoice.status}</td>
-              <td>
-                <FaEye className="mx-1 text-primary" />
-                <FaEdit className="mx-1 text-warning" />
-                <FaTrash className="mx-1 text-danger" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <nav>
-        <ul className="pagination">
-          <li className="page-item">
-            <button className="page-link">Prev</button>
-          </li>
-          <li className="page-item active">
-            <button className="page-link">1</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">2</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">3</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">4</button>
-          </li>
-          <li className="page-item">
-            <button className="page-link">Next</button>
-          </li>
-        </ul>
-      </nav>
+      ) : (
+        <>
+          <h3>Danh sách khoản nợ</h3>
+          <Row className="mb-3 justify-content-end">
+            <Col className="d-flex align-items-center">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Tìm kiếm tên khách hàng..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button className="btn btn-dark">
+                <FaSearch />
+              </button>
+            </Col>
+            <Col xs="auto" className="d-flex align-items-center">
+              <Form.Select
+                size="sm"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </Form.Select>
+            </Col>
+          </Row>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Ngày đặt hàng</th>
+                <th>Tên khách hàng</th>
+                <th>Số tiền cần thanh toán</th>
+                <th>Ngày giao hàng</th>
+                <th>Số tiền đã trả</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData?.map((invoice, index) => (
+                <tr key={invoice.id}>
+                  <td>{index + 1}</td>
+                  <td>21:00 04/04/2025</td>
+                  <td
+                    className="text-primary cursor-pointer"
+                    onClick={() => {
+                      setSelectedInvoice(invoice.userId);
+                    }}
+                  >
+                    {invoice.firstName || "user"}
+                  </td>
+                  <td>{invoice.totalAmount}</td>
+                  <td>21:00 04/04/2025</td>
+                  <td>{invoice.paidAmount}</td>
+                  <td>
+                    {invoice.paidPercentage > 100
+                      ? "Đã thanh toán"
+                      : `Đã thanh toán ${invoice.paidPercentage}%`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div className="row mt-4">
+            <div className="col">
+              <nav>
+                <ul className="pagination">
+                  <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page - 1)}
+                      aria-label="Previous"
+                    >
+                      <i className="fa fa-chevron-left" />
+                    </Link>
+                  </li>
+
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <li
+                        key={pageNumber}
+                        className={`page-item ${
+                          page === pageNumber ? "active" : ""
+                        }`}
+                      >
+                        <Link
+                          className="page-link mx-1 rounded-3 text-body"
+                          to="#"
+                          onClick={() => handlePageChange(pageNumber)}
+                        >
+                          {pageNumber}
+                        </Link>
+                      </li>
+                    );
+                  })}
+
+                  <li
+                    className={`page-item ${
+                      page === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page + 1)}
+                      aria-label="Next"
+                    >
+                      <i className="fa fa-chevron-right" />
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

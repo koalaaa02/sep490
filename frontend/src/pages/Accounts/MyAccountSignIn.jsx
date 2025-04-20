@@ -16,11 +16,13 @@ const MyAccountSignIn = () => {
   const [successMessage, setSuccessMessage] = useState(
     location.state?.successMessage || ""
   );
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [activationCode, setActivationCode] = useState("");
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  // State để chuyển đổi giữa form đăng nhập và form kích hoạt
+  const [isActivate, setIsActivate] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
@@ -30,7 +32,7 @@ const MyAccountSignIn = () => {
     setErrorMessage("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitSignIn = async (e) => {
     e.preventDefault();
     dispatch(loginStart());
 
@@ -54,7 +56,36 @@ const MyAccountSignIn = () => {
       navigate("/");
     } catch (err) {
       dispatch(loginFailure(err.message));
-      setErrorMessage("Sai email hoặc mật khẩu");
+      setErrorMessage("Sai email, mật khẩu hoặc tài khoản của bạn chưa được kích hoạt");
+    }
+  };
+
+  const handleSubmitActivate = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/auth/activate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email, resetToken: activationCode }),
+      });
+
+      const data = await response.text();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Kích hoạt thất bại");
+      }
+
+      setSuccessMessage(
+        "Kích hoạt tài khoản thành công, vui lòng đăng nhập lại!"
+      );
+
+      setIsActivate(false);
+    } catch (err) {
+      setErrorMessage("Kích hoạt thất bại, vui lòng thử lại!");
     }
   };
 
@@ -69,10 +100,13 @@ const MyAccountSignIn = () => {
             </div>
             <div className="col-12 col-md-6 offset-lg-1 col-lg-4 order-lg-2 order-1">
               <div className="mb-lg-9 mb-5">
-                <h1 className="mb-1 h2 fw-bold">Đăng nhập</h1>
+                <h1 className="mb-1 h2 fw-bold">
+                  {isActivate ? "Kích hoạt tài khoản" : "Đăng nhập"}
+                </h1>
                 <p>
-                  Chào mừng bạn quay trở lại! Nhập tài khoản của bạn để tiếp
-                  tục.
+                  {isActivate
+                    ? "Nhập email và mã kích hoạt của bạn để kích hoạt tài khoản."
+                    : "Chào mừng bạn quay trở lại! Nhập tài khoản của bạn để tiếp tục."}
                 </p>
               </div>
               {successMessage && (
@@ -81,71 +115,155 @@ const MyAccountSignIn = () => {
               {errorMessage && (
                 <div className="alert alert-danger">{errorMessage}</div>
               )}
-              <form onSubmit={handleSubmit}>
-                <div className="row g-3">
-                  <div className="col-12">
-                    <input
-                      className="form-control"
-                      placeholder="Email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        handleInputChange();
-                      }}
-                      required
-                    />
-                  </div>
-                  <div className="col-12 position-relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      className="form-control"
-                      placeholder="Mật khẩu"
-                      value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        handleInputChange();
-                      }}
-                      required
-                    />
-                    <span
-                      className="position-absolute top-50 end-0 translate-middle-y me-3"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </span>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <div className="form-check">
+              {isActivate ? (
+                // Form kích hoạt tài khoản
+                <form onSubmit={handleSubmitActivate}>
+                  <div className="row g-3">
+                    <div className="col-12">
                       <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id="rememberMe"
+                        className="form-control"
+                        placeholder="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          handleInputChange();
+                        }}
+                        required
                       />
-                      <label className="form-check-label" htmlFor="rememberMe">
-                        Nhớ tài khoản
-                      </label>
                     </div>
-                    <div>
-                      Quên mật khẩu?{" "}
-                      <a href="/MyAccountForgetPassword">Khôi phục ngay</a>
+                    <div className="col-12">
+                      <input
+                        className="form-control"
+                        placeholder="Mã kích hoạt"
+                        type="text"
+                        value={activationCode}
+                        onChange={(e) => {
+                          setActivationCode(e.target.value);
+                          handleInputChange();
+                        }}
+                        required
+                      />
+                    </div>
+                    <div className="col-12 d-grid">
+                      <button type="submit" className="btn btn-warning">
+                        Kích hoạt
+                      </button>
+                    </div>
+                    <div className="mt-2">
+                      Đã có tài khoản?{" "}
+                      <span
+                        onClick={() => {
+                          setIsActivate(false);
+                          setErrorMessage("");
+                        }}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                        className="text-warning"
+                      >
+                        Đăng nhập
+                      </span>
                     </div>
                   </div>
-                  <div className="col-12 d-grid">
-                    <button
-                      type="submit"
-                      className="btn btn-warning"
-                      disabled={loading}
-                    >
-                      {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-                    </button>
+                </form>
+              ) : (
+                // Form đăng nhập
+                <form onSubmit={handleSubmitSignIn}>
+                  <div className="row g-3">
+                    <div className="col-12">
+                      <input
+                        className="form-control"
+                        placeholder="Email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          handleInputChange();
+                        }}
+                        required
+                      />
+                    </div>
+                    <div className="col-12 position-relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        className="form-control"
+                        placeholder="Mật khẩu"
+                        value={password}
+                        onChange={(e) => {
+                          setPassword(e.target.value);
+                          handleInputChange();
+                        }}
+                        required
+                      />
+                      <span
+                        className="position-absolute top-50 end-0 translate-middle-y me-3"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </span>
+                    </div>
+                    <div className="d-flex justify-content-between">
+                      <div className="form-check">
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          id="rememberMe"
+                        />
+                        <label
+                          className="form-check-label"
+                          htmlFor="rememberMe"
+                        >
+                          Nhớ tài khoản
+                        </label>
+                      </div>
+                      <div>
+                        Quên mật khẩu?{" "}
+                        <a
+                          href="/MyAccountForgetPassword"
+                          className="text-decoration-none text-warning"
+                        >
+                          Khôi phục ngay
+                        </a>
+                      </div>
+                    </div>
+                    <div className="col-12 d-grid">
+                      <button
+                        type="submit"
+                        className="btn btn-warning"
+                        disabled={loading}
+                      >
+                        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                      </button>
+                    </div>
+                    <div className="mt-2">
+                      Chưa có tài khoản?{" "}
+                      <a
+                        href="/MyAccountSignUp"
+                        className="text-decoration-none text-warning"
+                      >
+                        Đăng ký
+                      </a>
+                    </div>
+                    {/* <div className="mt-2">
+                      Tài khoản của bạn chưa được kích hoạt?{" "}
+                      <span
+                        onClick={() => {
+                          setIsActivate(true);
+                          setErrorMessage("");
+                        }}
+                        style={{
+                          cursor: "pointer",
+                        }}
+                        className="text-warning"
+                      >
+                        Kích hoạt
+                      </span>
+                    </div> */}
                   </div>
-                  <div>
-                    Chưa có tài khoản? <a href="/MyAccountSignUp">Đăng ký</a>
-                  </div>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           </div>
         </div>

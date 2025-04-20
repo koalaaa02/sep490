@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <title>In phiếu giao hàng</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print {
+        display: none;
+      }
+
+      .invoice-box {
+        page-break-after: always;
+      }
+
+      .invoice-box:first-of-type {
+        page-break-before: always;
+      }
+
+      body * {
+        visibility: hidden;
+      }
+
+      .invoice-box,
+      .invoice-box * {
+        visibility: visible;
+      }
+
+      .invoice-box {
+        position: relative;
+        left: 0;
+        top: 0;
+      }
+    }
+
+    .invoice-box {
+      border: 1px solid #ddd;
+      padding: 20px;
+      margin-bottom: 40px;
+      background-color: #fff;
+    }
+
+    .notes {
+      margin-top: 20px;
+      font-style: italic;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <div class="container my-4">
+    <div class="text-end mb-3 no-print">
+      <button class="btn btn-success" onclick="window.print()">🖨 In phiếu</button>
+    </div>
+
+    <div id="invoices"></div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    function renderInvoice(order) {
+      let rows = '';
+      let total = 0;
+
+      order.orderDetails.forEach((item, i) => {
+        const sub = item.quantity * item.productSku.sellingPrice;
+        total += sub;
+
+        rows += ` 
+          <tr>
+            <td>${i + 1}</td>
+            <td>${item.productSku.skuCode}</td>
+            <td>${item.quantity}</td>
+            <td>${item.productSku.sellingPrice.toLocaleString()}đ</td>
+            <td>${sub.toLocaleString()}đ</td>
+          </tr>
+        `;
+      });
+
+      const today = new Date().toLocaleDateString('vi-VN');
+
+      const address = order.address || {};
+      const deliveryDate = new Date(order.deliveryDate).toLocaleDateString('vi-VN');
+      const notes = [
+        " - Đề nghị Quý khách kiểm tra hàng khi nhận hàng ký xác nhận và thanh toán.",
+        " - Chứng từ này là căn cứ để đối chiếu hàng hóa và công nợ phát sinh.",
+        " - Có nhầm lẫn vui lòng báo lại trong 48h kể từ khi nhận hàng."
+      ];
+      const shop = order.shop || {};
+
+      $('#invoices').html(`
+        <div class="invoice-box">
+          <h4 class="text-center">PHIẾU GIAO HÀNG</h4>
+          <p><strong>Mã đơn hàng:</strong> ${order.orderCode}</p>
+          <p><strong>Ngày tạo:</strong> ${new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+          <p><strong>Ngày giao:</strong> ${deliveryDate}</p>
+          <p><strong>Khách hàng:</strong> ${address.recipientName}</p>
+          <p><strong>Điện thoại:</strong> ${address.phone}</p>
+          <p><strong>Địa chỉ:</strong> ${address.address}, ${address.ward}, ${address.province}</p>
+          <p><strong>Tên cửa hàng:</strong> ${shop.name}</p>
+          <p><strong>Mã số thuế:</strong> ${shop.tin}</p>
+          <p><strong>Danh sách sản phẩm:</strong></p>
+          <table class="table table-bordered mt-3">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-end">Tổng cộng:</th>
+                <th>${total.toLocaleString()}đ</th>
+              </tr>
+            </tfoot>
+          </table>
+          <p class="text-end"><strong>Ngày in:</strong> ${today}</p>
+          <div class="notes">
+            <p><strong>Ghi chú:</strong></p>
+            <ul>
+              ${notes.map(note => `<li>${note}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="row text-center mt-5">
+            <div class="col-4">
+              <strong>Người lập phiếu</strong><br><br><br><br>
+                (Ký, ghi rõ họ tên)
+          </div>
+          <div class="col-4">
+              <strong>Người giao hàng</strong><br><br><br><br>
+                 (Ký, ghi rõ họ tên)
+           </div>
+          <div class="col-4">
+              <strong>Người nhận hàng</strong><br><br><br><br>
+                (Ký, ghi rõ họ tên)
+          </div>
+        </div>
+        </div>
+
+        <!-- Bản thứ 2 của phiếu giao hàng -->
+        <div class="invoice-box">
+          <h4 class="text-center">PHIẾU GIAO HÀNG</h4>
+          <p><strong>Mã đơn hàng:</strong> ${order.orderCode}</p>
+          <p><strong>Ngày tạo:</strong> ${new Date(order.createdAt).toLocaleDateString('vi-VN')}</p>
+          <p><strong>Ngày giao:</strong> ${deliveryDate}</p>
+          <p><strong>Khách hàng:</strong> ${address.recipientName}</p>
+          <p><strong>Điện thoại:</strong> ${address.phone}</p>
+          <p><strong>Địa chỉ:</strong> ${address.address}, ${address.ward}, ${address.province}</p>
+          <p><strong>Tên cửa hàng:</strong> ${shop.name}</p>
+          <p><strong>Mã số thuế:</strong> ${shop.tin}</p>
+          <p><strong>Danh sách sản phẩm:</strong></p>
+          <table class="table table-bordered mt-3">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr>
+                <th colspan="4" class="text-end">Tổng cộng:</th>
+                <th>${total.toLocaleString()}đ</th>
+              </tr>
+            </tfoot>
+          </table>
+          <p class="text-end"><strong>Ngày in:</strong> ${today}</p>
+          <div class="notes">
+            <p><strong>Ghi chú:</strong></p>
+            <ul>
+              ${notes.map(note => `<li>${note}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="row text-center mt-5">
+            <div class="col-4">
+              <strong>Người lập phiếu</strong><br><br><br><br>
+                (Ký, ghi rõ họ tên)
+          </div>
+          <div class="col-4">
+              <strong>Người giao hàng</strong><br><br><br><br>
+                 (Ký, ghi rõ họ tên)
+           </div>
+          <div class="col-4">
+              <strong>Người nhận hàng</strong><br><br><br><br>
+                (Ký, ghi rõ họ tên)
+          </div>
+        </div>
+      </div>
+      `);
+
+      setTimeout(() => window.print(), 500);
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.origin !== window.location.origin) return;
+
+      const order = event.data;
+      if (!order || !order.orderCode) return;
+
+      renderInvoice(order);
+    });
+  </script>
+</body>
+
+</html>

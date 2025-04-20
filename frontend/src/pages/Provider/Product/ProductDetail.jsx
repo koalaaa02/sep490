@@ -24,6 +24,48 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     bulky: false,
   };
 
+  const deleteProduct = async (productId) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa sản phẩm này không?")) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/products/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.ok) {
+        alert("Xóa sản phẩm thành công!");
+        setSelectedProductId(null);
+      } else {
+        alert("Xóa sản phẩm thất bại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
+
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -153,7 +195,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           body: JSON.stringify({
             id: sku.id,
             skuCode: sku.skuCode,
-            stock: sku.stock,
+            stock: 999,
             costPrice: sku.costPrice || 0,
             listPrice: sku.listPrice || 0,
             sellingPrice: sku.sellingPrice,
@@ -430,7 +472,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 "TON",
               ].map((unit) => (
                 <option key={unit} value={unit}>
-                  {unit}
+                  {convertUnitToVietnamese(unit)}
                 </option>
               ))}
             </select>
@@ -445,7 +487,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 <th>ID</th>
                 <th>Ảnh</th>
                 <th>Mã SKU</th>
-                <th>Số lượng tồn kho</th>
+                {/* <th>Số lượng tồn kho</th> */}
                 <th>Giá bán (VNĐ)</th>
                 <th>Giá sỉ (VNĐ)</th>
               </tr>
@@ -524,7 +566,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                       }
                     />
                   </td>
-                  <td>
+                  {/* <td>
                     <input
                       type="number"
                       className="form-control"
@@ -533,7 +575,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                         handleSkuChange(index, "stock", e.target.value)
                       }
                     />
-                  </td>
+                  </td> */}
                   <td>
                     <input
                       type="number"
@@ -719,12 +761,20 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
         {/* Nút Chỉnh sửa, Lưu, Hủy */}
         {!isEditing ? (
-          <button
-            className="btn btn-primary"
-            onClick={() => setIsEditing(true)}
-          >
-            Chỉnh sửa
-          </button>
+          <>
+            <button
+              className="btn btn-primary"
+              onClick={() => setIsEditing(true)}
+            >
+              Chỉnh sửa
+            </button>
+            <button
+              className="btn btn-danger ms-2"
+              onClick={() => deleteProduct(product.id)}
+            >
+              Ẩn Sản Phẩm
+            </button>
+          </>
         ) : (
           <>
             <button className="btn btn-success me-2" onClick={handleSave}>

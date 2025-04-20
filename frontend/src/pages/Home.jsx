@@ -3,18 +3,7 @@ import slider2 from "../images/banner_2.jpg";
 import adbanner1 from "../images/adbanner1.jpg";
 import adbanner2 from "../images/adbanner2.jpg";
 import adbanner3 from "../images/adbanner3.jpg";
-import cement from "../images/cement.jpg";
-import bricks from "../images/bricks.jpg";
-import sand from "../images/sand.jpg";
-import steel from "../images/steel.jpg";
-import tiles from "../images/tiles.png";
-import wood from "../images/wood.jpg";
-import glass from "../images/glass.jpg";
-import paint from "../images/paint.jpg";
-import plumbing from "../images/plumbing.jpg";
-import electrical from "../images/electrical.jpg";
-import roofing from "../images/roofing.jpg";
-import insulation from "../images/insulation.jpg";
+import dfCate from "../images/defaultCategory.png";
 import clock from "../images/clock.svg";
 import gift from "../images/gift.svg";
 import package1 from "../images/package.svg";
@@ -25,8 +14,14 @@ import ProductItem from "../ProductList/ProductItem";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { useEffect } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
+import { BASE_URL } from "../Utils/config";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/grid";
+import { Grid } from "swiper/modules";
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [materials, setMaterial] = useState([]);
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -50,21 +45,52 @@ const Home = () => {
     };
   }, []);
 
-  const materials = [
-    { src: cement, alt: "cement", label: "Xi măng" },
-    { src: bricks, alt: "bricks", label: "Gạch" },
-    { src: sand, alt: "sand", label: "Cát" },
-    { src: steel, alt: "steel", label: "Thép" },
-    { src: tiles, alt: "tiles", label: "Gạch lát" },
-    { src: wood, alt: "wood", label: "Gỗ" },
-    { src: glass, alt: "glass", label: "Kính" },
-    { src: paint, alt: "paint", label: "Sơn" },
-    { src: plumbing, alt: "plumbing", label: "Ống nước" },
-    { src: electrical, alt: "electrical", label: "Điện" },
-    { src: roofing, alt: "roofing", label: "Mái" },
-    { src: insulation, alt: "insulation", label: "Cách nhiệt" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: "1",
+          size: "200",
+          sortBy: "id",
+          direction: "ASC",
+        });
+        const response = await fetch(
+          `${BASE_URL}/api/public/categories?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              // Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
+        const result = await response.json();
+        setMaterial(
+          result.map((c) => ({
+            name: c.name,
+            id: c.id,
+            src: c.images,
+            alt: c?.name,
+          }))
+        );
+        // setMaterial([
+        //   ...materials,
+        //   ...result.map((c) => ({
+        //     name: c.name,
+        //     id: c.id,
+        //     src: c.images,
+        //     alt: c?.name,
+        //   })),
+        // ]);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -327,37 +353,52 @@ const Home = () => {
                           </h3>
                           <div className="wt-separator bg-primarys"></div>
                           <div className="wt-separator2 bg-primarys"></div>
-                          {/* <p>Connecting with entrepreneurs online, is just a few clicks away.</p> */}
                         </div>
                       </div>
                     </div>
                     <div className="row">
-                      {materials.map((material, index) => (
-                        <div
-                          key={index}
-                          className="col-lg-2 col-md-4 col-6 fade-zoom"
-                        >
-                          <Zoom>
-                            <div className="text-center mb-10">
-                              <Link to="#">
-                                <img
-                                  src={material.src}
-                                  alt={material.alt}
-                                  className="card-image rounded-circle"
-                                  style={{ height: "200px", width: "200px" }}
-                                />
-                              </Link>
-                              <div className="mt-4">
-                                <h5 className="fs-6 mb-0">
-                                  <Link to="#" className="text-inherit">
-                                    {material.label}
+                      <Swiper
+                        slidesPerView={6} // Number of items visible at once
+                        grid={{
+                          rows: 2, // Display items in 2 rows
+                          fill: "row",
+                        }}
+                        spaceBetween={20}
+                        pagination={{
+                          clickable: true,
+                        }}
+                        modules={[Grid]}
+                        className="mySwiper"
+                      >
+                        {materials.map((material, index) => (
+                          <SwiperSlide key={index}>
+                            <div className="fade-zoom">
+                              <Zoom>
+                                <div className="text-center mb-10">
+                                  <Link to={`/Shop/${material.id}`}>
+                                    <img
+                                      src={material.src ? material.src : dfCate}
+                                      alt={material.alt}
+                                      className="card-image rounded-circle"
+                                      style={{
+                                        height: "150px",
+                                        width: "150px",
+                                      }}
+                                    />
                                   </Link>
-                                </h5>
-                              </div>
+                                  <div className="mt-4">
+                                    <h5 className="fs-6 mb-0">
+                                      <Link to="#" className="text-inherit">
+                                        {material.name}
+                                      </Link>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </Zoom>
                             </div>
-                          </Zoom>
-                        </div>
-                      ))}
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
                     </div>
                   </div>
                 </div>

@@ -4,11 +4,11 @@ import image1 from "../../images/paint.jpg";
 import { BASE_URL } from "../../Utils/config";
 import Swal from "sweetalert2";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import ChatBox from "../Shop/ChatBox";
 import { Carousel } from "react-bootstrap";
 
 const ShopProductDetail = ({ id, onBack }) => {
   const [product, setProduct] = useState(null);
+  const [skus, setSkus] = useState([]);
   const [selectedSku, setSelectedSku] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const shopId = 1;
@@ -27,20 +27,42 @@ const ShopProductDetail = ({ id, onBack }) => {
         }
 
         const data = await response.json();
-        const validSkus = data.skus.filter((sku) => sku.delete === false);
-
-        if (validSkus.length === 0) {
-          throw new Error("Không có SKU hợp lệ.");
-        }
-
-        setProduct({ ...data, skus: validSkus });
-        setSelectedSku(validSkus[0]);
+        setProduct(data);
       } catch (error) {
         console.error("Error fetching product:", error);
       }
     };
     fetchProduct();
   }, [id]);
+
+  useEffect(() => {
+    if (!product) return;
+
+    const params = new URLSearchParams({
+      page: 1,
+      size: 10,
+      sortBy: "id",
+      direction: "ASC",
+      productId: product.id,
+    });
+
+    const fetchSKUs = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/public/productskus?${params.toString()}`
+        );
+        const data = await response.json();
+        setSkus(data.content);
+        if (data.content.length > 0) {
+          setSelectedSku(data.content[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching SKUs:", error);
+      }
+    };
+
+    fetchSKUs();
+  }, [product]);
 
   const handleQuantityChange = (type) => {
     setQuantity((prev) => {
@@ -53,10 +75,6 @@ const ShopProductDetail = ({ id, onBack }) => {
   const handleSkuChange = (sku) => {
     setSelectedSku(sku);
   };
-
-  if (!product) {
-    return <p>Loading...</p>;
-  }
 
   const handleAddCart = async () => {
     if (!selectedSku?.id || quantity <= 0) {
@@ -98,6 +116,10 @@ const ShopProductDetail = ({ id, onBack }) => {
     }
   };
 
+  if (!product) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="container shadow-sm border rounded p-3">
       <div className="d-flex align-items-center mb-3">
@@ -118,7 +140,7 @@ const ShopProductDetail = ({ id, onBack }) => {
           <Carousel indicators={false} interval={null} className="mt-3">
             <Carousel.Item>
               <div className="d-flex gap-2 justify-content-center">
-                {product.skus.map((sku) => (
+                {skus?.map((sku) => (
                   <img
                     key={sku.id}
                     src={sku.images || image1}
@@ -154,7 +176,7 @@ const ShopProductDetail = ({ id, onBack }) => {
           <p className="text-muted mt-10">Màu sắc: {selectedSku?.skuCode}</p>
           <h6 className="text-muted mb-10">
             Vận chuyển:{" "}
-            {!product.skus.bulky ? <>Liên hệ người bán</> : <>12.800 đ</>}{" "}
+            {!selectedSku?.bulky ? <>Liên hệ người bán</> : <>12.800 đ</>}{" "}
           </h6>
           <div className="d-flex align-items-center mb-3">
             <span className="text-muted mr-3">Số lượng: </span>
@@ -175,7 +197,7 @@ const ShopProductDetail = ({ id, onBack }) => {
 
           <button
             className="btn btn-warning w-100 text-white fw-bold"
-            onClick={() => handleAddCart()}
+            onClick={handleAddCart}
           >
             <FaShoppingCart className="me-2" /> Thêm vào giỏ hàng
           </button>
@@ -192,11 +214,6 @@ const ShopProductDetail = ({ id, onBack }) => {
             <h6 className="m-0">Người bán: {product.supplier.name}</h6>
           </div>
         </div>
-        {/* <div className="mt-3 d-flex gap-2">
-          <button className="btn btn-warning">
-            <FaEye className="me-1" /> Xem Shop
-          </button>
-        </div> */}
         <hr />
         <div className="d-flex justify-content-between flex-wrap">
           <div>
@@ -211,16 +228,7 @@ const ShopProductDetail = ({ id, onBack }) => {
             <p className="m-0">Địa chỉ</p>
             <strong>{product.supplier.address}</strong>
           </div>
-          <div>
-            <p className="m-0"></p>
-            <strong></strong>
-          </div>
-          <div>
-            <p className="m-0"></p>
-            <strong></strong>
-          </div>
         </div>
-        <ChatBox />
       </div>
       <div className="mt-1 mb-10 p-3 shadow-sm border rounded">
         <h4 className="m-0 fw-bold">Mô tả sản phẩm</h4>

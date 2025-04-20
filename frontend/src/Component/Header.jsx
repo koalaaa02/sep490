@@ -16,9 +16,12 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const name = useSelector((state) => state.auth.user?.firstName);
+  const name = useSelector((state) => state.auth.user?.lastthonngName);
   const token = useSelector((state) => state.auth.token);
-  const role = useSelector((state) => state.auth.user?.roles);
+  const role = useSelector((state) => state.auth.user?.roles || []);
+  const normalizedRoles = typeof role === "string" ? role.split(",") : [];
+
+  const isProvider = normalizedRoles.includes("ROLE_PROVIDER");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,38 +29,8 @@ const Header = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
+    window.location.reload();
   };
-
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const params = new URLSearchParams({
-          page: 1,
-          size: 10,
-          sortBy: "id",
-          direction: "ASC",
-        });
-
-        const response = await fetch(
-          `${BASE_URL}/api/public/categories?${params.toString()}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,19 +100,7 @@ const Header = () => {
   return (
     <div>
       <>
-        <div className="container  displaydesign">
-          <div className="row g-4">
-            <div className="col-8 col-sm-4 col-lg-9 py-2">
-              <input
-                className="form-control "
-                style={{ width: "100%" }}
-                list="datalistOptions"
-                id="exampleDataList"
-                placeholder="Tìm kiếm..."
-              />
-            </div>
-          </div>
-        </div>
+        <div className="container  displaydesign"></div>
       </>
       <nav className="navbar navbar-expand-lg navbar-light sticky-top">
         <div className="container">
@@ -150,14 +111,6 @@ const Header = () => {
               alt="eCommerce HTML Template"
             />
           </Link>
-          <input
-            className="form-control responsivesearch "
-            list="datalistOptions"
-            id="exampleDataList"
-            placeholder="Tìm kiếm..."
-            fdprocessedid="9icrif"
-            style={{ width: "35%" }}
-          />
 
           <button
             className="navbar-toggler"
@@ -185,39 +138,6 @@ const Header = () => {
                 <Link className="nav-link" to="/">
                   Trang chủ
                 </Link>
-              </li>
-              <li className="nav-item">
-                <li className="nav-item dmenu dropdown">
-                  <Link
-                    className="nav-link dropdown-toggle"
-                    to=""
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    Tất cả danh mục
-                  </Link>
-                  <div
-                    className="dropdown-menu sm-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((material, index) => (
-                        <Link
-                          key={index}
-                          className="dropdown-item"
-                          to={`/Shop/${material.id}`}
-                        >
-                          {material.name}
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="dropdown-item">Đang tải...</p>
-                    )}
-                  </div>
-                </li>
               </li>
 
               <li className="nav-item dmenu dropdown">
@@ -256,20 +176,20 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Cửa hàng
+                  Nhà cung cấp
                 </Link>
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
                   <Link className="dropdown-item" to="/StoreList">
-                    Danh sách cửa hàng
+                    Danh sách nhà cung cấp
                   </Link>
                 </div>
               </li>
 
               <li className="nav-item dmenu dropdown">
-                <Link
+                {/* <Link
                   className="nav-link dropdown-toggle"
                   to="#"
                   id="navbarDropdown"
@@ -279,7 +199,7 @@ const Header = () => {
                   aria-expanded="false"
                 >
                   Thông tin
-                </Link>
+                </Link> */}
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
@@ -338,12 +258,6 @@ const Header = () => {
                           </Link>
                           <Link
                             className="dropdown-item"
-                            to="/MyAcconutPaymentMethod"
-                          >
-                            Phương thức thanh toán
-                          </Link>
-                          <Link
-                            className="dropdown-item"
                             to="/MyAcconutInvoice"
                           >
                             Hóa đơn của tôi
@@ -378,8 +292,16 @@ const Header = () => {
                   </div>
                 </div>
               </li>
+              {token && (
+                <li className="nav-item">
+                  <Link className="nav-link text-danger" to="/MyAcconutPaymentMethod">
+                    Đăng ký bán hàng
+                  </Link>
+                </li>
+              )}
+
               <li className="nav-item dmenu dropdown ml-3">
-                <Link
+                {/* <Link
                   className="text-muted position-relative"
                   data-bs-toggle="offcanvas"
                   data-bs-target="#offcanvasRight"
@@ -408,8 +330,8 @@ const Header = () => {
                       0
                     )}
                   </span>
-                </Link>
-                {role === "ROLE_PROVIDER" && (
+                </Link> */}
+                {isProvider && (
                   <Link
                     className="text-muted position-relative"
                     to="/ProviderDashBoard"
