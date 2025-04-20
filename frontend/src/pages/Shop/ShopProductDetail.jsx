@@ -11,7 +11,6 @@ const ShopProductDetail = ({ id, onBack }) => {
   const [skus, setSkus] = useState([]);
   const [selectedSku, setSelectedSku] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const shopId = 1;
 
   const convertUnitToVietnamese = (unit) => {
     const unitMap = {
@@ -104,7 +103,7 @@ const ShopProductDetail = ({ id, onBack }) => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/cart/add?shopId=${shopId}&productSKUId=${selectedSku.id}&quantity=${quantity}`,
+        `${BASE_URL}/api/cart/add?shopId=${selectedSku.product.shop.id}&productSKUId=${selectedSku.id}&quantity=${quantity}`,
         {
           method: "POST",
           credentials: "include",
