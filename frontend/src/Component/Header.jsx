@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
 import img from "../images/glass.jpg";
 import { FaStore } from "react-icons/fa";
+import { setShopId } from "../Redux/shop.js";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,6 +52,34 @@ const Header = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchMyShop = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy thông tin shop");
+        }
+
+        const data = await response.json();
+        dispatch(setShopId(data.id));
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin shop:", error);
+      }
+    };
+
+    if (isProvider && token) {
+      fetchMyShop();
+    }
+  }, [isProvider, token, dispatch]);
 
   const removeFromCart = async (shopId, productSKUId) => {
     try {
@@ -294,7 +323,10 @@ const Header = () => {
               </li>
               {token && (
                 <li className="nav-item">
-                  <Link className="nav-link text-danger" to="/MyAcconutPaymentMethod">
+                  <Link
+                    className="nav-link text-danger"
+                    to="/MyAcconutPaymentMethod"
+                  >
                     Đăng ký bán hàng
                   </Link>
                 </li>

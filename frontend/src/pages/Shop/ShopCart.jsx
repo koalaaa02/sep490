@@ -35,6 +35,22 @@ const ShopCart = () => {
     fetchData();
   }, []);
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   const removeFromCart = async (shopId, productSKUId) => {
     try {
       const response = await fetch(
@@ -73,7 +89,8 @@ const ShopCart = () => {
           shop.items.reduce((shopTotal, item) => {
             if (selectedItems[item.productSKUId]) {
               return (
-                shopTotal + item.quantity * item.productSKUResponse.sellingPrice
+                shopTotal +
+                item.quantity * item.productSKUResponse?.sellingPrice
               );
             }
             return shopTotal;
@@ -181,9 +198,10 @@ const ShopCart = () => {
                   <div className="card p-3 mb-2 d-flex flex-row align-items-center">
                     <h5 className="mb-0 col-4 text-center">Sản Phẩm</h5>
                     <h5 className="mb-0 col-2 text-center">Đơn giá</h5>
+                    <h5 className="mb-0 col-1 text-center">Đơn vị</h5>
                     <h5 className="mb-0 col-2 text-center">Số lượng</h5>
                     <h5 className="mb-0 col-2 text-center">Số tiền</h5>
-                    <h5 className="mb-0 col-2 text-center">Thao tác</h5>
+                    <h5 className="mb-0 col-1 text-center">Thao tác</h5>
                   </div>
 
                   {/* Danh sách sản phẩm */}
@@ -247,6 +265,12 @@ const ShopCart = () => {
                               <div className="col-2">
                                 <h6>{item.productName}</h6>
                                 <p className="text-muted">
+                                  {
+                                    item.productSKUResponse?.product
+                                      ?.unitAdvance
+                                  }
+                                </p>
+                                <p className="text-muted">
                                   Mã SKU: {item.productSKUCode}
                                 </p>
                               </div>
@@ -254,10 +278,19 @@ const ShopCart = () => {
                               {/* Đơn giá */}
                               <div className="col-2 text-center">
                                 <strong className="text-muted">
-                                  {item.productSKUResponse.sellingPrice.toLocaleString(
+                                  {item.productSKUResponse?.sellingPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   đ
+                                </strong>
+                              </div>
+                              
+                              {/* Đơn vị */}
+                              <div className="col-1 text-center">
+                                <strong className="text-muted">
+                                  {convertUnitToVietnamese(
+                                    item.productSKUResponse?.product?.unit
+                                  )}
                                 </strong>
                               </div>
 
@@ -292,11 +325,11 @@ const ShopCart = () => {
                               </div>
 
                               {/* Số tiền */}
-                              <div className="col-3 text-center">
+                              <div className="col-2 text-center">
                                 <strong className="text-danger">
                                   {(
                                     item.quantity *
-                                    item.productSKUResponse.sellingPrice
+                                    item.productSKUResponse?.sellingPrice
                                   ).toLocaleString("vi-VN")}
                                   đ
                                 </strong>

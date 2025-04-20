@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaStore } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
 import { Row, Col, Form } from "react-bootstrap";
@@ -53,6 +53,9 @@ const ProductList = ({ setSelectedProductId }) => {
   };
 
   const fetchProducts = async (search) => {
+    if (!data?.id) {
+      return;
+    }
     try {
       const params = new URLSearchParams({
         page: page,

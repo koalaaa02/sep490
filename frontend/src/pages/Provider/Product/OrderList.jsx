@@ -150,7 +150,7 @@ const OrderList = () => {
             </div>
 
             {/* Payment Method Dropdown */}
-            <div className="me-3">
+            {/* <div className="me-3">
               <label>Phương thức thanh toán: </label>
               <select
                 className="form-select"
@@ -158,10 +158,10 @@ const OrderList = () => {
                 onChange={(e) => setFilterPaymentMethod(e.target.value)}
               >
                 <option value="">Tất cả</option>
-                <option value="COD">Thanh toán khi nhận hàng</option>
+                <option value="COD">Thanh toán khi đã nhận hàng</option>
                 <option value="DEBT">Trả góp</option>
               </select>
-            </div>
+            </div> */}
 
             <div className="me-3">
               <label>Sắp xếp theo: </label>
@@ -229,8 +229,8 @@ const OrderList = () => {
                       <td>{order.address.phone}</td>
                       <td>
                         {order.paymentMethod === "COD"
-                          ? "Thanh toán khi nhận hàng"
-                          : "Trả góp"}
+                          ? "Thanh toán khi đã nhận hàng"
+                          : "Thanh toán khi đã nhận hàng"}
                       </td>
                       <td>
                         <Badge bg={statusColors[order.status] || "secondary"}>

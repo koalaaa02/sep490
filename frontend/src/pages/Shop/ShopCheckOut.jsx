@@ -279,7 +279,10 @@ const ShopCheckOut = () => {
                       </div>
                     ))}
                   </div>
+                </div>
 
+                {/* Cột bên phải */}
+                <div className="col-md-4">
                   {/* Phương thức thanh toán */}
                   <div className="card mb-3">
                     <div className="card-header bg-warning fw-bold text-black">
@@ -339,26 +342,6 @@ const ShopCheckOut = () => {
 
                       {/* Hiển thị PaymentMethod nếu chọn VNPay */}
                       {selectedPayment === "VNPAY" && <PaymentMethod />}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Cột bên phải */}
-                <div className="col-md-4">
-                  {/* Phương thức thanh toán */}
-                  <div className="card mb-3">
-                    <div className="card-header bg-warning fw-bold text-black">
-                      Phương thức vận chuyển
-                    </div>
-                    <div className="card-body">
-                      <div className="d-flex align-items-center">
-                        <p className="mb-0 me-2">
-                          <strong>
-                            Tiền vận chuyển:{" "}
-                            {hasBulkyItem ? "Liên hệ người bán" : "0đ"}
-                          </strong>
-                        </p>
-                      </div>
                     </div>
                   </div>
                   <div className="card mb-10">
