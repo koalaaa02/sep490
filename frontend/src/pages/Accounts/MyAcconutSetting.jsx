@@ -258,7 +258,8 @@ const MyAcconutSetting = () => {
 
                         <div className="mb-3">
                           <label className="form-label">Số CCCD</label>
-                          {!cccdVerified ? (
+                          {!cccdVerified &&
+                          editableUser.citizenIdentificationCard !== "" ? (
                             <div style={{ position: "relative" }}>
                               <input
                                 type="password"
@@ -306,41 +307,45 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt trước CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageUp && (
-                              <div
-                                style={{
-                                  position: "relative",
-                                  width: "fit-content",
-                                }}
-                              >
-                                <img
-                                  src={
-                                    editableUser.citizenIdentificationCardImageUp
-                                  }
-                                  alt="Mặt trước CCCD"
+                            {editableUser.citizenIdentificationCardImageUp &&
+                              editableUser.citizenIdentificationCardImageUp !==
+                                "" && (
+                                <div
                                   style={{
-                                    width: "100px",
-                                    marginTop: "10px",
-                                    filter: cccdVerified ? "none" : "blur(8px)",
+                                    position: "relative",
+                                    width: "fit-content",
                                   }}
-                                />
-                                {!cccdVerified && (
-                                  <i
-                                    className="fa fa-eye position-absolute"
+                                >
+                                  <img
+                                    src={
+                                      editableUser.citizenIdentificationCardImageUp
+                                    }
+                                    alt="Mặt trước CCCD"
                                     style={{
-                                      top: "10px",
-                                      left: "10px",
-                                      cursor: "pointer",
-                                      color: "white",
-                                      background: "rgba(0,0,0,0.5)",
-                                      padding: "5px",
-                                      borderRadius: "50%",
+                                      width: "100px",
+                                      marginTop: "10px",
+                                      filter: cccdVerified
+                                        ? "none"
+                                        : "blur(8px)",
                                     }}
-                                    onClick={() => setShowCccdModal(true)}
                                   />
-                                )}
-                              </div>
-                            )}
+                                  {!cccdVerified && (
+                                    <i
+                                      className="fa fa-eye position-absolute"
+                                      style={{
+                                        top: "10px",
+                                        left: "10px",
+                                        cursor: "pointer",
+                                        color: "white",
+                                        background: "rgba(0,0,0,0.5)",
+                                        padding: "5px",
+                                        borderRadius: "50%",
+                                      }}
+                                      onClick={() => setShowCccdModal(true)}
+                                    />
+                                  )}
+                                </div>
+                              )}
                             {isEditing && (
                               <input
                                 type="file"
@@ -357,41 +362,45 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt sau CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageDown && (
-                              <div
-                                style={{
-                                  position: "relative",
-                                  width: "fit-content",
-                                }}
-                              >
-                                <img
-                                  src={
-                                    editableUser.citizenIdentificationCardImageDown
-                                  }
-                                  alt="Mặt sau CCCD"
+                            {editableUser.citizenIdentificationCardImageDown &&
+                              editableUser.citizenIdentificationCardImageDown !==
+                                "" && (
+                                <div
                                   style={{
-                                    width: "100px",
-                                    marginTop: "10px",
-                                    filter: cccdVerified ? "none" : "blur(8px)",
+                                    position: "relative",
+                                    width: "fit-content",
                                   }}
-                                />
-                                {!cccdVerified && (
-                                  <i
-                                    className="fa fa-eye position-absolute"
+                                >
+                                  <img
+                                    src={
+                                      editableUser.citizenIdentificationCardImageDown
+                                    }
+                                    alt="Mặt sau CCCD"
                                     style={{
-                                      top: "10px",
-                                      left: "10px",
-                                      cursor: "pointer",
-                                      color: "white",
-                                      background: "rgba(0,0,0,0.5)",
-                                      padding: "5px",
-                                      borderRadius: "50%",
+                                      width: "100px",
+                                      marginTop: "10px",
+                                      filter: cccdVerified
+                                        ? "none"
+                                        : "blur(8px)",
                                     }}
-                                    onClick={() => setShowCccdModal(true)}
                                   />
-                                )}
-                              </div>
-                            )}
+                                  {!cccdVerified && (
+                                    <i
+                                      className="fa fa-eye position-absolute"
+                                      style={{
+                                        top: "10px",
+                                        left: "10px",
+                                        cursor: "pointer",
+                                        color: "white",
+                                        background: "rgba(0,0,0,0.5)",
+                                        padding: "5px",
+                                        borderRadius: "50%",
+                                      }}
+                                      onClick={() => setShowCccdModal(true)}
+                                    />
+                                  )}
+                                </div>
+                              )}
                             {isEditing && (
                               <input
                                 type="file"

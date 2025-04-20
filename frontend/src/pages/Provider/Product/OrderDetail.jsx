@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { Modal, Button, Form, Card } from "react-bootstrap";
 import AddInvoice from "../Invoice/AddInvoice";
+import AddPayment from "../Invoice/AddPayment";
 
 const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(order?.id || null);
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [paymentAmount, setPaymentAmount] = useState(0);
+  const [paymentAmount, setPaymentAmount] = useState("");
   const [showInvoiceForm, setShowInvoiceForm] = useState(false);
+  const [showAddPayment, setShowAddPayment] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [data, setData] = useState(order);
   const token = localStorage.getItem("access_token");
@@ -30,7 +32,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     FINDINGTRUCK: "Đang tìm xe",
     ACCEPTED: "Chấp nhận",
     PACKAGING: "Đóng gói",
-    DELIVERING: "Chưa giao",
+    DELIVERING: "Giao hàng",
     DELIVERED: "Đã giao",
   };
 
@@ -49,6 +51,16 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     } else {
       setShowPopup(true);
     }
+  };
+
+  const [selectedNote, setSelectedNote] = useState(null);
+  const [showNotePopup, setShowNotePopup] = useState(false);
+  const [noteDetails, setNoteDetails] = useState(null);
+  const [loadingNote, setLoadingNote] = useState(false);
+
+  const handleViewDeliveryNote = (note) => {
+    setSelectedNote(note);
+    setShowNotePopup(true);
   };
 
   const confirmStatusChange = async () => {
@@ -120,6 +132,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           status: "DELIVERED",
         }));
         alert("Đơn nợ đã được tạo thành công!");
+        refreshOrderDetails();
         setShowPaymentPopup(false);
       } else {
         alert("Có lỗi khi tạo đơn nợ. Vui lòng thử lại!");
@@ -131,12 +144,100 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   };
 
   const toggleInvoiceForm = () => setShowInvoiceForm(true);
-  const closeAddInvoice = () => setShowInvoiceForm(false);
+  const closeAddInvoice = () =>  onBack();
+
+  const togglePaymetForm = () => setShowAddPayment(true);
+  const closeAddPayment = () => onBack();
+
+  useEffect(() => {
+    const fetchNoteDetails = async () => {
+      if (showNotePopup && selectedNote) {
+        setLoadingNote(true);
+        try {
+          const response = await fetch(
+            `${BASE_URL}/api/provider/deliverynotes/${selectedNote.id}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const result = await response.json();
+          setNoteDetails(result);
+        } catch (error) {
+          console.error("Lỗi khi lấy chi tiết phiếu giao:", error);
+        } finally {
+          setLoadingNote(false);
+        }
+      }
+    };
+
+    fetchNoteDetails();
+  }, [showNotePopup, selectedNote]);
+
+  const refreshOrderDetails = async () => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 10000,
+          sortBy: "id",
+          paymentMethod: "",
+          direction: "DESC",
+        });
+
+        const response = await fetch(
+          `${BASE_URL}/api/provider/orders/?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+    fetchData();
+  };
+
+  const totalDeliveredQuantity = data.deliveryNotes?.reduce((sum, note) => {
+    return (
+      sum +
+      note.deliveryDetails?.reduce((subSum, item) => subSum + item.quantity, 0)
+    );
+  }, 0);
+
+  const totalOrderQuantity = data.orderDetails?.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
 
   return (
     <>
       {showInvoiceForm ? (
-        <AddInvoice closeAddInvoice={closeAddInvoice} orderData={data} />
+        <AddInvoice
+          closeAddInvoice={closeAddInvoice}
+          orderData={data}
+          onInvoiceCreated={async () => {
+            await refreshOrderDetails();
+          }}
+        />
+      ) : showAddPayment ? (
+        <AddPayment
+          closeAddPayment={closeAddPayment}
+          orderData={data}
+          onPaymentCreated={async () => {
+            await refreshOrderDetails();
+          }}
+        />
       ) : (
         <div className="p-3 mb-10" style={{ height: "100%" }}>
           <div className="d-flex align-items-center mb-2">
@@ -145,70 +246,11 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             </button>
             <h4>Chi tiết đơn hàng:</h4>
           </div>
-          <div className="mt-2">
-            <Card>
-              <Card.Header>Thông tin nhà cung cấp</Card.Header>
-              <Card.Body>
-                <div className="row">
-                  <div className="row">
-                    <div className="col-12 d-flex align-items-center mb-2">
-                      <strong className="me-2">Tên nhà cung cấp:</strong>
-                      <span className="text-muted">{data.shop.name}</span>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-12 d-flex align-items-center mb-2">
-                      <strong className="me-2">Mã số thuế:</strong>
-                      <span className="text-muted">{data.shop.tin}</span>
-                    </div>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
 
-            <Card className="mt-2">
-              <Card.Header>Danh sách sản phẩm</Card.Header>
-              <Card.Body>
-                <table className="table table-bordered table-striped mt-3">
-                  <thead>
-                    <tr>
-                      <th>Ảnh sản phẩm</th>
-                      <th>Tên sản phẩm</th>
-                      <th>Số lượng</th>
-                      <th>Giá</th>
-                      <th>Tổng tiền</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.orderDetails.map((detail, idx) => (
-                      <tr key={idx}>
-                        <td>
-                          <img
-                            src={detail.productSku.images}
-                            alt=""
-                            style={{ height: "50px", width: "50px" }}
-                          />
-                        </td>
-                        <td>{detail.productSku.skuCode}</td>
-                        <td>{detail.quantity}</td>
-                        <td>
-                          {detail.productSku.sellingPrice.toLocaleString()} VND
-                        </td>
-                        <td>
-                          {(
-                            detail.quantity * detail.productSku.sellingPrice
-                          ).toLocaleString()}{" "}
-                          VND
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Card.Body>
-            </Card>
-          </div>
           <Card className="mt-4">
-            <Card.Header>Thông tin đơn hàng</Card.Header>
+            <Card.Header>
+              <strong>Thông tin đơn hàng</strong>
+            </Card.Header>
             <Card.Body>
               <div className="row">
                 {/* Cột trái */}
@@ -218,46 +260,24 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                     <span className="text-muted">{data.orderCode}</span>
                   </div>
                   <div className="mb-2 d-flex align-items-center">
-                    <strong className="me-2">Ngày tạo:</strong>
-                    <span className="text-muted">
-                      {new Date(data.createdAt).toLocaleString("vi-VN")}
-                    </span>
+                    <strong className="me-2">Người nhận:</strong>
+                    <strong className="text-danger">
+                      {data.address?.recipientName}
+                    </strong>
                   </div>
                 </div>
 
                 {/* Cột giữa */}
                 <div className="col-md-4 mb-2">
                   <div className="mb-2 d-flex align-items-center">
-                    <strong className="me-2">Người nhận:</strong>
+                    <strong className="me-2">Ngày tạo:</strong>
                     <span className="text-muted">
-                      {data.address?.recipientName}
+                      {new Date(data.createdAt).toLocaleString("vi-VN")}
                     </span>
                   </div>
                   <div className="mb-2 d-flex align-items-center">
-                    <strong className="me-2">Số điện thoại:</strong>
+                    <strong className="me-2">Số điện thoại người nhận:</strong>
                     <span className="text-muted">{data.address?.phone}</span>
-                  </div>
-                </div>
-
-                {/* Cột phải */}
-                <div className="col-md-4 mb-2">
-                  <div className="mb-2 d-flex align-items-center">
-                    <strong className="me-2">Ngày giao:</strong>
-                    <span className="text-muted">
-                      {data?.deliveryNotes &&
-                      data.deliveryNotes.length > 0 &&
-                      data.deliveryNotes[0].deliveredDate
-                        ? new Date(
-                            data.deliveryNotes[0].deliveredDate
-                          ).toLocaleDateString("vi-VN")
-                        : ""}
-                    </span>
-                  </div>
-                  <div className="mb-2 d-flex align-items-center">
-                    <strong className="me-2">Phí giao hàng:</strong>
-                    <span className="text-muted">
-                      {`${data.shippingFee.toLocaleString()} VND`}
-                    </span>
                   </div>
                 </div>
               </div>
@@ -265,19 +285,9 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
               {/* Địa chỉ giao */}
               <div className="row">
                 <div className="col-12 d-flex align-items-center mb-2">
-                  <strong className="me-2">Địa chỉ giao:</strong>
+                  <strong className="me-2">Địa chỉ nhận hàng tại kho:</strong>
                   <span className="text-muted">
                     {`${data.address?.address}, ${data.address?.ward}, ${data.address?.province}`}
-                  </span>
-                </div>
-              </div>
-
-              {/* Tổng tiền */}
-              <div className="row">
-                <div className="col-md-12 d-flex align-items-center mb-2">
-                  <strong className="me-2">Tổng tiền:</strong>
-                  <span className="text-muted">
-                    {`${data.totalAmount.toLocaleString()} VND`}
                   </span>
                 </div>
               </div>
@@ -286,65 +296,276 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
               <div className="row">
                 <div className="col-12 d-flex align-items-center mb-2">
                   <strong className="me-2">Phương thức:</strong>
-                  <span className="text-muted">
-                    {data.paymentMethod === "COD"
-                      ? "Thanh toán khi nhận hàng"
-                      : "Trả góp"}
+                  <span className="text-danger text-decoration-underline">
+                    {data.paymentMethod !== "COD"
+                      ? "Thanh toán khi đã nhận hàng"
+                      : "Thanh toán khi đã nhận hàng"}
                   </span>
                 </div>
               </div>
-
-              {/* Trạng thái và nút hành động */}
-              {!fromDeliveryList && data.status !== "DELIVERED" && (
-                <div className="row">
-                  <div className="col-12 d-flex align-items-center mb-2">
-                    <strong>Thay đổi trạng thái:</strong>
-                    <div className="d-flex flex-wrap m-2">
-                      {(() => {
-                        let filteredOptions = [];
-
-                        if (
-                          data.status === "PENDING" ||
-                          data.status === "FINDINGTRUCK"
-                        ) {
-                          filteredOptions = ["ACCEPTED", "CANCELLED"];
-                        } else if (data.status === "ACCEPTED") {
-                          filteredOptions = ["DELIVERING", "DELIVERED"];
-                        } else if (data.status === "DELIVERING") {
-                          filteredOptions = ["DELIVERED"];
-                        } else {
-                          filteredOptions = statusOptions;
-                        }
-
-                        return filteredOptions.map((status) => (
-                          <button
-                            key={status}
-                            className={`btn m-1 ${
-                              status === data.status
-                                ? "btn-secondary"
-                                : status === "CANCELLED" ||
-                                  status === "DELIVERED"
-                                ? "btn-danger"
-                                : "btn-success"
-                            }`}
-                            disabled={status === data.status}
-                            onClick={() => handleStatusChange(data.id, status)}
-                          >
-                            {statusTranslations[status]}
-                          </button>
-                        ));
-                      })()}
-                    </div>
-                  </div>
-                </div>
-              )}
-              {!fromDeliveryList && data.status === "DELIVERING" && (
-                <button className="btn btn-primary" onClick={toggleInvoiceForm}>
-                  In phiếu giao hàng
-                </button>
-              )}
             </Card.Body>
           </Card>
+
+          <Card className="mt-2">
+            <Card.Header>
+              <strong>Danh sách sản phẩm</strong>
+            </Card.Header>
+            <Card.Body>
+              <div className="row">
+                <div className="row">
+                  <div className="col-6 d-flex align-items-center mb-2">
+                    <strong className="me-2">Tên nhà cung cấp:</strong>
+                    <span className="text-muted">{data.shop?.name}</span>
+                  </div>
+                  <div className="col-6 d-flex align-items-center mb-2">
+                    <strong className="me-2">Mã số thuế:</strong>
+                    <span className="text-muted">{data.shop?.tin}</span>
+                  </div>
+                </div>
+              </div>
+              <table className="table table-bordered table-striped mt-3">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Ảnh sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    {/* <th>Đơn vị</th> */}
+                    <th>Số lượng</th>
+                    <th>Số tiền</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.orderDetails?.map((detail, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>
+                        <img
+                          src={detail.productSku.images}
+                          alt=""
+                          style={{ height: "50px", width: "50px" }}
+                        />
+                      </td>
+                      <td>{detail.productSku.skuCode}</td>
+                      <td>
+                        {detail.productSku.sellingPrice.toLocaleString()} VND
+                      </td>
+                      <td>{detail.quantity}</td>
+                      <td>
+                        {(
+                          detail.quantity * detail.productSku.sellingPrice
+                        ).toLocaleString()}{" "}
+                        VND
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div style={{ fontWeight: "bold", marginTop: "10px" }}>
+                Tổng tiền:{" "}
+                <strong className="text-danger">
+                  {data.orderDetails
+                    ?.reduce(
+                      (sum, detail) =>
+                        sum + detail.quantity * detail.productSku.sellingPrice,
+                      0
+                    )
+                    .toLocaleString()}{" "}
+                  VND
+                </strong>
+              </div>
+            </Card.Body>
+          </Card>
+
+          <Card className="mt-2">
+            <Card.Header className="d-flex justify-content-between align-items-center">
+              <strong>Lịch sử giao hàng </strong>
+
+              {!fromDeliveryList &&
+                data.status === "DELIVERING" &&
+                totalDeliveredQuantity < totalOrderQuantity && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={toggleInvoiceForm}
+                  >
+                    Thêm phiếu giao hàng
+                  </button>
+                )}
+            </Card.Header>
+            {!order.deliveryNotes || order.deliveryNotes.length === 0 ? (
+              <strong className="m-2 text-danger">
+                Chưa có lịch sử giao hàng
+              </strong>
+            ) : (
+              <Card.Body>
+                <table className="table table-bordered table-striped mt-3">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Mã giao hàng</th>
+                      <th>Ngày giao hàng</th>
+                      <th>Người nhận</th>
+                      <th>Địa chỉ kho giao hàng</th>
+                      <th>Số điện thoại người nhận</th>
+                      <th>Phương thức thanh toán</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.deliveryNotes?.map((detail, idx) => (
+                      <tr
+                        key={idx}
+                        style={{ cursor: "pointer" }}
+                        onClick={() => handleViewDeliveryNote(detail)}
+                      >
+                        <td>{idx + 1}</td>
+                        <td>{detail.deliveryCode}</td>
+                        <td>
+                          {
+                            new Date(detail.deliveredDate)
+                              .toISOString()
+                              .split("T")[0]
+                          }
+                        </td>
+                        <td>{data.address?.recipientName}</td>
+                        <td>
+                          {`${data.address?.address}, ${data.address?.ward}, ${data.address?.province}`}
+                        </td>
+                        <td>{data.address?.phone}</td>
+                        <td>
+                          {data.paymentMethod !== "COD"
+                            ? "Thanh toán khi nhận hết hàng"
+                            : "Thanh toán khi nhận hết hàng"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card.Body>
+            )}
+          </Card>
+
+          <Card className="mt-2">
+            <Card.Header className="d-flex justify-content-between align-items-center">
+              <strong>Lịch sử giao dịch</strong>
+              {!fromDeliveryList && data.status === "DELIVERED" && (
+                <button className="btn btn-primary" onClick={togglePaymetForm}>
+                  Thêm phiếu giao dịch
+                </button>
+              )}
+            </Card.Header>
+            {!order.invoice || order.invoice.length === 0 ? (
+              <strong className="m-2 text-danger">
+                Không có lịch sử giao dịch
+              </strong>
+            ) : (
+              <Card.Body>
+                <table className="table table-bordered table-striped mt-3">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Mã giao dịch</th>
+                      <th>Ngày giao dịch</th>
+                      <th>Người trả tiền</th>
+                      <th>Số điện thoại người trả</th>
+                      <th>Phương thức thanh toán</th>
+                      <th>Số tiền đã trả</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.orderDetails?.map((detail, idx) => (
+                      <tr key={idx}>
+                        <td>{idx + 1}</td>
+                        <td>{data?.invoice?.invoiceCode}</td>
+                        <td>
+                          {new Date(order?.invoice?.createdAt).toLocaleString(
+                            "vi-VN"
+                          )}
+                        </td>
+                        <td>{data.address?.recipientName}</td>
+                        <td>{data.address?.phone}</td>
+                        <td>
+                          {data.paymentMethod !== "COD"
+                            ? "Thanh toán khi nhận hết hàng"
+                            : "Trả góp"}
+                        </td>
+                        <td>
+                          {order?.invoice?.paidAmount.toLocaleString()} VND
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Card.Body>
+            )}
+          </Card>
+          <div
+            className="mt-5"
+            style={{ fontWeight: "bold", marginTop: "10px" }}
+          >
+            Tổng tiền toàn bộ đơn hàng:{" "}
+            <strong className="text-danger">
+              {data.orderDetails
+                ?.reduce(
+                  (sum, detail) =>
+                    sum + detail.quantity * detail.productSku.sellingPrice,
+                  0
+                )
+                .toLocaleString()}{" "}
+              VND
+            </strong>
+          </div>
+          {/* Trạng thái và nút hành động */}
+          {!fromDeliveryList && (
+            <div className="row mt-5">
+              <div className="col-12 align-items-center mb-2">
+                <strong>Trạng thái đơn hàng</strong>
+                <div className="d-flex flex-wrap m-2">
+                  {data.status === "DELIVERED" ? (
+                    <button className="btn btn-secondary m-1" disabled>
+                      {statusTranslations["DELIVERED"]}
+                    </button>
+                  ) : (
+                    (() => {
+                      let filteredOptions = [];
+
+                      if (
+                        data.status === "PENDING" ||
+                        data.status === "FINDINGTRUCK"
+                      ) {
+                        filteredOptions = ["ACCEPTED", "CANCELLED"];
+                      } else if (data.status === "ACCEPTED") {
+                        filteredOptions = ["DELIVERING", "DELIVERED"];
+                      } else if (data.status === "DELIVERING") {
+                        filteredOptions = ["DELIVERED"];
+                      } else if (data.status === "CANCELLED") {
+                        filteredOptions = ["CANCELLED"];
+                      } else {
+                        filteredOptions = statusOptions;
+                      }
+
+                      return filteredOptions?.map((status) => (
+                        <button
+                          key={status}
+                          className={`btn m-1 ${
+                            status === data.status
+                              ? "btn-secondary"
+                              : status === "CANCELLED" || status === "DELIVERED"
+                              ? "btn-danger"
+                              : "btn-success"
+                          }`}
+                          disabled={status === data.status}
+                          onClick={() => handleStatusChange(data.id, status)}
+                        >
+                          {statusTranslations[status]}
+                        </button>
+                      ));
+                    })()
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Popup xác nhận */}
           <Modal show={showPopup} onHide={() => setShowPopup(false)} centered>
@@ -444,6 +665,157 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                 }}
               >
                 Xác nhận
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Modal thanh toán */}
+          <Modal
+            show={showNotePopup}
+            onHide={() => setShowNotePopup(false)}
+            centered
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Chi tiết lịch sử giao hàng</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {selectedNote ? (
+                <>
+                  <Card className="mt-4">
+                    <Card.Header>
+                      <strong>Thông tin đơn hàng</strong>
+                    </Card.Header>
+                    <Card.Body>
+                      <div className="row">
+                        {/* Cột trái */}
+                        <div className="col-md-4 mb-2">
+                          <div className="mb-2 d-flex align-items-center">
+                            <strong className="me-2">Mã đơn hàng:</strong>
+                            <span className="text-muted">{data.orderCode}</span>
+                          </div>
+                          <div className="mb-2 d-flex align-items-center">
+                            <strong className="me-2">Người nhận:</strong>
+                            <strong className="text-danger">
+                              {data.address?.recipientName}
+                            </strong>
+                          </div>
+                        </div>
+
+                        {/* Cột giữa */}
+                        <div className="col-md-4 mb-2">
+                          <div className="mb-2 d-flex align-items-center">
+                            <strong className="me-2">Ngày tạo:</strong>
+                            <span className="text-muted">
+                              {new Date(data.createdAt).toLocaleString("vi-VN")}
+                            </span>
+                          </div>
+                          <div className="mb-2 d-flex align-items-center">
+                            <strong className="me-2">
+                              Số điện thoại người nhận:
+                            </strong>
+                            <span className="text-muted">
+                              {data.address?.phone}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Địa chỉ giao */}
+                      <div className="row">
+                        <div className="col-12 d-flex align-items-center mb-2">
+                          <strong className="me-2">
+                            Địa chỉ nhận hàng tại kho:
+                          </strong>
+                          <span className="text-muted">
+                            {`${data.address?.address}, ${data.address?.ward}, ${data.address?.province}`}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Phương thức thanh toán */}
+                      <div className="row">
+                        <div className="col-12 d-flex align-items-center mb-2">
+                          <strong className="me-2">Phương thức:</strong>
+                          <span className="text-danger text-decoration-underline">
+                            {data.paymentMethod !== "COD"
+                              ? "Thanh toán khi đã nhận hàng"
+                              : "Thanh toán khi đã nhận hàng"}
+                          </span>
+                        </div>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                  <Card className="mt-2">
+                    <Card.Header>
+                      <strong>Danh sách sản phẩm</strong>
+                    </Card.Header>
+                    <Card.Body>
+                      <table className="table table-bordered table-striped mt-3">
+                        <thead>
+                          <tr>
+                            <th>STT</th>
+                            {/* <th>Ảnh sản phẩm</th> */}
+                            <th>Tên sản phẩm</th>
+                            <th>Đơn giá</th>
+                            {/* <th>Đơn vị</th> */}
+                            <th>Số lượng</th>
+                            <th>Số tiền</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {noteDetails?.deliveryDetails?.map((detail, idx) => (
+                            <tr key={idx}>
+                              <td>{idx + 1}</td>
+                              {/* <td>
+                                <img
+                                  src={detail.productSku.images}
+                                  alt=""
+                                  style={{ height: "50px", width: "50px" }}
+                                />
+                              </td> */}
+                              <td>{detail.productSKUCode}</td>
+                              <td>{detail.price.toLocaleString()} VND</td>
+                              <td>{detail.quantity}</td>
+                              <td>
+                                {(
+                                  detail.quantity * detail.price
+                                ).toLocaleString()}{" "}
+                                VND
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+
+                      <div style={{ fontWeight: "bold", marginTop: "10px" }}>
+                        Tổng tiền:{" "}
+                        <strong className="text-danger">
+                          {data.orderDetails
+                            ?.reduce(
+                              (sum, detail) =>
+                                sum +
+                                detail.quantity *
+                                  detail.productSku.sellingPrice,
+                              0
+                            )
+                            .toLocaleString()}{" "}
+                          VND
+                        </strong>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </>
+              ) : (
+                <p>Không có dữ liệu.</p>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="secondary"
+                onClick={() => setShowNotePopup(false)}
+              >
+                Đóng
               </Button>
             </Modal.Footer>
           </Modal>

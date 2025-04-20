@@ -9,6 +9,7 @@ import ProviderDashBoardDetail from "./ProviderDashboar/ProviderDashBoardDetail.
 import OrderList from "./Product/OrderList";
 import ChatBox from "./Chat/ChatBox";
 import DeliveryList from "./Product/DeliveryList.jsx";
+import AddPayment from "./Invoice/AddPayment";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState(
@@ -38,10 +39,20 @@ const ProviderDashBoard = () => {
         return <InvoiceManagement />;
       case "AddInvoice":
         return <AddInvoice />;
+      case "AddPayment":
+        return <AddPayment />;
       case "ProductList":
         return <ProductList setSelectedProductId={setSelectedProductId} />;
       case "AddProduct":
-        return <AddProduct />;
+        return (
+          <AddProduct
+            onAddProduct={(newProduct) => {
+              setSelectedComponent("ProductList");
+            }}
+            onCancel={() => setSelectedComponent("ProductList")}
+          />
+        );
+
       case "OrderList":
         return <OrderList />;
       case "ChatBox":
