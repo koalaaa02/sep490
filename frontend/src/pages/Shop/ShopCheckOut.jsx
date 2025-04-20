@@ -5,7 +5,7 @@ import { BASE_URL } from "../../Utils/config";
 import img1 from "../../images/glass.jpg";
 import Swal from "sweetalert2";
 import PaymentMethod from "../../Component/PaymentMethod";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ShopCheckOut = () => {
   const location = useLocation();
@@ -19,6 +19,7 @@ const ShopCheckOut = () => {
   const [selectedAddressId, setSelectedAddressId] = useState(10);
   const [expandedAddressId, setExpandedAddressId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const navigate = useNavigate();
   const hasBulkyItem = cartItems.some((cart) =>
     cart.items.some((item) => item.productSKUResponse?.bulky === true)
   );
@@ -112,6 +113,8 @@ const ShopCheckOut = () => {
         showConfirmButton: true,
         timer: 2000,
       });
+
+      navigate("/MyAccountOrder");
     } catch (error) {
       console.error("Lỗi khi xử lý thanh toán hoặc đặt hàng:", error);
       Swal.fire({
@@ -224,7 +227,7 @@ const ShopCheckOut = () => {
                               {/* Ảnh sản phẩm */}
                               <div className="col-2 text-center">
                                 <img
-                                  src={img1}
+                                  src={item.imageUrl || img1}
                                   alt={item.productName}
                                   className="img-fluid mt-2"
                                   style={{
@@ -284,7 +287,7 @@ const ShopCheckOut = () => {
                     </div>
                     <div className="card-body">
                       {/* Trả góp - DEBT */}
-                      <div className="form-check border-bottom border-1 pb-3">
+                      {/* <div className="form-check border-bottom border-1 pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -300,10 +303,10 @@ const ShopCheckOut = () => {
                         >
                           Trả góp
                         </label>
-                      </div>
+                      </div> */}
 
                       {/* Thanh toán khi nhận hàng - COD */}
-                      <div className="form-check border-bottom border-1 pb-3">
+                      <div className="form-check pb-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -319,7 +322,7 @@ const ShopCheckOut = () => {
                       </div>
 
                       {/* Thanh toán qua VNPay - VNPAY */}
-                      <div className="form-check pt-3">
+                      {/* <div className="form-check pt-3">
                         <input
                           className="form-check-input"
                           type="radio"
@@ -332,7 +335,7 @@ const ShopCheckOut = () => {
                         <label className="form-check-label" htmlFor="vnpay">
                           Thanh toán qua ví VNPay
                         </label>
-                      </div>
+                      </div> */}
 
                       {/* Hiển thị PaymentMethod nếu chọn VNPay */}
                       {selectedPayment === "VNPAY" && <PaymentMethod />}

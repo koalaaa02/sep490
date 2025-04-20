@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
+import { Link } from "react-router-dom";
+import OrderDetails from "./OrderDetail";
+import { Badge } from "react-bootstrap";
 
 const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [currentView, setCurrentView] = useState("list");
   const token = localStorage.getItem("access_token");
+  const [page, setPage] = useState(1);
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterPaymentMethod, setFilterPaymentMethod] = useState("");
+  const [filterDirection, setFilterDirection] = useState("DESC");
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [size, setSize] = useState(10);
   const statusOptions = [
     "PENDING",
     "CANCELLED",
@@ -17,20 +24,22 @@ const OrderList = () => {
     "PACKAGING",
     "DELIVERING",
     "DELIVERED",
-    "LOST",
+    // "LOST",
   ];
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page, filterStatus, filterPaymentMethod, filterDirection, size]);
 
   const fetchData = async () => {
     try {
       const params = new URLSearchParams({
-        page: 1,
-        size: 10,
+        page: page,
+        size: size,
         sortBy: "id",
-        direction: "ASC",
+        status: filterStatus,
+        paymentMethod: filterPaymentMethod,
+        direction: filterDirection,
       });
 
       const response = await fetch(
@@ -51,131 +60,252 @@ const OrderList = () => {
     }
   };
 
-  const handleStatusChange = (orderId, newStatus) => {
-    setSelectedOrder(orderId);
-    setSelectedStatus(newStatus);
-    setShowPopup(true);
+  const handleStatusClick = (status) => {
+    if (status === " ") {
+      setFilterStatus(" ");
+    }
+    setFilterStatus(status === filterStatus ? null : status);
   };
 
-  const confirmStatusChange = async () => {
-    if (!selectedOrder || !selectedStatus) return;
+  const filteredOrders = data?.content?.filter((order) =>
+    order.address.recipientName
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
-    try {
-      const response = await fetch(`${BASE_URL}/api/provider/orders/status`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ids: [selectedOrder],
-          status: selectedStatus,
-        }),
-      });
+  const totalPages = data?.totalElements
+    ? Math.ceil(data?.totalElements / 15)
+    : 0;
 
-      if (response.ok) {
-        setData((prevData) => ({
-          ...prevData,
-          content: prevData.content.map((order) =>
-            order.id === selectedOrder
-              ? { ...order, status: selectedStatus }
-              : order
-          ),
-        }));
-        alert("Cập nhật trạng thái thành công!");
-      } else {
-        alert("Cập nhật thất bại. Vui lòng thử lại!");
-      }
-    } catch (error) {
-      console.error("Lỗi khi cập nhật trạng thái:", error);
-      alert("Có lỗi xảy ra!");
-    } finally {
-      setShowPopup(false);
-      setSelectedOrder(null);
-      setSelectedStatus("");
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
     }
   };
 
-  return (
-    <div className="p-3 mb-10">
-      <h3>Danh sách đặt hàng</h3>
-      <div className="mb-3 d-flex align-items-center">
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Tìm kiếm..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button className="btn btn-dark">
-          <FaSearch />
-        </button>
-      </div>
-      <div className="border p-2 mb-3">
-        <strong>Thống kê nhanh:</strong>
-        <div>Tổng hóa đơn: {data?.content?.length || 0}</div>
-        <div>Tổng tiền: ...</div>
-      </div>
-      <table className="table table-bordered table-striped">
-        <thead>
-          <tr>
-            <th>Mã đơn</th>
-            <th>Ngày tạo</th>
-            <th>Khách hàng</th>
-            <th>Tổng tiền</th>
-            <th>Trạng Thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data?.content?.map((order) => {
-            const totalAmount = order.orderDetails.reduce(
-              (sum, item) => sum + item.quantity * item.productSku.sellingPrice,
-              0
-            );
-            return (
-              <tr key={order.id}>
-                <td>{order.id}</td>
-                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                <td>{order.address.recipientName || "Chưa có tên"}</td>
-                <td>{totalAmount.toLocaleString()} VND</td>
-                <td>
-                  <select
-                    className="form-select"
-                    value={order.status}
-                    onChange={(e) =>
-                      handleStatusChange(order.id, e.target.value)
-                    }
-                  >
-                    {statusOptions.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+  const statusTranslations = {
+    PENDING: "Đang chờ",
+    CANCELLED: "Hủy",
+    FINDINGTRUCK: "Đang tìm xe",
+    ACCEPTED: "Chấp nhận",
+    PACKAGING: "Đóng gói",
+    DELIVERING: "Chưa giao",
+    DELIVERED: "Đã giao",
+  };
 
-      {showPopup && (
-        <div className="popup">
-          <div className="popup-content">
-            <p>Bạn có chắc muốn đổi trạng thái đơn hàng không?</p>
-            <button className="btn btn-success" onClick={confirmStatusChange}>
-              Xác nhận
-            </button>
-            <button
-              className="btn btn-danger"
-              onClick={() => setShowPopup(false)}
-            >
-              Hủy
+  const handleOrderClick = (order) => {
+    setSelectedOrder(order);
+    setCurrentView("details");
+  };
+
+  const handleBackToList = () => {
+    setCurrentView("list");
+    setSelectedOrder(null);
+  };
+
+  const statusColors = {
+    PENDING: "secondary",
+    CANCELLED: "danger",
+    FINDINGTRUCK: "info",
+    ACCEPTED: "primary",
+    PACKAGING: "dark",
+    DELIVERING: "warning",
+    DELIVERED: "success",
+  };
+
+  return (
+    <>
+      {currentView === "list" ? (
+        <div className="p-3 mb-10">
+          <h3>Danh sách đặt hàng</h3>
+          <div className="mb-3 d-flex align-items-center">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Tìm kiếm tên khách hàng..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button className="btn btn-dark">
+              <FaSearch />
             </button>
           </div>
+          <div className="mb-3 d-flex">
+            {/* Status Dropdown */}
+            <div className="me-3">
+              <label>Trạng thái:</label>
+
+              <select
+                className="form-select"
+                value={filterStatus}
+                onChange={(e) => handleStatusClick(e.target.value)}
+              >
+                <option value="">Tất cả</option>
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {statusTranslations[status] || status}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Payment Method Dropdown */}
+            <div className="me-3">
+              <label>Phương thức thanh toán: </label>
+              <select
+                className="form-select"
+                value={filterPaymentMethod}
+                onChange={(e) => setFilterPaymentMethod(e.target.value)}
+              >
+                <option value="">Tất cả</option>
+                <option value="COD">Thanh toán khi nhận hàng</option>
+                <option value="DEBT">Trả góp</option>
+              </select>
+            </div>
+
+            <div className="me-3">
+              <label>Sắp xếp theo: </label>
+              <select
+                className="form-select"
+                value={filterDirection}
+                onChange={(e) => setFilterDirection(e.target.value)}
+              >
+                <option value="DESC">Mới nhất</option>
+                <option value="ASC">Cũ nhất</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Số sản phẩm: </label>
+              <select
+                className="form-select"
+                value={filterDirection}
+                onChange={(e) => setSize(e.target.value)}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="border p-2 mb-3">
+            <strong>Thống kê nhanh:</strong>
+            <div>Tổng hóa đơn: {data?.totalElements || 0}</div>
+          </div>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th>STT</th>
+                <th>Mã đơn</th>
+                <th>Ngày tạo</th>
+                <th>Khách hàng</th>
+                <th>Địa chỉ nhận hàng</th>
+                <th>Số điện thoại người nhận</th>
+                {/* <th>Phương thức vận chuyển</th> */}
+                <th>Phương thức thanh toán</th>
+                <th>Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders?.map((order, index) => {
+                return (
+                  <React.Fragment key={order.id}>
+                    <tr
+                      onClick={() => handleOrderClick(order)}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <td>{index + 1}</td>
+                      <td>{order.orderCode}</td>
+                      <td>
+                        {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                      </td>
+                      <td>{order.address.recipientName || "Chưa có tên"}</td>
+                      <td>
+                        {order.address.address}, {order.address.ward},{" "}
+                        {order.address.province}
+                      </td>
+                      <td>{order.address.phone}</td>
+                      <td>
+                        {order.paymentMethod === "COD"
+                          ? "Thanh toán khi nhận hàng"
+                          : "Trả góp"}
+                      </td>
+                      <td>
+                        <Badge bg={statusColors[order.status] || "secondary"}>
+                          {statusTranslations[order.status] || order.status}
+                        </Badge>
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <div className="row mt-8">
+            <div className="col">
+              <nav>
+                <ul className="pagination">
+                  <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page - 1)}
+                      aria-label="Previous"
+                    >
+                      <i className="fa fa-chevron-left" />
+                    </Link>
+                  </li>
+
+                  {[...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <li
+                        key={pageNumber}
+                        className={`page-item ${
+                          page === pageNumber ? "active" : ""
+                        }`}
+                      >
+                        <Link
+                          className="page-link mx-1 rounded-3 text-body"
+                          to="#"
+                          onClick={() => handlePageChange(pageNumber)}
+                        >
+                          {pageNumber}
+                        </Link>
+                      </li>
+                    );
+                  })}
+
+                  <li
+                    className={`page-item ${
+                      page === totalPages ? "disabled" : ""
+                    }`}
+                  >
+                    <Link
+                      className="page-link mx-1 rounded-3"
+                      to="#"
+                      onClick={() => handlePageChange(page + 1)}
+                      aria-label="Next"
+                    >
+                      <i className="fa fa-chevron-right" />
+                    </Link>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
         </div>
+      ) : (
+        <OrderDetails
+          order={selectedOrder}
+          onBack={handleBackToList}
+          fromDeliveryList={false}
+        />
       )}
-    </div>
+    </>
   );
 };
 

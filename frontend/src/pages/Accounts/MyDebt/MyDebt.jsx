@@ -5,88 +5,150 @@ import { MagnifyingGlass } from "react-loader-spinner";
 import styles from "./MyDebt.module.css";
 import { AiOutlineShoppingCart } from "react-icons/ai";
 import classNames from "classnames";
-const DebtOrder = (item) => {
-  const items = item?.item;
+import CheckoutForm from "../../../Component/MyDebt/CheckoutForm";
+import { BASE_URL } from "../../../Utils/config";
+import { format } from "date-fns";
+const DebtOrder = ({ item, activeShop, setActiveShop, orders }) => {
   return (
-    <div className={styles.debtOrderCard}>
+    <div
+      className={styles.debtOrderCard}
+      onClick={() => {
+        if (item === activeShop) {
+          setActiveShop(null);
+        } else {
+          setActiveShop(item);
+        }
+      }}
+    >
       <div
         className={classNames(
           "d-flex align-items-center justify-content-between px-2"
         )}
       >
-        <div className="d-flex gap-2 align-items-center fw-bold">
+        <div
+          className={classNames(
+            "d-flex gap-2 align-items-center fw-bold",
+            styles.shopName
+          )}
+        >
           <AiOutlineShoppingCart />
-          {items?.shopName}
+          {item?.shopName}
         </div>
-        <input type="checkbox" />
+        <input type="checkbox" checked={item?.shopId === activeShop?.shopId} />
       </div>
-      {items?.orders?.map((o, index) => (
-        <div className={styles.itemCard} key={index}>
-          <img src={o?.itemImage} alt="" />
-          <div className={styles.infoCard}>
-            <div className="d-flex flex-column fw-bold">
-              <span>{o?.name}</span>
-              <span>50kg/1 bao</span>
-            </div>
-            <div className={classNames(styles.middlePart)}>
-              <span>1.500.000 đ/1 lần</span>
-              <input className="inputNumber" min="1" defaultValue="1" />
-            </div>
-            <span>1.500.000 vnđ</span>
+      {item?.shopId === activeShop?.shopId && (
+        <>
+          <table className={styles.shopDebtDetail}>
+            <thead>
+              <th className="col-4">Thời gian giao dịch</th>
+              <th className="col-4">Tổng nợ</th>
+              <th className="col-4">Số tiền còn nợ</th>
+            </thead>
+            <tbody>
+              {orders
+                ?.filter((o) => o?.status !== "PAID")
+                ?.map((o) => (
+                  <tr className={styles.itemCard} key={o?.id}>
+                    <td className="fw-bold">
+                      {format(new Date(o?.createdAt), "dd-MM-yyyy")}
+                    </td>
+                    <td>
+                      {Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(o?.totalAmount)}
+                    </td>
+                    <td className="text-danger">
+                      {Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(o?.totalAmount - o?.paidAmount)}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+          <div className="d-flex justify-content-between alig n-items-center">
+            <span className="fw-bold">Tổng tiền còn nợ của đơn hàng</span>
+            <span>
+              {Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(
+                orders
+                  ?.filter((o) => o?.status !== "PAID")
+                  ?.reduce((acc, index) => {
+                    return acc + (index?.totalAmount - index?.paidAmount);
+                  }, 0)
+              )}
+            </span>
           </div>
-        </div>
-      ))}
-      <div className="d-flex justify-content-between align-items-center">
-        <span className="fw-bold">Tổng tiền nợ của đơn hàng</span>
-        <span>300.000 vnđ</span>
-      </div>
+        </>
+      )}
     </div>
   );
 };
 const MyDebt = () => {
+  const token = localStorage.getItem("access_token");
   const [loaderStatus, setLoaderStatus] = useState(true);
-  const items = [
-    {
-      shopName: "Shop 1",
-      orders: [
-        {
-          itemImage:
-            "https://c4.wallpaperflare.com/wallpaper/987/319/586/windows-11-dark-theme-silk-hd-wallpaper-preview.jpg",
-          name: "Xi măng",
-        },
-        {
-          itemImage:
-            "https://c4.wallpaperflare.com/wallpaper/987/319/586/windows-11-dark-theme-silk-hd-wallpaper-preview.jpg",
-          name: "Xi măng",
-        },
-        {
-          itemImage:
-            "https://c4.wallpaperflare.com/wallpaper/987/319/586/windows-11-dark-theme-silk-hd-wallpaper-preview.jpg",
-          name: "Xi măng",
-        },
-      ],
-    },
-    {
-      shopName: "Shop 2",
-      orders: [
-        {
-          itemImage:
-            "https://c4.wallpaperflare.com/wallpaper/987/319/586/windows-11-dark-theme-silk-hd-wallpaper-preview.jpg",
-          name: "Xi măng",
-        },
-        {
-          itemImage:
-            "https://c4.wallpaperflare.com/wallpaper/987/319/586/windows-11-dark-theme-silk-hd-wallpaper-preview.jpg",
-          name: "Xi măng",
-        },
-      ],
-    },
-  ];
+  const [showModal, setShowModal] = useState(false);
+  const [activeShop, setActiveShop] = useState(null);
+  const [shops, setShops] = useState([]);
+  const [orders, setOrders] = useState([]);
+
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/dealer/ShopInvoiceSummary`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        setShops(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/dealer/GetInvoicesByShopId/${activeShop?.shopId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        setOrders(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    if (activeShop?.shopId) {
+      fetchData();
+    }
+  }, [activeShop?.shopId]);
+
   return (
     <div>
       <>
@@ -135,12 +197,12 @@ const MyDebt = () => {
                                 </h5>
                                 <p className="fw-bold">
                                   Tổng đơn hàng còn nợ:{" "}
-                                  <span className="fw-normal">3</span>
+                                  <span className="fw-normal">2</span>
                                 </p>
                                 <p className="fw-bold">
                                   Tổng tiền nợ:{" "}
                                   <span className="fw-normal">
-                                    3.000.000 vnđ
+                                    6 vnđ
                                   </span>
                                 </p>
                               </div>
@@ -150,28 +212,65 @@ const MyDebt = () => {
                                   Các đơn hàng đang còn nợ
                                 </h5>
                                 <div className={styles.itemsList}>
-                                  {items?.map((i, index) => (
-                                    <DebtOrder item={i} key={index} />
-                                  ))}
+                                  {shops?.length > 0 &&
+                                    shops?.map((i) => (
+                                      <DebtOrder
+                                        item={i}
+                                        key={i?.shopId}
+                                        activeShop={activeShop}
+                                        orders={orders}
+                                        setActiveShop={setActiveShop}
+                                      />
+                                    ))}
                                 </div>
                               </div>
                             </div>
-                            <div
-                              className={classNames(styles.total, "col-3")}
-                            >
+                            <div className={classNames(styles.total, "col-3")}>
                               <h5 className={styles.sectionHeader}>
                                 Khoản nợ đã chọn
                               </h5>
                               <span className={styles.secondaryHeader}>
-                                <span className="text-danger">*</span>Bạn có thể thanh toán khoản nợ đã
-                                chọn nếu chúng cùng một người bán
+                                <span className="text-danger">*</span>Bạn có thể
+                                thanh toán khoản nợ đã chọn nếu chúng cùng một
+                                người bán
                               </span>
                               <div>
                                 <p>Số tiền cần thanh toàn</p>
-                                <p className={classNames("text-danger", styles.totalPrice)}>300.000 vnđ</p>
+                                <p
+                                  className={classNames(
+                                    !activeShop?.shopId && "text-danger",
+                                    styles.totalPrice
+                                  )}
+                                >
+                                  {activeShop?.shopId
+                                    ? Intl.NumberFormat("vi-VN", {
+                                        style: "currency",
+                                        currency: "VND",
+                                      }).format(
+                                        orders
+                                          ?.filter((o) => o?.status !== "PAID")
+                                          ?.reduce((acc, index) => {
+                                            return (
+                                              acc +
+                                              (index?.totalAmount -
+                                                index?.paidAmount)
+                                            );
+                                          }, 0)
+                                      )
+                                    : "Chọn khoản nợ "}
+                                </p>
                               </div>
                               <div className="d-flex justify-content-center">
-                                <button className={classNames("bg-black text-white", styles.cashOutButton)}>Thanh Toán</button>
+                                <button
+                                  disabled={!activeShop}
+                                  className={classNames(
+                                    "bg-black text-white",
+                                    styles.cashOutButton
+                                  )}
+                                  onClick={() => setShowModal(true)}
+                                >
+                                  Thanh Toán
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -184,6 +283,12 @@ const MyDebt = () => {
             </div>
           </section>
         </div>
+        <CheckoutForm
+          showModal={showModal}
+          handleCloseModal={() => setShowModal(false)}
+          shop={activeShop}
+          orders={orders}
+        />
       </>
     </div>
   );

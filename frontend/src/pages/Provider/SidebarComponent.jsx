@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import { BiTask } from "react-icons/bi";
 import { RiShoppingCart2Line } from "react-icons/ri";
-import { FaClipboardList } from "react-icons/fa";
+import { FaClipboardList, FaChartBar } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
-import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { TbMessageReport } from "react-icons/tb";
+import { MdAddBox, MdOutlineNoteAlt } from "react-icons/md";
 
 const SidebarComponent = ({ setSelectedComponent }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -15,116 +13,71 @@ const SidebarComponent = ({ setSelectedComponent }) => {
   };
 
   return (
-    <div
-      className="d-flex flex-column p-3 bg-light"
-      style={{ width: "250px", height: "100vh" }}
-    >
+    <div className="d-flex flex-column p-3 bg-light" style={{ width: "250px" }}>
       <ul className="nav flex-column navbar-nav navbar-light">
-        {/* Quản lý sản phẩm */}
         <li>
           <button
             className="nav-link"
-            onClick={() => toggleDropdown("product")}
+            onClick={() => setSelectedComponent("ProviderDashBoardDetail")}
           >
-            <RiShoppingCart2Line size={30} className="ms-1" /> Cửa hàng của tôi
+            <FaChartBar size={30} className="ms-1" /> Thống kê
           </button>
-          {openDropdown === "product" && (
-            <div className="dropdown-menu show">
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("ProductList")}
-              >
-                Danh sách sản phẩm
-              </button>
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("AddProduct")}
-              >
-                Thêm sản phẩm
-              </button>
-            </div>
-          )}
         </li>
-        {/* Hóa đơn */}
         <li>
           <button
             className="nav-link"
-            onClick={() => toggleDropdown("invoice")}
+            onClick={() => setSelectedComponent("ProductList")}
           >
-            <BiTask size={30} className="ms-1" /> Hóa đơn
+            <RiShoppingCart2Line size={30} className="ms-1" />
+            Danh sách sản phẩm
           </button>
-          {openDropdown === "invoice" && (
-            <div className="dropdown-menu show">
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("InvoiceManagement")}
-              >
-                Danh sách hóa đơn
-              </button>
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("AddInvoice")}
-              >
-                Thêm hóa đơn
-              </button>
-            </div>
-          )}
         </li>
-
-        {/* Đặt hàng */}
-        <li>
-          <button className="nav-link" onClick={() => toggleDropdown("order")}>
-            <FaClipboardList size={30} className="ms-1" /> Đặt hàng
-          </button>
-          {openDropdown === "order" && (
-            <div className="dropdown-menu show">
-              <button
-                className="dropdown-item"
-                onClick={() => setSelectedComponent("OrderList")}
-              >
-                Danh sách đặt hàng
-              </button>
-            </div>
-          )}
-        </li>
-
-        {/* Báo cáo */}
-        <li>
-          <button className="nav-link" onClick={() => toggleDropdown("report")}>
-            <TbMessageReport size={30} className="ms-1" /> Báo cáo
-          </button>
-          {openDropdown === "report" && (
-            <div className="dropdown-menu show">
-              <Link className="dropdown-item" to="#">
-                Báo cáo bán hàng
-              </Link>
-            </div>
-          )}
-        </li>
-
-        {/* Giao dịch */}
         <li>
           <button
             className="nav-link"
-            onClick={() => toggleDropdown("transaction")}
+            onClick={() => setSelectedComponent("AddProduct")}
           >
-            <FaMoneyBillTransfer size={30} className="ms-1" /> Quản lý giao dịch
+            <MdAddBox size={30} className="ms-1" />
+            Thêm sản phẩm
           </button>
-          {openDropdown === "transaction" && (
-            <div className="dropdown-menu show">
-              <Link className="dropdown-item" to="#">
-                Danh sách giao dịch
-              </Link>
-            </div>
-          )}
         </li>
-
-        {/* Chat */}
         <li>
-          <Link className="nav-link" to="#">
+          <button
+            className="nav-link"
+            onClick={() => setSelectedComponent("InvoiceManagement")}
+          >
+            <BiTask size={30} className="ms-1" />
+            Danh sách khoản nợ
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            onClick={() => setSelectedComponent("OrderList")}
+          >
+            <FaClipboardList size={30} className="ms-1" />
+            Danh sách đặt hàng
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            onClick={() => setSelectedComponent("DeliveryList")}
+          >
+            <MdOutlineNoteAlt size={30} className="ms-1" /> Phiếu giao hàng
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            onClick={() => {
+              setSelectedComponent("ChatBox");
+              toggleDropdown("chat");
+            }}
+          >
             <HiChatBubbleBottomCenterText size={30} className="ms-1" /> Trò
             chuyện
-          </Link>
+          </button>
         </li>
       </ul>
     </div>

@@ -1,0 +1,85 @@
+[33m375981a[m[33m ([m[1;36mHEAD -> [m[1;32mmanh[m[33m, [m[1;31morigin/manh[m[33m)[m HEAD@{0}: pull: Fast-forward
+[33m302107d[m HEAD@{1}: commit: fix fe
+[33m4e8d98b[m HEAD@{2}: commit: quick fix
+[33maed303d[m HEAD@{3}: commit: fix check out
+[33m5eb7380[m HEAD@{4}: pull --tags origin manh: Merge made by the 'ort' strategy.
+[33mf0f9e68[m HEAD@{5}: commit: fix bug
+[33ma2c832a[m HEAD@{6}: commit: fix
+[33m891da6b[m HEAD@{7}: commit: có detail shop
+[33m041e1b4[m HEAD@{8}: pull --tags origin manh: Merge made by the 'ort' strategy.
+[33m0cfeee1[m HEAD@{9}: commit: fix bug 1/4
+[33mb7d5423[m HEAD@{10}: commit: fix header
+[33m0b9eb31[m HEAD@{11}: commit: đã có mở cửa hàng
+[33mf94f00e[m HEAD@{12}: commit: fix fe
+[33m5039542[m HEAD@{13}: commit: Đã nối xong api
+[33mf3bc239[m HEAD@{14}: pull: Fast-forward
+[33m8b5e6dd[m HEAD@{15}: pull: Fast-forward
+[33mabc0ace[m HEAD@{16}: commit: fix fe
+[33mf8c4e5a[m HEAD@{17}: commit (merge): Merge branch 'manh' of https://github.com/koalaaa02/sep490 into manh
+[33mf96dda5[m HEAD@{18}: commit: nối api
+[33m30de965[m HEAD@{19}: pull origin manh: Fast-forward
+[33mf2844ad[m HEAD@{20}: commit: Fe provider
+[33m829bccc[m HEAD@{21}: pull origin manh: Fast-forward
+[33mbbd72b4[m HEAD@{22}: commit: fix fe
+[33m63f9996[m HEAD@{23}: pull: Fast-forward
+[33m4fca81c[m HEAD@{24}: pull: Fast-forward
+[33m560bc79[m HEAD@{25}: commit: fix bug fe
+[33m2ba9c47[m HEAD@{26}: commit: Đã có images nhé
+[33m4880a4c[m HEAD@{27}: commit: fix unit
+[33m2542dd3[m HEAD@{28}: commit: crud provider
+[33m3717292[m HEAD@{29}: commit: chỉ provider mới hiện icon FaStore
+[33m493adc5[m HEAD@{30}: merge origin: Merge made by the 'ort' strategy.
+[33maa04ba7[m HEAD@{31}: pull --tags origin manh: Merge made by the 'ort' strategy.
+[33m40af2e7[m HEAD@{32}: commit: api up ảnh đang lỗi, api thêm sản phẩm cần admin đưa active thành true
+[33mb205ec1[m HEAD@{33}: commit: fix fe
+[33m07755a0[m HEAD@{34}: commit (merge): Merge branch 'manh' of https://github.com/koalaaa02/sep490 into manh
+[33m49b8ff0[m HEAD@{35}: commit: fix
+[33m519790e[m HEAD@{36}: commit: fe tam
+[33m7baa51b[m HEAD@{37}: pull --ff --recurse-submodules --progress origin: Merge made by the 'ort' strategy.
+[33m6b0ba28[m HEAD@{38}: pull origin main: Merge made by the 'ort' strategy.
+[33maaaa6d6[m HEAD@{39}: commit: fix fe
+[33m2a18c3b[m HEAD@{40}: commit: gitignore
+[33m24e66cc[m HEAD@{41}: checkout: moving from main to manh
+[33m7815213[m HEAD@{42}: checkout: moving from manh to main
+[33m24e66cc[m HEAD@{43}: checkout: moving from main to manh
+[33m7815213[m HEAD@{44}: checkout: moving from manh to main
+[33m24e66cc[m HEAD@{45}: checkout: moving from main to manh
+[33m7815213[m HEAD@{46}: checkout: moving from manh to main
+[33m24e66cc[m HEAD@{47}: checkout: moving from main to manh
+[33m7815213[m HEAD@{48}: checkout: moving from manh to main
+[33m24e66cc[m HEAD@{49}: checkout: moving from main to manh
+[33m7815213[m HEAD@{50}: checkout: moving from manh to main
+[33m24e66cc[m HEAD@{51}: commit: fix front-end
+[33m7815213[m HEAD@{52}: merge main: Fast-forward
+[33m996e2be[m HEAD@{53}: checkout: moving from main to manh
+[33m7815213[m HEAD@{54}: commit: fix api
+[33me23ef36[m HEAD@{55}: commit: fix fe
+[33m7f8f78b[m HEAD@{56}: commit: fix ui
+[33m6ae665f[m HEAD@{57}: commit: cart
+[33m2b0efbc[m HEAD@{58}: commit: noi api
+[33m996e2be[m HEAD@{59}: checkout: moving from manh to main
+[33m996e2be[m HEAD@{60}: merge main: Fast-forward
+[33mf28309d[m HEAD@{61}: checkout: moving from main to manh
+[33m996e2be[m HEAD@{62}: pull --tags origin main: Fast-forward
+[33ma416c92[m HEAD@{63}: checkout: moving from manh to main
+[33mf28309d[m HEAD@{64}: checkout: moving from main to manh
+[33ma416c92[m HEAD@{65}: checkout: moving from manh to main
+[33mf28309d[m HEAD@{66}: commit: fix code
+[33ma6f68ab[m HEAD@{67}: commit: fix code
+[33m272e71d[m HEAD@{68}: commit: nối api
+[33ma416c92[m HEAD@{69}: checkout: moving from main to manh
+[33ma416c92[m HEAD@{70}: checkout: moving from Manh to main
+[33m8f38906[m HEAD@{71}: checkout: moving from main to Manh
+[33ma416c92[m HEAD@{72}: checkout: moving from Manh to main
+[33mb9be0ed[m HEAD@{73}: commit: merge main
+[33m09e1b87[m HEAD@{74}: commit: pull main
+[33ma416c92[m HEAD@{75}: pull origin main: Fast-forward
+[33m8f38906[m HEAD@{76}: checkout: moving from main to Manh
+[33m8ba7fec[m HEAD@{77}: checkout: moving from Manh to main
+[33m8f38906[m HEAD@{78}: checkout: moving from main to Manh
+[33m8ba7fec[m HEAD@{79}: checkout: moving from Manh to main
+[33m8f38906[m HEAD@{80}: commit: fix order
+[33mb2563e5[m HEAD@{81}: commit: test git
+[33ma9cac80[m HEAD@{82}: commit: front base
+[33mf811694[m HEAD@{83}: checkout: moving from main to Manh
+[33me821fab[m HEAD@{84}: clone: from https://github.com/koalaaa02/sep490.git
