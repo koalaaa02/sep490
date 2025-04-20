@@ -50,11 +50,13 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           },
           body: JSON.stringify({
             ...product,
-            categoryId: product.category.id,
+            categoryId: product.category?.id || null,
+            supplierId: product.supplier?.id || null,
             active: !product.active,
           }),
         }
       );
+    console.log(product.supplier?.id);
 
       if (response.ok) {
         const updatedProduct = await response.json();
@@ -136,7 +138,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 10,
+          size: 100,
           sortBy: "id",
           direction: "ASC",
         });
@@ -252,7 +254,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             description: product.description,
             specifications: product.specifications,
             unit: product.unit.toUpperCase(),
-            unitAdvance:product.unitAdvance,
+            unitAdvance: product.unitAdvance,
             // images: product.images,
             active: product.active,
             categoryId: product.category?.id || 1,
@@ -261,6 +263,8 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           }),
         }
       );
+
+      console.log(product.supplier?.id);
 
       if (response.ok) {
         const updatedProduct = await response.json();
@@ -373,19 +377,18 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         },
         body: JSON.stringify(bodyData),
       });
-
+  
       if (!response.ok) throw new Error("Lỗi khi thêm SKU!");
-
+  
       const addedSku = await response.json();
-      setProductSkuData([...productSkuData, addedSku]);
+      setProductSkuData([...productSkuData, addedSku]); 
       setNewSku(null);
     } catch (error) {
       console.error(error);
       alert("Thêm SKU thất bại!");
     }
-    setProductSkuData([...productSkuData, newSku]);
-    setNewSku(null);
   };
+  
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
