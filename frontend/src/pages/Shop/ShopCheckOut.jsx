@@ -65,6 +65,22 @@ const ShopCheckOut = () => {
     }, 0);
   };
 
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
+
   const handleAddressChange = (id) => {
     setSelectedAddressId(id);
   };
@@ -200,13 +216,16 @@ const ShopCheckOut = () => {
                       <div className="col-5 card-header fw-bold text-black">
                         Sản phẩm
                       </div>
+                      <div className="col-1 card-header text-muted">
+                        Đơn vị
+                      </div>
                       <div className="col-2 card-header text-muted">
                         Đơn giá
                       </div>
                       <div className="col-2 card-header text-muted">
                         Số lượng
                       </div>
-                      <div className="col-3 card-header text-muted">
+                      <div className="col-2 card-header text-muted">
                         Thành tiền
                       </div>
                     </div>
@@ -244,8 +263,22 @@ const ShopCheckOut = () => {
                               <div className="col-3">
                                 <h6>Tên sản phẩm: {item.productName}</h6>
                                 <p className="text-muted">
-                                  Mã SKU: {item.productSKUCode}
+                                  {
+                                    item.productSKUResponse?.product
+                                      ?.unitAdvance
+                                  }
                                 </p>
+                                <p className="text-muted">
+                                  Phân loại: {item.productSKUCode}
+                                </p>
+                              </div>
+                              {/* Đơn vị */}
+                              <div className="col-1 text-center">
+                                <strong className="text-muted">
+                                  {convertUnitToVietnamese(
+                                    item.productSKUResponse?.product?.unit
+                                  )}
+                                </strong>
                               </div>
 
                               {/* Đơn giá */}
@@ -254,7 +287,7 @@ const ShopCheckOut = () => {
                                   {item.productSKUResponse.sellingPrice.toLocaleString(
                                     "vi-VN"
                                   )}
-                                  đ
+                                  VNĐ
                                 </strong>
                               </div>
 
@@ -270,7 +303,7 @@ const ShopCheckOut = () => {
                                     item.quantity *
                                     item.productSKUResponse.sellingPrice
                                   ).toLocaleString("vi-VN")}
-                                  đ
+                                  VNĐ
                                 </strong>
                               </div>
                             </div>

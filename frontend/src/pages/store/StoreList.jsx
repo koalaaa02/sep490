@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import graphics from "../../images/store-graphics.svg";
-import storeLogo9 from "../../images/stores-logo-9.svg";
 import { BASE_URL } from "../../Utils/config";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { MagnifyingGlass } from "react-loader-spinner";

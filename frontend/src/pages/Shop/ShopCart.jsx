@@ -271,7 +271,7 @@ const ShopCart = () => {
                                   }
                                 </p>
                                 <p className="text-muted">
-                                  Mã SKU: {item.productSKUCode}
+                                  Phân loại: {item.productSKUCode}
                                 </p>
                               </div>
 
