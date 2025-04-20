@@ -66,9 +66,7 @@ public class CartService {
                 .orElseGet(() -> {
                     Shop shop = getShop(shopId);
                     ShopCart newShop = new ShopCart(shopId, shop.getName(), new java.util.ArrayList<>());
-                    List<ShopCart> oldShops = cart.getShops();
-                    oldShops.add(newShop);
-                    cart.setShops(oldShops);
+                    cart.getShops().add(newShop);
                     return newShop;
                 });
 
@@ -90,7 +88,6 @@ public class CartService {
         if (!shopCart.getItems().contains(itemCart)) {
             shopCart.getItems().add(itemCart);
         }
-        cart.getShops().add(shopCart);
         saveCartToCookies(cart, response);
     }
 
@@ -123,7 +120,7 @@ public class CartService {
 
     // Xóa sản phẩm khỏi giỏ hàng
     public void removeFromCart(Long shopId, Long productSKUId, HttpServletRequest request, HttpServletResponse response) {
-        Cart cart = getCartFromCookies(request);
+        Cart cart = getCartFromCookiesToChange(request);
 
         // Tìm shop trong giỏ hàng
         ShopCart shopCart = cart.getShops().stream()
