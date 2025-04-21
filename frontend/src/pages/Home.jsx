@@ -410,9 +410,9 @@ const Home = () => {
               {/* section */}
             </>
 
-            <>
+            {/* <>
               <ProductItem />
-            </>
+            </> */}
             <>
               <section className="my-lg-14 my-8">
                 <div className="container" style={{ marginTop: 50 }}>
