@@ -8,6 +8,7 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
     amountPaid: 0,
     paymentDate: new Date().toISOString(),
   });
+
   const token = localStorage.getItem("access_token");
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState(null);
@@ -76,6 +77,7 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
                   className="form-control"
                   value={paymentData.paymentDate.substring(0, 10)}
                   required
+                  disabled
                   onChange={(e) =>
                     setPaymentData({
                       ...paymentData,

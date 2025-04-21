@@ -15,7 +15,6 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [data, setData] = useState(order);
   const [user, setUser] = useState(null);
-  const [quantityDeli, setQuantityDeli] = useState("");
   const [deliNotes, setdeliNotes] = useState("");
 
   const token = localStorage.getItem("access_token");
@@ -442,15 +441,12 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
               <strong>Lịch sử giao hàng </strong>
 
               {!fromDeliveryList &&
-                data.status === "DELIVERING" &&
-                totalDeliveredQuantity < totalOrderQuantity ? (
-                  <button
-                    className="btn btn-primary"
-                    onClick={toggleInvoiceForm}
-                  >
-                    Thêm phiếu giao hàng
-                  </button>
-                ):(<span className="text-danger">Đã hoàn thành giao hàng</span>)}
+              data.status === "DELIVERING" &&
+              totalDeliveredQuantity < totalOrderQuantity && (
+                <button className="btn btn-primary" onClick={toggleInvoiceForm}>
+                  Thêm phiếu giao hàng
+                </button>
+              )}
             </Card.Header>
             {!order.deliveryNotes || order.deliveryNotes.length === 0 ? (
               <strong className="m-2 text-danger">
@@ -507,7 +503,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           <Card className="mt-2">
             <Card.Header className="d-flex justify-content-between align-items-center">
               <strong>Lịch sử giao dịch</strong>
-              {!fromDeliveryList && data.status !== "DELIVERED" && (
+              {!fromDeliveryList && data.status === "DELIVERED" && (
                 <button className="btn btn-primary" onClick={togglePaymetForm}>
                   Thêm phiếu giao dịch
                 </button>
@@ -598,22 +594,30 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                         filteredOptions = statusOptions;
                       }
 
-                      return filteredOptions?.map((status) => (
-                        <button
-                          key={status}
-                          className={`btn m-1 ${
-                            status === data.status
-                              ? "btn-secondary"
-                              : status === "CANCELLED" || status === "DELIVERED"
-                              ? "btn-danger"
-                              : "btn-success"
-                          }`}
-                          disabled={status === data.status}
-                          onClick={() => handleStatusChange(data.id, status)}
-                        >
-                          {statusTranslations[status]}
-                        </button>
-                      ));
+                      return filteredOptions?.map((status) => {
+                        const isDelivered = status === "DELIVERED";
+                        const notEnoughDelivery =
+                          isDelivered && totalDeliveredQuantity < totalOrderQuantity;
+                      
+                        return (
+                          <button
+                            key={status}
+                            className={`btn m-1 ${
+                              status === data.status
+                                ? "btn-secondary"
+                                : status === "CANCELLED" || status === "DELIVERED"
+                                ? "btn-danger"
+                                : "btn-success"
+                            }`}
+                            disabled={status === data.status || notEnoughDelivery}
+                            onClick={() =>
+                              !notEnoughDelivery && handleStatusChange(data.id, status)
+                            }
+                          >
+                            {statusTranslations[status]}
+                          </button>
+                        );
+                      });                      
                     })()
                   )}
                 </div>
