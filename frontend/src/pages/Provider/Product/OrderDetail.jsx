@@ -15,6 +15,8 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [data, setData] = useState(order);
   const [user, setUser] = useState(null);
+  const [quantityDeli, setQuantityDeli] = useState("");
+  const [deliNotes, setdeliNotes] = useState("");
 
   const token = localStorage.getItem("access_token");
 
@@ -209,11 +211,11 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     fetchData();
   };
 
-  const totalDeliveredQuantity = data.deliveryNotes?.reduce((sum, note) => {
-    return (
-      sum +
-      note.deliveryDetails?.reduce((subSum, item) => subSum + item.quantity, 0)
-    );
+  const totalDeliveredQuantity = deliNotes.content?.reduce((sum, note) => {
+    const detailSum = note.deliveryDetails?.reduce((subSum, item) => {
+      return subSum + (item.quantity || 0);
+    }, 0);
+    return sum + detailSum;
   }, 0);
 
   const totalOrderQuantity = data.orderDetails?.reduce(
@@ -230,6 +232,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
 
   useEffect(() => {
     getUser();
+    getDeli();
   }, []);
 
   const getUser = async (id) => {
@@ -253,10 +256,28 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     }
   };
 
+  const getDeli = async () => {
+    try {
+      const response1 = await fetch(
+        `${BASE_URL}/api/provider/deliverynotes/?page=1&size=1000&sortBy=id&direction=ASC&orderId=${order.id}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data1 = await response1.json();
+      setdeliNotes(data1);
+    } catch (error) {
+      console.error("Lỗi load api:", error);
+    }
+  };
+
   const filteredData = user?.content?.filter(
     (item) => item.order?.id === order?.id
   );
-  console.log(filteredData);
 
   return (
     <>
@@ -422,14 +443,14 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
 
               {!fromDeliveryList &&
                 data.status === "DELIVERING" &&
-                totalDeliveredQuantity < totalOrderQuantity && (
+                totalDeliveredQuantity < totalOrderQuantity ? (
                   <button
                     className="btn btn-primary"
                     onClick={toggleInvoiceForm}
                   >
                     Thêm phiếu giao hàng
                   </button>
-                )}
+                ):(<span className="text-danger">Đã hoàn thành giao hàng</span>)}
             </Card.Header>
             {!order.deliveryNotes || order.deliveryNotes.length === 0 ? (
               <strong className="m-2 text-danger">
@@ -486,13 +507,14 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           <Card className="mt-2">
             <Card.Header className="d-flex justify-content-between align-items-center">
               <strong>Lịch sử giao dịch</strong>
-              {!fromDeliveryList && data.status === "DELIVERED" && (
+              {!fromDeliveryList && data.status !== "DELIVERED" && (
                 <button className="btn btn-primary" onClick={togglePaymetForm}>
                   Thêm phiếu giao dịch
                 </button>
               )}
             </Card.Header>
-            {!order.invoice || order.invoice.length === 0 ? (
+            {filteredData?.length === 0 ||
+            filteredData?.[0]?.debtPayments?.length === 0 ? (
               <strong className="m-2 text-danger">
                 Không có lịch sử giao dịch
               </strong>

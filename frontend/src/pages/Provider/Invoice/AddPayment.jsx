@@ -4,7 +4,7 @@ import { Modal, Button } from "react-bootstrap";
 
 const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
   const [paymentData, setPaymentData] = useState({
-    invoiceId: orderData.invoice.id,
+    invoiceId: orderData?.invoice?.id,
     amountPaid: 0,
     paymentDate: new Date().toISOString(),
   });
