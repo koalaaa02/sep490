@@ -270,7 +270,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
         <OrderDetails
           order={selectedOrder}
           onBack={handleBackToList}
-          fromDeliveryList={true}
+          fromDeliveryList={false}
         />
       )}
     </>

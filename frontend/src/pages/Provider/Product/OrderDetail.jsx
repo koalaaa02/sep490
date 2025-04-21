@@ -132,7 +132,6 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           status: "DELIVERED",
         }));
         alert("Đơn nợ đã được tạo thành công!");
-        refreshOrderDetails();
         setShowPaymentPopup(false);
       } else {
         alert("Có lỗi khi tạo đơn nợ. Vui lòng thử lại!");
