@@ -426,7 +426,7 @@ const Header = () => {
                             <div className="col-4">
                               <h6 className="mb-0">{item.productName}</h6>
                               <span className="text-muted">
-                                Mã SKU: {item.productSKUCode}
+                                Phân loại: {item.productSKUCode}
                               </span>
                               <div className="mt-2 small">
                                 <button

@@ -30,12 +30,12 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
   const [products, setProducts] = useState(
     orderData?.orderDetails.map((item) => ({
       productName: item.productSku?.skuCode || "",
-      quantity: item.quantity || "",
+      quantity: item.quantity,
       price: item.price || "",
       imageUrl: item.productSku?.images || "",
       productSkuId: item.id?.skuId || item.productSku?.id || null,
       isEditable: false,
-      maxQuantity: item.quantity ?? 1,
+      maxQuantity: item.quantity
     })) || [
       {
         productName: "",
@@ -87,27 +87,24 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const newProducts = [...products];
-
+  
     if (name === "quantity") {
-      let qty = parseInt(value, 10);
+      const qty = value === "" ? "" : parseInt(value, 10);
       const max = newProducts[index].maxQuantity;
-
-      if (isNaN(qty) || qty < 1) {
-        qty = 1;
-      }
-
-      if (qty > max) {
+  
+      if (!isNaN(qty) && qty > max) {
         alert(`Số lượng tối đa cho sản phẩm này là ${max}.`);
-        qty = max;
+        return;
       }
-
-      newProducts[index][name] = qty;
+  
+      newProducts[index][name] = value;
     } else {
       newProducts[index][name] = value;
     }
-
+  
     setProducts(newProducts);
   };
+  
   const createDeliveryNote = async () => {
     if (!invoice.deliveryDate) {
       alert("Vui lòng nhập ngày giao hàng trước khi tạo phiếu.");

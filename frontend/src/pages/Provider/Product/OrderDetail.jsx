@@ -14,6 +14,8 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [data, setData] = useState(order);
+  const [user, setUser] = useState(null);
+
   const token = localStorage.getItem("access_token");
 
   const statusOptions = [
@@ -143,7 +145,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   };
 
   const toggleInvoiceForm = () => setShowInvoiceForm(true);
-  const closeAddInvoice = () =>  onBack();
+  const closeAddInvoice = () => onBack();
 
   const togglePaymetForm = () => setShowAddPayment(true);
   const closeAddPayment = () => onBack();
@@ -218,6 +220,43 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     (sum, item) => sum + item.quantity,
     0
   );
+
+  const params = new URLSearchParams({
+    page: 1,
+    size: 100,
+    sortBy: "id",
+    direction: "ASC",
+  });
+
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser = async (id) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/provider/invoices/GetAllByDealerId/${
+          order.createdBy
+        }?${params.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const dataUser = await response.json();
+      setUser(dataUser);
+    } catch (error) {
+      console.error("Lỗi khi xóa sản phẩm:", error);
+    }
+  };
+
+  const filteredData = user?.content?.filter(
+    (item) => item.order?.id === order?.id
+  );
+  console.log(filteredData);
 
   return (
     <>
@@ -463,7 +502,6 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                   <thead>
                     <tr>
                       <th>STT</th>
-                      <th>Mã giao dịch</th>
                       <th>Ngày giao dịch</th>
                       <th>Người trả tiền</th>
                       <th>Số điện thoại người trả</th>
@@ -472,14 +510,11 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {data?.orderDetails?.map((detail, idx) => (
+                    {filteredData?.[0]?.debtPayments?.map((d, idx) => (
                       <tr key={idx}>
                         <td>{idx + 1}</td>
-                        <td>{data?.invoice?.invoiceCode}</td>
                         <td>
-                          {new Date(order?.invoice?.createdAt).toLocaleString(
-                            "vi-VN"
-                          )}
+                          {new Date(d?.paymentDate).toLocaleString("vi-VN")}
                         </td>
                         <td>{data.address?.recipientName}</td>
                         <td>{data.address?.phone}</td>
@@ -488,9 +523,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                             ? "Thanh toán khi nhận hết hàng"
                             : "Trả góp"}
                         </td>
-                        <td>
-                          {order?.invoice?.paidAmount.toLocaleString()} VND
-                        </td>
+                        <td>{d?.amountPaid} VND</td>
                       </tr>
                     ))}
                   </tbody>

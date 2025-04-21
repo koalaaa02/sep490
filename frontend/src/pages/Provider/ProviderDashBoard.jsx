@@ -66,7 +66,10 @@ const ProviderDashBoard = () => {
 
   return (
     <div className="d-flex">
-      <SidebarComponent setSelectedComponent={handleSidebarClick} />
+      <SidebarComponent
+        setSelectedComponent={handleSidebarClick}
+        selectedComponent={selectedComponent}
+      />
       <div className="flex-grow-1 p-1">{renderComponent()}</div>
     </div>
   );

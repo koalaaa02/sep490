@@ -56,7 +56,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           }),
         }
       );
-    console.log(product.supplier?.id);
+      console.log(product.supplier?.id);
 
       if (response.ok) {
         const updatedProduct = await response.json();
@@ -217,10 +217,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       const selectedSupplier = suppliers.find(
         (supplier) => supplier.id.toString() === value
       );
-
       setProduct({
         ...product,
         supplier: selectedSupplier || null,
+      });
+    } else if (name === "categoryId") {
+      const selectedCategory = categories.find(
+        (category) => category.id.toString() === value
+      );
+      setProduct({
+        ...product,
+        category: selectedCategory || null,
       });
     } else {
       setProduct({
@@ -377,18 +384,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         },
         body: JSON.stringify(bodyData),
       });
-  
+
       if (!response.ok) throw new Error("Lỗi khi thêm SKU!");
-  
+
       const addedSku = await response.json();
-      setProductSkuData([...productSkuData, addedSku]); 
+      setProductSkuData([...productSkuData, addedSku]);
       setNewSku(null);
     } catch (error) {
       console.error(error);
       alert("Thêm SKU thất bại!");
     }
   };
-  
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
@@ -635,7 +641,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               <tr>
                 <th>ID</th>
                 <th>Ảnh</th>
-                <th>Mã SKU</th>
+                <th>Phân loại</th>
                 {/* <th>Số lượng tồn kho</th> */}
                 <th>Giá bán (VNĐ)</th>
                 <th>Giá sỉ (VNĐ)</th>
