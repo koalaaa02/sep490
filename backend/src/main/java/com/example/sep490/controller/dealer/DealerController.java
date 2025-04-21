@@ -134,8 +134,8 @@ public class DealerController {
     public static class UpdateSecret {
         public Long shopId;
         public String password;
-        public String vnp_TmnCode;
-        public String vnp_HashSecret;
+        public String vnp_TmnCode;//secretA
+        public String vnp_HashSecret;//secretB
     }
 
     @PutMapping("/shop/updatesecretvnpay/{shopId}")
