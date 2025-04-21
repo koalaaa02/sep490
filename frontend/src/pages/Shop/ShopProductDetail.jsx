@@ -151,7 +151,7 @@ const ShopProductDetail = ({ id, onBack }) => {
             className="img-fluid rounded"
             style={{ width: "350px", height: "350px", cursor: "pointer" }}
           />
-          {/* Carousel hiển thị các SKU */}
+          {/* Carousel hiển thị các phân loại */}
           <Carousel indicators={false} interval={null} className="mt-3">
             <Carousel.Item>
               <div className="d-flex gap-2 justify-content-center">

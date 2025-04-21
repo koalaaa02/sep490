@@ -324,12 +324,12 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       );
       setEditingSkuId(null);
       if (response.ok) {
-        alert("Cập nhật SKU thành công!");
+        alert("Cập nhật thành công!");
       } else {
-        alert("Lỗi khi cập nhật SKU!");
+        alert("Lỗi khi cập nhật!");
       }
     } catch (error) {
-      console.error("Lỗi khi cập nhật SKU:", error);
+      console.error("Lỗi khi cập nhật:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
@@ -351,20 +351,20 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         setProductSkuData((prevSkus) =>
           prevSkus.filter((item) => item.id !== sku.id)
         );
-        alert("Xóa SKU thành công!");
+        alert("Xóa thành công!");
       } else {
-        alert("Lỗi khi xóa SKU!");
+        alert("Lỗi khi xóa!");
       }
       setEditingSkuId(null);
     } catch (error) {
-      console.error("Lỗi khi xóa SKU:", error);
+      console.error("Lỗi khi xóa !", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
 
   const handleAddNewSku = async () => {
     if (!newSku.skuCode || newSku.stock <= 0) {
-      alert("Vui lòng nhập đầy đủ thông tin SKU hợp lệ!");
+      alert("Vui lòng nhập đầy đủ thông tin hợp lệ!");
       return;
     }
     try {
@@ -392,7 +392,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       setNewSku(null);
     } catch (error) {
       console.error(error);
-      alert("Thêm SKU thất bại!");
+      alert("Thêm mới thất bại!");
     }
   };
 
@@ -462,17 +462,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       if (response.ok) {
         const data = await response.json();
         const imageUrl = data.images;
-        alert("Tải ảnh SKU thành công!");
+        alert("Tải ảnh thành công!");
         setProductSkuData((prevData) =>
           prevData.map((sku) =>
             sku.id === skuId ? { ...sku, images: imageUrl } : sku
           )
         );
       } else {
-        alert("Lỗi khi tải ảnh SKU!");
+        alert("Lỗi khi tải ảnh!");
       }
     } catch (error) {
-      console.error("Lỗi tải ảnh SKU:", error);
+      console.error("Lỗi tải ảnh:", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
@@ -635,7 +635,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         </div>
 
         <div className="row mb-3">
-          <label className="form-label fw-bold">Danh sách SKU:</label>
+          <label className="form-label fw-bold">Danh sách phân loại:</label>
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -852,7 +852,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                 })
               }
             >
-              <FaPlus /> Thêm SKU mới
+              <FaPlus /> Thêm mới
             </button>
           )}
         </div>

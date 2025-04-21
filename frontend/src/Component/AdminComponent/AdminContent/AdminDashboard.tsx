@@ -188,7 +188,7 @@ const AdminDashboard = () => {
                       },
                       title: {
                         display: true,
-                        text: "Thông số cửa hàng",
+                        text: "Thông số nhà phân phối",
                         font: {
                           size: 14,
                         },

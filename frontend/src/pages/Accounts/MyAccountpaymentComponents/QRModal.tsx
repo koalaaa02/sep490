@@ -26,13 +26,13 @@ const QRModal = ({
             <h5>Thông tin đăng ký:</h5>
             <ul className="list-unstyled">
               <li>
-                <strong>Tên cửa hàng:</strong> {storeName}
+                <strong>Tên nhà phân phối:</strong> {storeName}
               </li>
               <li>
-                <strong>CCCD chủ cửa hàng:</strong> {citizenId}
+                <strong>CCCD chủ nhà phân phối:</strong> {citizenId}
               </li>
               <li>
-                <strong>Loại cửa hàng:</strong>{" "}
+                <strong>Loại nhà phân phối:</strong>{" "}
                 {shopType === "ENTERPRISE" ? "Doanh nghiệp" : "Cá nhân"}
               </li>
               <li>

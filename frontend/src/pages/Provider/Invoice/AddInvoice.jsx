@@ -147,7 +147,7 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
       const deliveryNoteResult = await res.json();
       const deliveryNoteId = deliveryNoteResult.id;
 
-      // 2. Map SKU ID đúng từ orderDetails
+      // 2. Map ID đúng từ orderDetails
       const skuMap = new Map();
       orderData.orderDetails.forEach((item) => {
         const skuId = item.id?.skuId;
@@ -163,7 +163,7 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
         const matchedSkuId = skuMap.get(skuCode);
 
         if (!matchedSkuId) {
-          console.warn("Không tìm thấy SKU ID cho sản phẩm:", skuCode);
+          console.warn("Không tìm thấy ID cho sản phẩm:", skuCode);
           continue; // bỏ qua sản phẩm nếu không tìm được skuId
         }
 

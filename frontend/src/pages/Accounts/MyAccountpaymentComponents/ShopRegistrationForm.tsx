@@ -41,10 +41,10 @@ const ShopRegistrationForm = ({
           {/* Changed to handleFormSubmit */}
           {/* Tên cửa hàng */}
           <Form.Group className="mb-3">
-            <Form.Label>Tên cửa hàng:</Form.Label>
+            <Form.Label>Tên nhà phân phối:</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Nhập tên cửa hàng"
+              placeholder="Nhập tên nhà phân phối"
               value={storeName}
               onChange={(e) => setStoreName(e.target.value)}
               required
@@ -52,7 +52,7 @@ const ShopRegistrationForm = ({
           </Form.Group>
           {/* Số CCCD */}
           <Form.Group className="mb-3">
-            <Form.Label>CCCD của chủ cửa hàng:</Form.Label>
+            <Form.Label>CCCD của chủ nhà phân phối:</Form.Label>
             <Form.Control
               type="text"
               placeholder="Nhập số CCCD"
@@ -63,7 +63,7 @@ const ShopRegistrationForm = ({
           </Form.Group>
           {/* Loại cửa hàng */}
           <Form.Group className="mb-3">
-            <Form.Label>Loại cửa hàng:</Form.Label>
+            <Form.Label>Loại nhà phân phối:</Form.Label>
             <Form.Select
               value={shopType}
               onChange={(e) => setShopType(e.target.value)}
@@ -84,7 +84,7 @@ const ShopRegistrationForm = ({
           </Form.Group>
           <UploadCertificate handleFileChange={handleFileChange} />
           <Button variant="primary" type="submit" className="mt-3">
-            Đăng ký cửa hàng
+            Đăng ký nhà phân phối
           </Button>
         </Form>
       </div>

@@ -233,7 +233,7 @@ const ShopCheckOut = () => {
                       <div key={shop.shopId}>
                         {/* Tên cửa hàng */}
                         <div className="d-flex align-items-center mt-1 mb-3 border-bottom pb-3">
-                          <span>Tên cửa hàng: {shop.shopName}</span>
+                          <span>Tên nhà phân phối: {shop.shopName}</span>
                         </div>
 
                         {/* Sản phẩm trong cửa hàng */}

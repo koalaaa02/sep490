@@ -105,7 +105,7 @@ const MyAcconutPaymentMethod = () => {
       if (!createResponse.ok) {
         const errorMessage =
           createData?.message ||
-          "Đã xảy ra lỗi khi tạo cửa hàng, vui lòng thử lại!";
+          "Đã xảy ra lỗi khi đăng ký nhà phân phối, vui lòng thử lại!";
         showNotification(setNotification, errorMessage, "danger");
         return;
       }

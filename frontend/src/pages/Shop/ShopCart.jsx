@@ -216,7 +216,7 @@ const ShopCart = () => {
                             onChange={toggleSelectAll}
                             className="me-2"
                           />
-                          <strong>Tên cửa hàng: {shop.shopName}</strong>
+                          <strong>Tên nhà phân phối: {shop.shopName}</strong>
                         </div>
 
                         {/* Sản phẩm trong cửa hàng */}
