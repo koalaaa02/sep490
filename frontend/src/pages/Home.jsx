@@ -22,11 +22,10 @@ import { Grid } from "swiper/modules";
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [materials, setMaterial] = useState([]);
-  const [parentCateID, setparentCateID] = useState(1);
-  const [selectSubCate, setSelectSubCate] = useState(
-    materials[0]?.subCategories || []
-  );
-  console.log(materials[0]);
+  // const [parentCateID, setparentCateID] = useState(1);
+  // const [selectSubCate, setSelectSubCate] = useState(
+  //   materials[0]?.subCategories || []
+  // );
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -82,7 +81,7 @@ const Home = () => {
             subCategories: c.subCategories,
           }))
         );
-        setparentCateID(result[0].id);
+        // setparentCateID(result[0].id);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -97,7 +96,6 @@ const Home = () => {
       setLoaderStatus(false);
     }, 1500);
   }, []);
-  console.log(selectSubCate);
 
   return (
     <div>
@@ -375,23 +373,23 @@ const Home = () => {
                             <div className="fade-zoom p-2">
                               <Zoom>
                                 <div
-                                  onClick={() => {
-                                    setparentCateID(material.id);
-                                    setSelectSubCate(material.subCategories);
-                                  }}
+                                  // onClick={() => {
+                                  //   setparentCateID(material.id);
+                                  //   setSelectSubCate(material.subCategories);
+                                  // }}
                                   className="text-center mb-10"
                                 >
-                                  {/* <Link to={`/Shop/${material.id}`}> */}
-                                  <img
-                                    src={material.src ? material.src : dfCate}
-                                    alt={material.alt}
-                                    className="card-image rounded-circle"
-                                    style={{
-                                      height: "150px",
-                                      width: "150px",
-                                    }}
-                                  />
-                                  {/* </Link> */}
+                                  <Link to={`/Shop/${material.id}`}>
+                                    <img
+                                      src={material.src ? material.src : dfCate}
+                                      alt={material.alt}
+                                      className="card-image rounded-circle"
+                                      style={{
+                                        height: "150px",
+                                        width: "150px",
+                                      }}
+                                    />
+                                  </Link>
                                   <div className="mt-4">
                                     <h5 className="fs-6 mb-0">
                                       <Link to="#" className="text-inherit">
@@ -411,66 +409,7 @@ const Home = () => {
               </section>
               {/* section */}
             </>
-            <>
-              {/* section  subcate */}
-              <section className="my-lg-14 my-8">
-                <div className="container ">
-                  <div className="row">
-                    <div className="row ">
-                      <Swiper
-                        slidesPerView={6} // Number of items visible at once
-                        grid={{
-                          rows: 2, // Display items in 2 rows
-                          fill: "row",
-                        }}
-                        spaceBetween={10}
-                        pagination={{
-                          clickable: true,
-                        }}
-                        modules={[Grid]}
-                        className="mySwiper"
-                      >
-                        {selectSubCate.map((material, index) => (
-                          <SwiperSlide key={index}>
-                            <div className="fade-zoom p-2">
-                              <Zoom>
-                                <div className="text-center mb-10 ">
-                                  <Link
-                                    to={`/Shop/${parentCateID}/${material.id}`}
-                                  >
-                                    <img
-                                      src={
-                                        material.images
-                                          ? material.images
-                                          : dfCate
-                                      }
-                                      alt={material.name}
-                                      className="card-image rounded shadow-sm"
-                                      style={{
-                                        height: "150px",
-                                        width: "150px",
-                                      }}
-                                    />
-                                  </Link>
-                                  <div className="mt-4">
-                                    <h5 className="fs-6 mb-0">
-                                      {/* <Link to="#" className="text-inherit"> */}
-                                      {material.name}
-                                      {/* </Link> */}
-                                    </h5>
-                                  </div>
-                                </div>
-                              </Zoom>
-                            </div>
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              {/* section */}
-            </>
+
             <>
               <ProductItem />
             </>

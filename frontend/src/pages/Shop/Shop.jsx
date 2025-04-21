@@ -18,7 +18,7 @@ function Dropdown() {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState({});
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const { cateId, subCateId } = useParams();
+  const { cateId } = useParams();
   const storedWishlist = JSON.parse(localStorage.getItem("wishList")) || [];
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(6);
@@ -31,7 +31,7 @@ function Dropdown() {
     sortBy: "id",
     direction: direction,
     active: true,
-    categoryId: subCateId,
+    categoryId: cateId,
     name: searchQuery,
   });
 
