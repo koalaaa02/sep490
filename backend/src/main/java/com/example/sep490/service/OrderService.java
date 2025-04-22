@@ -207,6 +207,7 @@ public class OrderService {
             }
             order.setDeliveryDate(LocalDateTime.now());
         }
+        order.setStatus(orderStatus);
         orderRepo.save(order);
     }
 
