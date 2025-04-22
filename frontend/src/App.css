@@ -29963,3 +29963,16 @@ background-color: #f3f6ff;
   cursor: pointer;
 }
 
+.hover-overlay {
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .hover-overlay:hover {
+    opacity: 1;
+  }
+  
+  .hover-overlay:hover .d-none {
+    display: block !important;
+  }

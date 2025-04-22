@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { BiTask } from "react-icons/bi";
 import { RiShoppingCart2Line } from "react-icons/ri";
-import { FaClipboardList, FaChartBar } from "react-icons/fa";
+import { FaClipboardList, FaChartBar, FaSupple } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
-import { MdAddBox, MdOutlineNoteAlt } from "react-icons/md";
+import { MdAddBox, MdOutlineBusAlert, MdOutlineNoteAlt } from "react-icons/md";
 
 const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -78,6 +78,16 @@ const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
           >
             <FaClipboardList size={30} className="ms-1" />
             Danh sách đặt hàng
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            style={getItemStyle("SupplierLisr")}
+            onClick={() => handleClick("SupplierLisr")}
+          >
+            <MdOutlineBusAlert size={30} className="ms-1" />
+            Danh sách suppliers
           </button>
         </li>
         <li>

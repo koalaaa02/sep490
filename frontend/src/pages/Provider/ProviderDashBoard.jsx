@@ -10,6 +10,7 @@ import OrderList from "./Product/OrderList";
 import ChatBox from "./Chat/ChatBox";
 import DeliveryList from "./Product/DeliveryList.jsx";
 import AddPayment from "./Invoice/AddPayment";
+import SupplierList from "./Product/SupplierList.jsx";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState(
@@ -55,6 +56,8 @@ const ProviderDashBoard = () => {
 
       case "OrderList":
         return <OrderList />;
+      case "SupplierLisr":
+        return <SupplierList />;
       case "ChatBox":
         return <ChatBox />;
       case "DeliveryList":
