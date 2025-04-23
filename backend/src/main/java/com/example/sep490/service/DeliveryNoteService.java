@@ -7,6 +7,7 @@ import com.example.sep490.dto.InvoiceRequest;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.compositeKeys.OrderDetailId;
 import com.example.sep490.entity.enums.InvoiceStatus;
+import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.mapper.DeliveryNoteMapper;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.DeliveryNoteFilterDTO;
@@ -107,23 +108,37 @@ public class DeliveryNoteService {
             deliveryNote.setTotalAmount(totalAmount);
             deliveryNoteRepo.save(deliveryNote);
         }
-
-        if(deliveryNote.getTotalAmount().compareTo(order.getTotalAmount()) < 0
-                && !invoiceRepo.findByOrderIdAndIsDeleteFalse(order.getId()).isPresent()) {
-            InvoiceRequest invoice = InvoiceRequest.builder()
-                    .invoiceCode(commonUtils.randomString(10))
-                    .status(InvoiceStatus.PARTIALLY_PAID)
-                    .orderId(order.getId())
-                    .paidAmount(deliveryNote.getTotalAmount())
-                    .totalAmount(order.getTotalAmount())
-                    .deliveryDate(LocalDateTime.now())
-                    .build();
-            invoiceService.createInvoice(invoice);
-        }
-
+        isAllDeliveryDone(order.getId());
         return deliveryNoteMapper.EntityToResponse(deliveryNote);
     }
 
+    public void isAllDeliveryDone(Long orderId){
+        Order order = getOrder(orderId);
+        if(order == null) throw new RuntimeException("Không xác định được đơn hàng cần giao");
+
+        List<OrderDetail> orderDetails = order.getOrderDetails();
+        List<DeliveryDetail> deliveredDeliveryDetails = deliveryDetailRepo.findByOrderIdAndIsDeleteFalse(orderId);
+        for (OrderDetail orderDetail : orderDetails) {
+            int totalQuantity = deliveredDeliveryDetails.stream()
+                    .filter(d -> d.getOrderDetailId().getSkuId().equals(orderDetail.getId().getSkuId()))
+                    .mapToInt(DeliveryDetail::getQuantity)
+                    .sum();
+
+            if(orderDetail.getQuantity() != totalQuantity) return ;
+        }
+
+        InvoiceRequest invoice = InvoiceRequest.builder()
+                .invoiceCode(commonUtils.randomString(10))
+                .status(InvoiceStatus.PARTIALLY_PAID)
+                .orderId(order.getId())
+                .paidAmount(BigDecimal.ZERO)
+                .totalAmount(order.getTotalAmount())
+                .deliveryDate(LocalDateTime.now())
+                .build();
+        invoiceService.createInvoice(invoice);
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepo.save(order);
+    }
 
 
     @Transactional

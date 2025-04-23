@@ -19,6 +19,9 @@ public interface DeliveryNoteRepository extends JpaRepository<DeliveryNote, Long
     Page<DeliveryNote> findByIsDeleteFalse(Pageable pageable);
     Optional<DeliveryNote> findByIdAndIsDeleteFalse(Long id);
 
+    @Query("SELECT d FROM DeliveryNote d WHERE d.order.id = :orderId")
+    List<DeliveryNote> findByOrderIdAndIsDeleteFalse(Long id);
+
 
 
 }
