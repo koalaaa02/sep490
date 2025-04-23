@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { Modal, Button } from "react-bootstrap";
+import dayjs from "dayjs";
 
 const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
   const [paymentData, setPaymentData] = useState({
     invoiceId: orderData?.invoice?.id,
     amountPaid: 0,
-    paymentDate: new Date().toISOString(),
+    paymentDate: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
   });
 
   const token = localStorage.getItem("access_token");
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState(null);
   const handleConfirmSubmit = async () => {
+    if (Number(paymentData.amountPaid) <= 0) {
+      setError("Số tiền phải lớn hơn 0.");
+      return;
+    }
     try {
       const response = await fetch(`${BASE_URL}/api/provider/debt-payments`, {
         method: "POST",
@@ -27,7 +32,7 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
         throw new Error("Có lỗi khi tạo phiếu thanh toán");
       }
       if (typeof onInvoiceCreated === "function") {
-       await onPaymentCreated();
+        await onPaymentCreated();
       }
       setShowConfirm(false);
 
@@ -77,11 +82,10 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
                   className="form-control"
                   value={paymentData.paymentDate.substring(0, 10)}
                   required
-                  disabled
                   onChange={(e) =>
                     setPaymentData({
                       ...paymentData,
-                      paymentDate: e.target.value,
+                      paymentDate: `${e.target.value}T00:00:00`,
                     })
                   }
                 />

@@ -109,34 +109,34 @@ const SupplierList = () => {
     <Container className="mt-4">
       <Row className="justify-content-between mb-3">
         <Col>
-          <h2>Supplier List</h2>
+          <h2>Danh sách nhà phân phối</h2>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowModal(true)}>
-            <FaPlus className="me-2" /> Add Supplier
+            <FaPlus className="me-2" /> Thêm nhà phân phối
           </Button>
         </Col>
       </Row>
 
-      <Table striped bordered hover responsive>
+      <Table striped hover responsive>
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
+            <th>STT</th>
+            <th>Tên nhà phân phối</th>
             <th>Email</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Created At</th>
+            <th>Số điện thoại</th>
+            <th>Địa chỉ</th>
+            <th>Ngày thêm</th>
           </tr>
         </thead>
         <tbody>
-          {suppliers?.map((supplier) => (
+          {suppliers?.map((supplier, index) => (
             <tr
               key={supplier.id}
               onClick={() => handleRowClick(supplier)}
               style={{ cursor: "pointer" }}
             >
-              <td>{supplier.id}</td>
+              <td>{index + 1}</td>
               <td>{supplier.name}</td>
               <td>{supplier.contactEmail}</td>
               <td>{supplier.phone}</td>
@@ -150,13 +150,13 @@ const SupplierList = () => {
       {/* Add Supplier Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Add New Supplier</Modal.Title>
+          <Modal.Title>Thêm nhà phân phối</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             {/* {error.name && <Alert variant="danger">{error.name}</Alert>} */}
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Tên</Form.Label>
               <Form.Control
                 type="text"
                 value={newSupplier.name}
@@ -183,7 +183,7 @@ const SupplierList = () => {
             </Form.Group>
             {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
             <Form.Group className="mb-3">
-              <Form.Label>Phone</Form.Label>
+              <Form.Label>Số điện thoại</Form.Label>
               <Form.Control
                 type="tel"
                 value={newSupplier.phone}
@@ -193,7 +193,7 @@ const SupplierList = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Address</Form.Label>
+              <Form.Label>Địa chỉ</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -207,10 +207,10 @@ const SupplierList = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
+            Hủy
           </Button>
           <Button variant="primary" onClick={handleCreateSupplier}>
-            Save Supplier
+            Lưu
           </Button>
         </Modal.Footer>
       </Modal>
@@ -287,7 +287,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Supplier Details</Modal.Title>
+        <Modal.Title>Thông tin nhà cung cấp</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -295,7 +295,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
         {editMode ? (
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Name</Form.Label>
+              <Form.Label>Tên</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
@@ -318,7 +318,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
             </Form.Group>
             <Form.Group className="mb-3">
               {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
-              <Form.Label>Phone</Form.Label>
+              <Form.Label>Số điện thoại</Form.Label>
               <Form.Control
                 type="tel"
                 name="phone"
@@ -327,7 +327,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Address</Form.Label>
+              <Form.Label>Địa chỉ</Form.Label>
               <Form.Control
                 as="textarea"
                 name="address"
@@ -340,52 +340,41 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
         ) : (
           <div>
             <p>
-              <strong>ID:</strong> {supplier.id}
+              <strong>STT:</strong> {supplier.id}
             </p>
             <p>
-              <strong>Name:</strong> {supplier.name}
+              <strong>Tên:</strong> {supplier.name}
             </p>
             <p>
               <strong>Email:</strong> {supplier.contactEmail}
             </p>
             <p>
-              <strong>Phone:</strong> {supplier.phone}
+              <strong>Số điện thoại:</strong> {supplier.phone}
             </p>
             <p>
-              <strong>Address:</strong> {supplier.address}
-            </p>
-            <p>
-              <strong>Created At:</strong>{" "}
-              {new Date(supplier.createdAt).toLocaleString()}
-            </p>
-            <p>
-              <strong>Updated At:</strong>{" "}
-              {new Date(supplier.updatedAt).toLocaleString()}
+              <strong>Địa chỉ:</strong> {supplier.address}
             </p>
           </div>
         )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="danger" onClick={handleDelete}>
-          <FaTrash className="me-2" /> Delete
+          <FaTrash className="me-2" /> Xóa
         </Button>
         {editMode ? (
           <>
             <Button variant="secondary" onClick={() => setEditMode(false)}>
-              Cancel
+              Hủy
             </Button>
             <Button variant="primary" onClick={handleSave}>
-              Save Changes
+              Lưu
             </Button>
           </>
         ) : (
           <Button variant="primary" onClick={() => setEditMode(true)}>
-            <FaEdit className="me-2" /> Edit
+            <FaEdit className="me-2" /> Sửa
           </Button>
         )}
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
       </Modal.Footer>
     </Modal>
   );
