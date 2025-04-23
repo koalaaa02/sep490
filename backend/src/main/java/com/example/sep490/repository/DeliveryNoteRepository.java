@@ -18,4 +18,7 @@ import java.util.Optional;
 public interface DeliveryNoteRepository extends JpaRepository<DeliveryNote, Long>, JpaSpecificationExecutor<DeliveryNote> {
     Page<DeliveryNote> findByIsDeleteFalse(Pageable pageable);
     Optional<DeliveryNote> findByIdAndIsDeleteFalse(Long id);
+
+
+
 }

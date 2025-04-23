@@ -3,8 +3,10 @@ package com.example.sep490.service;
 import com.example.sep490.dto.DeliveryDetailRequest;
 import com.example.sep490.dto.DeliveryNoteRequest;
 import com.example.sep490.dto.DeliveryNoteResponse;
+import com.example.sep490.dto.InvoiceRequest;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.compositeKeys.OrderDetailId;
+import com.example.sep490.entity.enums.InvoiceStatus;
 import com.example.sep490.mapper.DeliveryNoteMapper;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.DeliveryNoteFilterDTO;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,6 +48,10 @@ public class DeliveryNoteService {
     private AddressRepository addressRepo;
     @Autowired
     private OrderRepository orderRepo;
+    @Autowired
+    private InvoiceRepository invoiceRepo;
+    @Autowired
+    private InvoiceService invoiceService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -99,6 +106,19 @@ public class DeliveryNoteService {
 
             deliveryNote.setTotalAmount(totalAmount);
             deliveryNoteRepo.save(deliveryNote);
+        }
+
+        if(deliveryNote.getTotalAmount().compareTo(order.getTotalAmount()) < 0
+                && !invoiceRepo.findByOrderIdAndIsDeleteFalse(order.getId()).isPresent()) {
+            InvoiceRequest invoice = InvoiceRequest.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.PARTIALLY_PAID)
+                    .orderId(order.getId())
+                    .paidAmount(deliveryNote.getTotalAmount())
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryDate(LocalDateTime.now())
+                    .build();
+            invoiceService.createInvoice(invoice);
         }
 
         return deliveryNoteMapper.EntityToResponse(deliveryNote);
