@@ -10,22 +10,30 @@ const InvoiceDetails = ({ invoice, onClose }) => {
   const [historyVisible, setHistoryVisible] = useState(null);
   const [currentView, setCurrentView] = useState("list");
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("DESC");
+  const [pageSize, setPageSize] = useState(10);
 
-  const params = new URLSearchParams({
-    page: page,
-    size: 10,
-    sortBy: "id",
-    direction: "ASC",
-    // agentName: "string",
-    // status: "UNPAID",
-  });
+  // Hàm tạo tham số cho URL với các giá trị động
+  const getQueryParams = () => {
+    const params = new URLSearchParams({
+      page: page,
+      size: pageSize,
+      sortBy: "createdAt", // Hoặc bạn có thể dùng trường khác để sắp xếp
+      direction: sortOrder, // Thêm direction để sắp xếp theo ASC/DESC
+      searchTerm: searchTerm, // Thêm searchTerm để tìm kiếm theo mã khoản nợ
+    });
+
+    return params;
+  };
 
   useEffect(() => {
     getUser();
-  }, [page]);
+  }, [page, pageSize, sortOrder, searchTerm]); // Lắng nghe thay đổi của page, pageSize, sortOrder, searchTerm
 
-  const getUser = async (id) => {
+  const getUser = async () => {
     try {
+      const params = getQueryParams();
       const response = await fetch(
         `${BASE_URL}/api/provider/invoices/GetAllByDealerId/${invoice}?${params.toString()}`,
         {
@@ -87,13 +95,22 @@ const InvoiceDetails = ({ invoice, onClose }) => {
     }
   };
 
+  const handleSortChange = (e) => {
+    setSortOrder(e.target.value);
+  };
+
+  const handlePageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value, 10));
+  };
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <>
       {currentView === "list" ? (
-        <div
-          className="p-3"
-          style={{ height: "100vh" }}
-        >
+        <div className="p-3" style={{ height: "100vh" }}>
           <div>
             <div>
               <div className="d-flex align-items-center mb-2">
@@ -111,6 +128,45 @@ const InvoiceDetails = ({ invoice, onClose }) => {
             <strong>Email:</strong>
             <span className="ms-2">{user?.content[0]?.agent.email}</span>
           </div>
+
+          {/* Tìm kiếm và các select */}
+          <div className="mb-3 d-flex justify-content-between align-items-center">
+            <input
+              type="text"
+              className="form-control me-2 flex-grow-1"
+              placeholder="Tìm kiếm bằng mã khoản nợ"
+              value={searchTerm}
+              onChange={handleSearch}
+              style={{ maxWidth: "1200px" }}
+            />
+
+            <div className="d-flex">
+              {/* Select số lượng dữ liệu trên trang */}
+              <select
+                className="form-select me-2"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                style={{ minWidth: "120px" }}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+              </select>
+
+              {/* Select sắp xếp */}
+              <select
+                className="form-select"
+                value={sortOrder}
+                onChange={handleSortChange}
+                style={{ minWidth: "120px" }}
+              >
+                <option value="DESC">Mới nhất</option>
+                <option value="ASC">Cũ nhất</option>
+              </select>
+            </div>
+          </div>
+
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -124,16 +180,13 @@ const InvoiceDetails = ({ invoice, onClose }) => {
               </tr>
             </thead>
             {user?.content?.map((u, index) => (
-              <tbody>
+              <tbody key={u.id}>
                 <tr>
                   <td>{index + 1}</td>
                   <td
                     onClick={() => handleOrderClick(u)}
                     style={{ cursor: "pointer" }}
                   >
-                    {/* {`VN${u.deliveryMethod === "GHN" ? "GHN" : "DEB"}${Math.floor(
-                  new Date(u.createdAt).getTime() / 1000
-                )}${u.agent.name?.slice(0, 2).toUpperCase()}`} */}
                     {u.invoiceCode}
                   </td>
                   <td>
@@ -226,7 +279,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                   </li>
 
                   {/* Hiển thị số trang */}
-                  {[...Array(user?.totalPages)]?.map((_, index) => {
+                  {[...Array(user?.totalPages)].map((_, index) => {
                     const pageNumber = index + 1;
                     return (
                       <li
@@ -276,4 +329,5 @@ const InvoiceDetails = ({ invoice, onClose }) => {
     </>
   );
 };
+
 export default InvoiceDetails;

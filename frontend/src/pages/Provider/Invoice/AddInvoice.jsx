@@ -2,7 +2,12 @@ import React, { useState, useEffect } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { Card, Modal, Button } from "react-bootstrap";
 
-const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
+const AddInvoice = ({
+  orderData,
+  closeAddInvoice,
+  onInvoiceCreated,
+  productQuantities,
+}) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [invoice, setInvoice] = useState({
     invoiceId: orderData?.orderCode || "",
@@ -35,7 +40,7 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
       imageUrl: item.productSku?.images || "",
       productSkuId: item.id?.skuId || item.productSku?.id || null,
       isEditable: false,
-      maxQuantity: item.quantity
+      maxQuantity: item.quantity,
     })) || [
       {
         productName: "",
@@ -68,15 +73,26 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
     });
 
     setProducts(
-      orderData?.orderDetails.map((item) => ({
-        productName: item.productSku?.skuCode || "",
-        productSKUCode: item.productSku?.skuCode || "",
-        quantity: item.quantity || "",
-        price: item.price || "",
-        imageUrl: item.productSku?.images || "",
-        isEditable: false,
-        maxQuantity: item.quantity ?? 1,
-      })) || [{ productName: "", quantity: "", price: "", imageUrl: "" }]
+      orderData?.orderDetails.map((item) => {
+        const skuCode = item.productSku?.skuCode || "";
+        const skuId = item.productSku?.id;
+        const usedQty =
+          Array.isArray(productQuantities) && productQuantities.length > 0
+            ? productQuantities.find((q) => q.skuId === skuId)?.quantity || 0
+            : 0;
+
+        const availableQty = item.quantity - usedQty;
+
+        return {
+          productName: skuCode,
+          productSKUCode: skuCode,
+          quantity: availableQty,
+          price: item.price || "",
+          imageUrl: item.productSku?.images || "",
+          isEditable: false,
+          maxQuantity: availableQty > 0 ? availableQty : 0,
+        };
+      }) || [{ productName: "", quantity: "", price: "", imageUrl: "" }]
     );
   }, [orderData]);
 
@@ -87,24 +103,24 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
   const handleProductChange = (index, e) => {
     const { name, value } = e.target;
     const newProducts = [...products];
-  
+
     if (name === "quantity") {
       const qty = value === "" ? "" : parseInt(value, 10);
       const max = newProducts[index].maxQuantity;
-  
+
       if (!isNaN(qty) && qty > max) {
         alert(`Số lượng tối đa cho sản phẩm này là ${max}.`);
         return;
       }
-  
+
       newProducts[index][name] = value;
     } else {
       newProducts[index][name] = value;
     }
-  
+
     setProducts(newProducts);
   };
-  
+
   const createDeliveryNote = async () => {
     if (!invoice.deliveryDate) {
       alert("Vui lòng nhập ngày giao hàng trước khi tạo phiếu.");
@@ -329,20 +345,27 @@ const AddInvoice = ({ orderData, closeAddInvoice, onInvoiceCreated }) => {
                     </td>
                     <td>{product.productName}</td>
                     <td>
-                      <input
-                        type="number"
-                        name="quantity"
-                        className="form-control"
-                        value={product.quantity}
-                        min={1}
-                        max={product.maxQuantity}
-                        onChange={(e) => handleProductChange(index, e)}
-                      />
+                      {product.maxQuantity === 0 ? (
+                        <span className="text-danger fw-bold">Đã giao đủ</span>
+                      ) : (
+                        <input
+                          type="number"
+                          name="quantity"
+                          className="form-control"
+                          value={product.quantity}
+                          min={1}
+                          max={product.maxQuantity}
+                          onChange={(e) => handleProductChange(index, e)}
+                        />
+                      )}
                     </td>
 
                     <td>{Number(product.price).toLocaleString()} VND</td>
                     <td>
-                      {(product.quantity * product.price).toLocaleString()} VND
+                      {product.maxQuantity === 0
+                        ? ""
+                        : (product.quantity * product.price).toLocaleString() +
+                          " VND"}
                     </td>
                   </tr>
                 ))}

@@ -222,6 +222,17 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     0
   );
 
+  const productQuantities =
+    deliNotes.content?.flatMap(
+      (note) =>
+        note.deliveryDetails?.map((detail) => ({
+          skuId: detail.orderDetailId.skuId,
+          quantity: detail.quantity,
+        })) || []
+    ) || [];
+
+  console.log(order);
+
   const params = new URLSearchParams({
     page: 1,
     size: 100,
@@ -283,6 +294,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
       {showInvoiceForm ? (
         <AddInvoice
           closeAddInvoice={closeAddInvoice}
+          productQuantities ={productQuantities}
           orderData={data}
           onInvoiceCreated={async () => {
             await refreshOrderDetails();
@@ -441,12 +453,15 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
               <strong>Lịch sử giao hàng </strong>
 
               {!fromDeliveryList &&
-              data.status === "DELIVERING" &&
-              totalDeliveredQuantity < totalOrderQuantity && (
-                <button className="btn btn-primary" onClick={toggleInvoiceForm}>
-                  Thêm phiếu giao hàng
-                </button>
-              )}
+                data.status === "DELIVERING" &&
+                totalDeliveredQuantity < totalOrderQuantity && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={toggleInvoiceForm}
+                  >
+                    Thêm phiếu giao hàng
+                  </button>
+                )}
             </Card.Header>
             {!order.deliveryNotes || order.deliveryNotes.length === 0 ? (
               <strong className="m-2 text-danger">
@@ -597,27 +612,32 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                       return filteredOptions?.map((status) => {
                         const isDelivered = status === "DELIVERED";
                         const notEnoughDelivery =
-                          isDelivered && totalDeliveredQuantity < totalOrderQuantity;
-                      
+                          isDelivered &&
+                          totalDeliveredQuantity < totalOrderQuantity;
+
                         return (
                           <button
                             key={status}
                             className={`btn m-1 ${
                               status === data.status
                                 ? "btn-secondary"
-                                : status === "CANCELLED" || status === "DELIVERED"
+                                : status === "CANCELLED" ||
+                                  status === "DELIVERED"
                                 ? "btn-danger"
                                 : "btn-success"
                             }`}
-                            disabled={status === data.status || notEnoughDelivery}
+                            disabled={
+                              status === data.status || notEnoughDelivery
+                            }
                             onClick={() =>
-                              !notEnoughDelivery && handleStatusChange(data.id, status)
+                              !notEnoughDelivery &&
+                              handleStatusChange(data.id, status)
                             }
                           >
                             {statusTranslations[status]}
                           </button>
                         );
-                      });                      
+                      });
                     })()
                   )}
                 </div>

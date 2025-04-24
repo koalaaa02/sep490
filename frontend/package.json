@@ -12,6 +12,7 @@
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.8",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "file-saver": "^2.0.5",
     "gh-pages": "^6.1.1",
     "jquery": "^3.7.1",
