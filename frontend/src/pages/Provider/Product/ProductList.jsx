@@ -13,8 +13,8 @@ const ProductList = ({ setSelectedProductId }) => {
   const [isActive, setIsActive] = useState(true);
   const [pageSize, setPageSize] = useState(10);
   const [rf, setRF] = useState(true);
-  const [selectedFile, setSelectedFile] = React.useState(null);
   const fileInputRef = React.useRef(null);
+  const fileInputRef2 = React.useRef(null);
   const [editableUser, setEditableUser] = useState({
     citizenIdentificationCard: "",
   });
@@ -136,6 +136,7 @@ const ProductList = ({ setSelectedProductId }) => {
 
     let endpoint;
     let stateField;
+    console.log(uploadType);
 
     switch (uploadType) {
       case "registrationCertificate":
@@ -184,7 +185,6 @@ const ProductList = ({ setSelectedProductId }) => {
       alert("Không thể upload ảnh.");
     }
   };
-  console.log(data);
   const handleFileChange = (e, uploadType) => {
     const file = e.target.files[0];
     if (file) {
@@ -210,13 +210,13 @@ const ProductList = ({ setSelectedProductId }) => {
               <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-circle hover-overlay">
                 <input
                   type="file"
-                  ref={fileInputRef}
+                  ref={fileInputRef2}
                   onChange={(e) => handleFileChange(e, "shopLogo")}
                   style={{ display: "none" }}
                   accept="image/*" // Optional: restrict to image files
                 />
                 <FaEdit
-                  onClick={() => fileInputRef.current.click()}
+                  onClick={() => fileInputRef2.current.click()}
                   className="text-white fs-4 d-none"
                   style={{ cursor: "pointer" }}
                 />

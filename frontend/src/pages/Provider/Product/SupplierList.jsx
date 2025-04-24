@@ -106,7 +106,7 @@ const SupplierList = () => {
     );
 
   return (
-    <Container className="mt-4">
+    <Container className="mt-4 min-vh-100">
       <Row className="justify-content-between mb-3">
         <Col>
           <h2>Supplier List</h2>
