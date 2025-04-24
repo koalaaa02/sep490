@@ -6,11 +6,14 @@ import img1 from "../../images/glass.jpg";
 import Swal from "sweetalert2";
 import PaymentMethod from "../../Component/PaymentMethod";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Modal, Button, Form } from "react-bootstrap";
 
 const ShopCheckOut = () => {
   const location = useLocation();
   const cartItems = location.state?.selectedShops || [];
-
+  const userId = useSelector((state) => state.auth.user?.uid || []);
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState("COD");
@@ -19,10 +22,128 @@ const ShopCheckOut = () => {
   const [selectedAddressId, setSelectedAddressId] = useState(10);
   const [expandedAddressId, setExpandedAddressId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [formData, setFormData] = useState({
+    id: "",
+    userId: userId,
+    shopId: "",
+    recipientName: "",
+    phone: "",
+    address: "",
+    provinceId: "",
+    districtId: "",
+    wardId: "",
+    province: "",
+    district: "",
+    ward: "",
+    postalCode: "",
+    defaultAddress: false,
+  });
+
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
+      const data = await response.json();
+      setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
+
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      if (!formData.provinceId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/districts?provinceId=${formData.provinceId}`
+      );
+      const data = await response.json();
+      setDistricts(data);
+    };
+    fetchDistricts();
+  }, [formData.provinceId]);
+
+  useEffect(() => {
+    const fetchWards = async () => {
+      if (!formData.districtId) return;
+      const response = await fetch(
+        `${BASE_URL}/api/ghn/wards?districtId=${formData.districtId}`
+      );
+      const data = await response.json();
+      setWards(data);
+    };
+    fetchWards();
+  }, [formData.districtId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === "provinceId") {
+      const selectedProvince = provinces.find(
+        (province) => province.ProvinceID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        provinceId: value,
+        province: selectedProvince ? selectedProvince.ProvinceName : "",
+      }));
+    }
+
+    if (name === "districtId") {
+      const selectedDistrict = districts.find(
+        (district) => district.DistrictID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        districtId: value,
+        district: selectedDistrict ? selectedDistrict.DistrictName : "",
+      }));
+    }
+
+    if (name === "wardId") {
+      const selectedWard = wards.find(
+        (ward) => ward.WardCode === String(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        wardId: value,
+        ward: selectedWard ? selectedWard.WardName : "",
+      }));
+    }
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
   const navigate = useNavigate();
   const hasBulkyItem = cartItems.some((cart) =>
     cart.items.some((item) => item.productSKUResponse?.bulky === true)
   );
+  const [showModal, setShowModal] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/addresses`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setDataAddress((prevData) => [...(prevData || []), result]);
+        setShowModal(false);
+      }
+    } catch (error) {
+      console.error("Error saving address:", error);
+      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
+    }
+  };
+
+  const handleClose = async () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     const fetchAddress = async () => {
@@ -176,38 +297,50 @@ const ShopCheckOut = () => {
                 <div className="col-md-8">
                   {/* Địa chỉ nhận hàng */}
                   <div className="card mb-3">
-                    <div className="card-header bg-warning fw-bold text-black">
-                      Địa Chỉ Nhận Hàng
+                    <div className="card-header bg-warning fw-bold text-black d-flex justify-content-between align-items-center">
+                      <span>Địa Chỉ Nhận Hàng</span>
+                      <Button
+                        variant="primary"
+                        onClick={() => setShowModal(true)}
+                      >
+                        Thêm địa chỉ
+                      </Button>
                     </div>
-                    <div className="card-body">
-                      {dataAddress?.map((a) => (
-                        <div key={a.id} className="border rounded-1 p-2 mb-2">
-                          <div
-                            className="d-flex align-items-center"
-                            onClick={() => toggleAddress(a.id)}
-                            style={{ cursor: "pointer" }}
-                          >
-                            <input
-                              type="radio"
-                              checked={selectedAddressId === a.id}
-                              onChange={() => toggleAddress(a.id)}
-                              className="me-2"
-                            />
-                            <strong>{a.recipientName}</strong>
-                          </div>
-
-                          {expandedAddressId === a.id && (
-                            <div className="mt-1">
-                              <span>{a.phone}</span> <br />
-                              <span>
-                                {a.address}, {a.ward}, {a.district},{" "}
-                                {a.province}
-                              </span>
+                    {dataAddress?.length === 1 ? (
+                      <span className="m-2 d-flex justify-content-center">
+                        Bạn chưa có địa chỉ. Thêm mới địa chỉ ngay
+                      </span>
+                    ) : (
+                      <div className="card-body">
+                        {dataAddress?.map((a) => (
+                          <div key={a.id} className="border rounded-1 p-2 mb-2">
+                            <div
+                              className="d-flex align-items-center"
+                              onClick={() => toggleAddress(a.id)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <input
+                                type="radio"
+                                checked={selectedAddressId === a.id}
+                                onChange={() => toggleAddress(a.id)}
+                                className="me-2"
+                              />
+                              <strong>{a.recipientName}</strong>
                             </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+
+                            {expandedAddressId === a.id && (
+                              <div className="mt-1">
+                                <span>{a.phone}</span> <br />
+                                <span>
+                                  {a.address}, {a.ward}, {a.district},{" "}
+                                  {a.province}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Sản phẩm */}
@@ -216,9 +349,7 @@ const ShopCheckOut = () => {
                       <div className="col-5 card-header fw-bold text-black">
                         Sản phẩm
                       </div>
-                      <div className="col-1 card-header text-muted">
-                        Đơn vị
-                      </div>
+                      <div className="col-1 card-header text-muted">Đơn vị</div>
                       <div className="col-2 card-header text-muted">
                         Đơn giá
                       </div>
@@ -406,6 +537,150 @@ const ShopCheckOut = () => {
                 </div>
               </div>
             </div>
+
+            <Modal show={showModal} onHide={handleClose}>
+              <Modal.Header closeButton>
+                <Modal.Title>Địa chỉ vận chuyển mới</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <p className="small mb-0 text-danger">
+                  Thêm địa chỉ vận chuyển mới cho giao hàng đơn đặt hàng của
+                  bạn.
+                </p>
+                <Form>
+                  <Form.Group controlId="recipientName" className="mb-3">
+                    <Form.Label>Tên người nhận:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="recipientName"
+                      placeholder="Họ và Tên"
+                      value={formData.recipientName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+
+                  <Form.Group controlId="phone" className="mb-3">
+                    <Form.Label>Số điện thoại:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="phone"
+                      placeholder="Số điện thoại"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </Form.Group>
+
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <Form.Group
+                      controlId="postalCode"
+                      className="mb-3"
+                      style={{ flex: 1 }}
+                    >
+                      <Form.Label>Mã bưu điện:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="postalCode"
+                        placeholder="Mã bưu điện"
+                        value={formData.postalCode}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+
+                    <Form.Group
+                      controlId="address"
+                      className="mb-3"
+                      style={{ flex: 1 }}
+                    >
+                      <Form.Label>Địa chỉ:</Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="address"
+                        placeholder="Địa chỉ"
+                        value={formData.address}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
+                  </div>
+
+                  <Form.Group controlId="provinceId" className="mb-3">
+                    <Form.Label>Tỉnh:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="provinceId"
+                      value={formData.provinceId}
+                      onChange={handleChange}
+                    >
+                      <option value="">Chọn thành phố</option>
+                      {provinces.map((province) => (
+                        <option
+                          key={province.ProvinceID}
+                          value={province.ProvinceID}
+                        >
+                          {province.ProvinceName}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <Form.Group
+                      controlId="districtId"
+                      className="mb-3"
+                      style={{ flex: 1 }}
+                    >
+                      <Form.Label>Huyện:</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="districtId"
+                        value={formData.districtId}
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn huyện</option>
+                        {districts.map((district) => (
+                          <option
+                            key={district.DistrictID}
+                            value={district.DistrictID}
+                          >
+                            {district.DistrictName}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+
+                    <Form.Group
+                      controlId="wardId"
+                      className="mb-3"
+                      style={{ flex: 1 }}
+                    >
+                      <Form.Label>Phường:</Form.Label>
+                      <Form.Control
+                        as="select"
+                        name="wardId"
+                        value={formData.WardCode}
+                        onChange={handleChange}
+                      >
+                        <option value="">Chọn phường</option>
+                        {wards.map((ward) => (
+                          <option key={ward.WardCode} value={ward.WardCode}>
+                            {ward.WardName}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+                  </div>
+                </Form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Hủy
+                </Button>
+                <Button variant="primary" onClick={handleSubmit}>
+                  Lưu địa chỉ
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </>
         )}
       </div>
