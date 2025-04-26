@@ -227,7 +227,7 @@ const AddInvoice = ({
   };
 
   return (
-    <div className="p-3 mb-10 container">
+    <div className="p-3 mb-10">
       <h4>Tạo phiếu giao hàng</h4>
       <form>
         <div className="border p-3 mb-3">
