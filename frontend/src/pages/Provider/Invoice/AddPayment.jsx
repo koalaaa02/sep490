@@ -3,7 +3,12 @@ import { BASE_URL } from "../../../Utils/config";
 import { Modal, Button } from "react-bootstrap";
 import dayjs from "dayjs";
 
-const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
+const AddPayment = ({
+  orderData,
+  closeAddPayment,
+  onPaymentCreated,
+  totalPaid,
+}) => {
   const [paymentData, setPaymentData] = useState({
     invoiceId: orderData?.invoice?.id,
     amountPaid: 0,
@@ -51,8 +56,8 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
   };
 
   return (
-    <div className="p-3 mb-10 container">
-      <h4>Thêm phiếu giao dịch</h4>
+    <div className="p-1 mb-10" style={{ height: "570px" }}>
+      <h4>Thêm phiếu thanh toán</h4>
       <form>
         <div className="border p-3 mb-3">
           <h5>Thông tin</h5>
@@ -102,6 +107,14 @@ const AddPayment = ({ orderData, closeAddPayment, onPaymentCreated }) => {
                 value={orderData.address.phone}
                 readOnly
               />
+            </div>
+            <div className="col-md-12 mb-2 d-flex align-items-center">
+              <strong style={{ minWidth: "200px" }}>
+                Số tiền cần thanh toán:
+              </strong>
+              <span>
+                {(orderData.totalAmount - totalPaid).toLocaleString()} VNĐ
+              </span>
             </div>
             <div className="col-md-12 mb-2 d-flex align-items-center">
               <strong style={{ minWidth: "200px" }}>Nhập số tiền trả:</strong>
