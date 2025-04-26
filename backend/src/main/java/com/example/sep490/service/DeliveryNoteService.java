@@ -127,15 +127,23 @@ public class DeliveryNoteService {
             if(orderDetail.getQuantity() != totalQuantity) return ;
         }
 
-        InvoiceRequest invoice = InvoiceRequest.builder()
-                .invoiceCode(commonUtils.randomString(10))
-                .status(InvoiceStatus.PARTIALLY_PAID)
-                .orderId(order.getId())
-                .paidAmount(BigDecimal.ZERO)
-                .totalAmount(order.getTotalAmount())
-                .deliveryDate(LocalDateTime.now())
-                .build();
-        invoiceService.createInvoice(invoice);
+        List<DeliveryNote> deliveredDeliveryNotes = deliveryNoteRepo.findByOrderIdAndIsDeleteFalse(orderId);
+        BigDecimal totalPaidAmount = deliveredDeliveryNotes.stream()
+                .map(DeliveryNote::getTotalAmount)
+                .filter(Objects::nonNull) // nếu có khả năng null
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if(totalPaidAmount.compareTo(order.getTotalAmount()) < 0 ){
+            InvoiceRequest invoice = InvoiceRequest.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.PARTIALLY_PAID)
+                    .orderId(order.getId())
+                    .paidAmount(totalPaidAmount.compareTo(BigDecimal.ZERO) > 0 ? totalPaidAmount: BigDecimal.ZERO )
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryDate(LocalDateTime.now())
+                    .build();
+            invoiceService.createInvoice(invoice);
+        }
         order.setStatus(OrderStatus.DELIVERED);
         orderRepo.save(order);
     }
