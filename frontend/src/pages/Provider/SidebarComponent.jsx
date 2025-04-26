@@ -102,6 +102,15 @@ const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
         <li>
           <button
             className="nav-link"
+            style={getItemStyle("transaction")}
+            onClick={() => handleClick("transaction")}
+          >
+            <MdOutlineNoteAlt size={30} className="ms-1" /> Chi Phí
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
             style={getItemStyle("ChatBox")}
             onClick={() => {
               setSelectedComponent("ChatBox");

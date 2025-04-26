@@ -101,8 +101,8 @@ const InvoiceListComponent = () => {
                 <th>STT</th>
                 <th>Ngày đặt hàng</th>
                 <th>Tên khách hàng</th>
-                <th>Số tiền cần thanh toán</th>
                 <th>Ngày giao hàng</th>
+                <th>Số tiền cần thanh toán</th>
                 <th>Số tiền đã trả</th>
                 <th>Trạng thái</th>
               </tr>
@@ -120,9 +120,13 @@ const InvoiceListComponent = () => {
                   >
                     {invoice.firstName || "user"}
                   </td>
-                  <td>{invoice.totalAmount}</td>
-                  <td>21:00 04/04/2025</td>
-                  <td>{invoice.paidAmount}</td>
+                  <td>21:00 04/04/2025</td>{" "}
+                  <td className="text-right">
+                    {invoice.totalAmount.toLocaleString()}đ
+                  </td>
+                  <td className="text-right">
+                    {invoice.paidAmount.toLocaleString()}đ
+                  </td>
                   <td>
                     {invoice.paidPercentage > 100
                       ? "Đã thanh toán"

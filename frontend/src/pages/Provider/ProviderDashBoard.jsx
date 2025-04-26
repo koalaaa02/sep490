@@ -11,6 +11,7 @@ import ChatBox from "./Chat/ChatBox";
 import DeliveryList from "./Product/DeliveryList.jsx";
 import AddPayment from "./Invoice/AddPayment";
 import SupplierList from "./Product/SupplierList.jsx";
+import Transaction from "./Product/Transaction.tsx";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState(
@@ -62,6 +63,8 @@ const ProviderDashBoard = () => {
         return <ChatBox />;
       case "DeliveryList":
         return <DeliveryList />;
+      case "transaction":
+        return <Transaction />;
       default:
         return <InvoiceManagement />;
     }

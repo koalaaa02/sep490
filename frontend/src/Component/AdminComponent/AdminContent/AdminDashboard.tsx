@@ -31,6 +31,8 @@ ChartJS.register(
 const AdminDashboard = () => {
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState([]);
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
   useEffect(() => {
     const fetchFromApis = async () => {
       const apiEndpoints = [
@@ -39,7 +41,7 @@ const AdminDashboard = () => {
         `${BASE_URL}/api/admin/statistics/users/new`,
         `${BASE_URL}/api/admin/statistics/shops`,
         `${BASE_URL}/api/admin/statistics/shops/new`,
-        `${BASE_URL}/api/admin/statistics/revenue`,
+        `${BASE_URL}/api/admin/statistics/revenue?month=${month}&year=${year}`,
       ];
 
       try {
@@ -66,7 +68,7 @@ const AdminDashboard = () => {
     };
 
     fetchFromApis();
-  }, []);
+  }, [year, month]);
   // console.log(Object.values(data[3]).slice(0, -1));
 
   return (
@@ -82,6 +84,38 @@ const AdminDashboard = () => {
               )}
             >
               <span className={styles.title}>Tổng Thu Nhập Tháng</span>
+              <span className="d-flex gap-2 mt-2">
+                <select
+                  className="form-select form-select-sm"
+                  style={{ width: "100px" }}
+                  onChange={(e) => setMonth(e.target.value)}
+                  defaultValue={new Date().getMonth() + 1} // Months are 0-indexed in JS
+                >
+                  <option value="">Tháng</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                    <option key={month} value={month}>
+                      Tháng {month}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  className="form-select form-select-sm"
+                  style={{ width: "100px" }}
+                  onChange={(e) => setYear(e.target.value)}
+                  defaultValue={new Date().getFullYear()}
+                >
+                  <option value="">Năm</option>
+                  {Array.from(
+                    { length: 10 },
+                    (_, i) => new Date().getFullYear() - i
+                  ).map((year) => (
+                    <option key={year} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </span>
               <span className={classNames(styles.amount, "text-success")}>
                 {typeof data[6] === "number"
                   ? `${data[6].toLocaleString()}đ`
@@ -305,7 +339,7 @@ const AdminDashboard = () => {
             >
               <span className={styles.title}>Tổng số người dùng</span>
               <span className={classNames(styles.amount, "text-success")}>
-                {data[0]||0}
+                {data[0] || 0}
               </span>
             </div>
           </div>

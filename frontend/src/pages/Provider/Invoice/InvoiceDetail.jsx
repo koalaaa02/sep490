@@ -173,8 +173,8 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                 <th>STT</th>
                 <th>Mã khoản nợ</th>
                 <th>Ngày đặt hàng</th>
-                <th>Số tiền cần thanh toán</th>
                 <th>Ngày giao hàng</th>
+                <th>Số tiền cần thanh toán</th>
                 <th>Số tiền đã trả</th>
                 <th>Trạng thái</th>
               </tr>
@@ -198,7 +198,6 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                       year: "numeric",
                     })}
                   </td>
-                  <td>{u.totalAmount}</td>
                   <td>
                     {new Date(u.deliveryDate).toLocaleString("vi-VN", {
                       hour: "2-digit",
@@ -207,12 +206,16 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                       month: "2-digit",
                       year: "numeric",
                     })}
+                  </td>{" "}
+                  <td className="text-right">
+                    {u.totalAmount.toLocaleString()} VNĐ
                   </td>
                   <td
+                    className="text-right"
                     onClick={() => toggleHistory(index)}
                     style={{ cursor: "pointer", color: "blue" }}
                   >
-                    {u.paidAmount}
+                    {u.paidAmount.toLocaleString()} VNĐ
                   </td>
                   <td>
                     {u.status === "PAID" ? "Đã thanh toán" : "Chưa thanh toán"}
