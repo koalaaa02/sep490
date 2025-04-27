@@ -100,7 +100,7 @@ const MyDebt = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${BASE_URL}/api/dealer/ShopInvoiceSummary`,
+          `${BASE_URL}/api/dealer/ShopInvoiceSummary?page=1&size=10&sortBy=id&direction=ASC`,
           {
             method: "GET",
             headers: {
@@ -201,9 +201,7 @@ const MyDebt = () => {
                                 </p>
                                 <p className="fw-bold">
                                   Tổng tiền nợ:{" "}
-                                  <span className="fw-normal">
-                                    6 vnđ
-                                  </span>
+                                  <span className="fw-normal">6 vnđ</span>
                                 </p>
                               </div>
                               <hr />

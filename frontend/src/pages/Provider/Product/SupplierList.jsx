@@ -68,8 +68,14 @@ const SupplierList = () => {
         body: JSON.stringify(newSupplier),
       });
 
-      if (!response.ok) throw new Error("Failed to create supplier");
+      if (!response.ok) {
+        const errorDetails = await response.json();
+        setError(errorDetails);
 
+        return;
+      }
+
+      // Success handling
       setShowModal(false);
       setNewSupplier({
         name: "",
@@ -79,8 +85,8 @@ const SupplierList = () => {
       });
       fetchSuppliers(); // Refresh the list
     } catch (err) {
-      setError(err);
-      alert(err.message);
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred. Please try again.");
     }
   };
 
@@ -109,11 +115,11 @@ const SupplierList = () => {
     <Container className="mt-4 min-vh-100">
       <Row className="justify-content-between mb-3">
         <Col>
-          <h2>Danh sách nhà phân phối</h2>
+          <h2>Danh sách nhà đối tác</h2>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowModal(true)}>
-            <FaPlus className="me-2" /> Thêm nhà phân phối
+            <FaPlus className="me-2" /> Thêm nhà đối tác
           </Button>
         </Col>
       </Row>
@@ -122,7 +128,7 @@ const SupplierList = () => {
         <thead>
           <tr>
             <th>STT</th>
-            <th>Tên nhà phân phối</th>
+            <th>Tên nhà đối tác</th>
             <th>Email</th>
             <th>Số điện thoại</th>
             <th>Địa chỉ</th>
@@ -150,7 +156,7 @@ const SupplierList = () => {
       {/* Add Supplier Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Thêm nhà phân phối</Modal.Title>
+          <Modal.Title>Thêm nhà đối tác</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -165,7 +171,7 @@ const SupplierList = () => {
                 }
               />
             </Form.Group>
-            {error?.contactEmailr && (
+            {error?.contactEmail && (
               <Alert variant="danger">{error?.contactEmail}</Alert>
             )}
             <Form.Group className="mb-3">
@@ -243,7 +249,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
       const response = await fetch(
         `${BASE_URL}/api/provider/suppliers/${supplier.id}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -255,7 +261,8 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
       if (!response.ok) throw new Error("Failed to update supplier");
 
       setEditMode(false);
-      handleClose(); // This will trigger a refresh in the parent component
+      handleClose();
+      setError(null);
     } catch (err) {
       setError(err.message);
     }
@@ -287,7 +294,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
   return (
     <Modal show={show} onHide={handleClose} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Thông tin nhà cung cấp</Modal.Title>
+        <Modal.Title>Thông tin nhà đối tác</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}

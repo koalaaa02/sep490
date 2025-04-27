@@ -134,6 +134,7 @@ const ShopProductDetail = ({ id, onBack }) => {
   if (!product) {
     return <p>Loading...</p>;
   }
+console.log(product);
 
   return (
     <div className="container shadow-sm border rounded p-3">

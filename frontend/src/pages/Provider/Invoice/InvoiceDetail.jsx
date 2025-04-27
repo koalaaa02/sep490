@@ -250,7 +250,7 @@ const InvoiceDetails = ({ invoice, onClose }) => {
                                     }
                                   )}
                                 </td>
-                                <td>{d.amountPaid}</td>
+                                <td>{d.amountPaid.toLocaleString()}VNĐ</td>
                               </tr>
                             ))}
                           </tbody>

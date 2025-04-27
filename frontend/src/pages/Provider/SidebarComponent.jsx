@@ -87,7 +87,7 @@ const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
             onClick={() => handleClick("SupplierLisr")}
           >
             <MdOutlineBusAlert size={30} className="ms-1" />
-            Danh sách nhà cung cấp
+            Danh sách nhà đối tác
           </button>
         </li>
         <li>

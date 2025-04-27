@@ -556,7 +556,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                             ? "Thanh toán khi nhận hết hàng"
                             : "Trả góp"}
                         </td>
-                        <td>{d?.amountPaid} VND</td>
+                        <td>{d?.amountPaid.toLocaleString()} VND</td>
                       </tr>
                     ))}
                   </tbody>
