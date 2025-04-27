@@ -109,15 +109,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
                 <strong>Ngày tạo:</strong>{" "}
                 {new Date(product.createdAt).toLocaleString()}
               </div>
-              <div className="mb-3">
-                <strong>Người tạo:</strong> {product.createdBy}
-              </div>
+
               <div className="mb-3">
                 <strong>Ngày cập nhật:</strong>{" "}
                 {new Date(product.updatedAt).toLocaleString()}
-              </div>
-              <div className="mb-3">
-                <strong>Người cập nhật:</strong> {product.updatedBy}
               </div>
             </Col>
           </Row>
@@ -169,7 +164,76 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               </Card>
             </Col>
           </Row>
-
+          <Card className="mb-3">
+            <Card.Header>Cửa hàng</Card.Header>
+            <Card.Body>
+              <Row>
+                <Col md={6} className="">
+                  <Row className="align-items-center">
+                    <Col md={6}>
+                      <strong>Tên:</strong>{" "}
+                      {product.shop?.name || "shop ba con cuu"}
+                    </Col>
+                    <Col md={6}>
+                      <strong>Logo:</strong>{" "}
+                      <img
+                        src={
+                          product.shop?.logoImage ||
+                          "https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/1745759062280_133875134764725175.jpg"
+                        }
+                        alt="Logo"
+                        className="ml-2 rounded-circle"
+                        style={{
+                          width: "70px",
+                          height: "70px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </Col>
+                  </Row>
+                </Col>
+                <Col md={6}>
+                  <strong>ID:</strong> {product.shop?.id || 1}
+                </Col>
+              </Row>
+              <Row className="mt-2">
+                <Col md={6}>
+                  <strong>CMND/CCCD:</strong>{" "}
+                  {product.shop?.citizenIdentificationCard || "345345"}
+                </Col>
+                <Col md={6}>
+                  <strong>TIN:</strong> {product.shop?.tin || "345345"}
+                </Col>
+              </Row>
+              <Row className="mt-2">
+                <Col md={6}>
+                  <strong>Loại cửa hàng:</strong>{" "}
+                  {product.shop?.shopType || "ENTERPRISE"}
+                </Col>
+                <Col md={6}>
+                  <strong>Trạng thái:</strong>{" "}
+                  {product.shop?.active ? "Đang hoạt động" : "Không hoạt động"}
+                </Col>
+              </Row>
+              <Row className="mt-3">
+                <Col md={6} className="text-center"></Col>
+                <Col md={6}>
+                  <strong>Giấy chứng nhận đăng ký:</strong>
+                  <br />
+                  <a
+                    href={
+                      product.shop?.registrationCertificateImages ||
+                      "https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/1745759104701_133862641566207024.jpg"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Xem tại đây
+                  </a>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
           {/* <Card className="mt-3">
             <Card.Header>Hình ảnh sản phẩm</Card.Header>
             <Card.Body>
