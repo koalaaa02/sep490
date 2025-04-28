@@ -11,6 +11,7 @@ import { BASE_URL } from "../../Utils/config";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 import OrderStatus from "../../Component/Order/OrderStatus/OrderStatus";
 import OrderList from "../../Component/Order/OrderDetail/OrderList";
+import OrderDetail from "../../Component/Order/OrderDetail/OrderDetail";
 const MyAccountOrder = () => {
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -75,6 +76,7 @@ const MyAccountOrder = () => {
       })),
     }))
     .filter((f) => f.status === status);
+console.log(data?.content);
 
   return (
     <div>

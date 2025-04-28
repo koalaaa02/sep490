@@ -234,7 +234,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Tên nhà phân phối:</label>
+            <label className="form-label fw-bold">Tên nhà cung cấp:</label>
             <select
               className="form-control"
               name="supplierId"
