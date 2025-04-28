@@ -3,7 +3,7 @@ import { Alert, Badge, Modal, Table, Button } from "react-bootstrap";
 import { BASE_URL } from "../../../../Utils/config";
 
 const ProviderInventory = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [inventoryData, setInventoryData] = useState<Record<string, number>>(
     {}
   );

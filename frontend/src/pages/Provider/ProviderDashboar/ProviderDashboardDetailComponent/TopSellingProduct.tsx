@@ -25,7 +25,7 @@ const TopSellingProduct = () => {
   const [data, setData] = useState<Record<string, number>>({});
   const [limit, setLimit] = useState<number>(5);
   const [isMostSold, setIsMostSold] = useState(true);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {

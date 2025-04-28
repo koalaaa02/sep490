@@ -17,7 +17,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [user, setUser] = useState(null);
   const [deliNotes, setdeliNotes] = useState("");
 
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   const statusOptions = [
     "PENDING",
@@ -28,6 +28,22 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     "DELIVERING",
     "DELIVERED",
   ];
+
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
 
   const statusTranslations = {
     PENDING: "Đang chờ",
@@ -161,7 +177,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             {
               method: "GET",
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
                 "Content-Type": "application/json",
               },
             }
@@ -289,12 +305,17 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
     (item) => item.order?.id === order?.id
   );
 
+  const totalPaid = filteredData?.[0]?.debtPayments?.reduce(
+    (sum, d) => sum + (d?.amountPaid || 0),
+    0
+  );
+
   return (
     <>
       {showInvoiceForm ? (
         <AddInvoice
           closeAddInvoice={closeAddInvoice}
-          productQuantities ={productQuantities}
+          productQuantities={productQuantities}
           orderData={data}
           onInvoiceCreated={async () => {
             await refreshOrderDetails();
@@ -302,6 +323,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
         />
       ) : showAddPayment ? (
         <AddPayment
+          totalPaid={totalPaid}
           closeAddPayment={closeAddPayment}
           orderData={data}
           onPaymentCreated={async () => {
@@ -520,7 +542,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
               <strong>Lịch sử giao dịch</strong>
               {!fromDeliveryList && data.status === "DELIVERED" && (
                 <button className="btn btn-primary" onClick={togglePaymetForm}>
-                  Thêm phiếu giao dịch
+                  Thêm phiếu thanh toán
                 </button>
               )}
             </Card.Header>
@@ -833,10 +855,10 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                         <thead>
                           <tr>
                             <th>STT</th>
-                            {/* <th>Ảnh sản phẩm</th> */}
                             <th>Tên sản phẩm</th>
+                            <th>Tên phân loại</th>
                             <th>Đơn giá</th>
-                            {/* <th>Đơn vị</th> */}
+                            <th>Đơn vị</th>
                             <th>Số lượng</th>
                             <th>Số tiền</th>
                           </tr>
@@ -852,9 +874,11 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                                   style={{ height: "50px", width: "50px" }}
                                 />
                               </td> */}
+                              <td>{detail.productName}</td>
                               <td>{detail.productSKUCode}</td>
                               <td>{detail.price.toLocaleString()} VND</td>
                               <td>{detail.quantity}</td>
+                              <td>{convertUnitToVietnamese(detail.unit)}</td>
                               <td>
                                 {(
                                   detail.quantity * detail.price

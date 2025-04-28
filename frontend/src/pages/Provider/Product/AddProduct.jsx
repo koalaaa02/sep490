@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Alert, Button, Form, Modal } from "react-bootstrap";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const shopId = useSelector((state) => state.shop.shopId);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);

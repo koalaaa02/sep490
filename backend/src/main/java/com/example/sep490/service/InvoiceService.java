@@ -1,10 +1,11 @@
 package com.example.sep490.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.sep490.dto.ShopInvoiceSummary;
-import com.example.sep490.dto.UserInvoiceSummary;
+import com.example.sep490.dto.*;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
@@ -20,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.example.sep490.dto.InvoiceRequest;
-import com.example.sep490.dto.InvoiceResponse;
 import com.example.sep490.mapper.InvoiceMapper;
 import com.example.sep490.entity.Invoice;
 import com.example.sep490.utils.BasePagination;
@@ -46,7 +45,7 @@ public class InvoiceService {
     @Autowired
     private UserService userService;
     @Autowired
-    private UserRepository userRepository;
+    private DebtPaymentService debtPaymentService;
     @Autowired
     private ShopRepository shopRepository;
 
@@ -116,7 +115,18 @@ public class InvoiceService {
         entity.setInvoiceCode(commonUtils.randomString(10));
         entity.setAgent(user);
         entity.setOrder(order);
-        return invoiceMapper.EntityToResponse(invoiceRepo.save(entity));
+        invoiceRepo.save(entity);
+
+//        if(entity.getPaidAmount().compareTo(BigDecimal.ZERO) > 0
+//                && entity.getPaidAmount().compareTo(order.getTotalAmount()) <0){
+//            DebtPaymentRequest debtPaymentRequest = DebtPaymentRequest.builder()
+//                    .invoiceId(entity.getId())
+//                    .amountPaid(entity.getPaidAmount())
+//                    .paymentDate(LocalDateTime.now())
+//                    .build();
+//            debtPaymentService.createDebtPayment(debtPaymentRequest);
+//        }
+        return invoiceMapper.EntityToResponse(entity);
     }
 
     public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceRequest) {

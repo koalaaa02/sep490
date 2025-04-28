@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 const ProductDetail = ({ productId, setSelectedProductId }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [productData, setProductData] = useState(null);
   const [product, setProduct] = useState(null);
   const [productSkuData, setProductSkuData] = useState([]);

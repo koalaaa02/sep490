@@ -23,7 +23,7 @@ interface PaginationState {
 }
 
 const ProductList = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [activeProducts, setActiveProducts] = useState<Product[]>([]);
   const [inactiveProducts, setInactiveProducts] = useState<Product[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

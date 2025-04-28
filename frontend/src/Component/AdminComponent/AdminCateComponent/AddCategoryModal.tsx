@@ -25,7 +25,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({
       const response = await fetch(`${BASE_URL}/api/admin/categories`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
           "Content-Type": "application/json",
         },
         credentials: "include",

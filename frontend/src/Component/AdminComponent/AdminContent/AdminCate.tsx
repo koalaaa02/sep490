@@ -17,7 +17,7 @@ type CategoryType = {
 };
 
 const AdminCate = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [categoriesForDropDown, setCategoriesForDropDown] = useState<
     CategoryType[]

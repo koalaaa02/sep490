@@ -29,7 +29,7 @@ ChartJS.register(
   BarElement
 );
 const AdminDashboard = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState([]);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());

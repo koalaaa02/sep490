@@ -127,7 +127,7 @@ const AddInvoice = ({
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = sessionStorage.getItem("access_token");
 
     const totalAmount = products.reduce((sum, p) => {
       const price = parseFloat(p.price) || 0;
@@ -227,7 +227,7 @@ const AddInvoice = ({
   };
 
   return (
-    <div className="p-3 mb-10 container">
+    <div className="p-3 mb-10">
       <h4>Tạo phiếu giao hàng</h4>
       <form>
         <div className="border p-3 mb-3">

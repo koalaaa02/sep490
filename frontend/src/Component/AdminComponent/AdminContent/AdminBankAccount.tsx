@@ -23,7 +23,7 @@ const AdminBankAccount = () => {
     updatedAt: "",
   });
   const [isLoading, setIsLoading] = useState(true);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [banks, setBanks] = useState([]);
 
   useEffect(() => {

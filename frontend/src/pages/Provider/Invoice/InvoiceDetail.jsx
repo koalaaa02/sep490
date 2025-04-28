@@ -5,7 +5,7 @@ import OrderDetails from "./../Product/OrderDetail";
 
 const InvoiceDetails = ({ invoice, onClose }) => {
   const [user, setUser] = useState(null);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [page, setPage] = useState(1);
   const [historyVisible, setHistoryVisible] = useState(null);
   const [currentView, setCurrentView] = useState("list");

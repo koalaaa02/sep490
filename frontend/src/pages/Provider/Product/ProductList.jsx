@@ -7,7 +7,7 @@ import EditShopModal from "../../../Component/EditShopModal.tsx";
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
   const [address, setAddress] = useState(null);
   const [products, setProducts] = useState(null);

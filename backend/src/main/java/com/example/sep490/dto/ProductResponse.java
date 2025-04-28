@@ -32,7 +32,8 @@ public class ProductResponse {
 //    private List<ProductSKU> skus;
     @JsonIgnoreProperties({"products"})
     private Supplier supplier;
-
+    @JsonIgnoreProperties({"orders","manager","address","bankAccount","products"})
+    private Shop shop;
 
     private boolean isDelete;
     private Long createdBy;

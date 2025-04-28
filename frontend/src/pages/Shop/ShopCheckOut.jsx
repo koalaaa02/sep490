@@ -17,7 +17,7 @@ const ShopCheckOut = () => {
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState("COD");
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [dataAddress, setDataAddress] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(10);
   const [expandedAddressId, setExpandedAddressId] = useState(null);

@@ -62,4 +62,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long>, JpaSpec
     """, nativeQuery = true)
     List<Invoice> findByShopIdAndAgentId(@Param("shop_id") Long shop_id, @Param("agent_id") Long agent_id);
 
+
+    @Query("SELECT i FROM Invoice i WHERE i.order.id = :orderId")
+    Optional<InvoiceRepository> findByOrderIdAndIsDeleteFalse(Long orderId);
 }

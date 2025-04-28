@@ -4,7 +4,7 @@ import { BASE_URL } from "../../../Utils/config";
 import { useNavigate } from "react-router-dom";
 
 const OrderDetail = ({ order, status }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const navigate = useNavigate();
   const totalSum = order.products.reduce((sum, product) => {
     return sum + product.price * product.quantity;
@@ -74,16 +74,13 @@ const OrderDetail = ({ order, status }) => {
           </span>
           <span className="fw-bold ml-2">{order.shopName}</span>
 
-          <div className="rounded-2 d-flex align-content-center">
-            <span className="ml-2 bg-warning rounded me-1 border border-warning text-white  py-2 px-2 border-end-0">
-              Nhắn tin
-            </span>
+          <div className="rounded-2 d-flex align-content-center ms-2">
             <span
               className=" btn btn-outline-danger px-2
             "
               onClick={() => navigate(`/SingleShop/${order.shopId}`)}
             >
-              Xem shop
+              Xem nhà cung cấp
             </span>
           </div>
         </div>
@@ -110,8 +107,8 @@ const OrderDetail = ({ order, status }) => {
                 />
               </div>
               <div className="ml-2">
-                <div className="fw-bold">{p.productName}</div>
-                <div className="fw-medium">x{p.quantity}</div>
+                <div className="fw-bold">Tên sản phẩm: {p.productName}</div>
+                <div className="fw-medium">Số lượng: x{p.quantity}</div>
               </div>
             </div>
           ))}
