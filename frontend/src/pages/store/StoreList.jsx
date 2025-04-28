@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import graphics from "../../images/store-graphics.svg";
+// import graphics from "../../images/store-graphics.svg";
+import ship from "../../images/ship.jpg";
 import { BASE_URL } from "../../Utils/config";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { MagnifyingGlass } from "react-loader-spinner";
@@ -100,11 +101,30 @@ const StoreList = () => {
                           {/* img */}
                           {/* img */}
                           <Zoom>
-                            <img
-                              src={graphics}
-                              alt="graphics"
-                              className="img-fluid"
-                            />
+                            <div
+                              style={{
+                                position: "relative",
+                                width: "300px",
+                              }}
+                            >
+                              <img
+                                src={ship}
+                                alt="graphics"
+                                className="img-fluid"
+                                style={{ width: "100%", height: "100%" }}
+                              />
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 0,
+                                  left: 0,
+                                  width: "100%",
+                                  height: "100%",
+                                  background:
+                                    "linear-gradient(to right,rgba(238, 238, 238, 0.4), rgba(0, 0, 0, 0))",
+                                }}
+                              ></div>
+                            </div>
                           </Zoom>
                         </div>
                       </div>
@@ -124,7 +144,9 @@ const StoreList = () => {
                         {/* title */}
                         <h6>
                           Có{" "}
-                          <span className="text-primary">{filteredShops.length}</span>{" "}
+                          <span className="text-primary">
+                            {filteredShops.length}
+                          </span>{" "}
                           nhà cung cấp
                         </h6>
                       </div>

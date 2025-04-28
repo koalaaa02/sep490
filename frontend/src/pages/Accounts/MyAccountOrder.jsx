@@ -47,6 +47,8 @@ const MyAccountOrder = () => {
           }
         );
         const result = await response.json();
+        console.log(result);
+
         setData(result);
       } catch (error) {
         console.error("Lỗi khi fetch dữ liệu:", error);
@@ -63,7 +65,7 @@ const MyAccountOrder = () => {
     ?.map((order) => ({
       shopName: order?.shop.name,
       id: order?.id,
-
+      shopId: order?.shop.id,
       status: order?.status,
       products: order?.orderDetails?.map((detail) => ({
         price: detail?.price,

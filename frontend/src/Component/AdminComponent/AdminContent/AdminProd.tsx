@@ -140,7 +140,7 @@ const ProductList = () => {
   const handleBackToList = () => {
     setSelectedProduct(null);
   };
-  console.log(selectedProduct);
+  console.log(activeProducts);
 
   if (selectedProduct) {
     return (
