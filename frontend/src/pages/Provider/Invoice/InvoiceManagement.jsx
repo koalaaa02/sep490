@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const InvoiceListComponent = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [page, setPage] = useState(1);

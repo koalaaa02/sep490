@@ -1,11 +1,11 @@
-// useLocalStorage.js
+// usesessionStorage.js
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 export function useLocalStorage(key: string) {
   const token = useSelector((state) => state?.auth?.token);
   const [value, setValue] = useState(() => {
-    const storedValue = localStorage.getItem(key);
+    const storedValue = sessionStorage.getItem(key);
     return storedValue ? JSON.parse(storedValue) : null;
   });
 

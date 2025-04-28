@@ -20,7 +20,7 @@ const SupplierList = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [showDetail, setShowDetail] = useState(false);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   // Form state for new supplier
   const [newSupplier, setNewSupplier] = useState({
@@ -237,7 +237,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedSupplier, setEditedSupplier] = useState(supplier);
   const [error, setError] = useState(null);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

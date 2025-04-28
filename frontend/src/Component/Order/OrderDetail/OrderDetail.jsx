@@ -4,7 +4,7 @@ import { BASE_URL } from "../../../Utils/config";
 import { useNavigate } from "react-router-dom";
 
 const OrderDetail = ({ order, status }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const navigate = useNavigate();
   const totalSum = order.products.reduce((sum, product) => {
     return sum + product.price * product.quantity;

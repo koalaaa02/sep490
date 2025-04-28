@@ -7,7 +7,7 @@ import { BASE_URL } from "../../Utils/config";
 import PaymentMethods from "../PaymentMethod";
 import { useSelector } from "react-redux";
 const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const bankCode = useSelector((state) => state.purchase.bank);
   const [amount, setAmount] = useState(
     orders

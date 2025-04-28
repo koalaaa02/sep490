@@ -26,7 +26,7 @@ const ShopRegistrationForm = ({
     setShowConfirmModal(false);
     handleSubmit();
   };
-
+  
   return (
     <div className="p-6 p-lg-10">
       <div className="container">

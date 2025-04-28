@@ -11,7 +11,7 @@ const DeliveryList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentView, setCurrentView] = useState("list");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [searchTerm, setSearchTerm] = useState("");
   const convertUnitToVietnamese = (unit) => {
     const unitMap = {

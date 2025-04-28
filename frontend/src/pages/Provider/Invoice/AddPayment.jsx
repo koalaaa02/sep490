@@ -15,7 +15,7 @@
       paymentDate: dayjs().format("YYYY-MM-DDTHH:mm:ss"),
     });
 
-    const token = localStorage.getItem("access_token");
+    const token = sessionStorage.getItem("access_token");
     const [showConfirm, setShowConfirm] = useState(false);
     const [error, setError] = useState(null);
     const handleConfirmSubmit = async () => {

@@ -3,7 +3,7 @@ import { BASE_URL } from "../../../Utils/config";
 import { useSelector } from "react-redux";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const shopId = useSelector((state) => state.shop.shopId);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);

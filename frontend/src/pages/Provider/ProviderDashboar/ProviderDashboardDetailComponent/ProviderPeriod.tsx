@@ -28,7 +28,7 @@ const ProviderPeriod = () => {
   const currentDate = new Date();
   const [month, setMonth] = useState<number>(currentDate.getMonth() + 1);
   const [year, setYear] = useState<number>(currentDate.getFullYear());
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   useEffect(() => {
     const fetchData = async () => {

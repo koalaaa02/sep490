@@ -305,7 +305,7 @@ const Header = () => {
                   </div>
                 </div>
               </li>
-              {token && (
+              {token && !isProvider && (
                 <li className="nav-item">
                   <Link
                     className="nav-link text-danger"

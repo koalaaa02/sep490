@@ -7,7 +7,7 @@ import { useSelector } from "react-redux";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAccountAddress = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const userId = useSelector((state) => state.auth.user?.uid || []);
   const [formData, setFormData] = useState({
     id: "",

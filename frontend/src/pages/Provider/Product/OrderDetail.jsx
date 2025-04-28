@@ -17,7 +17,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
   const [user, setUser] = useState(null);
   const [deliNotes, setdeliNotes] = useState("");
 
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
 
   const statusOptions = [
     "PENDING",
@@ -177,7 +177,7 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             {
               method: "GET",
               headers: {
-                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
                 "Content-Type": "application/json",
               },
             }

@@ -9,7 +9,7 @@ const OrderList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState(null);
   const [currentView, setCurrentView] = useState("list");
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [page, setPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("");

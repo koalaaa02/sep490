@@ -9,7 +9,7 @@ import img from "../../images/member6.jpg";
 
 const ChatBox = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
   const [selectedChatId, setSelectedChat] = useState(null);
   const userId = useSelector((state) => state?.auth?.user?.uid);

@@ -127,7 +127,7 @@ const AddInvoice = ({
       return;
     }
 
-    const token = localStorage.getItem("access_token");
+    const token = sessionStorage.getItem("access_token");
 
     const totalAmount = products.reduce((sum, p) => {
       const price = parseFloat(p.price) || 0;
