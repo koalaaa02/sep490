@@ -117,15 +117,15 @@ public class InvoiceService {
         entity.setOrder(order);
         invoiceRepo.save(entity);
 
-        if(entity.getPaidAmount().compareTo(BigDecimal.ZERO) > 0
-                && entity.getPaidAmount().compareTo(order.getTotalAmount()) <0){
-            DebtPaymentRequest debtPaymentRequest = DebtPaymentRequest.builder()
-                    .invoiceId(entity.getId())
-                    .amountPaid(entity.getPaidAmount())
-                    .paymentDate(LocalDateTime.now())
-                    .build();
-            debtPaymentService.createDebtPayment(debtPaymentRequest);
-        }
+//        if(entity.getPaidAmount().compareTo(BigDecimal.ZERO) > 0
+//                && entity.getPaidAmount().compareTo(order.getTotalAmount()) <0){
+//            DebtPaymentRequest debtPaymentRequest = DebtPaymentRequest.builder()
+//                    .invoiceId(entity.getId())
+//                    .amountPaid(entity.getPaidAmount())
+//                    .paymentDate(LocalDateTime.now())
+//                    .build();
+//            debtPaymentService.createDebtPayment(debtPaymentRequest);
+//        }
         return invoiceMapper.EntityToResponse(entity);
     }
 
