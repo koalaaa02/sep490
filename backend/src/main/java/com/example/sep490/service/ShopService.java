@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.sep490.configs.jwt.UserInfoUserDetails;
@@ -56,6 +57,8 @@ public class ShopService {
     private String baseURL;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public PageResponse<ShopResponsePublic> getShopsPublic(int page, int size, String sortBy, String direction, String name) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
@@ -149,6 +152,25 @@ public class ShopService {
             shop.setManager(user);
             shop.setAddress(address);
             shop.setBankAccount(bankAccount);
+            return shopMapper.EntityToResponse(shopRepo.save(shop));
+        }else throw new RuntimeException("");
+
+    }
+
+    public ShopResponse updateSecretVNPay(Long id, String password, String vnp_TmnCode, String vnp_HashSecret) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof UserInfoUserDetails) {
+            Shop shop = shopRepo.findByIdAndIsDeleteFalse(id)
+                    .orElseThrow(() -> new RuntimeException("Shop không tồn tại với ID: " + id));
+
+            UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
+            User user = getUser(userInfo.getId());
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new RuntimeException("Mật khẩu không chính xác");
+            }
+            shop.setSecretA(vnp_TmnCode);
+            shop.setSecretB(vnp_HashSecret);
+
             return shopMapper.EntityToResponse(shopRepo.save(shop));
         }else throw new RuntimeException("");
 

@@ -16,7 +16,7 @@ public class DeliveryNoteSpecification {
                 predicates.add(cb.equal(root.get("deliveryCode"), filter.getDeliveryCode() ));
             }
             if (filter.getOrderId() != null) {
-                predicates.add(cb.equal(root.get("orderId"), filter.getOrderId() ));
+                predicates.add(cb.equal(root.get("order").get("id"), filter.getOrderId() ));
             }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy() ));

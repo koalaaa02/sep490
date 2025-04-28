@@ -123,6 +123,29 @@ public class DealerController {
         return ResponseEntity.ok().body(shopService.createShop(shopRequest));
     }
 
+    @PutMapping("/shop/update/{id}")
+    public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
+        if (!id.equals(shopRequest.getId())) {
+            return ResponseEntity.badRequest().body("id và id trong url không trùng khớp.");
+        }
+        return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
+    }
+
+    public static class UpdateSecret {
+        public Long shopId;
+        public String password;
+        public String vnp_TmnCode;//secretA
+        public String vnp_HashSecret;//secretB
+    }
+
+    @PutMapping("/shop/updatesecretvnpay/{shopId}")
+    public ResponseEntity<?> updateSecretVNPay(@PathVariable Long shopId,@Valid @RequestBody UpdateSecret updateSecret) {
+        if (!shopId.equals(updateSecret.shopId)) {
+            return ResponseEntity.badRequest().body("id và shopId trong url không trùng khớp.");
+        }
+        return ResponseEntity.ok().body(shopService.updateSecretVNPay(shopId, updateSecret.password, updateSecret.vnp_TmnCode, updateSecret.vnp_HashSecret));
+    }
+
     @PostMapping(value = "/shop/uploadRegistrationCertificate", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadRegistrationCertificateImages(
             @RequestPart("file") MultipartFile file) {

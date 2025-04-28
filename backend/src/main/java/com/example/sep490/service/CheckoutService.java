@@ -101,7 +101,7 @@ public class CheckoutService {
                 if(proSKU.isBulky() && orderRequest.getDeliveryMethod().equals(DeliveryMethod.GHN)) {
                     throw new RuntimeException("Rất tiếc, giỏ hàng chứa mặt hàng cồng kềnh, vui lòng chọn phương thức vận chuyển SELF DELIVERY.");
                 }else{
-                    orderRequest.setStatus(OrderStatus.FINDINGTRUCK);
+                    orderRequest.setStatus(OrderStatus.PENDING);
                 };
 
                 totalAmount = totalAmount.add(productSKU.get().getSellingPrice().multiply(BigDecimal.valueOf(item.getQuantity())));

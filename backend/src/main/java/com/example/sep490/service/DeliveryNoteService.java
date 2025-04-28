@@ -3,8 +3,11 @@ package com.example.sep490.service;
 import com.example.sep490.dto.DeliveryDetailRequest;
 import com.example.sep490.dto.DeliveryNoteRequest;
 import com.example.sep490.dto.DeliveryNoteResponse;
+import com.example.sep490.dto.InvoiceRequest;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.compositeKeys.OrderDetailId;
+import com.example.sep490.entity.enums.InvoiceStatus;
+import com.example.sep490.entity.enums.OrderStatus;
 import com.example.sep490.mapper.DeliveryNoteMapper;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.DeliveryNoteFilterDTO;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,6 +49,10 @@ public class DeliveryNoteService {
     private AddressRepository addressRepo;
     @Autowired
     private OrderRepository orderRepo;
+    @Autowired
+    private InvoiceRepository invoiceRepo;
+    @Autowired
+    private InvoiceService invoiceService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -100,10 +108,37 @@ public class DeliveryNoteService {
             deliveryNote.setTotalAmount(totalAmount);
             deliveryNoteRepo.save(deliveryNote);
         }
-
+        isAllDeliveryDone(order.getId());
         return deliveryNoteMapper.EntityToResponse(deliveryNote);
     }
 
+    public void isAllDeliveryDone(Long orderId){
+        Order order = getOrder(orderId);
+        if(order == null) throw new RuntimeException("Không xác định được đơn hàng cần giao");
+
+        List<OrderDetail> orderDetails = order.getOrderDetails();
+        List<DeliveryDetail> deliveredDeliveryDetails = deliveryDetailRepo.findByOrderIdAndIsDeleteFalse(orderId);
+        for (OrderDetail orderDetail : orderDetails) {
+            int totalQuantity = deliveredDeliveryDetails.stream()
+                    .filter(d -> d.getOrderDetailId().getSkuId().equals(orderDetail.getId().getSkuId()))
+                    .mapToInt(DeliveryDetail::getQuantity)
+                    .sum();
+
+            if(orderDetail.getQuantity() != totalQuantity) return ;
+        }
+
+        InvoiceRequest invoice = InvoiceRequest.builder()
+                .invoiceCode(commonUtils.randomString(10))
+                .status(InvoiceStatus.PARTIALLY_PAID)
+                .orderId(order.getId())
+                .paidAmount(BigDecimal.ZERO)
+                .totalAmount(order.getTotalAmount())
+                .deliveryDate(LocalDateTime.now())
+                .build();
+        invoiceService.createInvoice(invoice);
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepo.save(order);
+    }
 
 
     @Transactional

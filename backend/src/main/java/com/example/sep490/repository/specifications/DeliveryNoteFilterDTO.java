@@ -19,7 +19,7 @@ public class DeliveryNoteFilterDTO {
 
     @JsonIgnore
     private Long deliveryCode;
-    @JsonIgnore
+
     private Long orderId;
     @JsonIgnore
     private Long createdBy;

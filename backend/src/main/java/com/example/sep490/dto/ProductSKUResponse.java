@@ -40,8 +40,8 @@ public class ProductSKUResponse{
     
     private String images;
     private boolean bulky;
-    @JsonIgnoreProperties({ "skus","category","shop","supplier"})
-    private Product product;
+    @JsonIgnoreProperties({ "skus","category","supplier"})
+    private ProductResponse product;
 
 
     private boolean isDelete;
