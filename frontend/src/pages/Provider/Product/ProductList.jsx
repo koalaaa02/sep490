@@ -3,11 +3,13 @@ import { FaEdit, FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
 import { Row, Col, Form } from "react-bootstrap";
+import EditShopModal from "../../../Component/EditShopModal.tsx";
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const token = localStorage.getItem("access_token");
   const [data, setData] = useState(null);
+  const [address, setAddress] = useState(null);
   const [products, setProducts] = useState(null);
   const [page, setPage] = useState(1);
   const [isActive, setIsActive] = useState(true);
@@ -191,6 +193,28 @@ const ProductList = ({ setSelectedProductId }) => {
       handleUploadFile(file, uploadType);
     }
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/addresses/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const result = await response.json();
+        setAddress(result?.content);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+console.log(data);
+
   return (
     <div className="p-3 mb-10">
       <div className="p-3 row shadow bg-light rounded">
@@ -222,7 +246,7 @@ const ProductList = ({ setSelectedProductId }) => {
                 />
               </div>
             </div>
-            <p>Tên nhà cung cấp: {data?.name}</p>
+            <p style={{ marginLeft: "4px" }}>Tên nhà cung cấp: {data?.name}</p>
           </div>
           <div className="d-flex align-items-center">
             <p>
@@ -243,30 +267,44 @@ const ProductList = ({ setSelectedProductId }) => {
               <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
             </p>
           </div>
+          <div className=" w-100 align-item text-right">
+            {address && (
+              <EditShopModal currentShopData={data} address={address} shopId={data?.id}/>
+            )}
+          </div>
         </div>
         <div className="col-6">
           <div className="text-center d-flex flex-column">
             <p className="fw-bold"> Registration Certificate</p>
-            <img
-              src={data?.registrationCertificateImages}
-              alt="certificate"
-              style={{ height: "200px", objectFit: "contain" }}
-              onerror="this.src='placeholder.jpg';"
-            />
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={(e) => handleFileChange(e, "registrationCertificate")}
-              style={{ display: "none" }}
-              accept="image/*" // Optional: restrict to image files
-            />
-            <button
-              style={{ width: "10%" }}
-              className="btn btn-info text-right align-self-end px-auto py-auto"
-              onClick={() => fileInputRef.current.click()}
-            >
-              <FaEdit size={25} color="white" />
-            </button>
+
+            <div className="position-relative">
+              <img
+                src={data?.registrationCertificateImages}
+                alt="certificate"
+                style={{ height: "200px", objectFit: "contain" }}
+                onerror="this.src='placeholder.jpg';"
+              />
+              <div
+                style={{ height: "200px", objectFit: "contain" }}
+                className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center hover-overlay"
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) =>
+                    handleFileChange(e, "registrationCertificate")
+                  }
+                  style={{ display: "none" }}
+                  accept="image/*" // Optional: restrict to image files
+                />
+                <div
+                  className="px-auto py-auto"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <FaEdit size={25} color="white" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>{" "}
         {/* <hr /> */}
