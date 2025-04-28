@@ -1,9 +1,6 @@
 package com.example.sep490.service;
 
-import com.example.sep490.dto.DeliveryDetailRequest;
-import com.example.sep490.dto.DeliveryNoteRequest;
-import com.example.sep490.dto.DeliveryNoteResponse;
-import com.example.sep490.dto.InvoiceRequest;
+import com.example.sep490.dto.*;
 import com.example.sep490.entity.*;
 import com.example.sep490.entity.compositeKeys.OrderDetailId;
 import com.example.sep490.entity.enums.InvoiceStatus;
@@ -50,9 +47,9 @@ public class DeliveryNoteService {
     @Autowired
     private OrderRepository orderRepo;
     @Autowired
-    private InvoiceRepository invoiceRepo;
-    @Autowired
     private InvoiceService invoiceService;
+    @Autowired
+    private DebtPaymentService debtPaymentService;
     @Autowired
     private UserService userService;
     @Autowired
@@ -112,6 +109,7 @@ public class DeliveryNoteService {
         return deliveryNoteMapper.EntityToResponse(deliveryNote);
     }
 
+    @Transactional
     public void isAllDeliveryDone(Long orderId){
         Order order = getOrder(orderId);
         if(order == null) throw new RuntimeException("Không xác định được đơn hàng cần giao");
@@ -127,15 +125,34 @@ public class DeliveryNoteService {
             if(orderDetail.getQuantity() != totalQuantity) return ;
         }
 
-        InvoiceRequest invoice = InvoiceRequest.builder()
-                .invoiceCode(commonUtils.randomString(10))
-                .status(InvoiceStatus.PARTIALLY_PAID)
-                .orderId(order.getId())
-                .paidAmount(BigDecimal.ZERO)
-                .totalAmount(order.getTotalAmount())
-                .deliveryDate(LocalDateTime.now())
-                .build();
-        invoiceService.createInvoice(invoice);
+        List<DeliveryNote> deliveredDeliveryNotes = deliveryNoteRepo.findByOrderIdAndIsDeleteFalse(orderId);
+        BigDecimal totalPaidAmount = deliveredDeliveryNotes.stream()
+                .map(DeliveryNote::getTotalAmount)
+                .filter(Objects::nonNull) // nếu có khả năng null
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if(totalPaidAmount.compareTo(order.getTotalAmount()) < 0 ){
+            InvoiceRequest invoice = InvoiceRequest.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.PARTIALLY_PAID)
+                    .orderId(order.getId())
+                    .paidAmount(totalPaidAmount.compareTo(BigDecimal.ZERO) > 0 ? totalPaidAmount: BigDecimal.ZERO )
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryDate(LocalDateTime.now())
+                    .build();
+            invoiceService.createInvoice(invoice);
+
+            for(DeliveryNote deliveryNote : deliveredDeliveryNotes){
+                if(deliveryNote.getTotalAmount().compareTo(BigDecimal.ZERO) > 0){
+                    DebtPaymentRequest debtPaymentRequest = DebtPaymentRequest.builder()
+                            .invoiceId(invoice.getId())
+                            .amountPaid(deliveryNote.getTotalAmount())
+                            .paymentDate(deliveryNote.getDeliveredDate())
+                            .build();
+                    debtPaymentService.createDebtPayment(debtPaymentRequest);
+                }
+            }
+        }
         order.setStatus(OrderStatus.DELIVERED);
         orderRepo.save(order);
     }
