@@ -258,47 +258,90 @@ const MyAcconutSetting = () => {
 
                         <div className="mb-3">
                           <label className="form-label">Số CCCD</label>
-                          {!cccdVerified &&
-                          editableUser.citizenIdentificationCard !== "" ? (
-                            <div style={{ position: "relative" }}>
-                              <input
-                                type="password"
-                                className="form-control"
-                                value={"************"}
-                                disabled
-                              />
-                              <i
-                                className="fa fa-eye position-absolute"
-                                style={{
-                                  top: "10px",
-                                  right: "10px",
-                                  cursor: "pointer",
-                                  color: "#888",
-                                }}
-                                onClick={() => setShowCccdModal(true)}
-                              ></i>
-                            </div>
-                          ) : (
-                            <div style={{ position: "relative" }}>
+
+                          {isEditing ? (
+                            // Nếu đang chỉnh sửa
+                            !editableUser?.citizenIdentificationCard ||
+                            cccdVerified ? (
+                              // Nếu chưa có CCCD hoặc đã xác thực thì cho phép nhập
                               <input
                                 type="text"
                                 name="citizenIdentificationCard"
                                 className="form-control"
-                                value={editableUser.citizenIdentificationCard}
+                                value={
+                                  editableUser.citizenIdentificationCard || ""
+                                }
                                 onChange={handleInputChange}
-                                disabled={!isEditing}
                               />
-                              <i
-                                className="fa fa-eye-slash position-absolute"
-                                style={{
-                                  top: "10px",
-                                  right: "10px",
-                                  cursor: "pointer",
-                                  color: "#888",
-                                }}
-                                onClick={() => setCccdVerified(false)}
-                              ></i>
-                            </div>
+                            ) : (
+                              // Nếu có CCCD nhưng chưa xác thực → khóa lại, yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
+                              </div>
+                            )
+                          ) : editableUser?.citizenIdentificationCard ? (
+                            // Nếu không phải đang chỉnh sửa, kiểm tra đã có CCCD chưa
+                            !cccdVerified ? (
+                              // Nếu đã có CCCD nhưng chưa xác thực → khóa lại và yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
+                              </div>
+                            ) : (
+                              // Nếu đã xác thực thì hiển thị số CCCD
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={editableUser.citizenIdentificationCard}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye-slash position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setCccdVerified(false)}
+                                ></i>
+                              </div>
+                            )
+                          ) : (
+                            // Nếu chưa có CCCD thì thông báo
+                            <p className="text-danger">
+                              Chưa cập nhật số căn cước
+                            </p>
                           )}
                         </div>
 
@@ -307,45 +350,47 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt trước CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageUp &&
-                              editableUser.citizenIdentificationCardImageUp !==
-                                "" && (
-                                <div
+
+                            {editableUser.citizenIdentificationCardImageUp ? (
+                              <div
+                                style={{
+                                  position: "relative",
+                                  width: "fit-content",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    editableUser.citizenIdentificationCardImageUp
+                                  }
+                                  alt="Mặt trước CCCD"
                                   style={{
-                                    position: "relative",
-                                    width: "fit-content",
+                                    width: "100px",
+                                    marginTop: "10px",
+                                    filter: cccdVerified ? "none" : "blur(8px)",
                                   }}
-                                >
-                                  <img
-                                    src={
-                                      editableUser.citizenIdentificationCardImageUp
-                                    }
-                                    alt="Mặt trước CCCD"
+                                />
+                                {!cccdVerified && (
+                                  <i
+                                    className="fa fa-eye position-absolute"
                                     style={{
-                                      width: "100px",
-                                      marginTop: "10px",
-                                      filter: cccdVerified
-                                        ? "none"
-                                        : "blur(8px)",
+                                      top: "10px",
+                                      left: "10px",
+                                      cursor: "pointer",
+                                      color: "white",
+                                      background: "rgba(0,0,0,0.5)",
+                                      padding: "5px",
+                                      borderRadius: "50%",
                                     }}
+                                    onClick={() => setShowCccdModal(true)}
                                   />
-                                  {!cccdVerified && (
-                                    <i
-                                      className="fa fa-eye position-absolute"
-                                      style={{
-                                        top: "10px",
-                                        left: "10px",
-                                        cursor: "pointer",
-                                        color: "white",
-                                        background: "rgba(0,0,0,0.5)",
-                                        padding: "5px",
-                                        borderRadius: "50%",
-                                      }}
-                                      onClick={() => setShowCccdModal(true)}
-                                    />
-                                  )}
-                                </div>
-                              )}
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-muted fst-italic">
+                                Chưa có ảnh CCCD mặt trước
+                              </p>
+                            )}
+
                             {isEditing && (
                               <input
                                 type="file"
@@ -362,45 +407,47 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt sau CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageDown &&
-                              editableUser.citizenIdentificationCardImageDown !==
-                                "" && (
-                                <div
+
+                            {editableUser.citizenIdentificationCardImageDown ? (
+                              <div
+                                style={{
+                                  position: "relative",
+                                  width: "fit-content",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    editableUser.citizenIdentificationCardImageDown
+                                  }
+                                  alt="Mặt sau CCCD"
                                   style={{
-                                    position: "relative",
-                                    width: "fit-content",
+                                    width: "100px",
+                                    marginTop: "10px",
+                                    filter: cccdVerified ? "none" : "blur(8px)",
                                   }}
-                                >
-                                  <img
-                                    src={
-                                      editableUser.citizenIdentificationCardImageDown
-                                    }
-                                    alt="Mặt sau CCCD"
+                                />
+                                {!cccdVerified && (
+                                  <i
+                                    className="fa fa-eye position-absolute"
                                     style={{
-                                      width: "100px",
-                                      marginTop: "10px",
-                                      filter: cccdVerified
-                                        ? "none"
-                                        : "blur(8px)",
+                                      top: "10px",
+                                      left: "10px",
+                                      cursor: "pointer",
+                                      color: "white",
+                                      background: "rgba(0,0,0,0.5)",
+                                      padding: "5px",
+                                      borderRadius: "50%",
                                     }}
+                                    onClick={() => setShowCccdModal(true)}
                                   />
-                                  {!cccdVerified && (
-                                    <i
-                                      className="fa fa-eye position-absolute"
-                                      style={{
-                                        top: "10px",
-                                        left: "10px",
-                                        cursor: "pointer",
-                                        color: "white",
-                                        background: "rgba(0,0,0,0.5)",
-                                        padding: "5px",
-                                        borderRadius: "50%",
-                                      }}
-                                      onClick={() => setShowCccdModal(true)}
-                                    />
-                                  )}
-                                </div>
-                              )}
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-danger">
+                                Chưa có ảnh CCCD mặt sau
+                              </p>
+                            )}
+
                             {isEditing && (
                               <input
                                 type="file"
@@ -412,21 +459,42 @@ const MyAcconutSetting = () => {
                               />
                             )}
                           </div>
-                          <div className="d-flex justify-content-start mt-2">
-                            <button
-                              type="button"
-                              className={`btn ${
-                                isEditing ? "btn-success" : "btn-secondary"
-                              }`}
-                              onClick={() => {
-                                if (isEditing) {
-                                  handleUpdateProfile();
-                                }
-                                setIsEditing((prev) => !prev);
-                              }}
-                            >
-                              {isEditing ? "Lưu" : "Chỉnh sửa"}
-                            </button>
+
+                          <div className="d-flex justify-content-start mt-2 gap-2">
+                            {isEditing ? (
+                              <>
+                                <button
+                                  type="button"
+                                  className="btn btn-success"
+                                  onClick={() => {
+                                    handleUpdateProfile();
+                                    setIsEditing(false);
+                                  }}
+                                >
+                                  Lưu
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary"
+                                  onClick={() => {
+                                    setEditableUser(userData); // Reset về thông tin gốc
+                                    setIsEditing(false);
+                                    setError("");
+                                    setMessage("");
+                                  }}
+                                >
+                                  Hủy
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setIsEditing(true)}
+                              >
+                                Chỉnh sửa
+                              </button>
+                            )}
                           </div>
                         </div>
                       </form>
