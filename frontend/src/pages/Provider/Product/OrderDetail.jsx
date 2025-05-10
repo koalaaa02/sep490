@@ -877,8 +877,8 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
                               <td>{detail.productName}</td>
                               <td>{detail.productSKUCode}</td>
                               <td>{detail.price.toLocaleString()} VND</td>
-                              <td>{detail.quantity}</td>
                               <td>{convertUnitToVietnamese(detail.unit)}</td>
+                              <td>{detail.quantity}</td>
                               <td>
                                 {(
                                   detail.quantity * detail.price

@@ -38,7 +38,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
           paymentProvider: "VNPAY",
           paymentType: "INVOICE",
           amount: amount,
-          bankCode: bankCode,
+          bankCode: "",
           referenceId: shop?.shopId,
         })}`,
         {

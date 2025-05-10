@@ -541,7 +541,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               value={product.category.id}
               disabled={!isEditing}
             >
-              <option value="">-- Chọn danh mục --</option>
+              <option value="" disabled>-- Chọn danh mục --</option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -561,7 +561,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               value={product?.supplier?.id}
               disabled={!isEditing}
             >
-              <option value="">-- Chọn nhà cung cấp --</option>
+              <option value="" disabled>-- Chọn nhà phân phối --</option>
               {suppliers?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
