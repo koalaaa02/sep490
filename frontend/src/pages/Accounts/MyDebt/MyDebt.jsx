@@ -100,7 +100,7 @@ const MyDebt = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${BASE_URL}/api/dealer/ShopInvoiceSummary?page=1&size=10&sortBy=id&direction=ASC`,
+          `${BASE_URL}/api/dealer/ShopInvoiceSummary?page=1&size=10&sortBy=shop_id&direction=ASC`,
           {
             method: "GET",
             headers: {

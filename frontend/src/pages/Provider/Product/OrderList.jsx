@@ -19,9 +19,9 @@ const OrderList = () => {
   const statusOptions = [
     "PENDING",
     "CANCELLED",
-    "FINDINGTRUCK",
+    // "FINDINGTRUCK",
     "ACCEPTED",
-    "PACKAGING",
+    // "PACKAGING",
     "DELIVERING",
     "DELIVERED",
     // "LOST",
@@ -40,6 +40,7 @@ const OrderList = () => {
         status: filterStatus,
         paymentMethod: filterPaymentMethod,
         direction: filterDirection,
+        paid: true, // thêm 1 bộ lọc
       });
 
       const response = await fetch(
@@ -86,9 +87,9 @@ const OrderList = () => {
   const statusTranslations = {
     PENDING: "Đang chờ",
     CANCELLED: "Hủy",
-    FINDINGTRUCK: "Đang tìm xe",
+    // FINDINGTRUCK: "Đang tìm xe",
     ACCEPTED: "Chấp nhận",
-    PACKAGING: "Đóng gói",
+    // PACKAGING: "Đóng gói",
     DELIVERING: "Chưa giao",
     DELIVERED: "Đã giao",
   };
