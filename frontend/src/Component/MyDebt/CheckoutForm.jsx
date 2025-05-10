@@ -186,7 +186,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                 </div>
               </div>
             </div>
-            <PaymentMethods />
+            {/* <PaymentMethods /> */}
             <div className="modal-footer">
               <button
                 type="button"
