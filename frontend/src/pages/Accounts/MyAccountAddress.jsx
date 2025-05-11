@@ -43,7 +43,15 @@ const MyAccountAddress = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
+      const data = await response.json();
+      setProvinces(data);
+      console.log(provinces);
+    };
+    fetchProvinces();
+  }, []);
   const handleEdit = (p, index) => {
     setEditIndex(index);
     setEditData({
@@ -285,15 +293,6 @@ const MyAccountAddress = () => {
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
-  }, []);
-
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
-      const data = await response.json();
-      setProvinces(data);
-    };
-    fetchProvinces();
   }, []);
 
   useEffect(() => {
@@ -713,14 +712,15 @@ const MyAccountAddress = () => {
                         onChange={handleChange}
                       >
                         <option value="">Chọn thành phố</option>
-                        {provinces.map((province) => (
-                          <option
-                            key={province.ProvinceID}
-                            value={province.ProvinceID}
-                          >
-                            {province.ProvinceName}
-                          </option>
-                        ))}
+                        {provinces.length > 0 &&
+                          provinces?.map((province) => (
+                            <option
+                              key={province.ProvinceID}
+                              value={province.ProvinceID}
+                            >
+                              {province.ProvinceName}
+                            </option>
+                          ))}
                       </select>
                     </div>
                     <div className="col-6">

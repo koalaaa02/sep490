@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Form, Button, Modal } from "react-bootstrap";
 import UploadCertificate from "./UploadCertificate.tsx";
+import { useSelector } from "react-redux";
 
 const ShopRegistrationForm = ({
   storeName,
@@ -16,6 +17,7 @@ const ShopRegistrationForm = ({
   notification,
 }) => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const userInfo = useSelector((state) => state.auth.user);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -26,7 +28,8 @@ const ShopRegistrationForm = ({
     setShowConfirmModal(false);
     handleSubmit();
   };
-  
+  if (userInfo.roles.includes("ROLE_PROVIDER"))
+    return <div className="text-center fs-4 h-25 mt-3"> Bạn đã là người bán hàng rồi!!!</div>;
   return (
     <div className="p-6 p-lg-10">
       <div className="container">
