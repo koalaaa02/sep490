@@ -29,7 +29,18 @@ const MyAcconutPaymentMethod = () => {
     updatedAt: "",
   });
   const [loaderStatus, setLoaderStatus] = useState(true);
+  const [citizenCardFront, setCitizenCardFront] = useState(null);
+  const [citizenCardBack, setCitizenCardBack] = useState(null);
 
+  const handleCitizenCardFrontChange = (data) => {
+    // Handle the response data from the API or the file object
+    setCitizenCardFront(data);
+  };
+
+  const handleCitizenCardBackChange = (data) => {
+    // Handle the response data from the API or the file object
+    setCitizenCardBack(data);
+  };
   const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
@@ -177,6 +188,8 @@ const MyAcconutPaymentMethod = () => {
                   handleFileChange={handleFileChange}
                   handleSubmit={handleSubmit}
                   notification={notification}
+                  handleCitizenCardFrontChange={handleCitizenCardFrontChange}
+                  handleCitizenCardBackChange={handleCitizenCardBackChange}
                 />
               </div>
             </div>

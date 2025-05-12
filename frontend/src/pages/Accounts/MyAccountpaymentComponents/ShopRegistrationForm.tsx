@@ -13,6 +13,8 @@ const ShopRegistrationForm = ({
   taxCode,
   setTaxCode,
   handleFileChange,
+  handleCitizenCardFrontChange,
+  handleCitizenCardBackChange,
   handleSubmit,
   notification,
 }) => {
@@ -28,8 +30,15 @@ const ShopRegistrationForm = ({
     setShowConfirmModal(false);
     handleSubmit();
   };
-  if (userInfo.roles.includes("ROLE_PROVIDER"))
-    return <div className="text-center fs-4 h-25 mt-3"> Bạn đã là người bán hàng rồi!!!</div>;
+
+  // if (userInfo.roles.includes("ROLE_PROVIDER"))
+  //   return (
+  //     <div className="text-center fs-4 h-25 mt-3">
+  //       {" "}
+  //       Bạn đã là người bán hàng rồi!!!
+  //     </div>
+  //   );
+
   return (
     <div className="p-6 p-lg-10">
       <div className="container">
@@ -40,8 +49,6 @@ const ShopRegistrationForm = ({
           </p>
         )}
         <Form onSubmit={handleFormSubmit}>
-          {" "}
-          {/* Changed to handleFormSubmit */}
           {/* Tên cửa hàng */}
           <Form.Group className="mb-3">
             <Form.Label>Tên nhà phân phối:</Form.Label>
@@ -53,6 +60,7 @@ const ShopRegistrationForm = ({
               required
             />
           </Form.Group>
+
           {/* Số CCCD */}
           <Form.Group className="mb-3">
             <Form.Label>CCCD của chủ nhà phân phối:</Form.Label>
@@ -64,6 +72,23 @@ const ShopRegistrationForm = ({
               required
             />
           </Form.Group>
+
+          {/* CCCD Front Side */}
+          <UploadCertificate
+            label="Ảnh mặt trước CCCD:"
+            accept=".jpg,.jpeg,.png"
+            handleFileChange={handleCitizenCardFrontChange}
+            apiEndpoint="/api/provider/shops/uploadCitizenIdentityCardUp"
+          />
+
+          {/* CCCD Back Side */}
+          <UploadCertificate
+            label="Ảnh mặt sau CCCD:"
+            accept=".jpg,.jpeg,.png"
+            handleFileChange={handleCitizenCardBackChange}
+            apiEndpoint="/api/provider/shops/uploadCitizenIdentityCardDown"
+          />
+
           {/* Loại cửa hàng */}
           <Form.Group className="mb-3">
             <Form.Label>Loại nhà phân phối:</Form.Label>
@@ -75,6 +100,7 @@ const ShopRegistrationForm = ({
               <option value="BUSINESS">Doanh nghiệp nhỏ</option>
             </Form.Select>
           </Form.Group>
+
           {/* Mã số thuế */}
           <Form.Group className="mb-3">
             <Form.Label>Mã số thuế:</Form.Label>
@@ -85,12 +111,21 @@ const ShopRegistrationForm = ({
               onChange={(e) => setTaxCode(e.target.value)}
             />
           </Form.Group>
-          <UploadCertificate handleFileChange={handleFileChange} />
+
+          {/* Business License */}
+          <UploadCertificate
+            label="Giấy phép đăng ký kinh doanh:"
+            accept=".jpg,.jpeg,.png"
+            handleFileChange={handleFileChange}
+            apiEndpoint="/api/provider/shops/uploadRegistrationCertificate"
+          />
+
           <Button variant="primary" type="submit" className="mt-3">
             Đăng ký nhà phân phối
           </Button>
         </Form>
       </div>
+
       <Modal
         show={showConfirmModal}
         onHide={() => setShowConfirmModal(false)}
