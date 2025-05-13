@@ -10,7 +10,15 @@ const MyAcconutSetting = () => {
   const navigate = useNavigate();
 
   const [loaderStatus, setLoaderStatus] = useState(true);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    citizenIdentificationCard: "",
+    citizenIdentificationCardImageUp: "",
+    citizenIdentificationCardImageDown: "",
+  });
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -56,17 +64,8 @@ const MyAcconutSetting = () => {
 
         const data = await response.json();
         setUserData(data);
-
-        // Kiểm tra xem trường `citizenIdentificationCard` có tồn tại hay không
-        if (data?.citizenIdentificationCard) {
-          setEditableUser(data);
-        } else {
-          // Nếu không có giá trị `citizenIdentificationCard`, khởi tạo giá trị trống
-          setEditableUser((prev) => ({
-            ...prev,
-            citizenIdentificationCard: "",
-          }));
-        }
+        setEditableUser(data);
+        // console.log(editableUser);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -86,11 +85,16 @@ const MyAcconutSetting = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
 
-    // Kiểm tra số CCCD nhập vào
-    if (name === "citizenIdentificationCard" && !isValidCccd(value)) {
-      setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
-    } else {
-      setError(""); // Xóa lỗi khi CCCD hợp lệ
+    // Kiểm tra nếu người dùng đã nhập số CCCD và kiểm tra độ dài (12 chữ số)
+    if (name === "citizenIdentificationCard") {
+      // Nếu chưa nhập hoặc nhập không đủ 12 ký tự, không cần kiểm tra
+      if (value === "") {
+        setError(""); // Không hiển thị lỗi khi không có CCCD
+      } else if (value.length === 12 && !isValidCccd(value)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+      } else {
+        setError(""); // Xóa lỗi nếu số CCCD hợp lệ
+      }
     }
 
     setEditableUser((prev) => ({
@@ -107,10 +111,14 @@ const MyAcconutSetting = () => {
   const handleUpdateProfile = async (e) => {
     if (e) e.preventDefault();
 
-    // Kiểm tra nếu CCCD không hợp lệ thì không cho phép cập nhật
-    if (!isValidCccd(editableUser.citizenIdentificationCard)) {
-      setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
-      return;
+    if (
+      editableUser.citizenIdentificationCard !==
+      userData.citizenIdentificationCard
+    ) {
+      if (!isValidCccd(editableUser.citizenIdentificationCard)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+        return;
+      }
     }
 
     try {
@@ -129,6 +137,10 @@ const MyAcconutSetting = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage("Thông tin đã được cập nhật thành công.");
+        setUserData((prevData) => ({
+          ...prevData,
+          ...editableUser, 
+        }));
       } else {
         setError(data.message || "Cập nhật thất bại.");
       }
@@ -230,6 +242,24 @@ const MyAcconutSetting = () => {
     }
   };
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   return (
     <div>
       <ScrollToTop />
@@ -261,23 +291,12 @@ const MyAcconutSetting = () => {
                     <div className="col-lg-5">
                       <form>
                         <div className="mb-3">
-                          <label className="form-label">Họ</label>
+                          <label className="form-label">Tên người dùng</label>
                           <input
                             type="text"
                             name="firstName"
                             className="form-control"
                             value={editableUser.firstName}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">Tên</label>
-                          <input
-                            type="text"
-                            name="lastName"
-                            className="form-control"
-                            value={editableUser.lastName}
                             onChange={handleInputChange}
                             disabled={!isEditing}
                           />
@@ -298,21 +317,18 @@ const MyAcconutSetting = () => {
                           <label className="form-label">Số CCCD</label>
 
                           {isEditing ? (
-                            // Nếu đang chỉnh sửa
-                            !editableUser?.citizenIdentificationCard ||
+                            // Nếu đang chỉnh sửa, kiểm tra xem citizenIdentificationCard có khác rỗng hoặc đã được xác thực
+                            !userData?.citizenIdentificationCard ||
                             cccdVerified ? (
-                              // Nếu chưa có CCCD hoặc đã xác thực thì cho phép nhập
+                              // Nếu không có CCCD hoặc đã xác thực, cho phép chỉnh sửa
                               <input
                                 type="text"
                                 name="citizenIdentificationCard"
                                 className="form-control"
-                                value={
-                                  editableUser.citizenIdentificationCard || ""
-                                }
                                 onChange={handleInputChange}
                               />
                             ) : (
-                              // Nếu có CCCD nhưng chưa xác thực → khóa lại, yêu cầu xác thực
+                              // Nếu có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
                               <div style={{ position: "relative" }}>
                                 <input
                                   type="password"
@@ -332,10 +348,10 @@ const MyAcconutSetting = () => {
                                 ></i>
                               </div>
                             )
-                          ) : editableUser?.citizenIdentificationCard ? (
+                          ) : userData?.citizenIdentificationCard ? (
                             // Nếu không phải đang chỉnh sửa, kiểm tra đã có CCCD chưa
                             !cccdVerified ? (
-                              // Nếu đã có CCCD nhưng chưa xác thực → khóa lại và yêu cầu xác thực
+                              // Nếu đã có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
                               <div style={{ position: "relative" }}>
                                 <input
                                   type="password"
@@ -376,7 +392,7 @@ const MyAcconutSetting = () => {
                               </div>
                             )
                           ) : (
-                            // Nếu chưa có CCCD thì cho phép nhập tự do
+                            // Nếu chưa có CCCD thì hiển thị thông báo
                             <p className="fst-italic text-danger">
                               Chưa có số CCCD
                             </p>
