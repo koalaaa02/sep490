@@ -29,6 +29,7 @@ const MyAcconutSetting = () => {
   const [cccdVerified, setCccdVerified] = useState(false);
   const [cccdPasswordInput, setCccdPasswordInput] = useState("");
   const [showCccdModal, setShowCccdModal] = useState(false);
+  const [hasEnteredCccd, setHasEnteredCccd] = useState(false); // Trạng thái đã nhập CCCD
 
   const token = useSelector((state) => state.auth.token);
   const userId = useSelector((state) => state.auth.user.uid);
@@ -55,7 +56,17 @@ const MyAcconutSetting = () => {
 
         const data = await response.json();
         setUserData(data);
-        setEditableUser(data);
+
+        // Kiểm tra xem trường `citizenIdentificationCard` có tồn tại hay không
+        if (data?.citizenIdentificationCard) {
+          setEditableUser(data);
+        } else {
+          // Nếu không có giá trị `citizenIdentificationCard`, khởi tạo giá trị trống
+          setEditableUser((prev) => ({
+            ...prev,
+            citizenIdentificationCard: "",
+          }));
+        }
       } catch (error) {
         setError(error.message);
       } finally {
@@ -66,16 +77,42 @@ const MyAcconutSetting = () => {
     fetchData();
   }, [token]);
 
+  // Kiểm tra tính hợp lệ của số CCCD
+  const isValidCccd = (cccd) => {
+    const cccdRegex = /^\d{12}$/; // Kiểm tra 12 chữ số
+    return cccdRegex.test(cccd);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Kiểm tra số CCCD nhập vào
+    if (name === "citizenIdentificationCard" && !isValidCccd(value)) {
+      setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+    } else {
+      setError(""); // Xóa lỗi khi CCCD hợp lệ
+    }
+
     setEditableUser((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Nếu người dùng bắt đầu nhập CCCD thì cho phép chỉnh sửa tự do
+    if (name === "citizenIdentificationCard" && !hasEnteredCccd) {
+      setHasEnteredCccd(true);
+    }
   };
 
   const handleUpdateProfile = async (e) => {
     if (e) e.preventDefault();
+
+    // Kiểm tra nếu CCCD không hợp lệ thì không cho phép cập nhật
+    if (!isValidCccd(editableUser.citizenIdentificationCard)) {
+      setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${BASE_URL}/api/myprofile/updateMyProfile`,
@@ -181,10 +218,10 @@ const MyAcconutSetting = () => {
 
       if (response.ok) {
         setMessage("Mật khẩu đã được thay đổi thành công.");
-        alert("Mật khẩu đã được thay đổi thành công.!");
+        alert("Mật khẩu đã được thay đổi thành công!");
       } else {
         setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
-        alert("Đã xảy ra lỗi. Vui lòng thử lại.!");
+        alert("Đã xảy ra lỗi. Vui lòng thử lại!");
       }
     } catch (err) {
       setError(
@@ -219,6 +256,7 @@ const MyAcconutSetting = () => {
                   {message && (
                     <div className="alert alert-success">{message}</div>
                   )}
+                  {error && <div className="alert alert-danger">{error}</div>}
                   <div className="row">
                     <div className="col-lg-5">
                       <form>
@@ -338,9 +376,9 @@ const MyAcconutSetting = () => {
                               </div>
                             )
                           ) : (
-                            // Nếu chưa có CCCD thì thông báo
-                            <p className="text-danger">
-                              Chưa cập nhật số căn cước
+                            // Nếu chưa có CCCD thì cho phép nhập tự do
+                            <p className="fst-italic text-danger">
+                              Chưa có số CCCD
                             </p>
                           )}
                         </div>
@@ -386,7 +424,7 @@ const MyAcconutSetting = () => {
                                 )}
                               </div>
                             ) : (
-                              <p className="text-muted fst-italic">
+                              <p className="text-danger fst-italic">
                                 Chưa có ảnh CCCD mặt trước
                               </p>
                             )}
@@ -443,7 +481,7 @@ const MyAcconutSetting = () => {
                                 )}
                               </div>
                             ) : (
-                              <p className="text-danger">
+                              <p className="text-danger fst-italic">
                                 Chưa có ảnh CCCD mặt sau
                               </p>
                             )}

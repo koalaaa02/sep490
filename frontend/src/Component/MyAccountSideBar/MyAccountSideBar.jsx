@@ -58,7 +58,7 @@ const MyAccountSideBar = ({ activeKey }) => {
             </Link>
           </li>
           {/* nav item */}
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link
               className={`nav-link ${
                 activeKey === "MyAccountInvoice" && "active"
@@ -68,7 +68,7 @@ const MyAccountSideBar = ({ activeKey }) => {
               <i className="fas fa-bell me-2" />
               Hóa đơn của tôi
             </Link>
-          </li>
+          </li> */}
           {/* nav item */}
           <li className="nav-item">
             <Link
