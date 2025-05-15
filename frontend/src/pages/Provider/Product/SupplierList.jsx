@@ -30,9 +30,52 @@ const SupplierList = () => {
     address: "",
   });
 
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    contactEmail: "",
+    phone: "",
+    address: "",
+  });
+
+  // Validate form function
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    if (!newSupplier.name.trim()) {
+      errors.name = "Vui lòng nhập tên nhà đối tác";
+      isValid = false;
+    }
+
+    if (!newSupplier.contactEmail.trim()) {
+      errors.contactEmail = "Vui lòng nhập email";
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newSupplier.contactEmail)) {
+      errors.contactEmail = "Email không hợp lệ";
+      isValid = false;
+    }
+
+    if (!newSupplier.phone.trim()) {
+      errors.phone = "Vui lòng nhập số điện thoại";
+      isValid = false;
+    } else if (!/^\d{10,11}$/.test(newSupplier.phone)) {
+      errors.phone = "Số điện thoại phải có 10-11 chữ số";
+      isValid = false;
+    }
+
+    if (!newSupplier.address.trim()) {
+      errors.address = "Vui lòng nhập địa chỉ";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
   // Fetch suppliers from API
   const fetchSuppliers = async () => {
     try {
+      setLoading(true);
       const response = await fetch(
         `${BASE_URL}/api/provider/suppliers/?page=1&size=10&sortBy=id&direction=ASC`,
         {
@@ -43,8 +86,14 @@ const SupplierList = () => {
           },
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Không thể tải danh sách nhà đối tác");
+      }
+
       const data = await response.json();
-      setSuppliers(data.content);
+      setSuppliers(data.content || []);
+      setError(null);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -58,6 +107,8 @@ const SupplierList = () => {
 
   // Handle create new supplier
   const handleCreateSupplier = async () => {
+    if (!validateForm()) return;
+
     try {
       const response = await fetch(`${BASE_URL}/api/provider/suppliers`, {
         method: "POST",
@@ -71,7 +122,6 @@ const SupplierList = () => {
       if (!response.ok) {
         const errorDetails = await response.json();
         setError(errorDetails);
-
         return;
       }
 
@@ -83,10 +133,16 @@ const SupplierList = () => {
         phone: "",
         address: "",
       });
+      setFormErrors({
+        name: "",
+        contactEmail: "",
+        phone: "",
+        address: "",
+      });
       fetchSuppliers(); // Refresh the list
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("An unexpected error occurred. Please try again.");
+      setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
     }
   };
 
@@ -102,7 +158,25 @@ const SupplierList = () => {
     fetchSuppliers(); // Refresh the list after possible edits
   };
 
-  if (loading)
+  // Reset form when modal closes
+  const handleModalClose = () => {
+    setShowModal(false);
+    setNewSupplier({
+      name: "",
+      contactEmail: "",
+      phone: "",
+      address: "",
+    });
+    setFormErrors({
+      name: "",
+      contactEmail: "",
+      phone: "",
+      address: "",
+    });
+    setError(null);
+  };
+
+  if (loading) {
     return (
       <div className="text-center my-5">
         <Spinner animation="border" role="status">
@@ -110,6 +184,7 @@ const SupplierList = () => {
         </Spinner>
       </div>
     );
+  }
 
   return (
     <Container className="mt-4 min-vh-100">
@@ -124,58 +199,78 @@ const SupplierList = () => {
         </Col>
       </Row>
 
-      <Table striped hover responsive>
-        <thead>
-          <tr>
-            <th>STT</th>
-            <th>Tên nhà đối tác</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Địa chỉ</th>
-            <th>Ngày thêm</th>
-          </tr>
-        </thead>
-        <tbody>
-          {suppliers?.map((supplier, index) => (
-            <tr
-              key={supplier.id}
-              onClick={() => handleRowClick(supplier)}
-              style={{ cursor: "pointer" }}
-            >
-              <td>{index + 1}</td>
-              <td>{supplier.name}</td>
-              <td>{supplier.contactEmail}</td>
-              <td>{supplier.phone}</td>
-              <td>{supplier.address}</td>
-              <td>{new Date(supplier.createdAt).toLocaleDateString()}</td>
+      {error && (
+        <Alert variant="danger" className="mb-3">
+          {error}
+        </Alert>
+      )}
+
+      {suppliers.length === 0 ? (
+        <div className="text-center py-5">
+          <h4>Không có nhà đối tác nào</h4>
+          <Button
+            variant="primary"
+            onClick={() => setShowModal(true)}
+            className="mt-3"
+          >
+            <FaPlus className="me-2" /> Thêm nhà đối tác mới
+          </Button>
+        </div>
+      ) : (
+        <Table striped hover responsive>
+          <thead>
+            <tr>
+              <th>STT</th>
+              <th>Tên nhà đối tác</th>
+              <th>Email</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ</th>
+              <th>Ngày thêm</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {suppliers.map((supplier, index) => (
+              <tr
+                key={supplier.id}
+                onClick={() => handleRowClick(supplier)}
+                style={{ cursor: "pointer" }}
+              >
+                <td>{index + 1}</td>
+                <td>{supplier.name}</td>
+                <td>{supplier.contactEmail}</td>
+                <td>{supplier.phone}</td>
+                <td>{supplier.address}</td>
+                <td>{new Date(supplier.createdAt).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      )}
 
       {/* Add Supplier Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={handleModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>Thêm nhà đối tác</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            {/* {error.name && <Alert variant="danger">{error.name}</Alert>} */}
             <Form.Group className="mb-3">
-              <Form.Label>Tên</Form.Label>
+              <Form.Label>Tên nhà đối tác *</Form.Label>
               <Form.Control
                 type="text"
                 value={newSupplier.name}
                 onChange={(e) =>
                   setNewSupplier({ ...newSupplier, name: e.target.value })
                 }
+                isInvalid={!!formErrors.name}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.name}
+              </Form.Control.Feedback>
             </Form.Group>
-            {error?.contactEmail && (
-              <Alert variant="danger">{error?.contactEmail}</Alert>
-            )}
+
             <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>Email *</Form.Label>
               <Form.Control
                 type="email"
                 value={newSupplier.contactEmail}
@@ -185,21 +280,30 @@ const SupplierList = () => {
                     contactEmail: e.target.value,
                   })
                 }
+                isInvalid={!!formErrors.contactEmail}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.contactEmail}
+              </Form.Control.Feedback>
             </Form.Group>
-            {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
+
             <Form.Group className="mb-3">
-              <Form.Label>Số điện thoại</Form.Label>
+              <Form.Label>Số điện thoại *</Form.Label>
               <Form.Control
                 type="tel"
                 value={newSupplier.phone}
                 onChange={(e) =>
                   setNewSupplier({ ...newSupplier, phone: e.target.value })
                 }
+                isInvalid={!!formErrors.phone}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.phone}
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Địa chỉ</Form.Label>
+              <Form.Label>Địa chỉ *</Form.Label>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -207,12 +311,16 @@ const SupplierList = () => {
                 onChange={(e) =>
                   setNewSupplier({ ...newSupplier, address: e.target.value })
                 }
+                isInvalid={!!formErrors.address}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.address}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={handleModalClose}>
             Hủy
           </Button>
           <Button variant="primary" onClick={handleCreateSupplier}>
@@ -227,24 +335,74 @@ const SupplierList = () => {
           show={showDetail}
           handleClose={handleCloseDetail}
           supplier={selectedSupplier}
+          token={token}
         />
       )}
     </Container>
   );
 };
 
-const SupplierDetail = ({ show, handleClose, supplier }) => {
+const SupplierDetail = ({ show, handleClose, supplier, token }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedSupplier, setEditedSupplier] = useState(supplier);
   const [error, setError] = useState(null);
-  const token = sessionStorage.getItem("access_token");
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    contactEmail: "",
+    phone: "",
+    address: "",
+  });
+
+  // Validate form function
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    if (!editedSupplier.name.trim()) {
+      errors.name = "Vui lòng nhập tên nhà đối tác";
+      isValid = false;
+    }
+
+    if (!editedSupplier.contactEmail.trim()) {
+      errors.contactEmail = "Vui lòng nhập email";
+      isValid = false;
+    } else if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editedSupplier.contactEmail)
+    ) {
+      errors.contactEmail = "Email không hợp lệ";
+      isValid = false;
+    }
+
+    if (!editedSupplier.phone.trim()) {
+      errors.phone = "Vui lòng nhập số điện thoại";
+      isValid = false;
+    } else if (!/^\d{10,11}$/.test(editedSupplier.phone)) {
+      errors.phone = "Số điện thoại phải có 10-11 chữ số";
+      isValid = false;
+    }
+
+    if (!editedSupplier.address.trim()) {
+      errors.address = "Vui lòng nhập địa chỉ";
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEditedSupplier((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleSave = async () => {
+    if (!validateForm()) return;
+
     try {
       const response = await fetch(
         `${BASE_URL}/api/provider/suppliers/${supplier.id}`,
@@ -258,7 +416,10 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
         }
       );
 
-      if (!response.ok) throw new Error("Failed to update supplier");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Không thể cập nhật nhà đối tác");
+      }
 
       setEditMode(false);
       handleClose();
@@ -269,7 +430,7 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
   };
 
   const handleDelete = async () => {
-    if (window.confirm("Are you sure you want to delete this supplier?")) {
+    if (window.confirm("Bạn có chắc chắn muốn xóa nhà đối tác này?")) {
       try {
         const response = await fetch(
           `${BASE_URL}/api/provider/suppliers/${supplier.id}`,
@@ -282,11 +443,13 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
           }
         );
 
-        if (!response.ok) throw new Error("Failed to delete supplier");
+        if (!response.ok) {
+          throw new Error("Không thể xóa nhà đối tác");
+        }
 
         handleClose(); // This will trigger a refresh in the parent component
       } catch (err) {
-        setError(err);
+        setError(err.message);
       }
     }
   };
@@ -302,46 +465,60 @@ const SupplierDetail = ({ show, handleClose, supplier }) => {
         {editMode ? (
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Tên</Form.Label>
+              <Form.Label>Tên nhà đối tác *</Form.Label>
               <Form.Control
                 type="text"
                 name="name"
                 value={editedSupplier.name}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.name}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.name}
+              </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
-              {error?.contactEmail && (
-                <Alert variant="danger">{error?.contactEmail}</Alert>
-              )}
 
-              <Form.Label>Email</Form.Label>
+            <Form.Group className="mb-3">
+              <Form.Label>Email *</Form.Label>
               <Form.Control
                 type="email"
                 name="contactEmail"
                 value={editedSupplier.contactEmail}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.contactEmail}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.contactEmail}
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
-              {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
-              <Form.Label>Số điện thoại</Form.Label>
+              <Form.Label>Số điện thoại *</Form.Label>
               <Form.Control
                 type="tel"
                 name="phone"
                 value={editedSupplier.phone}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.phone}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.phone}
+              </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Địa chỉ</Form.Label>
+              <Form.Label>Địa chỉ *</Form.Label>
               <Form.Control
                 as="textarea"
                 name="address"
                 rows={3}
                 value={editedSupplier.address}
                 onChange={handleInputChange}
+                isInvalid={!!formErrors.address}
               />
+              <Form.Control.Feedback type="invalid">
+                {formErrors.address}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         ) : (
