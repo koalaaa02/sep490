@@ -10,7 +10,15 @@ const MyAcconutSetting = () => {
   const navigate = useNavigate();
 
   const [loaderStatus, setLoaderStatus] = useState(true);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    citizenIdentificationCard: "",
+    citizenIdentificationCardImageUp: "",
+    citizenIdentificationCardImageDown: "",
+  });
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const [oldPassword, setOldPassword] = useState("");
@@ -29,6 +37,7 @@ const MyAcconutSetting = () => {
   const [cccdVerified, setCccdVerified] = useState(false);
   const [cccdPasswordInput, setCccdPasswordInput] = useState("");
   const [showCccdModal, setShowCccdModal] = useState(false);
+  const [hasEnteredCccd, setHasEnteredCccd] = useState(false); // Trạng thái đã nhập CCCD
 
   const token = useSelector((state) => state.auth.token);
   const userId = useSelector((state) => state.auth.user.uid);
@@ -56,6 +65,7 @@ const MyAcconutSetting = () => {
         const data = await response.json();
         setUserData(data);
         setEditableUser(data);
+        // console.log(editableUser);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -66,16 +76,51 @@ const MyAcconutSetting = () => {
     fetchData();
   }, [token]);
 
+  // Kiểm tra tính hợp lệ của số CCCD
+  const isValidCccd = (cccd) => {
+    const cccdRegex = /^\d{12}$/; // Kiểm tra 12 chữ số
+    return cccdRegex.test(cccd);
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Kiểm tra nếu người dùng đã nhập số CCCD và kiểm tra độ dài (12 chữ số)
+    if (name === "citizenIdentificationCard") {
+      // Nếu chưa nhập hoặc nhập không đủ 12 ký tự, không cần kiểm tra
+      if (value === "") {
+        setError(""); // Không hiển thị lỗi khi không có CCCD
+      } else if (value.length === 12 && !isValidCccd(value)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+      } else {
+        setError(""); // Xóa lỗi nếu số CCCD hợp lệ
+      }
+    }
+
     setEditableUser((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Nếu người dùng bắt đầu nhập CCCD thì cho phép chỉnh sửa tự do
+    if (name === "citizenIdentificationCard" && !hasEnteredCccd) {
+      setHasEnteredCccd(true);
+    }
   };
 
   const handleUpdateProfile = async (e) => {
     if (e) e.preventDefault();
+
+    if (
+      editableUser.citizenIdentificationCard !==
+      userData.citizenIdentificationCard
+    ) {
+      if (!isValidCccd(editableUser.citizenIdentificationCard)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+        return;
+      }
+    }
+
     try {
       const response = await fetch(
         `${BASE_URL}/api/myprofile/updateMyProfile`,
@@ -92,6 +137,10 @@ const MyAcconutSetting = () => {
       const data = await response.json();
       if (response.ok) {
         setMessage("Thông tin đã được cập nhật thành công.");
+        setUserData((prevData) => ({
+          ...prevData,
+          ...editableUser, 
+        }));
       } else {
         setError(data.message || "Cập nhật thất bại.");
       }
@@ -181,10 +230,10 @@ const MyAcconutSetting = () => {
 
       if (response.ok) {
         setMessage("Mật khẩu đã được thay đổi thành công.");
-        alert("Mật khẩu đã được thay đổi thành công.!");
+        alert("Mật khẩu đã được thay đổi thành công!");
       } else {
         setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
-        alert("Đã xảy ra lỗi. Vui lòng thử lại.!");
+        alert("Đã xảy ra lỗi. Vui lòng thử lại!");
       }
     } catch (err) {
       setError(
@@ -192,6 +241,24 @@ const MyAcconutSetting = () => {
       );
     }
   };
+
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   return (
     <div>
@@ -219,27 +286,17 @@ const MyAcconutSetting = () => {
                   {message && (
                     <div className="alert alert-success">{message}</div>
                   )}
+                  {error && <div className="alert alert-danger">{error}</div>}
                   <div className="row">
                     <div className="col-lg-5">
                       <form>
                         <div className="mb-3">
-                          <label className="form-label">Họ</label>
+                          <label className="form-label">Tên người dùng</label>
                           <input
                             type="text"
                             name="firstName"
                             className="form-control"
                             value={editableUser.firstName}
-                            onChange={handleInputChange}
-                            disabled={!isEditing}
-                          />
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">Tên</label>
-                          <input
-                            type="text"
-                            name="lastName"
-                            className="form-control"
-                            value={editableUser.lastName}
                             onChange={handleInputChange}
                             disabled={!isEditing}
                           />
@@ -258,46 +315,87 @@ const MyAcconutSetting = () => {
 
                         <div className="mb-3">
                           <label className="form-label">Số CCCD</label>
-                          {!cccdVerified ? (
-                            <div style={{ position: "relative" }}>
-                              <input
-                                type="password"
-                                className="form-control"
-                                value={"************"}
-                                disabled
-                              />
-                              <i
-                                className="fa fa-eye position-absolute"
-                                style={{
-                                  top: "10px",
-                                  right: "10px",
-                                  cursor: "pointer",
-                                  color: "#888",
-                                }}
-                                onClick={() => setShowCccdModal(true)}
-                              ></i>
-                            </div>
-                          ) : (
-                            <div style={{ position: "relative" }}>
+
+                          {isEditing ? (
+                            // Nếu đang chỉnh sửa, kiểm tra xem citizenIdentificationCard có khác rỗng hoặc đã được xác thực
+                            !userData?.citizenIdentificationCard ||
+                            cccdVerified ? (
+                              // Nếu không có CCCD hoặc đã xác thực, cho phép chỉnh sửa
                               <input
                                 type="text"
                                 name="citizenIdentificationCard"
                                 className="form-control"
-                                value={editableUser.citizenIdentificationCard}
                                 onChange={handleInputChange}
-                                disabled={!isEditing}
                               />
-                              <i
-                                className="fa fa-eye-slash position-absolute"
-                                style={{
-                                  top: "10px",
-                                  right: "10px",
-                                  cursor: "pointer",
-                                  color: "#888",
-                                }}
-                                onClick={() => setCccdVerified(false)}
-                              ></i>
-                            </div>
+                            ) : (
+                              // Nếu có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
+                              </div>
+                            )
+                          ) : userData?.citizenIdentificationCard ? (
+                            // Nếu không phải đang chỉnh sửa, kiểm tra đã có CCCD chưa
+                            !cccdVerified ? (
+                              // Nếu đã có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
+                              </div>
+                            ) : (
+                              // Nếu đã xác thực thì hiển thị số CCCD
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={editableUser.citizenIdentificationCard}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye-slash position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setCccdVerified(false)}
+                                ></i>
+                              </div>
+                            )
+                          ) : (
+                            // Nếu chưa có CCCD thì hiển thị thông báo
+                            <p className="fst-italic text-danger">
+                              Chưa có số CCCD
+                            </p>
                           )}
                         </div>
 
@@ -306,7 +404,8 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt trước CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageUp && (
+
+                            {editableUser.citizenIdentificationCardImageUp ? (
                               <div
                                 style={{
                                   position: "relative",
@@ -340,7 +439,12 @@ const MyAcconutSetting = () => {
                                   />
                                 )}
                               </div>
+                            ) : (
+                              <p className="text-danger fst-italic">
+                                Chưa có ảnh CCCD mặt trước
+                              </p>
                             )}
+
                             {isEditing && (
                               <input
                                 type="file"
@@ -357,7 +461,8 @@ const MyAcconutSetting = () => {
                             <label className="form-label">
                               Ảnh mặt sau CCCD
                             </label>
-                            {editableUser.citizenIdentificationCardImageDown && (
+
+                            {editableUser.citizenIdentificationCardImageDown ? (
                               <div
                                 style={{
                                   position: "relative",
@@ -391,7 +496,12 @@ const MyAcconutSetting = () => {
                                   />
                                 )}
                               </div>
+                            ) : (
+                              <p className="text-danger fst-italic">
+                                Chưa có ảnh CCCD mặt sau
+                              </p>
                             )}
+
                             {isEditing && (
                               <input
                                 type="file"
@@ -403,21 +513,42 @@ const MyAcconutSetting = () => {
                               />
                             )}
                           </div>
-                          <div className="d-flex justify-content-start mt-2">
-                            <button
-                              type="button"
-                              className={`btn ${
-                                isEditing ? "btn-success" : "btn-secondary"
-                              }`}
-                              onClick={() => {
-                                if (isEditing) {
-                                  handleUpdateProfile();
-                                }
-                                setIsEditing((prev) => !prev);
-                              }}
-                            >
-                              {isEditing ? "Lưu" : "Chỉnh sửa"}
-                            </button>
+
+                          <div className="d-flex justify-content-start mt-2 gap-2">
+                            {isEditing ? (
+                              <>
+                                <button
+                                  type="button"
+                                  className="btn btn-success"
+                                  onClick={() => {
+                                    handleUpdateProfile();
+                                    setIsEditing(false);
+                                  }}
+                                >
+                                  Lưu
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary"
+                                  onClick={() => {
+                                    setEditableUser(userData); // Reset về thông tin gốc
+                                    setIsEditing(false);
+                                    setError("");
+                                    setMessage("");
+                                  }}
+                                >
+                                  Hủy
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setIsEditing(true)}
+                              >
+                                Chỉnh sửa
+                              </button>
+                            )}
                           </div>
                         </div>
                       </form>

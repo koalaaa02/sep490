@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { FaSearch, FaStore } from "react-icons/fa";
+import { FaEdit, FaSearch } from "react-icons/fa";
 import { BASE_URL } from "../../../Utils/config";
 import { Link } from "react-router-dom";
 import { Row, Col, Form } from "react-bootstrap";
+import EditShopModal from "../../../Component/EditShopModal.tsx";
 
 const ProductList = ({ setSelectedProductId }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
+  const [address, setAddress] = useState(null);
   const [products, setProducts] = useState(null);
   const [page, setPage] = useState(1);
   const [isActive, setIsActive] = useState(true);
   const [pageSize, setPageSize] = useState(10);
+  const [rf, setRF] = useState(true);
+  const fileInputRef = React.useRef(null);
+  const fileInputRef2 = React.useRef(null);
   const [editableUser, setEditableUser] = useState({
     citizenIdentificationCard: "",
   });
@@ -24,11 +29,11 @@ const ProductList = ({ setSelectedProductId }) => {
 
       return () => clearTimeout(delayDebounceFn);
     }
-  }, [searchTerm, data?.id, isActive, page, pageSize]);
+  }, [searchTerm, data?.id, isActive, page, pageSize, rf]);
 
   useEffect(() => {
     fetchShopData();
-  }, [page]);
+  }, [page, rf]);
 
   const fetchShopData = async () => {
     try {
@@ -53,6 +58,9 @@ const ProductList = ({ setSelectedProductId }) => {
   };
 
   const fetchProducts = async (search) => {
+    if (!data?.id) {
+      return;
+    }
     try {
       const params = new URLSearchParams({
         page: page,
@@ -124,12 +132,36 @@ const ProductList = ({ setSelectedProductId }) => {
     setPageSize(Number(e.target.value));
     setPage(1);
   };
-
-  const handleUploadImage = async (file) => {
+  const handleUploadFile = async (file, uploadType) => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const url = `${BASE_URL}/api/provider/shops/uploadRegistrationCertificate`;
+    let endpoint;
+    let stateField;
+    console.log(uploadType);
+
+    switch (uploadType) {
+      case "registrationCertificate":
+        endpoint = "uploadRegistrationCertificate";
+        stateField = "citizenIdentificationCardImageDown";
+        break;
+      case "shopLogo":
+        endpoint = "uploadLogoShop";
+        stateField = "shopLogo";
+        break;
+      case "CitizenIdentityCardUp":
+        endpoint = "uploadCitizenIdentityCardUp";
+        stateField = "CitizenIdentityCardUp";
+        break;
+      case "CitizenIdentityCardDown":
+        endpoint = "uploadCitizenIdentityCardDown";
+        stateField = "CitizenIdentityCardDown";
+        break;
+      default:
+        throw new Error(`Unknown upload type: ${uploadType}`);
+    }
+
+    const url = `${BASE_URL}/api/provider/shops/${endpoint}`;
 
     try {
       const response = await fetch(url, {
@@ -142,9 +174,10 @@ const ProductList = ({ setSelectedProductId }) => {
 
       const data = await response.json();
       if (response.ok) {
+        setRF(!rf);
         setEditableUser((prev) => ({
           ...prev,
-          citizenIdentificationCardImageDown: data.url,
+          [stateField]: data.url,
         }));
       } else {
         alert("Upload thất bại. Vui lòng thử lại.");
@@ -154,70 +187,127 @@ const ProductList = ({ setSelectedProductId }) => {
       alert("Không thể upload ảnh.");
     }
   };
-
-  const handleUploadShopLogo = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const url = `${BASE_URL}/api/provider/shops//uploadLogoShop`;
-
-    try {
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setEditableUser((prev) => ({
-          ...prev,
-          citizenIdentificationCardImageDown: data.url,
-        }));
-      } else {
-        alert("Upload thất bại. Vui lòng thử lại.");
-      }
-    } catch (error) {
-      console.error("Upload error:", error);
-      alert("Không thể upload ảnh.");
+  const handleFileChange = (e, uploadType) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleUploadFile(file, uploadType);
     }
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/addresses/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const result = await response.json();
+        setAddress(result?.content);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+console.log(data);
 
   return (
     <div className="p-3 mb-10">
-      <div className="p-3 shadow bg-light rounded">
-        <div className="d-flex align-items-center">
-          <img
-            // src={data.registrationCertificateImages}
-            alt="Shop Logo"
-            className="rounded-circle me-3"
-            width="80"
-            height="80"
-          />
-          <p>Tên nhà cung cấp: {data?.name}</p>
+      <div className="p-3 row shadow bg-light rounded">
+        <div className="col-6">
+          <div className="d-flex align-items-center ">
+            <div
+              className="position-relative"
+              style={{ width: "80px", height: "80px" }}
+            >
+              <img
+                src={data?.logoImage}
+                alt="Shop Logo"
+                className="rounded-circle me-3"
+                width="80"
+                height="80"
+              />
+              <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-circle hover-overlay">
+                <input
+                  type="file"
+                  ref={fileInputRef2}
+                  onChange={(e) => handleFileChange(e, "shopLogo")}
+                  style={{ display: "none" }}
+                  accept="image/*" // Optional: restrict to image files
+                />
+                <FaEdit
+                  onClick={() => fileInputRef2.current.click()}
+                  className="text-white fs-4 d-none"
+                  style={{ cursor: "pointer" }}
+                />
+              </div>
+            </div>
+            <p style={{ marginLeft: "4px" }}>Tên nhà cung cấp: {data?.name}</p>
+          </div>
+          <div className="d-flex align-items-center">
+            <p>
+              Hình thức kinh doanh:{" "}
+              {data?.shopType === "ENTERPRISE"
+                ? "Doanh nghiệp lớn"
+                : "Doanh nghiệp nhỏ"}
+            </p>
+          </div>
+          <div className="d-flex align-items-center">
+            <p>Địa chỉ: {data?.address?.address}</p>
+          </div>
+          <div className="d-flex align-items-center">
+            <p>Số điện thoại: {data?.address?.phone}</p>
+          </div>
+          <div className="d-flex flex-wrap justify-content-between">
+            <p className="mb-0">
+              <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
+            </p>
+          </div>
+          <div className=" w-100 align-item text-right">
+            {address && (
+              <EditShopModal currentShopData={data} address={address} shopId={data?.id}/>
+            )}
+          </div>
         </div>
-        <div className="d-flex align-items-center">
-          <p>
-            Hình thức kinh doanh:{" "}
-            {data?.shopType === "ENTERPRISE"
-              ? "Doanh nghiệp lớn"
-              : "Doanh nghiệp nhỏ"}
-          </p>
-        </div>
-        <div className="d-flex align-items-center">
-          <p>Địa chỉ: {data?.address?.address}</p>
-        </div>
-        <div className="d-flex align-items-center">
-          <p>Số điện thoại: {data?.address?.phone}</p>
-        </div>
-        <hr />
-        <div className="d-flex flex-wrap justify-content-between">
-          <p className="mb-0">
-            <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
-          </p>
-        </div>
+        <div className="col-6">
+          <div className="text-center d-flex flex-column">
+            <p className="fw-bold"> Registration Certificate</p>
+
+            <div className="position-relative">
+              <img
+                src={data?.registrationCertificateImages}
+                alt="certificate"
+                style={{ height: "200px", objectFit: "contain" }}
+                onerror="this.src='placeholder.jpg';"
+              />
+              <div
+                style={{ height: "200px", objectFit: "contain" }}
+                className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center hover-overlay"
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={(e) =>
+                    handleFileChange(e, "registrationCertificate")
+                  }
+                  style={{ display: "none" }}
+                  accept="image/*" // Optional: restrict to image files
+                />
+                <div
+                  className="px-auto py-auto"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <FaEdit size={25} color="white" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>{" "}
+        {/* <hr /> */}
       </div>
 
       <h5 className="mb-3 mt-3">Danh sách sản phẩm</h5>

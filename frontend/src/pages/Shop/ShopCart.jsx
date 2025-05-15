@@ -11,7 +11,7 @@ const ShopCart = () => {
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState({});
-  const isLoggedIn = !!localStorage.getItem("user");
+  const isLoggedIn = !!sessionStorage.getItem("user");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,6 +34,22 @@ const ShopCart = () => {
 
     fetchData();
   }, []);
+
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
 
   const removeFromCart = async (shopId, productSKUId) => {
     try {
@@ -73,7 +89,8 @@ const ShopCart = () => {
           shop.items.reduce((shopTotal, item) => {
             if (selectedItems[item.productSKUId]) {
               return (
-                shopTotal + item.quantity * item.productSKUResponse.sellingPrice
+                shopTotal +
+                item.quantity * item.productSKUResponse?.sellingPrice
               );
             }
             return shopTotal;
@@ -107,23 +124,44 @@ const ShopCart = () => {
     }
   };
 
-  const toggleSelectAll = () => {
-    const newSelectAll = !selectAll;
-    setSelectAll(newSelectAll);
-    const updatedSelection = {};
-    cartItems.forEach((shop) => {
-      shop.items.forEach((item) => {
-        updatedSelection[item.productSKUId] = newSelectAll;
+  const toggleSelectAll = (shopId) => {
+    setSelectedItems((prevSelectedItems) => {
+      const updatedSelection = {};
+      const selectedShop = cartItems.find((shop) => shop.shopId === shopId);
+      if (!selectedShop) return prevSelectedItems;
+      selectedShop.items.forEach((item) => {
+        updatedSelection[item.productSKUId] = true;
       });
+
+      return updatedSelection;
     });
-    setSelectedItems(updatedSelection);
   };
 
-  const toggleItemSelection = (productSKUId) => {
-    setSelectedItems((prev) => ({
-      ...prev,
-      [productSKUId]: !prev[productSKUId],
-    }));
+  const toggleItemSelection = (productSKUId, shopId) => {
+    setSelectedItems((prevSelectedItems) => {
+      const selectedShopIds = cartItems.reduce((acc, shop) => {
+        shop.items.forEach((item) => {
+          if (prevSelectedItems[item.productSKUId]) {
+            acc.add(shop.shopId);
+          }
+        });
+        return acc;
+      }, new Set());
+
+      const isSelectingNewItem =
+        !prevSelectedItems[productSKUId] &&
+        selectedShopIds.size > 0 &&
+        !selectedShopIds.has(shopId);
+
+      if (isSelectingNewItem) {
+        return { [productSKUId]: true };
+      } else {
+        return {
+          ...prevSelectedItems,
+          [productSKUId]: !prevSelectedItems[productSKUId],
+        };
+      }
+    });
   };
 
   const updateQuantity = async (shopId, productSKUId, newQuantity) => {
@@ -181,9 +219,10 @@ const ShopCart = () => {
                   <div className="card p-3 mb-2 d-flex flex-row align-items-center">
                     <h5 className="mb-0 col-4 text-center">Sản Phẩm</h5>
                     <h5 className="mb-0 col-2 text-center">Đơn giá</h5>
+                    <h5 className="mb-0 col-1 text-center">Đơn vị</h5>
                     <h5 className="mb-0 col-2 text-center">Số lượng</h5>
                     <h5 className="mb-0 col-2 text-center">Số tiền</h5>
-                    <h5 className="mb-0 col-2 text-center">Thao tác</h5>
+                    <h5 className="mb-0 col-1 text-center">Thao tác</h5>
                   </div>
 
                   {/* Danh sách sản phẩm */}
@@ -194,11 +233,15 @@ const ShopCart = () => {
                         <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                           <input
                             type="checkbox"
-                            checked={selectAll}
-                            onChange={toggleSelectAll}
+                            checked={
+                              shop.items.every(
+                                (item) => selectedItems[item.productSKUId]
+                              ) && shop.items.length > 0
+                            }
+                            onChange={() => toggleSelectAll(shop.shopId)}
                             className="me-2"
                           />
-                          <strong>Tên cửa hàng: {shop.shopName}</strong>
+                          <strong>Tên nhà phân phối: {shop.shopName}</strong>
                         </div>
 
                         {/* Sản phẩm trong cửa hàng */}
@@ -222,7 +265,10 @@ const ShopCart = () => {
                                     selectedItems[item.productSKUId] || false
                                   }
                                   onChange={() =>
-                                    toggleItemSelection(item.productSKUId)
+                                    toggleItemSelection(
+                                      item.productSKUId,
+                                      shop.shopId
+                                    )
                                   }
                                 />
                               </div>
@@ -247,17 +293,32 @@ const ShopCart = () => {
                               <div className="col-2">
                                 <h6>{item.productName}</h6>
                                 <p className="text-muted">
-                                  Mã SKU: {item.productSKUCode}
+                                  {
+                                    item.productSKUResponse?.product
+                                      ?.unitAdvance
+                                  }
+                                </p>
+                                <p className="text-muted">
+                                  Phân loại: {item.productSKUCode}
                                 </p>
                               </div>
 
                               {/* Đơn giá */}
                               <div className="col-2 text-center">
                                 <strong className="text-muted">
-                                  {item.productSKUResponse.sellingPrice.toLocaleString(
+                                  {item.productSKUResponse?.sellingPrice.toLocaleString(
                                     "vi-VN"
                                   )}
                                   đ
+                                </strong>
+                              </div>
+
+                              {/* Đơn vị */}
+                              <div className="col-1 text-center">
+                                <strong className="text-muted">
+                                  {convertUnitToVietnamese(
+                                    item.productSKUResponse?.product?.unit
+                                  )}
                                 </strong>
                               </div>
 
@@ -292,11 +353,11 @@ const ShopCart = () => {
                               </div>
 
                               {/* Số tiền */}
-                              <div className="col-3 text-center">
+                              <div className="col-2 text-center">
                                 <strong className="text-danger">
                                   {(
                                     item.quantity *
-                                    item.productSKUResponse.sellingPrice
+                                    item.productSKUResponse?.sellingPrice
                                   ).toLocaleString("vi-VN")}
                                   đ
                                 </strong>

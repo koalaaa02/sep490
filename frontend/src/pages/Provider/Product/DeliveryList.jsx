@@ -11,7 +11,7 @@ const DeliveryList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentView, setCurrentView] = useState("list");
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [searchTerm, setSearchTerm] = useState("");
   const convertUnitToVietnamese = (unit) => {
     const unitMap = {
@@ -171,8 +171,8 @@ const DeliveryList = () => {
                   <td>{item.productName}</td>
                   <td>{item.productSKUCode}</td>
                   <td>{convertUnitToVietnamese(item.unit)}</td>
-                  <td>{(item.quantity * item.price).toLocaleString()}</td>
-                  <td>
+                  <td className="text-right">{(item.quantity * item.price).toLocaleString()} VNĐ</td>
+                  <td >
                     <Badge
                       bg={
                         item.deliveryNote?.delivered ? "secondary" : "success"

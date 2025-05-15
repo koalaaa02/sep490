@@ -22,6 +22,10 @@ import { Grid } from "swiper/modules";
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [materials, setMaterial] = useState([]);
+  // const [parentCateID, setparentCateID] = useState(1);
+  // const [selectSubCate, setSelectSubCate] = useState(
+  //   materials[0]?.subCategories || []
+  // );
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -67,23 +71,17 @@ const Home = () => {
         );
 
         const result = await response.json();
+
         setMaterial(
           result.map((c) => ({
             name: c.name,
             id: c.id,
             src: c.images,
             alt: c?.name,
+            subCategories: c.subCategories,
           }))
         );
-        // setMaterial([
-        //   ...materials,
-        //   ...result.map((c) => ({
-        //     name: c.name,
-        //     id: c.id,
-        //     src: c.images,
-        //     alt: c?.name,
-        //   })),
-        // ]);
+        // setparentCateID(result[0].id);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -144,7 +142,7 @@ const Home = () => {
                             backgroundSize: "cover",
                             borderRadius: ".5rem",
                             backgroundPosition: "center",
-                            height: "550px",
+                            height: "400px",
                           }}
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
@@ -172,7 +170,7 @@ const Home = () => {
                             backgroundSize: "cover",
                             borderRadius: ".5rem",
                             backgroundPosition: "center",
-                            height: "550px",
+                            height: "400px",
                           }}
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
@@ -224,6 +222,86 @@ const Home = () => {
                 </div>
               </section>
             </>
+            <>
+              {/* section category parent */}
+              <section className="my-lg-14 my-8">
+                <div className="container ">
+                  <div className="row">
+                    <div className="col-12">
+                      <div className="mb-6">
+                        {/* heading    */}
+                        <div className="section-head text-center">
+                          <h3
+                            className="h3style"
+                            data-title="Shop Popular Categories"
+                          >
+                            Danh mục phổ biến
+                          </h3>
+                          <div className="wt-separator bg-primarys"></div>
+                          <div className="wt-separator2 bg-primarys"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row ">
+                      <Swiper
+                        slidesPerView={6} // Number of items visible at once
+                        grid={{
+                          rows: 2, // Display items in 2 rows
+                          fill: "row",
+                        }}
+                        spaceBetween={20}
+                        pagination={{
+                          clickable: true,
+                        }}
+                        modules={[Grid]}
+                        className="mySwiper"
+                      >
+                        {materials.map((material, index) => (
+                          <SwiperSlide key={index}>
+                            <div className="fade-zoom p-2">
+                              <Zoom>
+                                <div
+                                  // onClick={() => {
+                                  //   setparentCateID(material.id);
+                                  //   setSelectSubCate(material.subCategories);
+                                  // }}
+                                  className="text-center mb-10"
+                                >
+                                  <Link to={`/Shop/${material.id}`}>
+                                    <img
+                                      src={material.src ? material.src : dfCate}
+                                      alt={material.alt}
+                                      className="card-image rounded-circle"
+                                      style={{
+                                        height: "150px",
+                                        width: "150px",
+                                      }}
+                                    />
+                                  </Link>
+                                  <div className="mt-4">
+                                    <h5 className="fs-6 mb-0">
+                                      <Link to="#" className="text-inherit">
+                                        {material.name}
+                                      </Link>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </Zoom>
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              {/* section */}
+            </>
+
+            {/* <>
+              <ProductItem />
+            </> */}
+
             <>
               {/* section */}
               <section className="mt-8">
@@ -335,78 +413,6 @@ const Home = () => {
                 </div>
               </section>
               {/* section */}
-            </>
-            <>
-              {/* section category */}
-              <section className="my-lg-14 my-8">
-                <div className="container ">
-                  <div className="row">
-                    <div className="col-12">
-                      <div className="mb-6">
-                        {/* heading    */}
-                        <div className="section-head text-center">
-                          <h3
-                            className="h3style"
-                            data-title="Shop Popular Categories"
-                          >
-                            Danh mục phổ biến
-                          </h3>
-                          <div className="wt-separator bg-primarys"></div>
-                          <div className="wt-separator2 bg-primarys"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      <Swiper
-                        slidesPerView={6} // Number of items visible at once
-                        grid={{
-                          rows: 2, // Display items in 2 rows
-                          fill: "row",
-                        }}
-                        spaceBetween={20}
-                        pagination={{
-                          clickable: true,
-                        }}
-                        modules={[Grid]}
-                        className="mySwiper"
-                      >
-                        {materials.map((material, index) => (
-                          <SwiperSlide key={index}>
-                            <div className="fade-zoom">
-                              <Zoom>
-                                <div className="text-center mb-10">
-                                  <Link to={`/Shop/${material.id}`}>
-                                    <img
-                                      src={material.src ? material.src : dfCate}
-                                      alt={material.alt}
-                                      className="card-image rounded-circle"
-                                      style={{
-                                        height: "150px",
-                                        width: "150px",
-                                      }}
-                                    />
-                                  </Link>
-                                  <div className="mt-4">
-                                    <h5 className="fs-6 mb-0">
-                                      <Link to="#" className="text-inherit">
-                                        {material.name}
-                                      </Link>
-                                    </h5>
-                                  </div>
-                                </div>
-                              </Zoom>
-                            </div>
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              {/* section */}
-            </>
-            <>
-              <ProductItem />
             </>
             <>
               <section className="my-lg-14 my-8">

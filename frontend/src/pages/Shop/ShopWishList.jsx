@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import productimage18 from "../../images/glass.jpg";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import Swal from "sweetalert2";
@@ -177,14 +176,14 @@ const ShopWishList = () => {
                                             Còn hàng
                                           </span>
                                         </td>
-                                        <td className="align-middle">
-                                          <div
-                                            onClick={() => handleAddCart()}
-                                            className="btn btn-warning btn-sm"
+                                        {/* <td className="align-middle">
+                                          <Link
+                                            to={`/Shop/${item.category}`}
+                                            className="btn btn-warning btn-sm text-white"
                                           >
                                             Thêm vào giỏ hàng
-                                          </div>
-                                        </td>
+                                          </Link>
+                                        </td> */}
                                         <td className="align-middle text-center">
                                           <div
                                             onClick={() =>

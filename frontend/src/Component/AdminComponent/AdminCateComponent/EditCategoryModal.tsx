@@ -28,7 +28,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   useEffect(() => {
     setName(category.name);
     setHasParent(!!category.parentName);
@@ -60,7 +60,7 @@ const EditCategoryModal: React.FC<EditCategoryModalProps> = ({
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
             "Content-Type": "application/json",
           },
           credentials: "include",

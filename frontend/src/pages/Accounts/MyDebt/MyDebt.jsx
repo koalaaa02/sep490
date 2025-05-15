@@ -89,7 +89,7 @@ const DebtOrder = ({ item, activeShop, setActiveShop, orders }) => {
   );
 };
 const MyDebt = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [activeShop, setActiveShop] = useState(null);
@@ -100,7 +100,7 @@ const MyDebt = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `${BASE_URL}/api/dealer/ShopInvoiceSummary`,
+          `${BASE_URL}/api/dealer/ShopInvoiceSummary?page=1&size=10&sortBy=shop_id&direction=ASC`,
           {
             method: "GET",
             headers: {
@@ -191,7 +191,7 @@ const MyDebt = () => {
                                 className="form-control"
                                 placeholder="Tìm kiếm theo tên người bán"
                               />
-                              <div className={styles.statistic}>
+                              {/* <div className={styles.statistic}>
                                 <h5 className={styles.sectionHeader}>
                                   Thống Kê
                                 </h5>
@@ -201,11 +201,9 @@ const MyDebt = () => {
                                 </p>
                                 <p className="fw-bold">
                                   Tổng tiền nợ:{" "}
-                                  <span className="fw-normal">
-                                    6 vnđ
-                                  </span>
+                                  <span className="fw-normal">6 vnđ</span>
                                 </p>
-                              </div>
+                              </div> */}
                               <hr />
                               <div>
                                 <h5 className={styles.sectionHeader}>

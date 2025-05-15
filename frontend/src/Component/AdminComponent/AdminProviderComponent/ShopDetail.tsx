@@ -17,13 +17,15 @@ const ShopDetail: React.FC<ShopDetailProps> = ({
   function getShop(type: string) {
     switch (type) {
       case "ENTERPRISE":
-        return "Doanh Nghiệp";
+        return "Doanh Nghiệp Lớn";
       case "BUSINESS":
-        return "Kinh Doanh";
+        return "Doanh Nghiệp Nhỏ";
       default:
         return "Không rõ";
     }
   }
+  console.log(shop);
+
   return (
     <div className="p-4">
       <Button variant="outline-primary" onClick={onBack} className="mb-3">

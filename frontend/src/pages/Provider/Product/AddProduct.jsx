@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
+  const shopId = useSelector((state) => state.shop.shopId);
   const [categories, setCategories] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newSupplier, setNewSupplier] = useState({
+    name: "",
+    contactEmail: "",
+    phone: "",
+    address: "",
+  });
   const [product, setProduct] = useState({
     name: "",
     description: "",
@@ -11,17 +23,19 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     unit: "PCS",
     images: "string",
     active: false,
+    unitAdvance: "",
     categoryId: "",
-    supplierId: 1,
-    shopId: 1,
+    supplierId: "",
+    shopId: shopId,
   });
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 10,
+          size: 100,
           sortBy: "id",
           direction: "ASC",
         });
@@ -36,8 +50,24 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
+        const response2 = await fetch(
+          `${BASE_URL}/api/provider/suppliers/?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        if (!response2.ok) {
+          throw new Error("Network response was not ok");
+        }
+
         const data = await response.json();
         setCategories(data);
+        const data2 = await response2.json();
+        setSuppliers(data2?.content);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
@@ -72,30 +102,35 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         body: JSON.stringify(bodyData),
       });
 
-      const addedProduct = await response.json();
-
+      const responseData = await response.json();
       if (!response.ok) {
-        throw new Error("API trả về lỗi hoặc thiếu dữ liệu!");
+        console.error("Lỗi API:", responseData);
+        alert(
+          "Lỗi khi thêm sản phẩm: " +
+            (responseData.message || "Không rõ nguyên nhân")
+        );
+        return;
       }
-      onAddProduct(addedProduct);
-      setProduct((prev) => ({
-        ...prev,
+      onAddProduct(responseData);
+      setProduct({
         name: "",
         description: "",
         specifications: "",
         unit: "PCS",
         images: "",
-        active: true,
+        active: false,
+        unitAdvance: "",
         categoryId: "",
-        supplierId: 1,
-        shopId: 1,
-      }));
+        supplierId: "",
+        shopId: shopId,
+      });
 
       setProductImages([]);
 
-      alert("Thêm sản phẩm thất bại!");
-    } catch (error) {
       alert("Thêm sản phẩm thành công!");
+    } catch (error) {
+      console.error("Lỗi thêm sản phẩm:", error);
+      alert("Thêm sản phẩm thất bại!\n" + error.message);
     }
   };
 
@@ -147,6 +182,39 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
     return unitMap[unit] || unit;
   };
+  const handleCreateSupplier = async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/provider/suppliers`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newSupplier),
+      });
+
+      if (!response.ok) {
+        const errorDetails = await response.json();
+        setError(errorDetails);
+
+        return;
+      }
+
+      // Success handling
+      setShowModal(false);
+      alert("Tạo supplier thành công");
+      setSuppliers([...suppliers, await response.json()]);
+      setNewSupplier({
+        name: "",
+        contactEmail: "",
+        phone: "",
+        address: "",
+      });
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred. Please try again.");
+    }
+  };
 
   return (
     <div className="p-3 mb-10">
@@ -197,7 +265,7 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
-          <div className="col-md-6">
+          <div className="col-md-12">
             <label className="form-label fw-bold">Tên sản phẩm:</label>
             <input
               type="text"
@@ -208,14 +276,47 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               required
             />
           </div>
+        </div>
+
+        <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Phân loại:</label>
+            <label className="form-label fw-bold">Tên nhà phân phối:</label>
+            {suppliers?.length > 0 ? (
+              <select
+                className="form-control"
+                name="supplierId"
+                onChange={handleChange}
+                value={product.supplierId}
+              >
+                <option value="">-- Chọn nhà cung cấp --</option>
+                {suppliers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="d-flex flex-column gap-2">
+                <div className="text-danger">Chưa có nhà cung cấp nào</div>
+                <Button
+                  onClick={() => setShowModal(true)}
+                  className="btn btn-primary"
+                >
+                  <i className="fas fa-plus me-2"></i>
+                  Thêm nhà cung cấp mới
+                </Button>
+              </div>
+            )}
+          </div>
+          <div className="col-md-6">
+            <label className="form-label fw-bold">Danh mục:</label>
             <select
               className="form-control"
               name="categoryId"
               onChange={handleChange}
-              // value={product.categoryId}
+              value={product.categoryId}
             >
+              <option value="">-- Chọn danh mục --</option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -251,6 +352,17 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               ))}
             </select>
           </div>
+          <div className="col-md-6">
+            <label className="form-label fw-bold">Tính theo đơn vị:</label>
+            <input
+              type="text"
+              className="form-control"
+              name="unitAdvance"
+              value={product.unitAdvance}
+              onChange={handleChange}
+              required
+            />
+          </div>
         </div>
 
         <div className="mb-3">
@@ -283,6 +395,72 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
           Hủy
         </button>
       </div>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Thêm nhà đối tác</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            {error?.name && <Alert variant="danger">{error?.name}</Alert>}
+            <Form.Group className="mb-3">
+              <Form.Label>Tên</Form.Label>
+              <Form.Control
+                type="text"
+                value={newSupplier?.name}
+                onChange={(e) =>
+                  setNewSupplier({ ...newSupplier, name: e.target.value })
+                }
+              />
+            </Form.Group>
+            {error?.contactEmail && (
+              <Alert variant="danger">{error?.contactEmail}</Alert>
+            )}
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                value={newSupplier.contactEmail}
+                onChange={(e) =>
+                  setNewSupplier({
+                    ...newSupplier,
+                    contactEmail: e.target.value,
+                  })
+                }
+              />
+            </Form.Group>
+            {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
+            <Form.Group className="mb-3">
+              <Form.Label>Số điện thoại</Form.Label>
+              <Form.Control
+                type="tel"
+                value={newSupplier.phone}
+                onChange={(e) =>
+                  setNewSupplier({ ...newSupplier, phone: e.target.value })
+                }
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Địa chỉ</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={newSupplier.address}
+                onChange={(e) =>
+                  setNewSupplier({ ...newSupplier, address: e.target.value })
+                }
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Hủy
+          </Button>
+          <Button variant="primary" onClick={handleCreateSupplier}>
+            Lưu
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

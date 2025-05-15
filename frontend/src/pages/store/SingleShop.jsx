@@ -9,6 +9,7 @@ import image1 from "../../images/glass.jpg";
 import ShopProductDetail from "../Shop/ShopProductDetail";
 import ChatBox from "../Shop/ChatBox";
 import { FaSearch } from "react-icons/fa";
+import { useSelector } from "react-redux";
 
 const SingleShop = () => {
   const [stores, setStores] = useState(null);
@@ -32,7 +33,7 @@ const SingleShop = () => {
     shopId: shopId,
   });
 
-  const wishList = JSON.parse(localStorage.getItem("wishList")) || [];
+  const token = useSelector((state) => state.auth.token);
 
   useEffect(() => {
     if (!shopId) return;
@@ -143,7 +144,7 @@ const SingleShop = () => {
             <div>
               <h5 className="fw-bold">{stores?.name}</h5>
               <p>
-                Chủ shop: {stores?.manager?.firstName}{" "}
+                Chủ quản lý: {stores?.manager?.firstName}{" "}
                 {stores?.manager?.lastName}
               </p>
               <p>Email: {stores?.manager?.email}</p>
@@ -152,7 +153,7 @@ const SingleShop = () => {
                 Địa chỉ: {stores?.address?.address}, {stores?.address?.ward},{" "}
                 {stores?.address?.district}, {stores?.address?.province}
               </p>
-              <ChatBox />
+              {token && <ChatBox />}
               <div
                 className="mt-2"
                 style={{ position: "relative", width: "70%" }}

@@ -8,7 +8,7 @@ import { BASE_URL } from "../../../Utils/config";
 import { Shop, PaginationState } from "../AdminProviderComponent/type.ts";
 
 const ShopList = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [activeShop, setActiveShop] = useState<Shop[]>([]);
   const [inactiveShop, setInactiveShop] = useState<Shop[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

@@ -10,7 +10,6 @@ const MyAccountSignUp = () => {
   const [successMessage, setSuccessMessage] = useState(
     location.state?.successMessage || ""
   );
-  const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,9 +28,6 @@ const MyAccountSignUp = () => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage(null);
-
-    const fullName = `${firstName}${lastName}`.trim();
-
     try {
       const response = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
@@ -39,7 +35,7 @@ const MyAccountSignUp = () => {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({ name: fullName, email, password }),
+        body: JSON.stringify({ name: lastName, email, password }),
       });
 
       const text = await response.text();
@@ -179,18 +175,7 @@ const MyAccountSignUp = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Họ"
-                        aria-label="Họ"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value.trim())}
-                        required
-                      />
-                    </div>
-                    <div className="col">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Tên"
+                        placeholder="Tên người dùng"
                         aria-label="Tên"
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value.trim())}

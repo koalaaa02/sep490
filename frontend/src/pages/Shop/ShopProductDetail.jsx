@@ -11,7 +11,22 @@ const ShopProductDetail = ({ id, onBack }) => {
   const [skus, setSkus] = useState([]);
   const [selectedSku, setSelectedSku] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const shopId = 1;
+
+  const convertUnitToVietnamese = (unit) => {
+    const unitMap = {
+      PCS: "Chiếc",
+      KG: "Kilogram",
+      PAIR: "Cặp",
+      SET: "Bộ",
+      PACK: "Gói",
+      BAG: "Túi",
+      DOZEN: "Chục",
+      BOX: "Hộp",
+      TON: "Tấn",
+    };
+
+    return unitMap[unit] || unit;
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -88,7 +103,7 @@ const ShopProductDetail = ({ id, onBack }) => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/cart/add?shopId=${shopId}&productSKUId=${selectedSku.id}&quantity=${quantity}`,
+        `${BASE_URL}/api/cart/add?shopId=${selectedSku.product.shop.id}&productSKUId=${selectedSku.id}&quantity=${quantity}`,
         {
           method: "POST",
           credentials: "include",
@@ -119,6 +134,7 @@ const ShopProductDetail = ({ id, onBack }) => {
   if (!product) {
     return <p>Loading...</p>;
   }
+console.log(product);
 
   return (
     <div className="container shadow-sm border rounded p-3">
@@ -136,7 +152,7 @@ const ShopProductDetail = ({ id, onBack }) => {
             className="img-fluid rounded"
             style={{ width: "350px", height: "350px", cursor: "pointer" }}
           />
-          {/* Carousel hiển thị các SKU */}
+          {/* Carousel hiển thị các phân loại */}
           <Carousel indicators={false} interval={null} className="mt-3">
             <Carousel.Item>
               <div className="d-flex gap-2 justify-content-center">
@@ -164,20 +180,14 @@ const ShopProductDetail = ({ id, onBack }) => {
           <h4 className="text-uppercase text-warning mb-8">{product.name}</h4>
           <div className="bg-light p-3">
             <span className="text-muted">Giá bán:</span>
-            <span className="text-danger m-3">
-              {selectedSku?.sellingPrice || 0} đ
-            </span>
-            <span className="text-decoration-line-through">
-              {selectedSku?.costPrice || 0} đ
-              <span className="badge bg-warning text-dark ml-2">0%</span>
-            </span>
+            <strong className="text-danger m-3">
+              {(selectedSku?.sellingPrice || 0).toLocaleString("vi-VN")} VNĐ
+            </strong>
             <br />
           </div>
-          <p className="text-muted mt-10">Màu sắc: {selectedSku?.skuCode}</p>
-          <h6 className="text-muted mb-10">
-            Vận chuyển:{" "}
-            {!selectedSku?.bulky ? <>Liên hệ người bán</> : <>12.800 đ</>}{" "}
-          </h6>
+          <p className="text-muted mt-10">Phân loại: {selectedSku?.skuCode}</p>
+          <h6 className="text-muted mb-10">Đơn vị: {convertUnitToVietnamese(product?.unit)} </h6>
+          <h6 className="text-muted mb-10">{product?.unitAdvance} </h6>
           <div className="d-flex align-items-center mb-3">
             <span className="text-muted mr-3">Số lượng: </span>
             <button

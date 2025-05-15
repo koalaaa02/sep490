@@ -28,7 +28,7 @@ interface InventoryItem {
 }
 
 const ProviderOutOfStock = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [inventoryData, setInventoryData] = useState<InventoryItem[] | null>(
     null
   );

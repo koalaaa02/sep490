@@ -3,13 +3,29 @@ import { BiTask } from "react-icons/bi";
 import { RiShoppingCart2Line } from "react-icons/ri";
 import { FaClipboardList, FaChartBar } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
-import { MdAddBox, MdOutlineNoteAlt } from "react-icons/md";
+import { MdAddBox, MdOutlineBusAlert, MdOutlineNoteAlt } from "react-icons/md";
 
-const SidebarComponent = ({ setSelectedComponent }) => {
+const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const toggleDropdown = (menu) => {
     setOpenDropdown(openDropdown === menu ? null : menu);
+  };
+
+  const handleClick = (component) => {
+    setSelectedComponent(component);
+  };
+
+  const getItemStyle = (component) => {
+    return selectedComponent === component
+      ? {
+          backgroundColor: "#ffc107",
+          color: "black",
+          borderRadius: "5px",
+          paddingRight: "20px",
+          width: "220px",
+        }
+      : {};
   };
 
   return (
@@ -18,7 +34,8 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("ProviderDashBoardDetail")}
+            style={getItemStyle("ProviderDashBoardDetail")}
+            onClick={() => handleClick("ProviderDashBoardDetail")}
           >
             <FaChartBar size={30} className="ms-1" /> Thống kê
           </button>
@@ -26,7 +43,8 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("ProductList")}
+            style={getItemStyle("ProductList")}
+            onClick={() => handleClick("ProductList")}
           >
             <RiShoppingCart2Line size={30} className="ms-1" />
             Danh sách sản phẩm
@@ -35,7 +53,8 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("AddProduct")}
+            style={getItemStyle("AddProduct")}
+            onClick={() => handleClick("AddProduct")}
           >
             <MdAddBox size={30} className="ms-1" />
             Thêm sản phẩm
@@ -44,7 +63,8 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("InvoiceManagement")}
+            style={getItemStyle("InvoiceManagement")}
+            onClick={() => handleClick("InvoiceManagement")}
           >
             <BiTask size={30} className="ms-1" />
             Danh sách khoản nợ
@@ -53,7 +73,8 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("OrderList")}
+            style={getItemStyle("OrderList")}
+            onClick={() => handleClick("OrderList")}
           >
             <FaClipboardList size={30} className="ms-1" />
             Danh sách đặt hàng
@@ -62,7 +83,18 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
-            onClick={() => setSelectedComponent("DeliveryList")}
+            style={getItemStyle("SupplierLisr")}
+            onClick={() => handleClick("SupplierLisr")}
+          >
+            <MdOutlineBusAlert size={30} className="ms-1" />
+            Danh sách nhà đối tác
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            style={getItemStyle("DeliveryList")}
+            onClick={() => handleClick("DeliveryList")}
           >
             <MdOutlineNoteAlt size={30} className="ms-1" /> Phiếu giao hàng
           </button>
@@ -70,6 +102,16 @@ const SidebarComponent = ({ setSelectedComponent }) => {
         <li>
           <button
             className="nav-link"
+            style={getItemStyle("transaction")}
+            onClick={() => handleClick("transaction")}
+          >
+            <MdOutlineNoteAlt size={30} className="ms-1" /> Chi Phí
+          </button>
+        </li>
+        <li>
+          <button
+            className="nav-link"
+            style={getItemStyle("ChatBox")}
             onClick={() => {
               setSelectedComponent("ChatBox");
               toggleDropdown("chat");

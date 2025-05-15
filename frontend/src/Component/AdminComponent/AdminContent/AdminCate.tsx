@@ -17,8 +17,11 @@ type CategoryType = {
 };
 
 const AdminCate = () => {
-  const token = localStorage.getItem("access_token");
+  const token = sessionStorage.getItem("access_token");
   const [categories, setCategories] = useState<CategoryType[]>([]);
+  const [categoriesForDropDown, setCategoriesForDropDown] = useState<
+    CategoryType[]
+  >([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -69,7 +72,43 @@ const AdminCate = () => {
 
     fetchData();
   }, [rfKey, currentPage, itemsPerPage, token]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: "1",
+          size: "100",
+          sortBy: "id",
+          direction: "ASC",
+        });
+        const response = await fetch(
+          `${BASE_URL}/api/admin/categories/?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
+        const result = await response.json();
+        setCategoriesForDropDown(
+          result.content.map((c: any) => ({
+            name: c.name,
+            id: c.id,
+            image: c.images,
+            parentName: c?.parentCategory?.name,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [rfKey]);
   const filteredCategories = categories.filter((category) =>
     category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -150,7 +189,7 @@ const AdminCate = () => {
           show={showEditModal}
           onHide={() => setShowEditModal(false)}
           category={currentEditCategory}
-          categories={categories}
+          categories={categoriesForDropDown}
           onSuccess={() => setRfKey(!rfKey)}
         />
       )}

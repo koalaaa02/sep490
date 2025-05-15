@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
 import img from "../images/glass.jpg";
 import { FaStore } from "react-icons/fa";
+import { setShopId } from "../Redux/shop.js";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,7 +17,7 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const name = useSelector((state) => state.auth.user?.lastthonngName);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.user?.roles || []);
   const normalizedRoles = typeof role === "string" ? role.split(",") : [];
@@ -51,6 +52,34 @@ const Header = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchMyShop = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy thông tin shop");
+        }
+
+        const data = await response.json();
+        dispatch(setShopId(data.id));
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin shop:", error);
+      }
+    };
+
+    if (isProvider && token) {
+      fetchMyShop();
+    }
+  }, [isProvider, token, dispatch]);
 
   const removeFromCart = async (shopId, productSKUId) => {
     try {
@@ -166,26 +195,10 @@ const Header = () => {
                 </div>
               </li>
 
-              <li className="nav-item dmenu dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Nhà cung cấp
+              <li className="nav-item">
+                <Link className="nav-link" to="/StoreList">
+                  Danh sách Nhà cung cấp
                 </Link>
-                <div
-                  className="dropdown-menu sm-menu"
-                  aria-labelledby="navbarDropdown"
-                >
-                  <Link className="dropdown-item" to="/StoreList">
-                    Danh sách nhà cung cấp
-                  </Link>
-                </div>
               </li>
 
               <li className="nav-item dmenu dropdown">
@@ -256,12 +269,12 @@ const Header = () => {
                           >
                             Địa chỉ
                           </Link>
-                          <Link
+                          {/* <Link
                             className="dropdown-item"
                             to="/MyAcconutInvoice"
                           >
                             Hóa đơn của tôi
-                          </Link>
+                          </Link> */}
                           <Link className="dropdown-item" to="/MyDebt">
                             Khoản nợ
                           </Link>
@@ -292,9 +305,12 @@ const Header = () => {
                   </div>
                 </div>
               </li>
-              {token && (
+              {token && !isProvider && (
                 <li className="nav-item">
-                  <Link className="nav-link text-danger" to="/MyAcconutPaymentMethod">
+                  <Link
+                    className="nav-link text-danger"
+                    to="/MyAcconutPaymentMethod"
+                  >
                     Đăng ký bán hàng
                   </Link>
                 </li>
@@ -394,7 +410,7 @@ const Header = () => {
                             <div className="col-4">
                               <h6 className="mb-0">{item.productName}</h6>
                               <span className="text-muted">
-                                Mã SKU: {item.productSKUCode}
+                                Phân loại: {item.productSKUCode}
                               </span>
                               <div className="mt-2 small">
                                 <button

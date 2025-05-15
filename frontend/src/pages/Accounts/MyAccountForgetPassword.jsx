@@ -37,7 +37,7 @@ const MyAccountForgetPassword = () => {
         );
         setStep("otp");
       } else {
-        setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+        setError("Email của bạn không tồn tại. Vui lòng thử lại.");
       }
     } catch (err) {
       setError(
