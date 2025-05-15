@@ -56,6 +56,8 @@ public class OrderService {
     private InvoiceRepository invoiceRepository;
     @Autowired
     private CommonUtils commonUtils;
+    @Autowired
+    private DebtPaymentRepository debtPaymentRepository;
 
     public PageResponse<OrderResponse> getOrdersPublicFilter(OrderFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
@@ -206,6 +208,15 @@ public class OrderService {
                 invoiceRepository.save(invoice);
             }
             order.setDeliveryDate(LocalDateTime.now());
+
+            if(amount.compareTo(BigDecimal.ZERO) >0){
+                 DebtPayment debt =  DebtPayment.builder()
+                        .invoice(invoice)
+                        .amountPaid(amount)
+                        .paymentDate(LocalDateTime.now())
+                        .build();
+                debtPaymentRepository.save(debt);
+            }
         }
         order.setStatus(orderStatus);
         orderRepo.save(order);
