@@ -7,7 +7,7 @@ import { BASE_URL } from "../../Utils/config";
 import { useSelector } from "react-redux";
 import img from "../../images/member6.jpg";
 
-const ChatBox = () => {
+const ChatBox = ({ selectedShopId }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -55,11 +55,11 @@ const ChatBox = () => {
     }
   };
 
-  const createChatRoom = async (dealerId, shopId) => {
+  const createChatRoom = async (dealerId, selectedShopId) => {
     try {
       const params = new URLSearchParams({
-        dealerId,
-        shopId,
+        dealerId: dealerId,
+        shopId: selectedShopId,
       });
 
       const response = await fetch(
@@ -113,11 +113,11 @@ const ChatBox = () => {
   };
 
   useEffect(() => {
-    if (userId && selectedShop) {
-      createChatRoom(userId, selectedShop); 
+    if (userId && selectedShopId) {
+      createChatRoom(userId, selectedShopId);
       fetchData();
     }
-  }, [userId, selectedShop]);
+  }, [userId, selectedShopId]);
 
   useEffect(() => {
     if (selectedChatId) {

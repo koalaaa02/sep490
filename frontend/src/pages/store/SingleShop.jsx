@@ -153,7 +153,7 @@ const SingleShop = () => {
                 Địa chỉ: {stores?.address?.address}, {stores?.address?.ward},{" "}
                 {stores?.address?.district}, {stores?.address?.province}
               </p>
-              {token && <ChatBox />}
+              {token && <ChatBox selectedShopId={shopId} />}
               <div
                 className="mt-2"
                 style={{ position: "relative", width: "70%" }}
