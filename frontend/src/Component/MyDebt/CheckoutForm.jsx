@@ -1,35 +1,35 @@
 import classNames from "classnames";
 import styles from "./styles.module.css";
-import storeImg from "../../images/stores-logo-1.svg";
 import { CiWarning } from "react-icons/ci";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../Utils/config";
-import PaymentMethods from "../PaymentMethod";
 import { useSelector } from "react-redux";
+
 const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
   const token = sessionStorage.getItem("access_token");
-  const bankCode = useSelector((state) => state.purchase.bank);
   const [amount, setAmount] = useState(
     orders
       ?.filter((o) => o?.status !== "PAID")
-      ?.reduce((acc, index) => {
-        return acc + index?.totalAmount;
-      }, 0)
+      ?.reduce((acc, index) => acc + index?.totalAmount, 0)
   );
   const [payMode, setPayMode] = useState("payAll");
+  const [errorMessage, setErrorMessage] = useState(""); // Lưu thông báo lỗi
+
   useEffect(() => {
     if (payMode === "payAll") {
       setAmount(
         orders
           ?.filter((o) => o?.status !== "PAID")
-          ?.reduce((acc, index) => {
-            return acc + index?.totalAmount;
-          }, 0)
+          ?.reduce((acc, index) => acc + index?.totalAmount, 0)
       );
     } else {
       setAmount(0);
     }
-  }, [payMode]);
+  }, [payMode, orders]);
+
+  const totalDebt = orders
+    ?.filter((o) => o?.status !== "PAID")
+    ?.reduce((acc, index) => acc + index?.totalAmount, 0);
 
   const pay = async () => {
     try {
@@ -38,7 +38,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
           paymentProvider: "VNPAY",
           paymentType: "INVOICE",
           amount: amount,
-          bankCode: "",
+          bankCode: "", 
           referenceId: shop?.shopId,
         })}`,
         {
@@ -56,6 +56,24 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
       console.error("Lỗi khi fetch dữ liệu:", error);
     }
   };
+
+  const handleAmountChange = (e) => {
+    const enteredAmount = parseFloat(e.target.value);
+
+    if (enteredAmount <= 0) {
+      setAmount("");
+      setErrorMessage("Số tiền phải lớn hơn 0.");
+    } else if (enteredAmount > totalDebt) {
+      setAmount("");
+      setErrorMessage(
+        "Số tiền nhập vào không được vượt quá số tiền nợ còn lại."
+      );
+    } else {
+      setAmount(enteredAmount);
+      setErrorMessage(""); // Xóa thông báo lỗi nếu nhập đúng
+    }
+  };
+
   return (
     <>
       <div
@@ -83,27 +101,15 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div className={"modal-body d-flex flex-column gap-3"}>
+            <div className="modal-body d-flex flex-column gap-3">
               <div className="d-flex flex-column gap-4 col-12">
                 <div className="d-flex align-items-center gap-3">
                   <div className="d-flex align-items-center gap-3">
-                    <span className="fw-bold">Số tiền nợ</span>
+                    <span className="fw-bold">Tên nhà phân phối</span>
                     <span
                       className={classNames(styles.textCard, styles.debtTo)}
                     >
                       {shop?.shopName}
-                    </span>
-                  </div>
-                  <div className="d-flex align-items-center gap-3 flex-grow-1">
-                    <span className="fw-bold">Còn</span>
-                    <span
-                      className={classNames(styles.textCard, "flex-grow-1")}
-                    >
-                      {Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(300000)}{" "}
-                      VND
                     </span>
                   </div>
                 </div>
@@ -113,13 +119,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                     {Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(
-                      orders
-                        ?.filter((o) => o?.status !== "PAID")
-                        ?.reduce((acc, index) => {
-                          return acc + index?.totalAmount;
-                        }, 0)
-                    )}
+                    }).format(totalDebt)}
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-3">
@@ -131,9 +131,7 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                     }).format(
                       orders
                         ?.filter((o) => o?.status !== "PAID")
-                        ?.reduce((acc, index) => {
-                          return acc + index?.paidAmount;
-                        }, 0)
+                        ?.reduce((acc, index) => acc + index?.paidAmount, 0)
                     )}
                   </span>
                 </div>
@@ -141,15 +139,14 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                   <span className="fw-bold">Trạng thái</span>
                   <select
                     className={classNames(styles.textCard, "flex-grow-1")}
-                    onChange={(e) => {
-                      setPayMode(e?.target?.value);
-                    }}
+                    onChange={(e) => setPayMode(e.target.value)}
                   >
                     <option value="payAll">Tôi muốn thanh toán khoản nợ</option>
                     <option value="payPart">Tôi muốn một phần nợ</option>
                   </select>
                 </div>
               </div>
+
               <div className="d-flex align-items-center">
                 <div className={styles.warningIcon}>
                   <CiWarning size={15} color="#c6b300" />
@@ -160,6 +157,8 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                   Hãy nhập số tiền muốn thanh toán cho khoản nợ
                 </div>
               </div>
+
+              {/* Nhập số tiền muốn thanh toán */}
               <div className="d-flex flex-column gap-4 col-12">
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">Nhập số tiền muốn thanh toán</span>
@@ -168,11 +167,18 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                     className="flex-grow-1"
                     value={amount}
                     disabled={payMode === "payAll"}
-                    onChange={(e) => {
-                      setAmount(e?.target?.value);
-                    }}
+                    onChange={handleAmountChange}
                   />
                 </div>
+
+                {/* Hiển thị thông báo lỗi nếu có */}
+                {errorMessage && (
+                  <div style={{ color: "red", marginTop: "5px" }}>
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Hiển thị số tiền nợ còn lại */}
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">
                     Số tiền nợ còn lại của đơn hàng sau khi thanh toán
@@ -181,26 +187,23 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                     {Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(100000 - amount)}
+                    }).format(totalDebt - (amount || 0))}
                   </span>
                 </div>
               </div>
             </div>
-            {/* <PaymentMethods /> */}
+
+            {/* Footer - Thanh toán */}
             <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => {
-                  pay();
-                }}
-              >
+              <button type="button" className="btn btn-primary" onClick={pay}>
                 Thanh Toán
               </button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Modal backdrop */}
       {showModal && (
         <div
           className="modal-backdrop fade show"
