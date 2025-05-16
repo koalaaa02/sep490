@@ -4,7 +4,7 @@ import { Modal, Button, Form, Card } from "react-bootstrap";
 import AddInvoice from "../Invoice/AddInvoice";
 import AddPayment from "../Invoice/AddPayment";
 
-const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
+const OrderDetails = ({ order, onBack, fromDeliveryList, paid }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(order?.id || null);
@@ -177,7 +177,9 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
             {
               method: "GET",
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("access_token")}`,
+                Authorization: `Bearer ${sessionStorage.getItem(
+                  "access_token"
+                )}`,
                 "Content-Type": "application/json",
               },
             }
@@ -476,7 +478,8 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
 
               {!fromDeliveryList &&
                 data.status === "DELIVERING" &&
-                totalDeliveredQuantity < totalOrderQuantity && (
+                totalDeliveredQuantity < totalOrderQuantity &&
+                paid === false && (
                   <button
                     className="btn btn-primary"
                     onClick={toggleInvoiceForm}
@@ -540,11 +543,16 @@ const OrderDetails = ({ order, onBack, fromDeliveryList }) => {
           <Card className="mt-2">
             <Card.Header className="d-flex justify-content-between align-items-center">
               <strong>Lịch sử giao dịch</strong>
-              {!fromDeliveryList && data.status === "DELIVERED" && (
-                <button className="btn btn-primary" onClick={togglePaymetForm}>
-                  Thêm phiếu thanh toán
-                </button>
-              )}
+              {!fromDeliveryList &&
+                data.status === "DELIVERED" &&
+                paid === false && (
+                  <button
+                    className="btn btn-primary"
+                    onClick={togglePaymetForm}
+                  >
+                    Thêm phiếu thanh toán
+                  </button>
+                )}
             </Card.Header>
             {filteredData?.length === 0 ||
             filteredData?.[0]?.debtPayments?.length === 0 ? (

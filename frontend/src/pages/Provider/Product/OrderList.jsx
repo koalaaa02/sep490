@@ -16,20 +16,18 @@ const OrderList = () => {
   const [filterDirection, setFilterDirection] = useState("DESC");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [size, setSize] = useState(10);
+  const [paid, setPaid] = useState(false);
   const statusOptions = [
     "PENDING",
     "CANCELLED",
-    // "FINDINGTRUCK",
     "ACCEPTED",
-    // "PACKAGING",
     "DELIVERING",
     "DELIVERED",
-    // "LOST",
   ];
 
   useEffect(() => {
     fetchData();
-  }, [page, filterStatus, filterPaymentMethod, filterDirection, size]);
+  }, [page, filterStatus, filterPaymentMethod, filterDirection, size, paid]);
 
   const fetchData = async () => {
     try {
@@ -40,7 +38,7 @@ const OrderList = () => {
         status: filterStatus,
         paymentMethod: filterPaymentMethod,
         direction: filterDirection,
-        paid: true, // thêm 1 bộ lọc
+        paid: paid, // Thêm bộ lọc paid vào URL params
       });
 
       const response = await fetch(
@@ -68,10 +66,12 @@ const OrderList = () => {
     setFilterStatus(status === filterStatus ? null : status);
   };
 
-  const filteredOrders = data?.content?.filter((order) =>
-    order.address.recipientName
-      ?.toLowerCase()
-      .includes(searchTerm.toLowerCase())
+  const filteredOrders = data?.content?.filter(
+    (order) =>
+      order.address.recipientName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      order.orderCode?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = data?.totalElements
@@ -87,9 +87,7 @@ const OrderList = () => {
   const statusTranslations = {
     PENDING: "Đang chờ",
     CANCELLED: "Hủy",
-    // FINDINGTRUCK: "Đang tìm xe",
     ACCEPTED: "Chấp nhận",
-    // PACKAGING: "Đóng gói",
     DELIVERING: "Chưa giao",
     DELIVERED: "Đã giao",
   };
@@ -108,11 +106,20 @@ const OrderList = () => {
   const statusColors = {
     PENDING: "secondary",
     CANCELLED: "danger",
-    FINDINGTRUCK: "info",
     ACCEPTED: "primary",
-    PACKAGING: "dark",
     DELIVERING: "warning",
     DELIVERED: "success",
+  };
+
+  const handleSetPaidFilter = (paidStatus) => {
+    setPaid(paidStatus);
+  };
+
+  const getOrderStatus = (order) => {
+    if (order.paid === true) {
+      return "DELIVERED";
+    }
+    return order.status;
   };
 
   return (
@@ -124,7 +131,7 @@ const OrderList = () => {
             <input
               type="text"
               className="form-control"
-              placeholder="Tìm kiếm tên khách hàng..."
+              placeholder="Tìm kiếm tên khách hàng hoặc mã giao hàng..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -132,71 +139,63 @@ const OrderList = () => {
               <FaSearch />
             </button>
           </div>
-          <div className="mb-3 d-flex">
-            {/* Status Dropdown */}
-            <div className="me-3">
-              <label>Trạng thái:</label>
 
-              <select
-                className="form-select"
-                value={filterStatus}
-                onChange={(e) => handleStatusClick(e.target.value)}
-              >
-                <option value="">Tất cả</option>
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {statusTranslations[status] || status}
-                  </option>
-                ))}
-              </select>
+          <div class="row mb-3">
+            <div class="col-2">
+              <div class="d-flex align-items-center">
+                <label for="status">Trạng thái:</label>
+                <select id="status" className="form-select w-auto">
+                  <option value="">Tất cả</option>
+                  <option value="pending">Đang chờ</option>
+                  <option value="accepted">Chấp nhận</option>
+                  <option value="delivered">Đã giao</option>
+                </select>
+              </div>
             </div>
 
-            {/* Payment Method Dropdown */}
-            {/* <div className="me-3">
-              <label>Phương thức thanh toán: </label>
-              <select
-                className="form-select"
-                value={filterPaymentMethod}
-                onChange={(e) => setFilterPaymentMethod(e.target.value)}
-              >
-                <option value="">Tất cả</option>
-                <option value="COD">Thanh toán khi đã nhận hàng</option>
-                <option value="DEBT">Trả góp</option>
-              </select>
-            </div> */}
-
-            <div className="me-3">
-              <label>Sắp xếp theo: </label>
-              <select
-                className="form-select"
-                value={filterDirection}
-                onChange={(e) => setFilterDirection(e.target.value)}
-              >
-                <option value="DESC">Mới nhất</option>
-                <option value="ASC">Cũ nhất</option>
-              </select>
+            <div class="col-2">
+              <div class="d-flex align-items-center">
+                <label for="sort">Sắp xếp theo:</label>
+                <select id="sort" className="form-select w-auto">
+                  <option value="desc">Mới nhất</option>
+                  <option value="asc">Cũ nhất</option>
+                </select>
+              </div>
             </div>
 
-            <div>
-              <label>Số sản phẩm: </label>
-              <select
-                className="form-select"
-                value={filterDirection}
-                onChange={(e) => setSize(e.target.value)}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-                <option value="20">20</option>
-                <option value="100">100</option>
-              </select>
+            <div class="col-2">
+              <div class="d-flex align-items-center">
+                <label for="size">Số sản phẩm:</label>
+                <select id="size" className="form-select w-auto">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="border p-2 mb-3">
-            <strong>Thống kê nhanh:</strong>
-            <div>Tổng hóa đơn: {data?.totalElements || 0}</div>
+          {/* Filter buttons for paid status */}
+          <div className="mb-3">
+            {" "}
+            <button
+              className={`btn ${
+                paid === true ? "btn-outline-danger" : "btn-danger"
+              } me-2`}
+              onClick={() => handleSetPaidFilter(false)}
+            >
+              Chưa thanh toán
+            </button>
+            <button
+              className={`btn ${
+                paid === false ? "btn-outline-success" : "btn-success"
+              } me-2`}
+              onClick={() => handleSetPaidFilter(true)}
+            >
+              Đã thanh toán
+            </button>
           </div>
+
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -206,44 +205,39 @@ const OrderList = () => {
                 <th>Khách hàng</th>
                 <th>Địa chỉ nhận hàng</th>
                 <th>Số điện thoại người nhận</th>
-                {/* <th>Phương thức vận chuyển</th> */}
                 <th>Phương thức thanh toán</th>
-                <th>Trạng Thái</th>
+                <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
-              {filteredOrders?.map((order, index) => {
-                return (
-                  <React.Fragment key={order.id}>
-                    <tr
-                      onClick={() => handleOrderClick(order)}
-                      style={{ cursor: "pointer" }}
+              {filteredOrders?.map((order, index) => (
+                <tr key={order.id} onClick={() => handleOrderClick(order)}>
+                  <td>{index + 1}</td>
+                  <td>{order.orderCode}</td>
+                  <td>
+                    {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                  </td>
+                  <td>{order.address.recipientName || "Chưa có tên"}</td>
+                  <td>
+                    {order.address.address}, {order.address.ward},{" "}
+                    {order.address.province}
+                  </td>
+                  <td>{order.address.phone}</td>
+                  <td>
+                    {order.paymentMethod === "COD"
+                      ? "Thanh toán khi đã nhận hàng"
+                      : "Thanh toán khi đã nhận hàng"}
+                  </td>
+                  <td>
+                    <Badge
+                      bg={statusColors[getOrderStatus(order)] || "secondary"}
                     >
-                      <td>{index + 1}</td>
-                      <td>{order.orderCode}</td>
-                      <td>
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-                      </td>
-                      <td>{order.address.recipientName || "Chưa có tên"}</td>
-                      <td>
-                        {order.address.address}, {order.address.ward},{" "}
-                        {order.address.province}
-                      </td>
-                      <td>{order.address.phone}</td>
-                      <td>
-                        {order.paymentMethod === "COD"
-                          ? "Thanh toán khi đã nhận hàng"
-                          : "Thanh toán khi đã nhận hàng"}
-                      </td>
-                      <td>
-                        <Badge bg={statusColors[order.status] || "secondary"}>
-                          {statusTranslations[order.status] || order.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
+                      {statusTranslations[getOrderStatus(order)] ||
+                        order.status}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
 
@@ -261,7 +255,6 @@ const OrderList = () => {
                       <i className="fa fa-chevron-left" />
                     </Link>
                   </li>
-
                   {[...Array(totalPages)].map((_, index) => {
                     const pageNumber = index + 1;
                     return (
@@ -281,7 +274,6 @@ const OrderList = () => {
                       </li>
                     );
                   })}
-
                   <li
                     className={`page-item ${
                       page === totalPages ? "disabled" : ""
@@ -306,6 +298,7 @@ const OrderList = () => {
           order={selectedOrder}
           onBack={handleBackToList}
           fromDeliveryList={false}
+          paid={paid}
         />
       )}
     </>

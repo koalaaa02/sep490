@@ -17,7 +17,7 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const name = useSelector((state) => state.auth.user?.lastthonngName);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
   const role = useSelector((state) => state.auth.user?.roles || []);
   const normalizedRoles = typeof role === "string" ? role.split(",") : [];
@@ -269,12 +269,12 @@ const Header = () => {
                           >
                             Địa chỉ
                           </Link>
-                          <Link
+                          {/* <Link
                             className="dropdown-item"
                             to="/MyAcconutInvoice"
                           >
                             Hóa đơn của tôi
-                          </Link>
+                          </Link> */}
                           <Link className="dropdown-item" to="/MyDebt">
                             Khoản nợ
                           </Link>
