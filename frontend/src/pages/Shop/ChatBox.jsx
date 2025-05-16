@@ -77,6 +77,9 @@ const ChatBox = ({ selectedShopId }) => {
         console.error("Không thể tạo phòng chat.");
       } else {
         console.log("Tạo phòng chat thành công.");
+        const newRoom = await response.json();
+        setData((prevData) => [...prevData, newRoom]);
+        setSelectedChat(newRoom.id);
       }
     } catch (error) {
       console.error("Lỗi khi tạo phòng chat:", error);
@@ -114,7 +117,10 @@ const ChatBox = ({ selectedShopId }) => {
 
   useEffect(() => {
     if (userId && selectedShopId) {
-      createChatRoom(userId, selectedShopId);
+      const roomExists = data?.some((room) => room.shop?.id === selectedShopId);
+      if (!roomExists) {
+        createChatRoom(userId, selectedShopId);
+      }
       fetchData();
     }
   }, [userId, selectedShopId]);
