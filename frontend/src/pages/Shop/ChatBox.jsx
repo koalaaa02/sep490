@@ -116,13 +116,19 @@ const ChatBox = ({ selectedShopId }) => {
   };
 
   useEffect(() => {
-    if (userId && selectedShopId) {
+    const checkAndCreateRoom = async () => {
+      if (!userId || !selectedShopId) return;
+
+      await fetchData();
+
       const roomExists = data?.some((room) => room.shop?.id === selectedShopId);
       if (!roomExists) {
-        createChatRoom(userId, selectedShopId);
+        await createChatRoom(userId, selectedShopId);
+        await fetchData();
       }
-      fetchData();
-    }
+    };
+
+    checkAndCreateRoom();
   }, [userId, selectedShopId]);
 
   useEffect(() => {
