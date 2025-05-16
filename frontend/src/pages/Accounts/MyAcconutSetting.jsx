@@ -38,6 +38,8 @@ const MyAcconutSetting = () => {
   const [cccdPasswordInput, setCccdPasswordInput] = useState("");
   const [showCccdModal, setShowCccdModal] = useState(false);
   const [hasEnteredCccd, setHasEnteredCccd] = useState(false); // Trạng thái đã nhập CCCD
+  const [isUploadingUp, setIsUploadingUp] = useState(false);
+  const [isUploadingDown, setIsUploadingDown] = useState(false);
 
   const token = useSelector((state) => state.auth.token);
   const userId = useSelector((state) => state.auth.user.uid);
@@ -139,7 +141,7 @@ const MyAcconutSetting = () => {
         setMessage("Thông tin đã được cập nhật thành công.");
         setUserData((prevData) => ({
           ...prevData,
-          ...editableUser, 
+          ...editableUser,
         }));
       } else {
         setError(data.message || "Cập nhật thất bại.");
@@ -159,6 +161,9 @@ const MyAcconutSetting = () => {
         : `${BASE_URL}/api/myprofile/uploadCitizenIdentityCardDown?${userId}`;
 
     try {
+      if (type === "up") setIsUploadingUp(true);
+      if (type === "down") setIsUploadingDown(true);
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -167,25 +172,48 @@ const MyAcconutSetting = () => {
         body: formData,
       });
 
-      const data = await response.json();
       if (response.ok) {
-        if (type === "up") {
-          setEditableUser((prev) => ({
-            ...prev,
-            citizenIdentificationCardImageUp: data.url,
-          }));
+        const data = await response.json();
+        if (
+          data &&
+          data.citizenIdentificationCardImageUp &&
+          data.citizenIdentificationCardImageDown
+        ) {
+          if (type === "up") {
+            setEditableUser((prev) => ({
+              ...prev,
+              citizenIdentificationCardImageUp:
+                data.citizenIdentificationCardImageUp,
+            }));
+            setUserData((prev) => ({
+              ...prev,
+              citizenIdentificationCardImageUp:
+                data.citizenIdentificationCardImageUp,
+            }));
+          } else if (type === "down") {
+            setEditableUser((prev) => ({
+              ...prev,
+              citizenIdentificationCardImageDown:
+                data.citizenIdentificationCardImageDown,
+            }));
+            setUserData((prev) => ({
+              ...prev,
+              citizenIdentificationCardImageDown:
+                data.citizenIdentificationCardImageDown,
+            }));
+          }
         } else {
-          setEditableUser((prev) => ({
-            ...prev,
-            citizenIdentificationCardImageDown: data.url,
-          }));
+          console.error("API response is missing image URL fields");
         }
       } else {
-        alert("Upload thất bại. Vui lòng thử lại.");
+        alert("Không thể tải lên ảnh. Vui lòng thử lại.");
       }
     } catch (error) {
       console.error("Upload error:", error);
       alert("Không thể upload ảnh.");
+    } finally {
+      if (type === "up") setIsUploadingUp(false);
+      if (type === "down") setIsUploadingDown(false);
     }
   };
 
@@ -405,7 +433,13 @@ const MyAcconutSetting = () => {
                               Ảnh mặt trước CCCD
                             </label>
 
-                            {editableUser.citizenIdentificationCardImageUp ? (
+                            {isUploadingUp ? (
+                              <p className="text-info fst-italic">
+                                Đang tải ảnh mặt trước...
+                              </p>
+                            ) : editableUser?.citizenIdentificationCardImageUp &&
+                              editableUser.citizenIdentificationCardImageUp !==
+                                "" ? (
                               <div
                                 style={{
                                   position: "relative",
@@ -414,7 +448,9 @@ const MyAcconutSetting = () => {
                               >
                                 <img
                                   src={
-                                    editableUser.citizenIdentificationCardImageUp
+                                    editableUser.citizenIdentificationCardImageUp +
+                                    "?t=" +
+                                    Date.now()
                                   }
                                   alt="Mặt trước CCCD"
                                   style={{
@@ -449,7 +485,7 @@ const MyAcconutSetting = () => {
                               <input
                                 type="file"
                                 accept="image/*"
-                                className="form-control"
+                                className="form-control mt-2"
                                 onChange={(e) =>
                                   handleUploadImage(e.target.files[0], "up")
                                 }
@@ -462,7 +498,13 @@ const MyAcconutSetting = () => {
                               Ảnh mặt sau CCCD
                             </label>
 
-                            {editableUser.citizenIdentificationCardImageDown ? (
+                            {isUploadingDown ? (
+                              <p className="text-info fst-italic">
+                                Đang tải ảnh mặt sau...
+                              </p>
+                            ) : editableUser?.citizenIdentificationCardImageDown &&
+                              editableUser.citizenIdentificationCardImageDown !==
+                                "" ? (
                               <div
                                 style={{
                                   position: "relative",
@@ -471,7 +513,9 @@ const MyAcconutSetting = () => {
                               >
                                 <img
                                   src={
-                                    editableUser.citizenIdentificationCardImageDown
+                                    editableUser.citizenIdentificationCardImageDown +
+                                    "?t=" +
+                                    Date.now()
                                   }
                                   alt="Mặt sau CCCD"
                                   style={{
@@ -506,7 +550,7 @@ const MyAcconutSetting = () => {
                               <input
                                 type="file"
                                 accept="image/*"
-                                className="form-control"
+                                className="form-control mt-2"
                                 onChange={(e) =>
                                   handleUploadImage(e.target.files[0], "down")
                                 }
