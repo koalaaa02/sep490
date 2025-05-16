@@ -1,10 +1,12 @@
 package com.example.sep490.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.sep490.entity.enums.InvoiceStatus;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,11 +23,17 @@ public class Invoice  extends Auditable{//hóa đơn nợ cho đơn hàng nào (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, length = 10, unique = true)
+    private String invoiceCode;
+
     private BigDecimal totalAmount; //tổng nợ phải trả
     private BigDecimal paidAmount = BigDecimal.ZERO; // Ban đầu = 0, khi đại lý trả sẽ tăng lên
 
     @Enumerated(EnumType.STRING)
     private InvoiceStatus status = InvoiceStatus.UNPAID;; // UNPAID, PARTIALLY_PAID, PAID
+    private LocalDateTime deliveryDate;
+    private String deliveryProofImage;
+    private String deliveryNote;
 
     // Relationship
     @OneToMany(mappedBy = "invoice")

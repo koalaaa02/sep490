@@ -1,72 +1,124 @@
 import storeImg from "../../../images/stores-logo-1.svg";
-const OrderDetail = ({ order }) => {
-  console.log(order);
+import { Image } from "react-bootstrap";
+import { BASE_URL } from "../../../Utils/config";
+import { useNavigate } from "react-router-dom";
+
+const OrderDetail = ({ order, status }) => {
+  const token = sessionStorage.getItem("access_token");
+  const navigate = useNavigate();
+  const totalSum = order.products.reduce((sum, product) => {
+    return sum + product.price * product.quantity;
+  }, 0);
+  const statusTab = {
+    PENDING: "Đang chờ",
+    ACCEPTED: "Đã chấp nhận",
+    PACKAGING: "Đóng gói",
+    FINDINGTRUCK: "Tìm xe tải",
+    DELIVERING: "Đang giao",
+    DELIVERED: "Đã giao",
+    CANCELLED: "Đã hủy",
+  };
+  const handleCanceled = async (id) => {
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/dealer/change-status/${id}?status=CANCELLED`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        alert("Đã huỷ đơn hàng thành công");
+      }
+    } catch (error) {
+      alert("Đã có lỗi xảy ra, vui lòng thử lại");
+    }
+  };
+  function renderButton(status) {
+    if (status === "PENDING" || status === "FINDINGTRUCK") {
+      return (
+        <button
+          onClick={() => handleCanceled(order.id)}
+          className="btn btn-outline-danger mt-3 min-wh-10"
+        >
+          Cancel
+        </button>
+      );
+    } else {
+      return (
+        <button className="btn btn-outline-success mt-3">
+          {statusTab[status] || "Order Status"}
+        </button>
+      );
+    }
+  }
 
   return (
-    <div className="d-flex p-2 border border-black  mt-2 mb-5 rounded shadow-sm">
-      <div className="order-info w-75 ">
-        <div className="text-black fw-bold fs-4 pb-2">
-          <span className="p-1">
-            <img
-              className="rounded-5"
-              src={storeImg}
+    <div className=" container border  mt-2 mb-5 rounded shadow-sm">
+      <div className=" d-flex pt-3 justify-content-between align-items-center">
+        <div className="container d-flex align-items-center">
+          <span className="">
+            <Image
+              rounded
               width={50}
               height={50}
+              src={storeImg}
               alt=""
+              srcset=""
             />
           </span>
-          <span>{order.name}</span>
+          <span className="fw-bold ml-2">{order.shopName}</span>
+
+          <div className="rounded-2 d-flex align-content-center ms-2">
+            <span
+              className=" btn btn-outline-danger px-2
+            "
+              onClick={() => navigate(`/SingleShop/${order.shopId}`)}
+            >
+              Xem nhà cung cấp
+            </span>
+          </div>
         </div>
-        <div className="order-product">
-          <table class="table table-bordered">
-            <thead>
-              <tr className="text-center">
-                <th scope="col">Sẩn phẩm</th>
-                <th scope="col">Đơn giá</th>
-                <th scope="col">Số lượng</th>
-                <th scope="col">Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              {order.products.map((p) => (
-                <tr className="">
-                  <th className="d-flex">
-                    <img
-                      width={200}
-                      height={150}
-                      className="object-fit-cover"
-                      src={p.src}
-                      alt=""
-                    />{" "}
-                    <span className="pl-1 fw-light ">{p.name}</span>
-                  </th>
-                  <td className="w-20 text-center">{p.price}</td>
-                  <td className=" w-20 text-center">
-                    <input
-                      // width={10}
-                      className="w-50 text-right"
-                      type="number"
-                      value={p.quantity}
-                    />
-                  </td>
-                  <td>{p.quantity * p.price}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="mr-2 text-info fs-6 fw-medium w-20">
+          <span>{statusTab[status]}</span>
         </div>
       </div>
-      <div className="order-button w-25 p-2 text-center d-flex flex-column">
-        <div className="bg-primary w-75 rounded mx-auto p-3 text-white fw-bold fs-6 mt-5 ">
-          Xem chi tiết
+      <hr />
+      <div className="d-flex justify-content-between align-items-center my-2">
+        <div>
+          {order.products.map((p) => (
+            <div className="d-flex w-70">
+              <div>
+                <img
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    overflow: "hidden",
+                  }}
+                  className="rounded"
+                  src={p.image}
+                  alt=""
+                  srcset=""
+                />
+              </div>
+              <div className="ml-2">
+                <div className="fw-bold">Tên sản phẩm: {p.productName}</div>
+                <div className="fw-medium">Số lượng: x{p.quantity}</div>
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="my-auto">
-          <div className="bg-warning-subtle w-80 mx-auto mt-5 px-10 py-5 rounded border">
-            <p className="fs-6 fw-bold">Tổng tiền</p>
-            <div className="border border-dark px-5 py-1">3000303</div>
+        <div className="text-center w-30">
+          <div className="d-flex align-items-center">
+            <small className="fw-normal mr-2">Thành tiền:</small>
+            <div className="fs-4 fw-semibold text-danger">{`${totalSum.toLocaleString()} vnd`}</div>
           </div>
-          <div className="my-5 "> Chờ xét duyệt</div>
-          <div className="my-5">Huỷ yêu cầu</div>
+          {renderButton(order.status)}
         </div>
       </div>
     </div>

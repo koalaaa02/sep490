@@ -24,7 +24,7 @@ public class PaymentStrategyFactory {
                 return orderPaymentStrategy;
             case INVOICE:
                 return invoicePaymentStrategy;
-            case PLATFORM_FEE:
+            case PLATFORMFEE:
                 return platformFeePaymentStrategy;
             default:
                 throw new IllegalArgumentException("Loại thanh toán không hợp lệ");

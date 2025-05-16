@@ -12,6 +12,9 @@ public class InvoiceSpecification {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (filter.getInvoiceCode() != null) {
+                predicates.add(cb.equal(root.get("invoiceCode"), filter.getInvoiceCode()));
+            }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy() ));
             }

@@ -1,14 +1,18 @@
 package com.example.sep490.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import com.example.sep490.dto.ShopInvoiceSummary;
-import com.example.sep490.dto.UserInvoiceSummary;
+import com.example.sep490.dto.*;
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
+import com.example.sep490.repository.specifications.FilterDTO;
 import com.example.sep490.repository.specifications.InvoiceFilterDTO;
 import com.example.sep490.repository.specifications.InvoiceSpecification;
+import com.example.sep490.utils.CommonUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import com.example.sep490.dto.InvoiceRequest;
-import com.example.sep490.dto.InvoiceResponse;
 import com.example.sep490.mapper.InvoiceMapper;
 import com.example.sep490.entity.Invoice;
 import com.example.sep490.utils.BasePagination;
@@ -34,7 +36,8 @@ public class InvoiceService {
     private InvoiceMapper invoiceMapper;
     @Autowired
     private BasePagination pagination;
-
+    @Autowired
+    private CommonUtils commonUtils;
     @Autowired
     private UserRepository userRepo;
     @Autowired
@@ -42,7 +45,7 @@ public class InvoiceService {
     @Autowired
     private UserService userService;
     @Autowired
-    private UserRepository userRepository;
+    private DebtPaymentService debtPaymentService;
     @Autowired
     private ShopRepository shopRepository;
 
@@ -74,12 +77,14 @@ public class InvoiceService {
         return pagination.createPageResponse(invoiceResponsePage);
     }
 
-    public List<UserInvoiceSummary> getUsersWithInvoicesCreatedBy() {
-        return invoiceRepo.findAllUserAndCountInvoiceByCreatedBy(userService.getContextUser().getId());
+    public List<UserInvoiceSummary> getUsersWithInvoicesCreatedBy(FilterDTO filter) {
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        return invoiceRepo.findAllUserAndCountInvoiceByCreatedBy(userService.getContextUser().getId(), pageable);
     }
 
-    public List<ShopInvoiceSummary> getShopsWithInvoices() {
-        return invoiceRepo.findAllShopAndCountInvoiceByAgentID(userService.getContextUser().getId());
+    public List<ShopInvoiceSummary> getShopsWithInvoices(FilterDTO filter) {
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        return invoiceRepo.findAllShopAndCountInvoiceByAgentID(userService.getContextUser().getId(), pageable);
     }
 
     public List<InvoiceResponse> getShopsInvoicesByShopIdAndDealerId(Long shopId) {
@@ -97,25 +102,41 @@ public class InvoiceService {
     }
 
     public InvoiceResponse createInvoice(InvoiceRequest invoiceRequest) {
-        User user = getUser(invoiceRequest.getAgentId());
         Order order = getOrder(invoiceRequest.getOrderId());
-        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
         if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
+        User user = getUser(order.getAddress().getUser().getId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
 
+        if(order.getPaymentMethod() == PaymentMethod.COD){
+            order.setPaymentMethod(PaymentMethod.DEBT);
+            orderRepo.save(order);
+        }
         Invoice entity = invoiceMapper.RequestToEntity(invoiceRequest);
+        entity.setInvoiceCode(commonUtils.randomString(10));
         entity.setAgent(user);
         entity.setOrder(order);
-        return invoiceMapper.EntityToResponse(invoiceRepo.save(entity));
+        invoiceRepo.save(entity);
+
+//        if(entity.getPaidAmount().compareTo(BigDecimal.ZERO) > 0
+//                && entity.getPaidAmount().compareTo(order.getTotalAmount()) <0){
+//            DebtPaymentRequest debtPaymentRequest = DebtPaymentRequest.builder()
+//                    .invoiceId(entity.getId())
+//                    .amountPaid(entity.getPaidAmount())
+//                    .paymentDate(LocalDateTime.now())
+//                    .build();
+//            debtPaymentService.createDebtPayment(debtPaymentRequest);
+//        }
+        return invoiceMapper.EntityToResponse(entity);
     }
 
     public InvoiceResponse updateInvoice(Long id, InvoiceRequest invoiceRequest) {
         Invoice invoice = invoiceRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
 
-        User user = getUser(invoiceRequest.getAgentId());
         Order order = getOrder(invoiceRequest.getOrderId());
-        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
         if(order == null) throw new RuntimeException("Không tìm thấy hóa đơn.");
+        User user = getUser(invoice.getAgent().getId());
+        if(user == null) throw new RuntimeException("Không tìm thấy người nợ.");
 
         try {
             objectMapper.updateValue(invoice, invoiceRequest);

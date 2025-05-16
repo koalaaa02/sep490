@@ -1,14 +1,20 @@
 package com.example.sep490.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.DeliveryMethod;
+import com.example.sep490.entity.enums.InvoiceStatus;
 import com.example.sep490.entity.enums.OrderStatus;
+import com.example.sep490.entity.enums.PaymentMethod;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.OrderFilterDTO;
 import com.example.sep490.repository.specifications.OrderSpecification;
+import com.example.sep490.utils.CommonUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +29,7 @@ import com.example.sep490.mapper.OrderMapper;
 import com.example.sep490.entity.Order;
 import com.example.sep490.utils.BasePagination;
 import com.example.sep490.utils.PageResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
@@ -43,6 +50,14 @@ public class OrderService {
     private ShopRepository shopRepo;
     @Autowired
     private UserService userService;
+    @Autowired
+    private InvoiceService invoiceService;
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+    @Autowired
+    private CommonUtils commonUtils;
+    @Autowired
+    private DebtPaymentRepository debtPaymentRepository;
 
     public PageResponse<OrderResponse> getOrdersPublicFilter(OrderFilterDTO filter) {
         filter.setCreatedBy(userService.getContextUser().getId());
@@ -101,13 +116,13 @@ public class OrderService {
 //    }
 
     public Order createOrder(OrderRequest orderRequest) {
-//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address address = getShippingAddres(orderRequest.getAddressId());
         if(shop == null) throw new RuntimeException("Thiếu thông tin shop.");
         if(address == null) throw new RuntimeException("Thiếu thông tin giao hàng.");
         Order entity = orderMapper.RequestToEntity(orderRequest);
-//        entity.setTransaction(transaction);
+        entity.setOrderCode(commonUtils.randomString(10));
+        entity.setOrderDate(LocalDateTime.now());
         entity.setShop(shop);
         entity.setAddress(address);
         return orderRepo.save(entity);
@@ -117,7 +132,6 @@ public class OrderService {
         Order order = orderRepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + id));
 
-//        Transaction transaction = getTransaction(orderRequest.getTransactionId());
         Shop shop = getShop(orderRequest.getShopId());
         Address Address = getShippingAddres(orderRequest.getAddressId());
 
@@ -126,39 +140,107 @@ public class OrderService {
         } catch (JsonMappingException e) {
             throw new RuntimeException("Dữ liệu gửi đi không đúng định dạng.");
         }
-//        order.setTransaction(transaction);
         order.setShop(shop);
         order.setAddress(Address);
         return orderMapper.EntityToResponse(orderRepo.save(order));
     }
 
-    public OrderResponse changeOrderStatusCustomer(Long orderId, OrderStatus orderStatus) {
+    public OrderResponse changeOrderStatusForDealer(Long orderId, OrderStatus orderStatus) {
         Order order = orderRepo.findByIdAndIsDeleteFalse(orderId)
-                .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
+            .orElseThrow(() -> new RuntimeException("Đơn hàng không tồn tại với ID: " + orderId));
         order.setStatus(orderStatus);
         Order updatedOrder = orderRepo.save(order);
         return orderMapper.EntityToResponse(updatedOrder);
     }
 
-    public void changeStatusOrders(List<Long> orderIds, OrderStatus orderStatus) {
-        List<Order> orders = orderRepo.findAllById(orderIds)
-                .stream()
-                .filter(order -> !order.isDelete()) // Lọc bỏ các đơn hàng đã bị xóa
+    @Transactional
+    public void changeStatusOrdersForProvider(List<Long> orderIds, OrderStatus orderStatus) {
+//        List<Invoice> invoices = new ArrayList<>();
+        List<Order> orders = orderRepo.findAllById(orderIds).stream()
+                .filter(order -> !order.isDelete())
+//                .peek(order -> processOrder(order, orderStatus, invoices))
                 .peek(order -> {
                     order.setStatus(orderStatus);
-                    if(orderStatus.equals(OrderStatus.DELIVERED)) {
-                        order.setShippedDate(LocalDateTime.now());
-                    }
+                    if(order.getStatus() == OrderStatus.DELIVERED)
+                        order.setDeliveryDate(LocalDateTime.now());
                 })
                 .toList();
-
         if (orders.isEmpty()) {
             throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với danh sách ID đã cung cấp");
         }
-
+//        if (!invoices.isEmpty()) {
+//            invoiceRepository.saveAll(invoices);
+//        }
         orderRepo.saveAll(orders);
     }
 
+    @Transactional
+    public void changeStatusOrderForProvider(Long orderId, BigDecimal amount , OrderStatus orderStatus) {
+        Order order = getOrder(orderId);
+        if (order == null) {
+            throw new RuntimeException("Không tìm thấy đơn hàng hợp lệ với ID đã cung cấp");
+        }
+
+        if (orderStatus == OrderStatus.DELIVERED) {
+            Invoice invoice = Invoice.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.UNPAID)
+                    .agent(order.getAddress().getUser())
+                    .order(order)
+                    .paidAmount(amount == null ? BigDecimal.ZERO: amount)
+                    .totalAmount(order.getTotalAmount())
+                    .deliveryDate(LocalDateTime.now())
+                    .build();
+            if(order.getDeliveryMethod() == DeliveryMethod.SELF_DELIVERY){
+                if(amount.compareTo(order.getTotalAmount()) < 0) {
+                    invoice.setStatus(InvoiceStatus.PARTIALLY_PAID);
+                    if(order.getPaymentMethod() == PaymentMethod.COD)
+                        order.setPaymentMethod(PaymentMethod.DEBT);
+                }
+                if(amount.compareTo(order.getTotalAmount()) == 0) {
+                    invoice.setStatus(InvoiceStatus.PAID);
+                    order.setPaid(true);
+                }
+                invoiceRepository.save(invoice);
+            }else if(order.getDeliveryMethod() == DeliveryMethod.GHN){
+//                invoice.setPaidAmount(order.getTotalAmount()); neu = GHN, set ve orderPaymentMethod = debt
+                order.setPaid(true);
+                invoiceRepository.save(invoice);
+            }
+            order.setDeliveryDate(LocalDateTime.now());
+
+            if(amount.compareTo(BigDecimal.ZERO) >0){
+                 DebtPayment debt =  DebtPayment.builder()
+                        .invoice(invoice)
+                        .amountPaid(amount)
+                        .paymentDate(LocalDateTime.now())
+                        .build();
+                debtPaymentRepository.save(debt);
+            }
+        }
+        order.setStatus(orderStatus);
+        orderRepo.save(order);
+    }
+
+
+    private void processOrder(Order order, OrderStatus orderStatus, List<Invoice> invoices) {
+        order.setStatus(orderStatus);
+        if (orderStatus == OrderStatus.DELIVERED) {
+            order.setDeliveryDate(LocalDateTime.now());
+        }
+        if (orderStatus == OrderStatus.ACCEPTED && order.getPaymentMethod() == PaymentMethod.DEBT) {
+            invoices.add(
+                    Invoice.builder()
+                    .invoiceCode(commonUtils.randomString(10))
+                    .status(InvoiceStatus.UNPAID)
+                    .agent(order.getAddress().getUser())
+                    .order(order)
+                    .paidAmount(BigDecimal.ZERO)
+                    .totalAmount(order.getTotalAmount())
+                    .build()
+            );
+        }
+    }
 
     public void deleteOrder(Long id) {
         Order updatedOrder = orderRepo.findByIdAndIsDeleteFalse(id)

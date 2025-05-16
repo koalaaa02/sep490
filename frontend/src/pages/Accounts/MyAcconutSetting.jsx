@@ -1,30 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { useSelector } from "react-redux";
 import { BASE_URL } from "../../Utils/config";
-import { useDispatch } from "react-redux";
-import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 
 const MyAcconutSetting = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogOut = () => {
-    dispatch(logout());
-    navigate("/");
-  };
   const [loaderStatus, setLoaderStatus] = useState(true);
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    citizenIdentificationCard: "",
+    citizenIdentificationCardImageUp: "",
+    citizenIdentificationCardImageDown: "",
+  });
   const [error, setError] = useState(null);
   const [message, setMessage] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [editableUser, setEditableUser] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    citizenIdentificationCard: "",
+    citizenIdentificationCardImageUp: "",
+    citizenIdentificationCardImageDown: "",
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [cccdVerified, setCccdVerified] = useState(false);
+  const [cccdPasswordInput, setCccdPasswordInput] = useState("");
+  const [showCccdModal, setShowCccdModal] = useState(false);
+  const [hasEnteredCccd, setHasEnteredCccd] = useState(false); // Trạng thái đã nhập CCCD
 
   const token = useSelector((state) => state.auth.token);
+  const userId = useSelector((state) => state.auth.user.uid);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,6 +64,8 @@ const MyAcconutSetting = () => {
 
         const data = await response.json();
         setUserData(data);
+        setEditableUser(data);
+        // console.log(editableUser);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -57,6 +75,129 @@ const MyAcconutSetting = () => {
 
     fetchData();
   }, [token]);
+
+  // Kiểm tra tính hợp lệ của số CCCD
+  const isValidCccd = (cccd) => {
+    const cccdRegex = /^\d{12}$/; // Kiểm tra 12 chữ số
+    return cccdRegex.test(cccd);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    // Kiểm tra nếu người dùng đã nhập số CCCD và kiểm tra độ dài (12 chữ số)
+    if (name === "citizenIdentificationCard") {
+      // Nếu chưa nhập hoặc nhập không đủ 12 ký tự, không cần kiểm tra
+      if (value === "") {
+        setError(""); // Không hiển thị lỗi khi không có CCCD
+      } else if (value.length === 12 && !isValidCccd(value)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+      } else {
+        setError(""); // Xóa lỗi nếu số CCCD hợp lệ
+      }
+    }
+
+    setEditableUser((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // Nếu người dùng bắt đầu nhập CCCD thì cho phép chỉnh sửa tự do
+    if (name === "citizenIdentificationCard" && !hasEnteredCccd) {
+      setHasEnteredCccd(true);
+    }
+  };
+
+  const handleUpdateProfile = async (e) => {
+    if (e) e.preventDefault();
+
+    if (
+      editableUser.citizenIdentificationCard !==
+      userData.citizenIdentificationCard
+    ) {
+      if (!isValidCccd(editableUser.citizenIdentificationCard)) {
+        setError("Số CCCD phải là 12 chữ số và chỉ chứa số.");
+        return;
+      }
+    }
+
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/myprofile/updateMyProfile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(editableUser),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage("Thông tin đã được cập nhật thành công.");
+        setUserData((prevData) => ({
+          ...prevData,
+          ...editableUser, 
+        }));
+      } else {
+        setError(data.message || "Cập nhật thất bại.");
+      }
+    } catch (err) {
+      setError("Không thể kết nối đến máy chủ.");
+    }
+  };
+
+  const handleUploadImage = async (file, type) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const url =
+      type === "up"
+        ? `${BASE_URL}/api/myprofile/uploadCitizenIdentityCardUp?${userId}`
+        : `${BASE_URL}/api/myprofile/uploadCitizenIdentityCardDown?${userId}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        if (type === "up") {
+          setEditableUser((prev) => ({
+            ...prev,
+            citizenIdentificationCardImageUp: data.url,
+          }));
+        } else {
+          setEditableUser((prev) => ({
+            ...prev,
+            citizenIdentificationCardImageDown: data.url,
+          }));
+        }
+      } else {
+        alert("Upload thất bại. Vui lòng thử lại.");
+      }
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Không thể upload ảnh.");
+    }
+  };
+
+  const handleCccdPasswordSubmit = () => {
+    if (cccdPasswordInput === editableUser.citizenIdentificationCard) {
+      setCccdVerified(true);
+      setShowCccdModal(false);
+      setCccdPasswordInput("");
+    } else {
+      alert("Số CCCD không đúng!");
+    }
+  };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
@@ -89,8 +230,10 @@ const MyAcconutSetting = () => {
 
       if (response.ok) {
         setMessage("Mật khẩu đã được thay đổi thành công.");
+        alert("Mật khẩu đã được thay đổi thành công!");
       } else {
         setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+        alert("Đã xảy ra lỗi. Vui lòng thử lại!");
       }
     } catch (err) {
       setError(
@@ -99,226 +242,408 @@ const MyAcconutSetting = () => {
     }
   };
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => {
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
   return (
     <div>
-      <>
-        <ScrollToTop />
-      </>
-      <>
-        <div>
-          {/* section */}
-          <section>
-            {/* container */}
-            <div className="container">
-              {/* row */}
-              <div className="row">
-                {/* col */}
-                <div className="col-12">
-                  <div className="mt-10 d-flex justify-content-between align-items-center d-md-none">
-                    {/* heading */}
-                    <h3 className="fs-5 mb-0">Tài khoản</h3>
-                  </div>
+      <ScrollToTop />
+      <section>
+        <div className="container">
+          <div className="row">
+            <MyAccountSideBar activeKey={"MyAccountSetting"} />
+            <div className="col-lg-9 col-md-8 col-12">
+              {loaderStatus ? (
+                <div className="loader-container">
+                  <MagnifyingGlass
+                    visible={true}
+                    height="100"
+                    width="100"
+                    ariaLabel="magnifying-glass-loading"
+                    glassColor="#c0efff"
+                    color="#0aad0a"
+                  />
                 </div>
-                {/* col */}
-                <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
-                  <div className="pt-10 pe-lg-10">
-                    {/* nav item */}
-                    <ul className="nav flex-column nav-pills nav-pills-dark">
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link "
-                          aria-current="page"
-                          to="/MyAccountOrder"
-                        >
-                          <i className="fas fa-shopping-bag me-2" />
-                          Đơn đặt hàng của bạn
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link
-                          className="nav-link active"
-                          to="/MyAccountSetting"
-                        >
-                          <i className="fas fa-cog me-2" />
-                          Cài đặt
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAccountAddress">
-                          <i className="fas fa-map-marker-alt me-2" />
-                          Địa chỉ
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutPaymentMethod">
-                          <i className="fas fa-credit-card me-2" />
-                          Phương thức thanh toán
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <Link className="nav-link" to="/MyAcconutNotification">
-                          <i className="fas fa-bell me-2" />
-                          Thông báo
-                        </Link>
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <hr />
-                      </li>
-                      {/* nav item */}
-                      <li className="nav-item">
-                        <button className="nav-link " onClick={handleLogOut}>
-                          <i className="fas fa-sign-out-alt me-2" />
-                          Đăng Xuất
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="col-lg-9 col-md-8 col-12">
-                  <div>
-                    {loaderStatus ? (
-                      <div className="loader-container">
-                        {/* <PulseLoader loading={loaderStatus} size={50} color="#0aad0a" /> */}
-                        <MagnifyingGlass
-                          visible={true}
-                          height="100"
-                          width="100"
-                          ariaLabel="magnifying-glass-loading"
-                          wrapperStyle={{}}
-                          wrapperclassName="magnifying-glass-wrapper"
-                          glassColor="#c0efff"
-                          color="#0aad0a"
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <div className="p-6 p-lg-10">
-                          <div className="mb-6">
-                            {/* heading */}
-                            <h2 className="mb-0">Cài đặt tài khoản</h2>
-                          </div>
-                          <div>
-                            {/* heading */}
-                            <h5 className="mb-4">Thông tin cá nhân</h5>
-                            {message && (
-                              <div className="alert alert-success">
-                                {message}
+              ) : (
+                <div className="p-6 p-lg-10">
+                  <h2 className="mb-0">Cài đặt tài khoản</h2>
+                  <h5 className="mb-4 mt-4">Thông tin cá nhân</h5>
+                  {message && (
+                    <div className="alert alert-success">{message}</div>
+                  )}
+                  {error && <div className="alert alert-danger">{error}</div>}
+                  <div className="row">
+                    <div className="col-lg-5">
+                      <form>
+                        <div className="mb-3">
+                          <label className="form-label">Tên người dùng</label>
+                          <input
+                            type="text"
+                            name="firstName"
+                            className="form-control"
+                            value={editableUser.firstName}
+                            onChange={handleInputChange}
+                            disabled={!isEditing}
+                          />
+                        </div>
+                        <div className="mb-3">
+                          <label className="form-label">Email</label>
+                          <input
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            value={editableUser.email}
+                            onChange={handleInputChange}
+                            disabled={!isEditing}
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label">Số CCCD</label>
+
+                          {isEditing ? (
+                            // Nếu đang chỉnh sửa, kiểm tra xem citizenIdentificationCard có khác rỗng hoặc đã được xác thực
+                            !userData?.citizenIdentificationCard ||
+                            cccdVerified ? (
+                              // Nếu không có CCCD hoặc đã xác thực, cho phép chỉnh sửa
+                              <input
+                                type="text"
+                                name="citizenIdentificationCard"
+                                className="form-control"
+                                onChange={handleInputChange}
+                              />
+                            ) : (
+                              // Nếu có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
                               </div>
+                            )
+                          ) : userData?.citizenIdentificationCard ? (
+                            // Nếu không phải đang chỉnh sửa, kiểm tra đã có CCCD chưa
+                            !cccdVerified ? (
+                              // Nếu đã có CCCD nhưng chưa xác thực, khóa lại và yêu cầu xác thực
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="password"
+                                  className="form-control"
+                                  value={"************"}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setShowCccdModal(true)}
+                                ></i>
+                              </div>
+                            ) : (
+                              // Nếu đã xác thực thì hiển thị số CCCD
+                              <div style={{ position: "relative" }}>
+                                <input
+                                  type="text"
+                                  className="form-control"
+                                  value={editableUser.citizenIdentificationCard}
+                                  disabled
+                                />
+                                <i
+                                  className="fa fa-eye-slash position-absolute"
+                                  style={{
+                                    top: "10px",
+                                    right: "10px",
+                                    cursor: "pointer",
+                                    color: "#888",
+                                  }}
+                                  onClick={() => setCccdVerified(false)}
+                                ></i>
+                              </div>
+                            )
+                          ) : (
+                            // Nếu chưa có CCCD thì hiển thị thông báo
+                            <p className="fst-italic text-danger">
+                              Chưa có số CCCD
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="row">
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">
+                              Ảnh mặt trước CCCD
+                            </label>
+
+                            {editableUser.citizenIdentificationCardImageUp ? (
+                              <div
+                                style={{
+                                  position: "relative",
+                                  width: "fit-content",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    editableUser.citizenIdentificationCardImageUp
+                                  }
+                                  alt="Mặt trước CCCD"
+                                  style={{
+                                    width: "100px",
+                                    marginTop: "10px",
+                                    filter: cccdVerified ? "none" : "blur(8px)",
+                                  }}
+                                />
+                                {!cccdVerified && (
+                                  <i
+                                    className="fa fa-eye position-absolute"
+                                    style={{
+                                      top: "10px",
+                                      left: "10px",
+                                      cursor: "pointer",
+                                      color: "white",
+                                      background: "rgba(0,0,0,0.5)",
+                                      padding: "5px",
+                                      borderRadius: "50%",
+                                    }}
+                                    onClick={() => setShowCccdModal(true)}
+                                  />
+                                )}
+                              </div>
+                            ) : (
+                              <p className="text-danger fst-italic">
+                                Chưa có ảnh CCCD mặt trước
+                              </p>
                             )}
-                            <div className="row">
-                              <div className="col-lg-5">
-                                {/* form */}
-                                <form>
-                                  {/* input */}
-                                  <div className="mb-3">
-                                    <label className="form-label">Tên</label>
-                                    <input
-                                      type="text"
-                                      className="form-control"
-                                      placeholder={userData.name}
-                                      disabled
-                                    />
-                                  </div>
-                                  {/* input */}
-                                  <div className="mb-3">
-                                    <label className="form-label">Email</label>
-                                    <input
-                                      type="email"
-                                      className="form-control"
-                                      placeholder={userData?.email}
-                                      disabled
-                                    />
-                                  </div>
-                                </form>
-                              </div>
-                            </div>
+
+                            {isEditing && (
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="form-control"
+                                onChange={(e) =>
+                                  handleUploadImage(e.target.files[0], "up")
+                                }
+                              />
+                            )}
                           </div>
-                          <hr className="my-5" />
-                          <div className="pe-lg-14">
-                            {/* heading */}
-                            <h5 className="mb-4">Mật khẩu</h5>
-                            <form onSubmit={handleChangePassword}>
-                              <div className="mb-3">
-                                <label className="form-label">
-                                  Mật khẩu hiện tại
-                                </label>
-                                <input
-                                  type="password"
-                                  className="form-control"
-                                  placeholder="Nhập mật khẩu hiện tại"
-                                  required
-                                  value={oldPassword}
-                                  onChange={(e) =>
-                                    setOldPassword(e.target.value)
+
+                          <div className="col-md-6 mb-3">
+                            <label className="form-label">
+                              Ảnh mặt sau CCCD
+                            </label>
+
+                            {editableUser.citizenIdentificationCardImageDown ? (
+                              <div
+                                style={{
+                                  position: "relative",
+                                  width: "fit-content",
+                                }}
+                              >
+                                <img
+                                  src={
+                                    editableUser.citizenIdentificationCardImageDown
                                   }
+                                  alt="Mặt sau CCCD"
+                                  style={{
+                                    width: "100px",
+                                    marginTop: "10px",
+                                    filter: cccdVerified ? "none" : "blur(8px)",
+                                  }}
                                 />
+                                {!cccdVerified && (
+                                  <i
+                                    className="fa fa-eye position-absolute"
+                                    style={{
+                                      top: "10px",
+                                      left: "10px",
+                                      cursor: "pointer",
+                                      color: "white",
+                                      background: "rgba(0,0,0,0.5)",
+                                      padding: "5px",
+                                      borderRadius: "50%",
+                                    }}
+                                    onClick={() => setShowCccdModal(true)}
+                                  />
+                                )}
                               </div>
-                              <div className="mb-3">
-                                <label className="form-label">
-                                  Mật khẩu mới
-                                </label>
-                                <input
-                                  type="password"
-                                  className="form-control"
-                                  placeholder="Nhập mật khẩu mới"
-                                  required
-                                  value={newPassword}
-                                  onChange={(e) =>
-                                    setNewPassword(e.target.value)
-                                  }
-                                />
-                              </div>
-                              <div className="mb-3">
-                                <label className="form-label">
-                                  Xác nhận mật khẩu mới
-                                </label>
-                                <input
-                                  type="password"
-                                  className="form-control"
-                                  placeholder="Nhập lại mật khẩu mới"
-                                  required
-                                  value={confirmNewPassword}
-                                  onChange={(e) =>
-                                    setConfirmNewPassword(e.target.value)
-                                  }
-                                />
-                              </div>
-                              <button type="submit" className="btn btn-warning">
-                                Đổi mật khẩu
+                            ) : (
+                              <p className="text-danger fst-italic">
+                                Chưa có ảnh CCCD mặt sau
+                              </p>
+                            )}
+
+                            {isEditing && (
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="form-control"
+                                onChange={(e) =>
+                                  handleUploadImage(e.target.files[0], "down")
+                                }
+                              />
+                            )}
+                          </div>
+
+                          <div className="d-flex justify-content-start mt-2 gap-2">
+                            {isEditing ? (
+                              <>
+                                <button
+                                  type="button"
+                                  className="btn btn-success"
+                                  onClick={() => {
+                                    handleUpdateProfile();
+                                    setIsEditing(false);
+                                  }}
+                                >
+                                  Lưu
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary"
+                                  onClick={() => {
+                                    setEditableUser(userData); // Reset về thông tin gốc
+                                    setIsEditing(false);
+                                    setError("");
+                                    setMessage("");
+                                  }}
+                                >
+                                  Hủy
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={() => setIsEditing(true)}
+                              >
+                                Chỉnh sửa
                               </button>
-                            </form>
-                          </div>
-                          <hr className="my-5" />
-                          <div>
-                            {/* heading */}
-                            <h5 className="mb-4">Xóa tài khoản</h5>
-                            <p className="mb-2">
-                              Bạn có muốn xóa tài khoản của mình không?
-                            </p>
-                            <p className="mb-5">
-                              Xóa tài khoản sẽ xóa tất cả các chi tiết đặt hàng
-                              liên kết với nó.
-                            </p>
-                            {/* btn */}
-                            <Link to="#" className="btn btn-outline-danger">
-                              Tôi muốn xóa tài khoản của mình
-                            </Link>
+                            )}
                           </div>
                         </div>
-                      </>
-                    )}
+                      </form>
+                    </div>
+                  </div>
+                  <hr className="my-5" />
+                  <div className="pe-lg-14">
+                    <h5 className="mb-4">Thay đổi mật khẩu</h5>
+                    <form onSubmit={handleChangePassword}>
+                      <div className="mb-3">
+                        <label className="form-label">Mật khẩu hiện tại</label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          required
+                          value={oldPassword}
+                          onChange={(e) => setOldPassword(e.target.value)}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label">Mật khẩu mới</label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          required
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                      </div>
+                      <div className="mb-3">
+                        <label className="form-label">
+                          Xác nhận mật khẩu mới
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          required
+                          value={confirmNewPassword}
+                          onChange={(e) =>
+                            setConfirmNewPassword(e.target.value)
+                          }
+                        />
+                      </div>
+                      <button type="submit" className="btn btn-warning">
+                        Đổi mật khẩu
+                      </button>
+                    </form>
                   </div>
                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Modal xác thực CCCD */}
+      {showCccdModal && (
+        <div className="modal show d-block" tabIndex="-1">
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Xác thực CCCD</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowCccdModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Nhập số CCCD để xác thực"
+                  value={cccdPasswordInput}
+                  onChange={(e) => setCccdPasswordInput(e.target.value)}
+                />
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowCccdModal(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleCccdPasswordSubmit}
+                >
+                  Xác nhận
+                </button>
               </div>
             </div>
-          </section>
+          </div>
         </div>
-      </>
+      )}
     </div>
   );
 };

@@ -3,8 +3,13 @@ package com.example.sep490.service;
 import java.io.IOException;
 import java.util.Optional;
 
+import com.example.sep490.dto.ProductResponse;
 import com.example.sep490.entity.*;
 import com.example.sep490.repository.*;
+import com.example.sep490.repository.specifications.ProductFilterDTO;
+import com.example.sep490.repository.specifications.ProductSKUFilterDTO;
+import com.example.sep490.repository.specifications.ProductSKUSpecification;
+import com.example.sep490.repository.specifications.ProductSpecification;
 import com.example.sep490.utils.FileUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.example.sep490.dto.ProductSKURequest;
@@ -32,17 +38,26 @@ public class ProductSKUService {
     private ProductSKUMapper productSKUMapper;
     @Autowired
     private BasePagination pagination;
-
     @Autowired
     private ProductRepository productRepo;
+    @Autowired
+    private StorageService storageService;
     @Value("${env.backendBaseURL}")
     private String baseURL;
 
-    public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction) {
+    public PageResponse<ProductSKUResponse> getProductSKUs(int page, int size, String sortBy, String direction, Long productId) {
         Pageable pageable = pagination.createPageRequest(page, size, sortBy, direction);
-        Page<ProductSKU> productSKUPage = productSKURepo.findByIsDeleteFalse(pageable);
+        Page<ProductSKU> productSKUPage = productSKURepo.findByProductIdAndIsDeleteFalse(productId,pageable);
         Page<ProductSKUResponse> productSKUResponsePage = productSKUPage.map(productSKUMapper::EntityToResponse);
         return pagination.createPageResponse(productSKUResponsePage);
+    }
+
+    public PageResponse<ProductSKUResponse> getProductSKUsByFilter(ProductSKUFilterDTO filter) {
+        Specification<ProductSKU> spec = ProductSKUSpecification.filterProductSKUs(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<ProductSKU> productPage = productSKURepo.findAll(spec, pageable);
+        Page<ProductSKUResponse> productResponsePage = productPage.map(productSKUMapper::EntityToResponse);
+        return pagination.createPageResponse(productResponsePage);
     }
 
     public ProductSKUResponse getProductSKUById(Long id) {
@@ -82,12 +97,9 @@ public class ProductSKUService {
         ProductSKU productSKU = productSKURepo.findByIdAndIsDeleteFalse(id)
                 .orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
         try {
-            String imageURL = FileUtils.uploadFile(image);
-            productSKU.setImages(baseURL + "/" + imageURL);
+            productSKU.setImages("https://mybucketsep490.s3.ap-southeast-2.amazonaws.com/" + storageService.uploadFile(image));
             return productSKUMapper.EntityToResponse(productSKURepo.save(productSKU));
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e.getMessage());
-        } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
     }

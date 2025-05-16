@@ -27,53 +27,85 @@ import SingleShop from "./pages/store/SingleShop";
 // Account pages
 import MyAccountOrder from "./pages/Accounts/MyAccountOrder";
 import MyAccountSetting from "./pages/Accounts/MyAcconutSetting";
-import MyAcconutNotification from "./pages/Accounts/MyAcconutNotification";
+import MyAcconutInvoice from "./pages/Accounts/MyAcconutInvoice";
 import MyAcconutPaymentMethod from "./pages/Accounts/MyAcconutPaymentMethod";
 import MyAccountAddress from "./pages/Accounts/MyAccountAddress";
 import MyAccountForgetPassword from "./pages/Accounts/MyAccountForgetPassword";
 import MyAccountSignIn from "./pages/Accounts/MyAccountSignIn";
 import MyAccountSignUp from "./pages/Accounts/MyAccountSignUp";
+// Provider
+import ProviderDashBoard from "./pages/Provider/ProviderDashBoard";
+import MyDebt from "./pages/Accounts/MyDebt/MyDebt";
+
+import Admin from "./pages/Admin/Admin.tsx";
+import { useSelector } from "react-redux";
 const App = () => {
+  // const userInfo = useLocalStorage("user");
+  const userInfo = useSelector((state) => state.auth.user);
+
   return (
     <div>
       <Router>
-        <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          {/* Shop pages */}
-          <Route path="/Shop/:cateId" element={<Shop />} />
-          <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
-          <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
-          <Route path="/ShopWishList" element={<ShopWishList />} />
-          <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
-          <Route path="/ShopCart" element={<ShopCart />} />
-          {/* Store pages */}
-          <Route path="/StoreList" element={<StoreList />} />
-          <Route path="/SingleShop/:shopId" element={<SingleShop />} />
-          {/* Accounts pages */}
-          <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
-          <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
-          <Route
+        {userInfo?.roles === "ROLE_ADMIN" ? (
+          <>
+            <Routes>
+              <Route path="/" element={<Admin />} />{" "}
+              <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
+            </Routes>
+          </>
+        ) : (
+          <>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              {/* Shop pages */}
+              <Route path="/Shop/:cateId" element={<Shop />} />{" "}
+              <Route path="/ShopGridCol3/:cateId" element={<ShopGridCol3 />} />
+              <Route path="/ShopListCol/:cateId" element={<ShopListCol />} />
+              <Route path="/ShopWishList" element={<ShopWishList />} />
+              <Route path="/ShopCheckOut" element={<ShopCheckOut />} />
+              <Route path="/ShopCart" element={<ShopCart />} />
+              {/* Store pages */}
+              <Route path="/StoreList" element={<StoreList />} />
+              <Route path="/SingleShop/:shopId" element={<SingleShop />} />
+              {/* Accounts pages */}
+              <Route path="/MyAccountOrder" element={<MyAccountOrder />} />
+              <Route path="/MyAccountSetting" element={<MyAccountSetting />} />
+              <Route path="/MyAcconutInvoice" element={<MyAcconutInvoice />} />
+              <Route
+                path="/MyAcconutPaymentMethod"
+                element={<MyAcconutPaymentMethod />}
+              />
+              {/* <Route
             path="/MyAcconutNotification"
             element={<MyAcconutNotification />}
-          />
-          <Route
-            path="/MyAcconutPaymentMethod"
-            element={<MyAcconutPaymentMethod />}
-          />
-          <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
-          <Route
-            path="/MyAccountForgetPassword"
-            element={<MyAccountForgetPassword />}
-          />
-          <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
-          <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
-          {/* About pages */}
-          <Route path="/Blog" element={<Blog />} />
-          <Route path="/BlogCategory" element={<BlogCategory />} />
-          <Route path="/Contact" element={<Contact />} />
-          <Route path="/AboutUs" element={<AboutUs />} />
-        </Routes>
+          /> */}
+              <Route
+                path="/MyAcconutPaymentMethod"
+                element={<MyAcconutPaymentMethod />}
+              />
+              <Route path="/MyAccountAddress" element={<MyAccountAddress />} />
+              <Route
+                path="/MyAccountForgetPassword"
+                element={<MyAccountForgetPassword />}
+              />
+              <Route path="/MyAccountSignIn" element={<MyAccountSignIn />} />
+              <Route path="/MyAccountSignUp" element={<MyAccountSignUp />} />
+              <Route path="/MyDebt" element={<MyDebt />} />
+              {/* About pages */}
+              <Route path="/Blog" element={<Blog />} />
+              <Route path="/BlogCategory" element={<BlogCategory />} />
+              <Route path="/Contact" element={<Contact />} />
+              <Route path="/AboutUs" element={<AboutUs />} />
+              {/* Provider */}
+              <Route
+                path="/ProviderDashBoard"
+                element={<ProviderDashBoard />}
+              />{" "}
+            </Routes>
+          </>
+        )}
+
         <Footer />
       </Router>
     </div>

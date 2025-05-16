@@ -1,13 +1,36 @@
+import { useState } from "react";
 import styles from "./style.module.css";
-const OrderStatus = () => {
+
+const OrderStatus = ({ setStatus }) => {
+  const [statusActive, setStatusActive] = useState("PENDING");
+
+  const statusTab = [
+    { code: "PENDING", label: "Đang chờ" },
+    { code: "ACCEPTED", label: "Đã chấp nhận" },
+    // { code: "PACKAGING", label: "Đóng gói" },
+    // { code: "FINDINGTRUCK", label: "Tìm xe tải" },
+    { code: "DELIVERING", label: "Đang giao" },
+    { code: "DELIVERED", label: "Đã giao" },
+    // { code: "LOST", label: "Mất hàng" },
+    { code: "CANCELLED", label: "Đã hủy" },
+  ];
+
   return (
     <div className={styles.orderStatusContainer}>
-      <div className={styles.orderStatusItem}>Tất Cả</div>
-      <div className={styles.orderStatusItem}>Chờ xét duyệt</div>
-      <div className={styles.orderStatusItem}>Chấp nhận</div>
-      <div className={styles.orderStatusItem}>Hoành thành</div>
-      <div className={styles.orderStatusItem}>Từ chối</div>
-      <div className={styles.orderStatusItem}>Đã huỷ</div>
+      {statusTab.map((status) => (
+        <div
+          key={status.code}
+          onClick={() => {
+            setStatusActive(status.code);
+            setStatus(status.code);
+          }}
+          className={`${styles.orderStatusItem}  ${
+            statusActive === status.code ? ` ${styles.activeStatus}` : ""
+          }`}
+        >
+          {status.label}
+        </div>
+      ))}
     </div>
   );
 };

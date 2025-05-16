@@ -37,7 +37,7 @@ const MyAccountForgetPassword = () => {
         );
         setStep("otp");
       } else {
-        setError(data || "Đã xảy ra lỗi. Vui lòng thử lại.");
+        setError("Email của bạn không tồn tại. Vui lòng thử lại.");
       }
     } catch (err) {
       setError(
@@ -126,7 +126,7 @@ const MyAccountForgetPassword = () => {
                           Đã có tài khoản?
                           <Link
                             to="/MyAccountSignIn"
-                            className="text-warning m-2"
+                            className="text-warning m-2 text-decoration-none"
                           >
                             Đăng nhập
                           </Link>

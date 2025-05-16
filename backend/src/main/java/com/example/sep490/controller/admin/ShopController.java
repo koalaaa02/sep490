@@ -24,8 +24,7 @@ public class ShopController {
     @GetMapping("/")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")
     public ResponseEntity<?> getShops(@Valid ShopFilterDTO filter) {
-        return ResponseEntity.ok(shopService.getShops(filter));
-    }
+        return ResponseEntity.ok(shopService.getShopsForAdmin(filter));    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PROVIDER')")

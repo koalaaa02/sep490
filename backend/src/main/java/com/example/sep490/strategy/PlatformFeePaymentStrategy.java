@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -30,15 +31,33 @@ public class PlatformFeePaymentStrategy implements PaymentStrategy {
 
     @Override
     public PaymentResponse processPayment(HttpServletRequest request, long amount, String bankCode, Long shopId) {
+//        Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
+//        vnpParamsMap.put("vnp_Amount", String.valueOf(amount * 100));
+//        if (bankCode != null && !bankCode.isEmpty()) {
+//            vnpParamsMap.put("vnp_BankCode", bankCode);
+//        }
+//        String orderInfo = VNPayUtils.generateOrderInfo(PaymentType.PLATFORM_FEE,shopId);
+//        vnpParamsMap.put("vnp_OrderInfo", orderInfo);
+//        vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(request));
+//        return generateResponse(vnpParamsMap);
         Map<String, String> vnpParamsMap = vnPayConfig.getVNPayConfig();
         vnpParamsMap.put("vnp_Amount", String.valueOf(amount * 100));
         if (bankCode != null && !bankCode.isEmpty()) {
             vnpParamsMap.put("vnp_BankCode", bankCode);
         }
-        String orderInfo = VNPayUtils.generateOrderInfo(PaymentType.PLATFORM_FEE,shopId);
+        String orderInfo = VNPayUtils.generateOrderInfo(PaymentType.PLATFORMFEE,shopId);
         vnpParamsMap.put("vnp_OrderInfo", orderInfo);
         vnpParamsMap.put("vnp_IpAddr", VNPayUtils.getIpAddress(request));
-        return generateResponse(vnpParamsMap);
+
+        Shop shop = shopRepo.findByIdAndIsDeleteFalse(shopId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy cửa hàng."));
+
+        String queryUrl = VNPayUtils.getPaymentURL(vnpParamsMap, true);
+        String hashData = VNPayUtils.getPaymentURL(vnpParamsMap, false);
+        String vnpSecureHash = VNPayUtils.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
+        queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
+        String paymentUrl = vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;
+        return PaymentResponse.builder().code("ok").message("success").paymentUrl(paymentUrl).build();
     }
 
     @Transactional
@@ -53,13 +72,13 @@ public class PlatformFeePaymentStrategy implements PaymentStrategy {
         String vnp_TransactionNo = request.getParameter("vnp_TransactionNo");
 
         TransactionRequest newTransaction = TransactionRequest.builder()
-                .amount(BigDecimal.ONE)
+                .amount(new BigDecimal(vnp_Amount).divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN))
                 .content(vnp_OrderInfo)
                 .bankCode(vnp_BankCode)
                 .transactionId(vnp_TransactionNo)
                 .paymentDate(LocalDateTime.now())
                 .paymentProvider(PaymentProvider.VNPAY)
-                .paymentType(PaymentType.PLATFORM_FEE)
+                .paymentType(PaymentType.PLATFORMFEE)
                 .status(TransactionStatus.SUCCESS)
                 .build();
 

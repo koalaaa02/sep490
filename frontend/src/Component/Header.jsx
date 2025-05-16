@@ -7,6 +7,8 @@ import { logout } from "../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../Utils/config";
 import img from "../images/glass.jpg";
+import { FaStore } from "react-icons/fa";
+import { setShopId } from "../Redux/shop.js";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,8 +17,12 @@ const Header = () => {
   const handleClick = () => {
     setIsOpen(!isOpen);
   };
-  const role = useSelector((state) => state.auth.roles);
+  const name = useSelector((state) => state.auth.user?.firstName);
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.user?.roles || []);
+  const normalizedRoles = typeof role === "string" ? role.split(",") : [];
+
+  const isProvider = normalizedRoles.includes("ROLE_PROVIDER");
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -24,38 +30,8 @@ const Header = () => {
   const handleLogOut = () => {
     dispatch(logout());
     navigate("/");
+    window.location.reload();
   };
-
-  const [categories, setCategories] = useState([]);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const params = new URLSearchParams({
-          page: 1,
-          size: 10,
-          sortBy: "id",
-          direction: "ASC",
-        });
-
-        const response = await fetch(
-          `${BASE_URL}/api/public/categories?${params.toString()}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-    fetchCategories();
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,6 +52,34 @@ const Header = () => {
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchMyShop = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/provider/shops/myshop`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Không thể lấy thông tin shop");
+        }
+
+        const data = await response.json();
+        dispatch(setShopId(data.id));
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin shop:", error);
+      }
+    };
+
+    if (isProvider && token) {
+      fetchMyShop();
+    }
+  }, [isProvider, token, dispatch]);
 
   const removeFromCart = async (shopId, productSKUId) => {
     try {
@@ -125,19 +129,7 @@ const Header = () => {
   return (
     <div>
       <>
-        <div className="container  displaydesign">
-          <div className="row g-4">
-            <div className="col-8 col-sm-4 col-lg-9 py-2">
-              <input
-                className="form-control "
-                style={{ width: "100%" }}
-                list="datalistOptions"
-                id="exampleDataList"
-                placeholder="Tìm kiếm..."
-              />
-            </div>
-          </div>
-        </div>
+        <div className="container  displaydesign"></div>
       </>
       <nav className="navbar navbar-expand-lg navbar-light sticky-top">
         <div className="container">
@@ -148,14 +140,6 @@ const Header = () => {
               alt="eCommerce HTML Template"
             />
           </Link>
-          <input
-            className="form-control responsivesearch "
-            list="datalistOptions"
-            id="exampleDataList"
-            placeholder="Tìm kiếm..."
-            fdprocessedid="9icrif"
-            style={{ width: "35%" }}
-          />
 
           <button
             className="navbar-toggler"
@@ -184,69 +168,6 @@ const Header = () => {
                   Trang chủ
                 </Link>
               </li>
-              <li className="nav-item">
-                <li className="nav-item dmenu dropdown">
-                  <Link
-                    className="nav-link dropdown-toggle"
-                    to=""
-                    id="navbarDropdown"
-                    role="button"
-                    data-toggle="dropdown"
-                    aria-haspopup="true"
-                    aria-expanded="false"
-                  >
-                    Tất cả danh mục
-                  </Link>
-                  <div
-                    className="dropdown-menu sm-menu"
-                    aria-labelledby="navbarDropdown"
-                  >
-                    {categories.length > 0 ? (
-                      categories.map((material, index) => (
-                        <Link
-                          key={index}
-                          className="dropdown-item"
-                          to={`/Shop/${material.id}`}
-                        >
-                          {material.name}
-                        </Link>
-                      ))
-                    ) : (
-                      <p className="dropdown-item">Đang tải...</p>
-                    )}
-                  </div>
-                </li>
-              </li>
-              <li className="nav-item dmenu dropdown">
-                <Link
-                  className="nav-link dropdown-toggle"
-                  to="#"
-                  id="navbarDropdown"
-                  role="button"
-                  data-toggle="dropdown"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Thông tin
-                </Link>
-                <div
-                  className="dropdown-menu sm-menu"
-                  aria-labelledby="navbarDropdown"
-                >
-                  <Link class="dropdown-item" to="/Blog">
-                    Bài viết
-                  </Link>
-                  <Link className="dropdown-item" to="/BlogCategory">
-                    Bài viết danh mục
-                  </Link>
-                  <Link className="dropdown-item" to="/AboutUs">
-                    Thông tin về chúng tôi
-                  </Link>
-                  <Link className="dropdown-item" to="/Contact">
-                    Liên hệ
-                  </Link>
-                </div>
-              </li>
 
               <li className="nav-item dmenu dropdown">
                 <Link
@@ -274,8 +195,14 @@ const Header = () => {
                 </div>
               </li>
 
+              <li className="nav-item">
+                <Link className="nav-link" to="/StoreList">
+                  Danh sách Nhà cung cấp
+                </Link>
+              </li>
+
               <li className="nav-item dmenu dropdown">
-                <Link
+                {/* <Link
                   className="nav-link dropdown-toggle"
                   to="#"
                   id="navbarDropdown"
@@ -284,14 +211,23 @@ const Header = () => {
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  Cửa hàng
-                </Link>
+                  Thông tin
+                </Link> */}
                 <div
                   className="dropdown-menu sm-menu"
                   aria-labelledby="navbarDropdown"
                 >
-                  <Link className="dropdown-item" to="/StoreList">
-                    Danh sách cửa hàng
+                  <Link class="dropdown-item" to="/Blog">
+                    Bài viết
+                  </Link>
+                  <Link className="dropdown-item" to="/BlogCategory">
+                    Bài viết danh mục
+                  </Link>
+                  <Link className="dropdown-item" to="/AboutUs">
+                    Thông tin về chúng tôi
+                  </Link>
+                  <Link className="dropdown-item" to="/Contact">
+                    Liên hệ
                   </Link>
                 </div>
               </li>
@@ -313,19 +249,10 @@ const Header = () => {
                 >
                   <div>
                     <div>
-                      {role && token ? (
+                      {token ? (
                         <>
                           <div className="dropdown-item disabled text-dark">
-                            Xin chào{" "}
-                            {role === "ROLE_DEALER"
-                              ? "Dealer"
-                              : role === "ROLE_SELLER"
-                              ? "Seller"
-                              : role === "ROLE_PROVIDER"
-                              ? "Provider"
-                              : role === "ROLE_ADMIN"
-                              ? "Admin"
-                              : "User"}
+                            Xin chào {name}
                           </div>
                           <Link className="dropdown-item" to="/MyAccountOrder">
                             Đơn hàng
@@ -342,17 +269,14 @@ const Header = () => {
                           >
                             Địa chỉ
                           </Link>
-                          <Link
+                          {/* <Link
                             className="dropdown-item"
-                            to="/MyAcconutPaymentMethod"
+                            to="/MyAcconutInvoice"
                           >
-                            Phương thức thanh toán
-                          </Link>
-                          <Link
-                            className="dropdown-item"
-                            to="/MyAcconutNotification"
-                          >
-                            Thông báo
+                            Hóa đơn của tôi
+                          </Link> */}
+                          <Link className="dropdown-item" to="/MyDebt">
+                            Khoản nợ
                           </Link>
                           <button
                             className="dropdown-item"
@@ -381,8 +305,19 @@ const Header = () => {
                   </div>
                 </div>
               </li>
+              {token && !isProvider && (
+                <li className="nav-item">
+                  <Link
+                    className="nav-link text-danger"
+                    to="/MyAcconutPaymentMethod"
+                  >
+                    Đăng ký bán hàng
+                  </Link>
+                </li>
+              )}
+
               <li className="nav-item dmenu dropdown ml-3">
-                <Link
+                {/* <Link
                   className="text-muted position-relative"
                   data-bs-toggle="offcanvas"
                   data-bs-target="#offcanvasRight"
@@ -411,7 +346,17 @@ const Header = () => {
                       0
                     )}
                   </span>
-                </Link>
+                </Link> */}
+                {isProvider && (
+                  <Link
+                    className="text-muted position-relative"
+                    to="/ProviderDashBoard"
+                    role="button"
+                    aria-controls="storeOffcanvas"
+                  >
+                    <FaStore size={20} className="mt-2 ms-3" />
+                  </Link>
+                )}
               </li>
             </ul>
           </div>
@@ -465,7 +410,7 @@ const Header = () => {
                             <div className="col-4">
                               <h6 className="mb-0">{item.productName}</h6>
                               <span className="text-muted">
-                                Mã SKU: {item.productSKUCode}
+                                Phân loại: {item.productSKUCode}
                               </span>
                               <div className="mt-2 small">
                                 <button
@@ -499,7 +444,7 @@ const Header = () => {
                             </div>
                             <div className="col-3 text-end">
                               <span className="fw-bold">
-                                {item.quantity * 100} VNĐ
+                                {(item.quantity * 100).toFixed(3)} VNĐ
                               </span>
                             </div>
                           </div>
@@ -511,7 +456,7 @@ const Header = () => {
                 <div className="d-grid mt-1">
                   <Link
                     className="btn btn-warning btn-lg d-flex justify-content-between align-items-center"
-                    to="/ShopCheckout"
+                    to="/ShopCart"
                   >
                     Thanh toán
                     <span className="fw-bold">{calculateTotal()} VNĐ</span>

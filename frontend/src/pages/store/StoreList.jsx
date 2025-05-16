@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import graphics from "../../images/store-graphics.svg";
-import storeLogo9 from "../../images/stores-logo-9.svg";
+// import graphics from "../../images/store-graphics.svg";
+import ship from "../../images/ship.jpg";
 import { BASE_URL } from "../../Utils/config";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { MagnifyingGlass } from "react-loader-spinner";
 import ScrollToTop from "../ScrollToTop";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const StoreList = () => {
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [stores, setStores] = useState([]);
+  const shop = useSelector((state) => state.shop.shopId);
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -41,6 +43,9 @@ const StoreList = () => {
       setLoaderStatus(false);
     }, 1500);
   }, []);
+
+  const filteredShops = stores.filter(s => s.id !== shop);
+
 
   return (
     <div>
@@ -77,7 +82,7 @@ const StoreList = () => {
             </>
             <>
               {/* section */}
-              <section className="mt-8">
+              <section>
                 {/* container */}
                 <div className="container">
                   {/* row */}
@@ -85,20 +90,41 @@ const StoreList = () => {
                     <div className="col-12">
                       {/* heading */}
                       <div className="bg-light rounded-3 d-flex justify-content-between">
-                        <div className="d-flex align-items-center  p-10">
+                        <div className="d-flex align-items-center p-10">
                           <Slide direction="down">
-                            <h1 className="mb-0 fw-bold">Danh sách cửa hàng</h1>
+                            <h2 className="mb-0 fw-bold">
+                              Danh sách nhà cung cấp
+                            </h2>
                           </Slide>
                         </div>
                         <div className="p-6">
                           {/* img */}
                           {/* img */}
                           <Zoom>
-                            <img
-                              src={graphics}
-                              alt="graphics"
-                              className="img-fluid"
-                            />
+                            <div
+                              style={{
+                                position: "relative",
+                                width: "300px",
+                              }}
+                            >
+                              <img
+                                src={ship}
+                                alt="graphics"
+                                className="img-fluid"
+                                style={{ width: "100%", height: "100%" }}
+                              />
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: 0,
+                                  left: 0,
+                                  width: "100%",
+                                  height: "100%",
+                                  background:
+                                    "linear-gradient(to right,rgba(238, 238, 238, 0.4), rgba(0, 0, 0, 0))",
+                                }}
+                              ></div>
+                            </div>
                           </Zoom>
                         </div>
                       </div>
@@ -118,49 +144,50 @@ const StoreList = () => {
                         {/* title */}
                         <h6>
                           Có{" "}
-                          <span className="text-primary">{stores.length}</span>{" "}
-                          cửa hàng
+                          <span className="text-primary">
+                            {filteredShops.length}
+                          </span>{" "}
+                          nhà cung cấp
                         </h6>
                       </div>
                     </div>
                   </div>
-                  {stores.length > 0 ? (
-                    stores.map((stores, index) => (
-                      <div
-                        key={index}
-                        className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 g-lg-4"
-                      >
-                        <Zoom>
-                          <div className="col">
+                  {filteredShops.length > 0 ? (
+                    <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 g-lg-4">
+                      {filteredShops.map((store, index) => (
+                        <div key={index} className="col">
+                          <Zoom>
                             {/* card */}
-                            <div className="card flex-row p-8 card-product ">
+                            <div className="card flex-row p-8 card-product">
                               <div>
-                                {/* img */}
                                 <img
-                                  src={storeLogo9}
+                                  src={store?.logoImage}
                                   alt="stores"
                                   className="rounded-circle icon-shape icon-xl"
                                 />
                               </div>
-                              {/* content */}
                               <div className="ms-6">
                                 <h5 className="mb-1">
                                   <Link
-                                    to={`/SingleShop/${stores.id}`}
+                                    to={`/SingleShop/${store.id}`}
                                     className="text-inherit"
                                   >
-                                    {stores.shopType}
+                                    {store.name}
                                   </Link>
                                 </h5>
                                 <div className="small text-muted">
-                                  <span>{stores.address.recipientName}</span>
+                                  <span>
+                                    {store.shopType === "ENTERPRISE"
+                                      ? "Doanh nghiệp lớn"
+                                      : "Doanh nghiệp nhỏ"}
+                                  </span>
                                   <span className="mx-1">
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       width={4}
                                       height={4}
                                       fill="#C1C7C6"
-                                      className="bi bi-circle-fill align-middle "
+                                      className="bi bi-circle-fill align-middle"
                                       viewBox="0 0 16 16"
                                     >
                                       <circle cx={8} cy={8} r={8} />
@@ -170,28 +197,22 @@ const StoreList = () => {
                                 <div className="py-3">
                                   <ul className="list-unstyled mb-0 small">
                                     <li>
-                                      <span className="text-primary">
-                                        {stores.address.address},{" "}
-                                        {stores.address.ward},{" "}
-                                        {stores.address.district},{" "}
-                                        {stores.address.province}
+                                      <span className="text-muted">
+                                        {store.address.address},{" "}
+                                        {store.address.ward},{" "}
+                                        {store.address.district},{" "}
+                                        {store.address.province}
                                       </span>
                                     </li>
-                                    <li>{stores.address.postalCode}</li>
+                                    <li>{store.address.postalCode}</li>
                                   </ul>
-                                </div>
-                                <div>
-                                  {/* badge */}
-                                  <div className="badge text-bg-light border">
-                                    7.5 mi away
-                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </Zoom>
-                      </div>
-                    ))
+                          </Zoom>
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <p className="dropdown-item">Đang tải...</p>
                   )}

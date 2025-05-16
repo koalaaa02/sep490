@@ -51,7 +51,7 @@ public class CheckoutService {
         }
 
         // Lấy giỏ hàng từ cookie
-        Cart cart = cartService.getCartFromCookies(request);
+        Cart cart = cartService.getCartFromCookiesToChange(request);
 
         if (cart.getShops() == null || cart.getShops().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng trống.");
@@ -83,7 +83,7 @@ public class CheckoutService {
             if (productIds.contains(item.getProductSKUId())) {
                 Optional<ProductSKU> productSKU = productSKURepository.findByIdAndIsDeleteFalse(item.getProductSKUId());
                 //kiểm tra exist
-                if(!productSKU.isPresent()) throw new RuntimeException("Không tìm thấy sản phẩm có ID " + item.getProductSKUId());
+                if(!productSKU.isPresent()) throw new RuntimeException("Không tìm thấy phân loại sản phẩm có ID " + item.getProductSKUId());
                 ProductSKU proSKU = productSKU.get();
                 //check sp cùng 1 shop
                 if(!proSKU.getProduct().getShop().getId().equals(shopId)) throw new RuntimeException("Bạn chỉ được đặt đơn hàng trong cùng 1 shop.");
@@ -101,7 +101,7 @@ public class CheckoutService {
                 if(proSKU.isBulky() && orderRequest.getDeliveryMethod().equals(DeliveryMethod.GHN)) {
                     throw new RuntimeException("Rất tiếc, giỏ hàng chứa mặt hàng cồng kềnh, vui lòng chọn phương thức vận chuyển SELF DELIVERY.");
                 }else{
-                    orderRequest.setStatus(OrderStatus.FINDINGTRUCK);
+                    orderRequest.setStatus(OrderStatus.PENDING);
                 };
 
                 totalAmount = totalAmount.add(productSKU.get().getSellingPrice().multiply(BigDecimal.valueOf(item.getQuantity())));

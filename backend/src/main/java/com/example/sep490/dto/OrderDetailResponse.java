@@ -7,6 +7,7 @@ import com.example.sep490.entity.Auditable;
 import com.example.sep490.entity.Order;
 import com.example.sep490.entity.ProductSKU;
 
+import com.example.sep490.entity.compositeKeys.OrderDetailId;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class OrderDetailResponse {
-	@NotNull
-    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop"})
+    private OrderDetailId id;
+
+    @NotNull
+    @JsonIgnoreProperties({ "orderDetails", "transaction", "invoice","address","shop","deliveryNotes"})
     private Order order;
 
     @NotNull

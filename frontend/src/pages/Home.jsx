@@ -3,18 +3,7 @@ import slider2 from "../images/banner_2.jpg";
 import adbanner1 from "../images/adbanner1.jpg";
 import adbanner2 from "../images/adbanner2.jpg";
 import adbanner3 from "../images/adbanner3.jpg";
-import cement from "../images/cement.jpg";
-import bricks from "../images/bricks.jpg";
-import sand from "../images/sand.jpg";
-import steel from "../images/steel.jpg";
-import tiles from "../images/tiles.png";
-import wood from "../images/wood.jpg";
-import glass from "../images/glass.jpg";
-import paint from "../images/paint.jpg";
-import plumbing from "../images/plumbing.jpg";
-import electrical from "../images/electrical.jpg";
-import roofing from "../images/roofing.jpg";
-import insulation from "../images/insulation.jpg";
+import dfCate from "../images/defaultCategory.png";
 import clock from "../images/clock.svg";
 import gift from "../images/gift.svg";
 import package1 from "../images/package.svg";
@@ -25,8 +14,18 @@ import ProductItem from "../ProductList/ProductItem";
 import { Slide, Zoom } from "react-awesome-reveal";
 import { useEffect } from "react";
 import { MagnifyingGlass } from "react-loader-spinner";
+import { BASE_URL } from "../Utils/config";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/grid";
+import { Grid } from "swiper/modules";
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [materials, setMaterial] = useState([]);
+  // const [parentCateID, setparentCateID] = useState(1);
+  // const [selectSubCate, setSelectSubCate] = useState(
+  //   materials[0]?.subCategories || []
+  // );
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
@@ -50,21 +49,46 @@ const Home = () => {
     };
   }, []);
 
-  const materials = [
-    { src: cement, alt: "cement", label: "Xi măng" },
-    { src: bricks, alt: "bricks", label: "Gạch" },
-    { src: sand, alt: "sand", label: "Cát" },
-    { src: steel, alt: "steel", label: "Thép" },
-    { src: tiles, alt: "tiles", label: "Gạch lát" },
-    { src: wood, alt: "wood", label: "Gỗ" },
-    { src: glass, alt: "glass", label: "Kính" },
-    { src: paint, alt: "paint", label: "Sơn" },
-    { src: plumbing, alt: "plumbing", label: "Ống nước" },
-    { src: electrical, alt: "electrical", label: "Điện" },
-    { src: roofing, alt: "roofing", label: "Mái" },
-    { src: insulation, alt: "insulation", label: "Cách nhiệt" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: "1",
+          size: "200",
+          sortBy: "id",
+          direction: "ASC",
+        });
+        const response = await fetch(
+          `${BASE_URL}/api/public/categories?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              // Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
+        const result = await response.json();
+
+        setMaterial(
+          result.map((c) => ({
+            name: c.name,
+            id: c.id,
+            src: c.images,
+            alt: c?.name,
+            subCategories: c.subCategories,
+          }))
+        );
+        // setparentCateID(result[0].id);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
@@ -118,7 +142,7 @@ const Home = () => {
                             backgroundSize: "cover",
                             borderRadius: ".5rem",
                             backgroundPosition: "center",
-                            height: "550px",
+                            height: "400px",
                           }}
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
@@ -127,7 +151,7 @@ const Home = () => {
                             </h2>
                             <p className="lead">
                               Cung cấp một loạt các vật liệu xây dựng với giá
-                              cạnh tranh với giao hàng nhanh.
+                              cạnh tranh
                             </p>
                             <Link
                               to="#!"
@@ -146,7 +170,7 @@ const Home = () => {
                             backgroundSize: "cover",
                             borderRadius: ".5rem",
                             backgroundPosition: "center",
-                            height: "550px",
+                            height: "400px",
                           }}
                         >
                           <div className="ps-lg-12 py-lg-16 col-xxl-5 col-md-7 py-14 px-8 text-xs-center">
@@ -156,8 +180,8 @@ const Home = () => {
                             </h2>
                             <p className="lead text-white">
                               Giảm giá đặc biệt cho các đơn đặt hàng lớn. Lấy
-                              Vật liệu xây dựng chất lượng cao ở mức tốt nhất
-                              Giá cả.
+                              Vật liệu xây dựng chất lượng cao ở mức giá tốt
+                              nhất
                             </p>
                             <Link
                               to="#!"
@@ -199,6 +223,86 @@ const Home = () => {
               </section>
             </>
             <>
+              {/* section category parent */}
+              <section className="my-lg-14 my-8">
+                <div className="container ">
+                  <div className="row">
+                    <div className="col-12">
+                      <div className="mb-6">
+                        {/* heading    */}
+                        <div className="section-head text-center">
+                          <h3
+                            className="h3style"
+                            data-title="Shop Popular Categories"
+                          >
+                            Danh mục phổ biến
+                          </h3>
+                          <div className="wt-separator bg-primarys"></div>
+                          <div className="wt-separator2 bg-primarys"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="row ">
+                      <Swiper
+                        slidesPerView={6} // Number of items visible at once
+                        grid={{
+                          rows: 2, // Display items in 2 rows
+                          fill: "row",
+                        }}
+                        spaceBetween={20}
+                        pagination={{
+                          clickable: true,
+                        }}
+                        modules={[Grid]}
+                        className="mySwiper"
+                      >
+                        {materials.map((material, index) => (
+                          <SwiperSlide key={index}>
+                            <div className="fade-zoom p-2">
+                              <Zoom>
+                                <div
+                                  // onClick={() => {
+                                  //   setparentCateID(material.id);
+                                  //   setSelectSubCate(material.subCategories);
+                                  // }}
+                                  className="text-center mb-10"
+                                >
+                                  <Link to={`/Shop/${material.id}`}>
+                                    <img
+                                      src={material.src ? material.src : dfCate}
+                                      alt={material.alt}
+                                      className="card-image rounded-circle"
+                                      style={{
+                                        height: "150px",
+                                        width: "150px",
+                                      }}
+                                    />
+                                  </Link>
+                                  <div className="mt-4">
+                                    <h5 className="fs-6 mb-0">
+                                      <Link to="#" className="text-inherit">
+                                        {material.name}
+                                      </Link>
+                                    </h5>
+                                  </div>
+                                </div>
+                              </Zoom>
+                            </div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              {/* section */}
+            </>
+
+            {/* <>
+              <ProductItem />
+            </> */}
+
+            <>
               {/* section */}
               <section className="mt-8">
                 <div className="container">
@@ -220,7 +324,7 @@ const Home = () => {
                               <h3 className="mb-0 fw-bold text-white">
                                 Giảm giá 10%
                                 <br />
-                                Đơn đặt hàng xi măng số lượng lớn
+                                Đặt hàng số lượng lớn
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -288,7 +392,7 @@ const Home = () => {
                               <h3 className="fs-2 fw-bold lh-1 mb-2 text-white">
                                 Dịch vụ giao hàng
                                 <br />
-                                Nhanh chóng và đáng tin cậy
+                                Đáng tin cậy
                               </h3>
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
@@ -309,63 +413,6 @@ const Home = () => {
                 </div>
               </section>
               {/* section */}
-            </>
-            <>
-              {/* section category */}
-              <section className="my-lg-14 my-8">
-                <div className="container ">
-                  <div className="row">
-                    <div className="col-12">
-                      <div className="mb-6">
-                        {/* heading    */}
-                        <div className="section-head text-center">
-                          <h3
-                            className="h3style"
-                            data-title="Shop Popular Categories"
-                          >
-                            Danh mục phổ biến
-                          </h3>
-                          <div className="wt-separator bg-primarys"></div>
-                          <div className="wt-separator2 bg-primarys"></div>
-                          {/* <p>Connecting with entrepreneurs online, is just a few clicks away.</p> */}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row">
-                      {materials.map((material, index) => (
-                        <div
-                          key={index}
-                          className="col-lg-2 col-md-4 col-6 fade-zoom"
-                        >
-                          <Zoom>
-                            <div className="text-center mb-10">
-                              <Link to="#">
-                                <img
-                                  src={material.src}
-                                  alt={material.alt}
-                                  className="card-image rounded-circle"
-                                  style={{ height: "200px", width: "200px" }}
-                                />
-                              </Link>
-                              <div className="mt-4">
-                                <h5 className="fs-6 mb-0">
-                                  <Link to="#" className="text-inherit">
-                                    {material.label}
-                                  </Link>
-                                </h5>
-                              </div>
-                            </div>
-                          </Zoom>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-              {/* section */}
-            </>
-            <>
-              <ProductItem />
             </>
             <>
               <section className="my-lg-14 my-8">
@@ -453,8 +500,8 @@ const Home = () => {
                               <h3 className="h5 mb-3">Giao hàng nhanh chóng</h3>
                               <p>
                                 Nhận đơn hàng vật liệu xây dựng của bạn được
-                                giao tận nơi nhanh chóng. Mang đến cho bạn sự tiện
-                                lợi và nhanh chóng trong mỗi lần mua sắm!
+                                giao tận nơi nhanh chóng. Mang đến cho bạn sự
+                                tiện lợi và nhanh chóng trong mỗi lần mua sắm!
                               </p>
                             </div>
                           </div>

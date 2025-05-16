@@ -7,9 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RedisReceiver {
-//    public void receiveMessage(String message) {
-//        System.out.println("Got Message: " + message);
-//    }
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired
@@ -20,7 +17,6 @@ public class RedisReceiver {
             ChatMessageRequest myMessage = objectMapper.readValue(message, ChatMessageRequest.class);
             System.out.println("Got Message: " + myMessage);
             messagingTemplate.convertAndSend("/topic/chat/" + myMessage.getChatRoomId(), myMessage);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

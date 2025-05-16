@@ -1,15 +1,13 @@
 package com.example.sep490.controller;
 
 import com.example.sep490.repository.specifications.ProductFilterDTO;
-import com.example.sep490.service.CategoryService;
-import com.example.sep490.service.ShopService;
-import com.example.sep490.service.UserService;
+import com.example.sep490.repository.specifications.ProductSKUFilterDTO;
+import com.example.sep490.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.sep490.service.ProductService;
 import com.example.sep490.utils.PageResponse;
 
 @RestController
@@ -18,6 +16,8 @@ public class PublicController {
 
 	@Autowired
 	private ProductService productService;
+    @Autowired
+    private ProductSKUService productSKUService;
     @Autowired
     private CategoryService categoryService;
     @Autowired
@@ -28,6 +28,11 @@ public class PublicController {
 	@GetMapping("/products")
     public PageResponse<?> getProducts(@Valid ProductFilterDTO filter) {
         return productService.getProductsPublicByFilter(filter);
+    }
+
+    @GetMapping({"/productskus"})
+    public ResponseEntity<?> getProductSKUsFilter(@Valid ProductSKUFilterDTO filter) {
+        return ResponseEntity.ok().body(productSKUService.getProductSKUsByFilter(filter));
     }
 
     @GetMapping("/product/{id}")

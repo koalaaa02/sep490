@@ -15,6 +15,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "tbl_product")
@@ -39,6 +40,8 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @Column(nullable = false)
     private UnitType unit;
 
+    private String unitAdvance;
+
     @Column(nullable = false)
     @ColumnDefault("false")
     private boolean active = false;
@@ -57,6 +60,7 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
 //    @JsonBackReference
     @JsonIgnoreProperties("product")
     @OneToMany(mappedBy = "product")
+//    @SQLRestriction("is_delete = false")
     private List<ProductSKU> skus;
     
     @ManyToOne

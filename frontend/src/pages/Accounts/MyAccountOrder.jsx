@@ -7,10 +7,15 @@ import ScrollToTop from "../ScrollToTop";
 import { useDispatch } from "react-redux";
 import { logout } from "../../Redux/slice/authSlice";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../Utils/config";
+import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
 import OrderStatus from "../../Component/Order/OrderStatus/OrderStatus";
 import OrderList from "../../Component/Order/OrderDetail/OrderList";
-
+import OrderDetail from "../../Component/Order/OrderDetail/OrderDetail";
 const MyAccountOrder = () => {
+  const token = sessionStorage.getItem("access_token");
+  const [data, setData] = useState(null);
+  const [status, setStatus] = useState("PENDING");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -21,19 +26,57 @@ const MyAccountOrder = () => {
   // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const params = new URLSearchParams({
+          page: 1,
+          size: 100,
+          sortBy: "id",
+          direction: "ASC",
+          paid: false,
+          // status: "DELIVERED"
+        });
+        const response = await fetch(
+          `${BASE_URL}/api/dealer/orders?${params.toString()}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
+        const result = await response.json();
+        console.log(result);
+
+        setData(result);
+      } catch (error) {
+        console.error("Lỗi khi fetch dữ liệu:", error);
+      }
+    };
+
+    fetchData();
     setTimeout(() => {
       setLoaderStatus(false);
     }, 1500);
-  }, []);
+  }, [status]);
 
-  // const [expandedRows, setExpandedRows] = useState({});
-
-  // const toggleRow = (index) => {
-  //   setExpandedRows((prev) => ({
-  //     ...prev,
-  //     [index]: !prev[index],
-  //   }));
-  // };
+  const orders = data?.content
+    ?.map((order) => ({
+      shopName: order?.shop.name,
+      id: order?.id,
+      shopId: order?.shop.id,
+      status: order?.status,
+      products: order?.orderDetails?.map((detail) => ({
+        price: detail?.price,
+        quantity: detail?.quantity,
+        image: detail?.productSku?.images,
+        productName: detail?.productSku?.skuCode,
+      })),
+    }))
+    .filter((f) => f.status === status);
+console.log(data?.content);
 
   return (
     <div>
@@ -41,99 +84,44 @@ const MyAccountOrder = () => {
         <ScrollToTop />
       </>
       <>
-        {/* section */}
         <section>
           <div className="container">
-            {/* row */}
             <div className="row">
-              {/* col */}
-              {/* col */}
               <div className="col-lg-3 col-md-4 col-12 border-end  d-none d-md-block">
                 <div className="mt-5 d-flex justify-content-between align-items-center d-md-none">
                   {/* heading */}
                   <h3 className="fs-5 mb-0">Tài khoản</h3>
                 </div>
-                <div className="pt-10 pe-lg-10">
-                  {/* nav */}
-                  <ul className="nav flex-column nav-pills nav-pills-dark">
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link
-                        className="nav-link active"
-                        aria-current="page"
-                        to="/MyAccountOrder"
-                      >
-                        <i className="fas fa-shopping-bag me-2" />
-                        Đơn đặt hàng của bạn
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAccountSetting">
-                        <i className="fas fa-cog me-2" />
-                        Cài đặt
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAccountAddress">
-                        <i className="fas fa-map-marker-alt me-2" />
-                        Địa chỉ
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAcconutPaymentMethod">
-                        <i className="fas fa-credit-card me-2" />
-                        Phương thức thanh toán
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <Link className="nav-link" to="/MyAcconutNotification">
-                        <i className="fas fa-bell me-2" />
-                        Thông báo
-                      </Link>
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <hr />
-                    </li>
-                    {/* nav item */}
-                    <li className="nav-item">
-                      <button className="nav-link " onClick={handleLogOut}>
-                        <i className="fas fa-sign-out-alt me-2" />
-                        Đăng Xuất
-                      </button>
-                    </li>
-                  </ul>
-                </div>
               </div>
 
-              <div className="col-lg-9 col-md-8 col-12">
-                <div>
-                  {loaderStatus ? (
-                    <div className="loader-container">
-                      {/* <PulseLoader loading={loaderStatus} size={50} color="#0aad0a" /> */}
-                      <MagnifyingGlass
-                        visible={true}
-                        height="100"
-                        width="100"
-                        ariaLabel="magnifying-glass-loading"
-                        wrapperStyle={{}}
-                        wrapperclassName="magnifying-glass-wrapper"
-                        glassColor="#c0efff"
-                        color="#0aad0a"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="">
-                        <OrderStatus />
-                        <OrderList />
+              <div className="d-flex">
+                <MyAccountSideBar activeKey={"MyAccountOrder"} />
+
+                <div className="col-lg-9 col-md-8 col-12">
+                  <div>
+                    {loaderStatus ? (
+                      <div className="loader-container">
+                        {/* <PulseLoader loading={loaderStatus} size={50} color="#0aad0a" /> */}
+                        <MagnifyingGlass
+                          visible={true}
+                          height="100"
+                          width="100"
+                          ariaLabel="magnifying-glass-loading"
+                          wrapperStyle={{}}
+                          wrapperclassName="magnifying-glass-wrapper"
+                          glassColor="#c0efff"
+                          color="#0aad0a"
+                        />
                       </div>
-                    </>
-                  )}
+                    ) : (
+                      <>
+                        <div className="w-100">
+                          <OrderStatus setStatus={setStatus} />
+                          <OrderList orders={orders} status={status} />
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

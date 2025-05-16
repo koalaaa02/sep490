@@ -22,16 +22,18 @@ public class ProductResponse {
     private String description;
     private String specifications;
     private UnitType unit;
+    private String unitAdvance;
     private String images;
     private boolean active;
 
     @JsonIgnoreProperties({"products","parentCategory","subCategories"})
     private Category category;
-    @JsonIgnoreProperties({"product"})
-    private List<ProductSKU> skus;
+//    @JsonIgnoreProperties({"product"})
+//    private List<ProductSKU> skus;
     @JsonIgnoreProperties({"products"})
     private Supplier supplier;
-
+    @JsonIgnoreProperties({"orders","manager","address","bankAccount","products"})
+    private Shop shop;
 
     private boolean isDelete;
     private Long createdBy;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import cement from "../images/cement.jpg";
@@ -11,6 +11,7 @@ import glass from "../images/glass.jpg";
 import paint from "../images/paint.jpg";
 import plumbing from "../images/plumbing.jpg";
 import electrical from "../images/electrical.jpg";
+import { BASE_URL } from "../Utils/config";
 
 const products = [
   {
@@ -116,6 +117,8 @@ const products = [
 ];
 
 const ProductItem = () => {
+  const token = sessionStorage.getItem("access_token");
+  const [data, setData] = useState([]);
   const handleAddClick = () => {
     Swal.fire({
       icon: "success",
@@ -125,6 +128,28 @@ const ProductItem = () => {
       timer: 2000,
     });
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/api/public/products?page=1&size=10&sortBy=id&direction=ASC&active=true`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) throw new Error(`Lỗi: ${response.status}`);
+
+        const data = await response.json();
+        setData(data.content || []);
+      } catch (error) {
+        console.error("Lỗi khi fetch API:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div>
@@ -143,7 +168,7 @@ const ProductItem = () => {
             </div>
           </div>
           <div className="row g-4 row-cols-lg-5 row-cols-2 row-cols-md-3">
-            {products.map((product) => (
+            {data.map((product) => (
               <div key={product.id} className="col fade-zoom">
                 <div className="card card-product">
                   <div className="card-body">
@@ -153,7 +178,7 @@ const ProductItem = () => {
                       </div>
                       <Link to="#">
                         <img
-                          src={product.image}
+                          src={product.images}
                           alt={product.name}
                           className="mb-3 img-fluid"
                           style={{ height: "200px", width: "200px" }}
@@ -178,7 +203,7 @@ const ProductItem = () => {
                     </div>
                     <div className="text-small mb-1">
                       <Link to="#" className="text-decoration-none text-muted">
-                        <small>{product.category}</small>
+                        <small>{product.category.name}</small>
                       </Link>
                     </div>
                     <h2 className="fs-6">
@@ -203,14 +228,16 @@ const ProductItem = () => {
                         ))}
                       </small>
                       <span className="text-muted small">
-                        {product.rating} ({product.reviews})
+                        {/* {product.rating} ({product.reviews}) */}
                       </span>
                     </div>
                     <div className="d-flex justify-content-between align-items-center mt-3">
                       <div>
-                        <span className="text-dark">{product.price} VNĐ</span>
+                        <span className="text-dark">
+                          {product.priceRange} VNĐ
+                        </span>
                         <span className="text-decoration-line-through text-muted ml-1">
-                          {product.originalPrice}
+                          {product.priceRange}
                         </span>
                       </div>
                       <div>
