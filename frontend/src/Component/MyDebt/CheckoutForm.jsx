@@ -7,29 +7,36 @@ import { useSelector } from "react-redux";
 
 const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
   const token = sessionStorage.getItem("access_token");
-  const [amount, setAmount] = useState(
-    orders
-      ?.filter((o) => o?.status !== "PAID")
-      ?.reduce((acc, index) => acc + index?.totalAmount, 0)
-  );
-  const [payMode, setPayMode] = useState("payAll");
-  const [errorMessage, setErrorMessage] = useState(""); // Lưu thông báo lỗi
-
-  useEffect(() => {
-    if (payMode === "payAll") {
-      setAmount(
-        orders
-          ?.filter((o) => o?.status !== "PAID")
-          ?.reduce((acc, index) => acc + index?.totalAmount, 0)
-      );
-    } else {
-      setAmount(0);
-    }
-  }, [payMode, orders]);
 
   const totalDebt = orders
     ?.filter((o) => o?.status !== "PAID")
     ?.reduce((acc, index) => acc + index?.totalAmount, 0);
+
+  const totalPaidAmount = orders
+    ?.filter((o) => o?.status !== "PAID")
+    ?.reduce((acc, index) => acc + index?.paidAmount, 0);
+  
+  const remainingDebt = totalDebt - totalPaidAmount;
+
+  const [amount, setAmount] = useState(remainingDebt); 
+  const [payMode, setPayMode] = useState("payAll");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    if (payMode === "payAll") {
+      setAmount(remainingDebt);
+    } else {
+      setAmount(0); 
+    }
+  }, [payMode, remainingDebt]); 
+
+  const formatCurrency = (amount) => {
+    if (isNaN(amount)) return "0 VNĐ";
+    const formattedAmount = amount
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return `${formattedAmount} VNĐ`;
+  };
 
   const pay = async () => {
     try {
@@ -38,8 +45,8 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
           paymentProvider: "VNPAY",
           paymentType: "INVOICE",
           amount: amount,
-          bankCode: "", 
-          referenceId: shop?.shopId,
+          bankCode: "",
+          referenceId: orders[0]?.id,
         })}`,
         {
           method: "GET",
@@ -63,14 +70,14 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
     if (enteredAmount <= 0) {
       setAmount("");
       setErrorMessage("Số tiền phải lớn hơn 0.");
-    } else if (enteredAmount > totalDebt) {
+    } else if (enteredAmount > remainingDebt) {
       setAmount("");
       setErrorMessage(
         "Số tiền nhập vào không được vượt quá số tiền nợ còn lại."
       );
     } else {
       setAmount(enteredAmount);
-      setErrorMessage(""); // Xóa thông báo lỗi nếu nhập đúng
+      setErrorMessage("");
     }
   };
 
@@ -116,23 +123,13 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">Tổng Tiền Nợ</span>
                   <span className={classNames(styles.textCard, "flex-grow-1")}>
-                    {Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(totalDebt)}
+                    {formatCurrency(totalDebt)}
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">Số tiền đã thanh toán</span>
                   <span className={classNames(styles.textCard, "flex-grow-1")}>
-                    {Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(
-                      orders
-                        ?.filter((o) => o?.status !== "PAID")
-                        ?.reduce((acc, index) => acc + index?.paidAmount, 0)
-                    )}
+                    {formatCurrency(totalPaidAmount)}
                   </span>
                 </div>
                 <div className="d-flex align-items-center gap-3">
@@ -171,23 +168,18 @@ const CheckoutForm = ({ showModal, handleCloseModal, shop, orders }) => {
                   />
                 </div>
 
-                {/* Hiển thị thông báo lỗi nếu có */}
                 {errorMessage && (
                   <div style={{ color: "red", marginTop: "5px" }}>
                     {errorMessage}
                   </div>
                 )}
 
-                {/* Hiển thị số tiền nợ còn lại */}
                 <div className="d-flex align-items-center gap-3">
                   <span className="fw-bold">
                     Số tiền nợ còn lại của đơn hàng sau khi thanh toán
                   </span>
                   <span className={classNames(styles.textCard, "flex-grow-1")}>
-                    {Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(totalDebt - (amount || 0))}
+                    {formatCurrency(remainingDebt - amount)}
                   </span>
                 </div>
               </div>
