@@ -55,6 +55,34 @@ const ChatBox = () => {
     }
   };
 
+  const createChatRoom = async (dealerId, shopId) => {
+    try {
+      const params = new URLSearchParams({
+        dealerId,
+        shopId,
+      });
+
+      const response = await fetch(
+        `${BASE_URL}/api/chat/rooms/create?${params.toString()}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Không thể tạo phòng chat.");
+      } else {
+        console.log("Tạo phòng chat thành công.");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo phòng chat:", error);
+    }
+  };
+
   const fetchMessages = async () => {
     try {
       const params = new URLSearchParams({
@@ -85,8 +113,11 @@ const ChatBox = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (userId && selectedShop) {
+      createChatRoom(userId, selectedShop); 
+      fetchData();
+    }
+  }, [userId, selectedShop]);
 
   useEffect(() => {
     if (selectedChatId) {
