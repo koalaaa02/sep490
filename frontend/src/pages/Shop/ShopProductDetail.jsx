@@ -134,7 +134,7 @@ const ShopProductDetail = ({ id, onBack }) => {
   if (!product) {
     return <p>Loading...</p>;
   }
-console.log(product);
+  console.log(product);
 
   return (
     <div className="container shadow-sm border rounded p-3">
@@ -186,7 +186,9 @@ console.log(product);
             <br />
           </div>
           <p className="text-muted mt-10">Phân loại: {selectedSku?.skuCode}</p>
-          <h6 className="text-muted mb-10">Đơn vị: {convertUnitToVietnamese(product?.unit)} </h6>
+          <h6 className="text-muted mb-10">
+            Đơn vị: {convertUnitToVietnamese(product?.unit)}{" "}
+          </h6>
           <h6 className="text-muted mb-10">{product?.unitAdvance} </h6>
           <div className="d-flex align-items-center mb-3">
             <span className="text-muted mr-3">Số lượng: </span>
@@ -216,27 +218,29 @@ console.log(product);
       <div className="mt-5 mb-1 p-3 shadow-sm border rounded">
         <div className="d-flex align-items-center">
           <img
-            src="https://via.placeholder.com/50"
+            src={product.shop.logoImage}
             alt="logo"
-            className="rounded-circle"
+            className="rounded-circle me-2"
+            style={{ height: "50px", width: "50px" }}
           />
           <div>
-            <h6 className="m-0">Người bán: {product.supplier.name}</h6>
+            <strong className="m-0 me-2">Nhà phân phối:</strong>
+            <span>{product.shop.name}</span>
           </div>
         </div>
         <hr />
         <div className="d-flex justify-content-between flex-wrap">
           <div>
-            <p className="m-0">Email</p>
-            <strong>{product.supplier.contactEmail}</strong>
+            <p className="m-0">Hình thứ kinh doanh</p>
+            <strong>
+              {product.shop.shopType === "ENTERPRISE"
+                ? "Doanh nghiệp lớn"
+                : "Doanh nghiệp nhỏ"}
+            </strong>
           </div>
-          <div>
-            <p className="m-0">Số điện thoại</p>
-            <strong>{product.supplier.phone}</strong>
-          </div>
-          <div>
-            <p className="m-0">Địa chỉ</p>
-            <strong>{product.supplier.address}</strong>
+          <div className="col-4">
+            <p className="m-0">Mã số thuế</p>
+            <strong>{product.shop.tin}</strong>
           </div>
         </div>
       </div>

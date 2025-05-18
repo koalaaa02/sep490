@@ -140,19 +140,32 @@ const SingleShop = () => {
       <ScrollToTop />
       <section className="mb-8 mt-4">
         <div className="container">
-          <div className="bg-light rounded-3 d-lg-flex justify-content-lg-between p-4 mb-5">
+          <div className="bg-light rounded-3 d-lg-flex justify-content-lg-between p-5 mb-5">
             <div>
-              <h5 className="fw-bold">{stores?.name}</h5>
-              <p>
-                Chủ quản lý: {stores?.manager?.firstName}{" "}
-                {stores?.manager?.lastName}
-              </p>
-              <p>Email: {stores?.manager?.email}</p>
-              <p>Số điện thoại: {stores?.address?.phone}</p>
-              <p>
-                Địa chỉ: {stores?.address?.address}, {stores?.address?.ward},{" "}
-                {stores?.address?.district}, {stores?.address?.province}
-              </p>
+              <div className="p-1">
+                <strong className="me-2 mt-2">Tên nhà phân phối: </strong>
+                <span>{stores?.name.toUpperCase()}</span>
+              </div>
+              <div className="p-2">
+                <strong className="me-2 mt-2">Chủ quản lý:</strong>
+                <span> {stores?.manager?.lastName}</span>
+              </div>
+              <div className="p-2">
+                <strong className="me-2 mt-2">Email: </strong>
+                <span>{stores?.manager?.email}</span>
+              </div>
+              <div className="p-2">
+                <strong className="me-2 mt-2">Số điện thoại:</strong>
+                <span>{stores?.address?.phone}</span>
+              </div>
+              <div className="p-2">
+                <strong className="me-2 mt-2">Địa chỉ:</strong>
+                <span>
+                  {stores?.address?.address}, {stores?.address?.ward},{" "}
+                  {stores?.address?.district}, {stores?.address?.province}
+                </span>
+              </div>
+
               {token && <ChatBox selectedShopId={shopId} />}
               <div
                 className="mt-2"
