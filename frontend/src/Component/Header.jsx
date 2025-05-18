@@ -316,7 +316,7 @@ const Header = () => {
                 </li>
               )}
 
-              <li className="nav-item dmenu dropdown ml-3">
+              <li className="nav-item dmenu dropdown">
                 {/* <Link
                   className="text-muted position-relative"
                   data-bs-toggle="offcanvas"
@@ -349,12 +349,11 @@ const Header = () => {
                 </Link> */}
                 {isProvider && (
                   <Link
-                    className="text-muted position-relative"
                     to="/ProviderDashBoard"
-                    role="button"
-                    aria-controls="storeOffcanvas"
+                    className="nav-link text-danger"
                   >
-                    <FaStore size={20} className="mt-2 ms-3" />
+                    {/* <FaStore size={20} className="mt-2 ms-3" /> */}
+                    Cửa hàng của tôi
                   </Link>
                 )}
               </li>
