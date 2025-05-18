@@ -150,8 +150,8 @@ const DeliveryList = () => {
                 <th>Tên sản phẩm</th>
                 <th>Mã sản phẩm</th>
                 <th>Đơn vị</th>
-                <th>Tổng tiền</th>
-                <th>Giao hàng</th>
+                <th className="text-right">Tổng tiền</th>
+                <th className="text-right">Giao hàng</th>
               </tr>
             </thead>
             <tbody>
@@ -171,8 +171,10 @@ const DeliveryList = () => {
                   <td>{item.productName}</td>
                   <td>{item.productSKUCode}</td>
                   <td>{convertUnitToVietnamese(item.unit)}</td>
-                  <td className="text-right">{(item.quantity * item.price).toLocaleString()} VNĐ</td>
-                  <td >
+                  <td className="text-right">
+                    {(item.quantity * item.price).toLocaleString()} VNĐ
+                  </td>
+                  <td className="text-right">
                     <Badge
                       bg={
                         item.deliveryNote?.delivered ? "secondary" : "success"
