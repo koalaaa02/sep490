@@ -13,7 +13,7 @@ public class TransactionSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getShopId() != null) {
-                predicates.add(cb.equal(root.get("order").get("shop_id"), filter.getShopId()));
+                predicates.add(cb.equal(root.get("order").get("id"), filter.getShopId()));
             }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy() ));

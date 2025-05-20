@@ -106,7 +106,7 @@ public class UserService {
     }
 
     public PageResponse<UserResponse> getUsers(UserFilterDTO filter) {
-        filter.setCreatedBy(getContextUser().getId());
+//        filter.setCreatedBy(getContextUser().getId());
         Specification<User> spec = UserSpecification.filterUsers(filter);
         Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
         Page<User> userPage = userRepo.findAll(spec, pageable);
@@ -119,9 +119,24 @@ public class UserService {
         if (User.isPresent()) {
             return userMapper.EntityToResponse(User.get());
         } else {
-            throw new RuntimeException("Danh mục không tồn tại với ID: " + id);
+            throw new RuntimeException("Người dùng không tồn tại với ID: " + id);
         }
     }
+
+    public UserResponse getAdminContact() {
+        Optional<User> User = userRepo.findByName("admin");
+        if (User.isPresent()) {
+            User u = User.get();
+            u.setCitizenIdentificationCard(null);
+            u.setCitizenIdentificationCardImageDown(null);
+            u.setCitizenIdentificationCardImageUp(null);
+            u.setUserType(null);
+            return userMapper.EntityToResponse(u);
+        } else {
+            throw new RuntimeException("Không tìm thấy admin: ");
+        }
+    }
+
 
     public UserResponse createUser(UserRequest userRequest) {
 //        Shop shop = getShop(userRequest.getShopId());
@@ -131,9 +146,17 @@ public class UserService {
         return userMapper.EntityToResponse(userRepo.save(entity));
     }
 
+    public UserResponse activeUser(Long id) {
+        User user = userRepo.findByIdAndIsDeleteFalse(id)
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại với ID: " + id));
+
+        user.setActive(!user.isActive());
+        return userMapper.EntityToResponse(userRepo.save(user));
+    }
+    
     public UserResponse updateUser(Long id, UserRequest userRequest) {
         User user = userRepo.findByIdAndIsDeleteFalse(id)
-                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại với ID: " + id));
 //        try {
 //            objectMapper.updateValue(user, userRequest);
 //        } catch (JsonMappingException e) {
@@ -167,7 +190,7 @@ public class UserService {
                     existingUser.setDelete(true);
                     return userRepo.save(existingUser);
                 })
-                .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại với ID: " + id));
+                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại với ID: " + id));
     }
 
 
