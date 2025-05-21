@@ -73,4 +73,9 @@ public class PublicController {
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
+
+    @GetMapping("/contact")
+    public ResponseEntity<?> getAdminContact() {
+        return ResponseEntity.ok().body(userService.getAdminContact());
+    }
 }
