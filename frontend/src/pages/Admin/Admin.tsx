@@ -5,7 +5,7 @@ import { useState } from "react";
 import AdminDashboard from "../../Component/AdminComponent/AdminContent/AdminDashboard.tsx";
 import AdminCate from "../../Component/AdminComponent/AdminContent/AdminCate.tsx";
 import AdminProd from "../../Component/AdminComponent/AdminContent/AdminProd.tsx";
-// import AdminDealer from "../../Component/AdminComponent/AdminContent/AdminDealer.tsx";
+import AdminDealer from "../../Component/AdminComponent/AdminContent/AdminDealer.tsx";
 import AdminProvider from "../../Component/AdminComponent/AdminContent/AdminProvider.tsx";
 import AdminBankAccount from "../../Component/AdminComponent/AdminContent/AdminBankAccount.tsx";
 
@@ -19,8 +19,8 @@ const Admin = () => {
         return <AdminCate />;
       case "Sản phẩm":
         return <AdminProd />;
-      // case "Khách hàng":
-      //   return <AdminDealer />;
+      case "Khách hàng":
+        return <AdminDealer />;
       case "Nhà cung cấp":
         return <AdminProvider />;
       case "Tài Khoản":
