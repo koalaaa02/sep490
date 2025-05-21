@@ -22,6 +22,9 @@ public interface UserRepository extends JpaRepository<User, Long> , JpaSpecifica
     Optional<User> findByEmailIgnoreCase(String email);
     Optional<User> findByEmailOrNameContainingIgnoreCase(String email, String Name);
 
+    Optional<User> findByEmail(String email);
+
+
     //admin statictic
     long count();
     @Query("SELECT r.name, COUNT(u) FROM User u JOIN u.roles r GROUP BY r.name")
