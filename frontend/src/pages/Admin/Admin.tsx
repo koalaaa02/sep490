@@ -19,7 +19,7 @@ const Admin = () => {
         return <AdminCate />;
       case "Sản phẩm":
         return <AdminProd />;
-      case "Khách hàng":
+      case "Người dùng":
         return <AdminDealer />;
       case "Nhà cung cấp":
         return <AdminProvider />;
