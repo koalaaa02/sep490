@@ -14,6 +14,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   const [previewImages, setPreviewImages] = useState({});
   const [suppliers, setSuppliers] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [skuErrors, setSkuErrors] = useState({});
+  const [nameError, setNameError] = useState("");
+
   const shopId = useSelector((state) => state.shop.shopId);
 
   const defaultSkuData = {
@@ -213,6 +216,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name === "supplierId") {
       const selectedSupplier = suppliers.find(
         (supplier) => supplier.id.toString() === value
@@ -234,6 +238,14 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         ...product,
         [name]: value,
       });
+
+      if (name === "name" || name === "unitAdvance") {
+        if (!value || value.trim() === "" || isValidInput(value)) {
+          setNameError("Giá trị truyền vào không hợp lệ.");
+        } else {
+          setNameError("");
+        }
+      }
     }
   };
 
@@ -246,6 +258,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   };
 
   const handleSave = async () => {
+    if (
+      !product.name?.trim() ||
+      !product.description?.trim() ||
+      !product.unit?.trim() ||
+      !product.category?.id ||
+      !product.supplier?.id ||
+      !product.specifications?.trim()
+    ) {
+      alert("Vui lòng điền đầy đủ các trường bắt buộc ! (*)");
+      return;
+    }
     try {
       const response = await fetch(
         `${BASE_URL}/api/provider/products/${productId}`,
@@ -293,12 +316,36 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   };
 
   const handleSkuChange = (index, field, value) => {
+    // Validate skuCode
+    if (field === "skuCode") {
+      if (!isValidInput(value)) {
+        setSkuErrors((prev) => ({
+          ...prev,
+          [index]: "SKU không được trống hoặc chứa ký tự đặc biệt",
+        }));
+      } else {
+        setSkuErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[index];
+          return newErrors;
+        });
+      }
+    }
+
     const updatedSkus = [...productSkuData];
     updatedSkus[index] = { ...updatedSkus[index], [field]: value };
     setProductSkuData(updatedSkus);
   };
 
   const handleSaveSku = async (sku) => {
+    if (!isValidPrice(sku.sellingPrice)) {
+      alert("Giá bán phải là số hợp lệ và không âm!");
+      return;
+    }
+    if (!isValidPrice(sku.wholesalePrice)) {
+      alert("Giá sỉ phải là số hợp lệ và không âm!");
+      return;
+    }
     try {
       const response = await fetch(
         `${BASE_URL}/api/provider/productskus/${sku.id}`,
@@ -335,6 +382,11 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   };
 
   const handleDeleteSku = async (sku) => {
+    const isConfirmed = window.confirm(
+      `Bạn có chắc chắn muốn xóa phân loại sản phẩm này không?`
+    );
+    if (!isConfirmed) return;
+
     try {
       const response = await fetch(
         `${BASE_URL}/api/provider/productskus/${sku.id}`,
@@ -357,7 +409,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       }
       setEditingSkuId(null);
     } catch (error) {
-      console.error("Lỗi khi xóa !", error);
+      console.error("Lỗi khi xóa!", error);
       alert("Có lỗi xảy ra, vui lòng thử lại!");
     }
   };
@@ -365,6 +417,15 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
   const handleAddNewSku = async () => {
     if (!newSku.skuCode || newSku.stock <= 0) {
       alert("Vui lòng nhập đầy đủ thông tin hợp lệ!");
+      return;
+    }
+
+    if (!isValidPrice(newSku.sellingPrice)) {
+      alert("Giá bán phải là số hợp lệ và không âm!");
+      return;
+    }
+    if (!isValidPrice(newSku.wholesalePrice)) {
+      alert("Giá sỉ phải là số hợp lệ và không âm!");
       return;
     }
     try {
@@ -477,6 +538,19 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     }
   };
 
+  const isValidInput = (value) => {
+    if (!value || value.trim() === "") return false;
+
+    const regex = /^[a-zA-Z0-9 _-]+$/;
+    return regex.test(value);
+  };
+
+  const isValidPrice = (value) => {
+    if (value === undefined || value === null || value === "") return false;
+    const numberValue = Number(value);
+    return !isNaN(numberValue) && numberValue >= 0;
+  };
+
   return (
     <div className="p-3 mb-10">
       <button
@@ -490,7 +564,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
       <div className="border p-3 rounded">
         {/* Hình ảnh sản phẩm */}
         <div className="mb-3">
-          <label className="form-label fw-bold">Hình ảnh sản phẩm:</label>
+          <label className="form-label fw-bold">
+            Hình ảnh sản phẩm: <span className="strong text-danger">(*)</span>
+          </label>
           <div className="d-flex align-items-center">
             {/* Hiển thị ảnh hiện tại hoặc thông báo nếu chưa có ảnh */}
             {product.images ? (
@@ -522,18 +598,23 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
           <div className="col-md-12">
-            <label className="form-label fw-bold">Tên sản phẩm:</label>
+            <label className="form-label fw-bold">
+              Tên sản phẩm: <span className="strong text-danger">(*)</span>
+            </label>
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${nameError ? "is-invalid" : ""}`}
               name="name"
               value={product.name || ""}
               onChange={handleChange}
               readOnly={!isEditing}
             />
+            {nameError && <div className="invalid-feedback">{nameError}</div>}
           </div>
           <div className="col-md-6">
-            <label className="form-label fw-bold">Danh mục:</label>
+            <label className="form-label fw-bold">
+              Danh mục: <span className="strong text-danger">(*)</span>
+            </label>
             <select
               className="form-control"
               name="categoryId"
@@ -541,7 +622,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               value={product.category.id}
               disabled={!isEditing}
             >
-              <option value="" disabled>-- Chọn danh mục --</option>
+              <option value="" disabled>
+                -- Chọn danh mục --
+              </option>
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -553,7 +636,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Tên nhà phân phối:</label>
+            <label className="form-label fw-bold">
+              Tên nhà phân phối: <span className="strong text-danger">(*)</span>
+            </label>
             <select
               className="form-control"
               name="supplierId"
@@ -561,7 +646,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               value={product?.supplier?.id}
               disabled={!isEditing}
             >
-              <option value="" disabled>-- Chọn nhà phân phối --</option>
+              <option value="" disabled>
+                -- Chọn nhà phân phối --
+              </option>
               {suppliers?.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -573,7 +660,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Email:</label>
+            <label className="form-label fw-bold">
+              Email: <span className="strong text-danger">(*)</span>
+            </label>
             <input
               type="email"
               className="form-control"
@@ -583,7 +672,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
           </div>
 
           <div className="col-md-6">
-            <label className="form-label fw-bold">Số điện thoại:</label>
+            <label className="form-label fw-bold">
+              Số điện thoại: <span className="strong text-danger">(*)</span>
+            </label>
             <input
               type="text"
               className="form-control"
@@ -595,7 +686,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Đơn vị:</label>
+            <label className="form-label fw-bold">
+              Đơn vị: <span className="strong text-danger">(*)</span>
+            </label>
             <select
               className="form-control"
               name="unit"
@@ -621,16 +714,19 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             </select>
           </div>
           <div className="col-md-6">
-            <label className="form-label fw-bold">Tính theo đơn vị:</label>
+            <label className="form-label fw-bold">
+              Tính theo đơn vị (VD: 1 thùng 24 lon):{" "}
+              <span className="strong text-danger">(*)</span>
+            </label>
             <input
               type="text"
-              className="form-control"
+              className={`form-control ${nameError ? "is-invalid" : ""}`}
               name="unitAdvance"
               value={product.unitAdvance}
               onChange={handleChange}
               readOnly={!isEditing}
-              required
             />
+            {nameError && <div className="invalid-feedback">{nameError}</div>}
           </div>
         </div>
 
@@ -641,10 +737,16 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
               <tr>
                 <th>ID</th>
                 <th>Ảnh</th>
-                <th>Phân loại</th>
+                <th>
+                  Phân loại <span className="strong text-danger">(*)</span>
+                </th>
                 {/* <th>Số lượng tồn kho</th> */}
-                <th>Giá bán (VNĐ)</th>
-                <th>Giá sỉ (VNĐ)</th>
+                <th>
+                  Giá bán (VNĐ) <span className="strong text-danger">(*)</span>
+                </th>
+                <th>
+                  Giá sỉ (VNĐ) <span className="strong text-danger">(*)</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -714,12 +816,17 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                   <td>
                     <input
                       type="text"
-                      className="form-control"
+                      className={`form-control ${
+                        skuErrors[index] ? "is-invalid" : ""
+                      }`}
                       value={sku.skuCode}
                       onChange={(e) =>
                         handleSkuChange(index, "skuCode", e.target.value)
                       }
                     />
+                    {skuErrors[index] && (
+                      <div className="invalid-feedback">{skuErrors[index]}</div>
+                    )}
                   </td>
                   {/* <td>
                     <input
@@ -734,6 +841,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                   <td>
                     <input
                       type="number"
+                      min="0"
                       className="form-control"
                       value={sku.sellingPrice}
                       onChange={(e) =>
@@ -744,6 +852,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
                   <td>
                     <input
                       type="number"
+                      min="0"
                       className="form-control"
                       value={sku.wholesalePrice}
                       onChange={(e) =>
@@ -858,7 +967,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         </div>
 
         <div className="mb-3">
-          <label className="form-label fw-bold">Mô tả sản phẩm:</label>
+          <label className="form-label fw-bold">
+            Mô tả sản phẩm: <span className="strong text-danger">(*)</span>
+          </label>
           <textarea
             className="form-control"
             name="description"
@@ -871,7 +982,9 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         </div>
 
         <div className="mb-3">
-          <label className="form-label fw-bold">Thông số kỹ thuật: </label>
+          <label className="form-label fw-bold">
+            Thông số kỹ thuật: <span className="strong text-danger">(*)</span>
+          </label>
           <textarea
             className="form-control"
             name="specifications"

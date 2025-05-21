@@ -5,6 +5,7 @@ import ScrollToTop from "../ScrollToTop";
 import { BASE_URL } from "../../Utils/config";
 import { useSelector } from "react-redux";
 import MyAccountSideBar from "../../Component/MyAccountSideBar/MyAccountSideBar";
+import { Modal, Button, Form } from "react-bootstrap";
 
 const MyAccountAddress = () => {
   const token = sessionStorage.getItem("access_token");
@@ -29,6 +30,7 @@ const MyAccountAddress = () => {
   const [deleteId, setDeleteId] = useState(null);
   const [notification, setNotification] = useState(null);
   const [editIndex, setEditIndex] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [editData, setEditData] = useState({
     id: "",
     userId: userId,
@@ -43,6 +45,8 @@ const MyAccountAddress = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [formErrors, setFormErrors] = useState({});
+
   useEffect(() => {
     const fetchProvinces = async () => {
       const response = await fetch(`${BASE_URL}/api/ghn/provinces`);
@@ -71,8 +75,34 @@ const MyAccountAddress = () => {
     });
   };
 
+  const handleClose = () => {
+    setShowModal(false);
+    setFormErrors({});
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.recipientName.trim())
+      errors.recipientName = "Vui lòng nhập tên người nhận";
+    if (!formData.phone.trim()) errors.phone = "Vui lòng nhập số điện thoại";
+    else if (!/^\d{10,11}$/.test(formData.phone))
+      errors.phone = "Số điện thoại không hợp lệ";
+    if (!formData.address.trim()) errors.address = "Vui lòng nhập địa chỉ";
+    if (!formData.provinceId)
+      errors.provinceId = "Vui lòng chọn tỉnh/thành phố";
+    if (!formData.districtId) errors.districtId = "Vui lòng chọn quận/huyện";
+    if (!formData.wardId) errors.wardId = "Vui lòng chọn phường/xã";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
 
     if (editIndex !== null) {
       if (name === "provinceId") {
@@ -159,6 +189,7 @@ const MyAccountAddress = () => {
   };
 
   const handleUpdate = async () => {
+    if (!validateForm()) return;
     try {
       const response = await fetch(`${BASE_URL}/api/addresses/${editData.id}`, {
         method: "PUT",
@@ -192,6 +223,7 @@ const MyAccountAddress = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validateForm()) return;
     try {
       const response = await fetch(`${BASE_URL}/api/addresses`, {
         method: "POST",
@@ -210,6 +242,7 @@ const MyAccountAddress = () => {
           ...prevData,
           content: [...prevData.content, result],
         }));
+        setShowModal(false);
       } else {
         showNotification("Thêm địa chỉ thất bại!", "danger");
       }
@@ -389,14 +422,12 @@ const MyAccountAddress = () => {
                             <h2 className="mb-0">Địa chỉ</h2>
                             {/* button */}
 
-                            <Link
-                              to="#"
-                              className="btn btn-outline-warning"
-                              data-bs-toggle="modal"
-                              data-bs-target="#addAddressModal"
+                            <Button
+                              variant="outline-warning"
+                              onClick={() => setShowModal(true)}
                             >
-                              Thêm địa chỉ mới{" "}
-                            </Link>
+                              + Thêm địa chỉ mới
+                            </Button>
                           </div>
                           {notification && (
                             <p className={`alert alert-${notification.type}`}>
@@ -431,21 +462,45 @@ const MyAccountAddress = () => {
                                     {editIndex === index ? (
                                       <div className="row">
                                         <input
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.recipientName
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
                                           name="recipientName"
                                           value={editData.recipientName}
                                           onChange={handleChange}
                                           placeholder="Tên người nhận"
                                         />
+                                        {formErrors.recipientName && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.recipientName}
+                                          </div>
+                                        )}
+
                                         <input
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.address
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
                                           name="address"
                                           value={editData.address}
                                           onChange={handleChange}
                                           placeholder="Địa chỉ"
                                         />
+                                        {formErrors.address && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.address}
+                                          </div>
+                                        )}
+
                                         <select
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.provinceId
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
                                           name="provinceId"
                                           value={editData.provinceId}
                                           onChange={handleChange}
@@ -460,9 +515,18 @@ const MyAccountAddress = () => {
                                             </option>
                                           ))}
                                         </select>
+                                        {formErrors.provinceId && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.provinceId}
+                                          </div>
+                                        )}
 
                                         <select
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.districtId
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
                                           name="districtId"
                                           value={editData.districtId}
                                           onChange={handleChange}
@@ -479,9 +543,18 @@ const MyAccountAddress = () => {
                                             </option>
                                           ))}
                                         </select>
+                                        {formErrors.districtId && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.districtId}
+                                          </div>
+                                        )}
 
                                         <select
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.wardId
+                                              ? "is-invalid"
+                                              : ""
+                                          }`}
                                           name="wardId"
                                           value={editData.wardId}
                                           onChange={handleChange}
@@ -498,23 +571,36 @@ const MyAccountAddress = () => {
                                             </option>
                                           ))}
                                         </select>
+                                        {formErrors.wardId && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.wardId}
+                                          </div>
+                                        )}
 
                                         <input
-                                          className="form-control mb-2"
+                                          className={`form-control mb-2 ${
+                                            formErrors.phone ? "is-invalid" : ""
+                                          }`}
                                           name="phone"
                                           value={editData.phone}
                                           onChange={handleChange}
                                           placeholder="Số điện thoại"
                                         />
+                                        {formErrors.phone && (
+                                          <div className="invalid-feedback">
+                                            {formErrors.phone}
+                                          </div>
+                                        )}
+
                                         <div>
                                           <button
-                                            className="btn btn-warning btn-sm me-2"
+                                            className="btn btn-warning btn-sm me-2 mt-4"
                                             onClick={handleUpdate}
                                           >
                                             Lưu
                                           </button>
                                           <button
-                                            className="btn btn-secondary btn-sm"
+                                            className="btn btn-secondary btn-sm mt-4"
                                             onClick={() => setEditIndex(null)}
                                           >
                                             Hủy
@@ -631,155 +717,178 @@ const MyAccountAddress = () => {
             </div>
           </div>
           {/* Modal */}
-          <div
-            className="modal fade"
-            id="addAddressModal"
-            tabIndex={-1}
-            aria-labelledby="addAddressModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-body p-6">
-                  <div className="d-flex justify-content-between mb-5">
-                    <div>
-                      <h5 className="h6 mb-1" id="addAddressModalLabel">
-                        Địa chỉ vận chuyển mới
-                      </h5>
-                      <p className="small mb-0">
-                        Thêm địa chỉ vận chuyển mới cho giao hàng đơn đặt hàng
-                        của bạn.
-                      </p>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        className="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                      />
-                    </div>
-                  </div>
-                  <div className="row g-3">
-                    <div className="col-12">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="recipientName"
-                        placeholder="Họ và Tên"
-                        value={formData.recipientName}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="col-12">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="phone"
-                        placeholder="Số điện thoại"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="col-4">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="postalCode"
-                        placeholder="Mã bưu điện"
-                        value={formData.postalCode}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-8">
-                      <input
-                        type="text"
-                        className="form-control"
-                        name="address"
-                        placeholder="Địa chỉ"
-                        value={formData.address}
-                        onChange={handleChange}
-                      />
-                    </div>
-                    <div className="col-12">
-                      <label className="me-2">Tỉnh: </label>
-                      <select
-                        className="form-control"
-                        name="provinceId"
-                        value={formData.provinceId}
-                        onChange={handleChange}
-                      >
-                        <option value="">Chọn thành phố</option>
-                        {provinces.length > 0 &&
-                          provinces?.map((province) => (
-                            <option
-                              key={province.ProvinceID}
-                              value={province.ProvinceID}
-                            >
-                              {province.ProvinceName}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                    <div className="col-6">
-                      <label> Huyện: </label>
-                      <select
-                        className="form-control"
-                        name="districtId"
-                        value={
-                          editIndex !== null
-                            ? editData.districtId
-                            : formData.districtId
-                        }
-                        onChange={handleChange}
-                      >
-                        <option value="">Chọn huyện</option>
-                        {districts.map((district) => (
-                          <option
-                            key={district.DistrictID}
-                            value={district.DistrictID}
-                          >
-                            {district.DistrictName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-6">
-                      <label>Phường: </label>
-                      <select
-                        className="form-control"
-                        name="wardId"
-                        value={
-                          editIndex !== null
-                            ? editData.WardCode
-                            : formData.WardCode
-                        }
-                        onChange={handleChange}
-                      >
-                        <option value="">Chọn phường</option>
-                        {wards.map((ward) => (
-                          <option key={ward.WardCode} value={ward.WardCode}>
-                            {ward.WardName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-12 text-end">
-                      <button
-                        className="btn btn-outline-warning"
-                        type="button"
-                        onClick={handleSubmit}
-                      >
-                        Lưu địa chỉ
-                      </button>
-                    </div>
-                  </div>
+          <Modal show={showModal} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Địa chỉ vận chuyển mới</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="mb-0 text-danger">
+                Thêm địa chỉ vận chuyển mới cho đơn đặt hàng của bạn.
+              </p>
+              <Form>
+                <Form.Group controlId="recipientName" className="mb-3">
+                  <Form.Label>Tên người nhận:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="recipientName"
+                    placeholder="Họ và Tên"
+                    value={formData.recipientName}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.recipientName}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.recipientName}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="phone" className="mb-3">
+                  <Form.Label>Số điện thoại:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="phone"
+                    placeholder="Số điện thoại"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.phone}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.phone}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Form.Group
+                    controlId="postalCode"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Mã bưu điện:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="postalCode"
+                      placeholder="Mã bưu điện"
+                      value={formData.postalCode}
+                      onChange={handleChange}
+                    />
+                  </Form.Group>
+
+                  <Form.Group
+                    controlId="address"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Địa chỉ:</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="address"
+                      placeholder="Địa chỉ"
+                      value={formData.address}
+                      onChange={handleChange}
+                      isInvalid={!!formErrors.address}
+                      required
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.address}
+                    </Form.Control.Feedback>
+                  </Form.Group>
                 </div>
-              </div>
-            </div>
-          </div>
+
+                <Form.Group controlId="provinceId" className="mb-3">
+                  <Form.Label>Tỉnh:</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="provinceId"
+                    value={formData.provinceId}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.provinceId}
+                    required
+                  >
+                    <option value="">Chọn thành phố</option>
+                    {provinces.map((province) => (
+                      <option
+                        key={province.ProvinceID}
+                        value={province.ProvinceID}
+                      >
+                        {province.ProvinceName}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.provinceId}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Form.Group
+                    controlId="districtId"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Huyện:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="districtId"
+                      value={formData.districtId}
+                      onChange={handleChange}
+                      isInvalid={!!formErrors.districtId}
+                      required
+                      disabled={!formData.provinceId}
+                    >
+                      <option value="">Chọn huyện</option>
+                      {districts.map((district) => (
+                        <option
+                          key={district.DistrictID}
+                          value={district.DistrictID}
+                        >
+                          {district.DistrictName}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.districtId}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  <Form.Group
+                    controlId="wardId"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Phường:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="wardId"
+                      value={formData.wardId}
+                      onChange={handleChange}
+                      isInvalid={!!formErrors.wardId}
+                      required
+                      disabled={!formData.districtId}
+                    >
+                      <option value="">Chọn phường</option>
+                      {wards.map((ward) => (
+                        <option key={ward.WardCode} value={ward.WardCode}>
+                          {ward.WardName}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.wardId}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </div>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Hủy
+              </Button>
+              <Button variant="primary" onClick={handleSubmit}>
+                Lưu địa chỉ
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
       </>
     </div>

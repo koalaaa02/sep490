@@ -46,7 +46,7 @@ const MyAcconutPaymentMethod = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/api/bankaccounts/1`, {
+        const response = await fetch(`${BASE_URL}/api/bankaccounts/5`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

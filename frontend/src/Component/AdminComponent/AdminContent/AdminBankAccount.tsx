@@ -19,14 +19,19 @@ const AdminBankAccount = () => {
   const [apiError, setApiError] = useState(null);
   const token = sessionStorage.getItem("access_token");
   const [banks, setBanks] = useState([]);
-
+  const params = new URLSearchParams({
+    page: 1,
+    size: 100,
+    sortBy: "id",
+    direction: "ASC",
+  });
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setApiError(null);
       try {
         const [accountResponse, banksResponse] = await Promise.all([
-          fetch(`${BASE_URL}/api/bankaccounts/1`, {
+          fetch(`${BASE_URL}/api/bankaccounts/?${params.toString()}`, {
             // Hardcoded ID 1
             method: "GET",
             headers: {
@@ -65,8 +70,10 @@ const AdminBankAccount = () => {
           }
         } else {
           const accountData = await accountResponse.json();
-          setAccount(accountData);
-          setOriginalAccount(accountData);
+          console.log(accountData?.content[0]);
+          
+          setAccount(accountData?.content[0]);
+          setOriginalAccount(accountData?.content[0]);
         }
 
         if (!banksResponse.ok) {

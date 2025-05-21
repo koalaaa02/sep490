@@ -161,7 +161,7 @@ const StoreList = () => {
                             <div className="card flex-row p-8 card-product">
                               <div>
                                 <img
-                                  src={store?.logoImage}
+                                  src={ship}
                                   alt="stores"
                                   className="rounded-circle icon-shape icon-xl"
                                 />
