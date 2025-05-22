@@ -6,7 +6,6 @@ import img1 from "../../images/glass.jpg";
 import Swal from "sweetalert2";
 import PaymentMethod from "../../Component/PaymentMethod";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Modal, Button, Form } from "react-bootstrap";
 
@@ -14,14 +13,15 @@ const ShopCheckOut = () => {
   const location = useLocation();
   const cartItems = location.state?.selectedShops || [];
   const userId = useSelector((state) => state.auth.user?.uid || []);
-  // loading
   const [loaderStatus, setLoaderStatus] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState("COD");
   const token = sessionStorage.getItem("access_token");
-  const [dataAddress, setDataAddress] = useState(null);
-  const [selectedAddressId, setSelectedAddressId] = useState(10);
+  const [dataAddress, setDataAddress] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [expandedAddressId, setExpandedAddressId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState(0);
+  const [formErrors, setFormErrors] = useState({});
+
   const [formData, setFormData] = useState({
     id: "",
     userId: userId,
@@ -42,6 +42,158 @@ const ShopCheckOut = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const navigate = useNavigate();
+  const hasBulkyItem = cartItems.some((cart) =>
+    cart.items.some((item) => item.productSKUResponse?.bulky === true)
+  );
+  const [showModal, setShowModal] = useState(false);
+
+  // Form validation
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.recipientName.trim())
+      errors.recipientName = "Vui lòng nhập tên người nhận";
+    if (!formData.phone.trim()) errors.phone = "Vui lòng nhập số điện thoại";
+    else if (!/^\d{10,11}$/.test(formData.phone))
+      errors.phone = "Số điện thoại không hợp lệ";
+    if (!formData.address.trim()) errors.address = "Vui lòng nhập địa chỉ";
+    if (!formData.provinceId)
+      errors.provinceId = "Vui lòng chọn tỉnh/thành phố";
+    if (!formData.districtId) errors.districtId = "Vui lòng chọn quận/huyện";
+    if (!formData.wardId) errors.wardId = "Vui lòng chọn phường/xã";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
+    if (name === "provinceId") {
+      const selectedProvince = provinces.find(
+        (province) => province.ProvinceID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        provinceId: value,
+        province: selectedProvince ? selectedProvince.ProvinceName : "",
+        districtId: "", // Reset district when province changes
+        wardId: "", // Reset ward when province changes
+      }));
+      setDistricts([]);
+      setWards([]);
+    }
+
+    if (name === "districtId") {
+      const selectedDistrict = districts.find(
+        (district) => district.DistrictID === Number(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        districtId: value,
+        district: selectedDistrict ? selectedDistrict.DistrictName : "",
+        wardId: "", // Reset ward when district changes
+      }));
+      setWards([]);
+    }
+
+    if (name === "wardId") {
+      const selectedWard = wards.find(
+        (ward) => ward.WardCode === String(value)
+      );
+      setFormData((prevData) => ({
+        ...prevData,
+        wardId: value,
+        ward: selectedWard ? selectedWard.WardName : "",
+      }));
+    }
+
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const response = await fetch(`${BASE_URL}/api/addresses`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setDataAddress((prevData) => [...prevData, result]);
+        setSelectedAddressId(result.id);
+        setShowModal(false);
+        // Reset form
+        setFormData({
+          ...formData,
+          recipientName: "",
+          phone: "",
+          address: "",
+          provinceId: "",
+          districtId: "",
+          wardId: "",
+          province: "",
+          district: "",
+          ward: "",
+          postalCode: "",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving address:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi",
+        text: "Đã có lỗi xảy ra, vui lòng thử lại.",
+      });
+    }
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    setFormErrors({});
+  };
+
+  useEffect(() => {
+    const fetchAddress = async () => {
+      try {
+        setLoaderStatus(true);
+        const addressResponse = await fetch(`${BASE_URL}/api/addresses/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+
+        if (!addressResponse.ok)
+          throw new Error(`Lỗi API Address: ${addressResponse.status}`);
+
+        const addressData = await addressResponse.json();
+        setDataAddress(addressData.content || []);
+        if (addressData.content?.length > 0) {
+          setSelectedAddressId(addressData.content[0].id);
+        }
+      } catch (error) {
+        console.error("Lỗi khi fetch API Address:", error);
+      }
+      setLoaderStatus(false);
+    };
+
+    fetchAddress();
+  }, [token]);
 
   useEffect(() => {
     const fetchProvinces = async () => {
@@ -76,103 +228,6 @@ const ShopCheckOut = () => {
     fetchWards();
   }, [formData.districtId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "provinceId") {
-      const selectedProvince = provinces.find(
-        (province) => province.ProvinceID === Number(value)
-      );
-      setFormData((prevData) => ({
-        ...prevData,
-        provinceId: value,
-        province: selectedProvince ? selectedProvince.ProvinceName : "",
-      }));
-    }
-
-    if (name === "districtId") {
-      const selectedDistrict = districts.find(
-        (district) => district.DistrictID === Number(value)
-      );
-      setFormData((prevData) => ({
-        ...prevData,
-        districtId: value,
-        district: selectedDistrict ? selectedDistrict.DistrictName : "",
-      }));
-    }
-
-    if (name === "wardId") {
-      const selectedWard = wards.find(
-        (ward) => ward.WardCode === String(value)
-      );
-      setFormData((prevData) => ({
-        ...prevData,
-        wardId: value,
-        ward: selectedWard ? selectedWard.WardName : "",
-      }));
-    }
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
-  const navigate = useNavigate();
-  const hasBulkyItem = cartItems.some((cart) =>
-    cart.items.some((item) => item.productSKUResponse?.bulky === true)
-  );
-  const [showModal, setShowModal] = useState(false);
-
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/addresses`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        setDataAddress((prevData) => [...(prevData || []), result]);
-        setShowModal(false);
-      }
-    } catch (error) {
-      console.error("Error saving address:", error);
-      alert("Đã có lỗi xảy ra, vui lòng thử lại.");
-    }
-  };
-
-  const handleClose = async () => {
-    setShowModal(false);
-  };
-
-  useEffect(() => {
-    const fetchAddress = async () => {
-      try {
-        setLoaderStatus(true);
-        const addressResponse = await fetch(`${BASE_URL}/api/addresses/`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
-
-        if (!addressResponse.ok)
-          throw new Error(`Lỗi API Address: ${addressResponse.status}`);
-
-        const addressData = await addressResponse.json();
-        setDataAddress(addressData.content || []);
-        setSelectedAddressId(addressData.content[0]?.id || null);
-      } catch (error) {
-        console.error("Lỗi khi fetch API Address:", error);
-      }
-      setLoaderStatus(false);
-    };
-
-    fetchAddress();
-  }, []);
-
   const calculateTotal = () => {
     return cartItems.reduce((total, shop) => {
       return (
@@ -198,7 +253,6 @@ const ShopCheckOut = () => {
       BOX: "Hộp",
       TON: "Tấn",
     };
-
     return unitMap[unit] || unit;
   };
 
@@ -207,6 +261,24 @@ const ShopCheckOut = () => {
   };
 
   const handleCheckout = async () => {
+    if (!selectedAddressId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Thiếu thông tin",
+        text: "Vui lòng chọn địa chỉ nhận hàng",
+      });
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Giỏ hàng trống",
+        text: "Không có sản phẩm nào để thanh toán",
+      });
+      return;
+    }
+
     try {
       const totalAmount = calculateTotal();
       const productIds = cartItems.flatMap((shop) =>
@@ -270,32 +342,34 @@ const ShopCheckOut = () => {
 
   return (
     <div>
-      <div>
-        {loaderStatus ? (
-          <div className="loader-container">
-            {/* <PulseLoader loading={loaderStatus} size={50} color="#0aad0a" /> */}
-            <MagnifyingGlass
-              visible={true}
-              height="100"
-              width="100"
-              ariaLabel="magnifying-glass-loading"
-              wrapperStyle={{}}
-              wrapperclassName="magnifying-glass-wrapper"
-              glassColor="#c0efff"
-              color="#0aad0a"
-            />
-          </div>
-        ) : (
-          <>
-            <>
-              <ScrollToTop />
-            </>
-            <div className="container mt-4">
-              <h4 className="mb-3">Thanh Toán Đơn Hàng</h4>
+      {loaderStatus ? (
+        <div className="loader-container">
+          <MagnifyingGlass
+            visible={true}
+            height="100"
+            width="100"
+            ariaLabel="magnifying-glass-loading"
+            wrapperStyle={{}}
+            wrapperclassName="magnifying-glass-wrapper"
+            glassColor="#c0efff"
+            color="#0aad0a"
+          />
+        </div>
+      ) : (
+        <>
+          <ScrollToTop />
+          <div className="container mt-4">
+            <h4 className="mb-3">Thanh Toán Đơn Hàng</h4>
+
+            {cartItems.length === 0 ? (
+              <div className="alert alert-warning text-center">
+                Không có sản phẩm nào trong giỏ hàng để thanh toán
+              </div>
+            ) : (
               <div className="row mb-10">
-                {/* Cột bên trái */}
+                {/* Left Column */}
                 <div className="col-md-8">
-                  {/* Địa chỉ nhận hàng */}
+                  {/* Shipping Address */}
                   <div className="card mb-3">
                     <div className="card-header bg-warning fw-bold text-black d-flex justify-content-between align-items-center">
                       <span>Địa Chỉ Nhận Hàng</span>
@@ -306,13 +380,19 @@ const ShopCheckOut = () => {
                         Thêm địa chỉ
                       </Button>
                     </div>
-                    {dataAddress?.length === 1 ? (
-                      <span className="m-2 d-flex justify-content-center">
-                        Bạn chưa có địa chỉ. Thêm mới địa chỉ ngay
-                      </span>
-                    ) : (
-                      <div className="card-body">
-                        {dataAddress?.map((a) => (
+                    <div className="card-body">
+                      {dataAddress.length === 0 ? (
+                        <div className="text-center py-3">
+                          <p>Bạn chưa có địa chỉ nào</p>
+                          <Button
+                            variant="primary"
+                            onClick={() => setShowModal(true)}
+                          >
+                            Thêm địa chỉ mới
+                          </Button>
+                        </div>
+                      ) : (
+                        dataAddress.map((a) => (
                           <div key={a.id} className="border rounded-1 p-2 mb-2">
                             <div
                               className="d-flex align-items-center"
@@ -338,14 +418,14 @@ const ShopCheckOut = () => {
                               </div>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        ))
+                      )}
+                    </div>
                   </div>
 
-                  {/* Sản phẩm */}
+                  {/* Products */}
                   <div className="card mb-3 container">
-                    <div className="row ">
+                    <div className="row">
                       <div className="col-5 card-header fw-bold text-black">
                         Sản phẩm
                       </div>
@@ -360,119 +440,105 @@ const ShopCheckOut = () => {
                         Thành tiền
                       </div>
                     </div>
-                    {cartItems?.map((shop) => (
+                    {cartItems.map((shop) => (
                       <div key={shop.shopId}>
-                        {/* Tên cửa hàng */}
+                        {/* Shop name */}
                         <div className="d-flex align-items-center mt-1 mb-3 border-bottom pb-3">
                           <span>Tên nhà phân phối: {shop.shopName}</span>
                         </div>
 
-                        {/* Sản phẩm trong cửa hàng */}
-                        {shop.items?.map((item) => (
-                          <div
-                            key={item.productSKUId}
-                            className="row border-bottom container"
-                          >
-                            <div className="row align-items-center m-2 p-2 border border-1 bg-light">
-                              {/* Ảnh sản phẩm */}
-                              <div className="col-2 text-center">
-                                <img
-                                  src={item.imageUrl || img1}
-                                  alt={item.productName}
-                                  className="img-fluid mt-2"
-                                  style={{
-                                    height: "100px",
-                                    width: "100px",
-                                    border: "1px solid #ddd",
-                                    borderRadius: "5px",
-                                    padding: "2px",
-                                  }}
-                                />
-                              </div>
+                        {/* Products in shop */}
+                        {shop.items.length === 0 ? (
+                          <div className="text-center py-3">
+                            Không có sản phẩm nào trong cửa hàng này
+                          </div>
+                        ) : (
+                          shop.items.map((item) => (
+                            <div
+                              key={item.productSKUId}
+                              className="row border-bottom container"
+                            >
+                              <div className="row align-items-center m-2 p-2 border border-1 bg-light">
+                                {/* Product image */}
+                                <div className="col-2 text-center">
+                                  <img
+                                    src={item.imageUrl || img1}
+                                    alt={item.productName}
+                                    className="img-fluid mt-2"
+                                    style={{
+                                      height: "100px",
+                                      width: "100px",
+                                      border: "1px solid #ddd",
+                                      borderRadius: "5px",
+                                      padding: "2px",
+                                    }}
+                                  />
+                                </div>
 
-                              {/* Tên sản phẩm */}
-                              <div className="col-3">
-                                <h6>Tên sản phẩm: {item.productName}</h6>
-                                <p className="text-muted">
-                                  {
-                                    item.productSKUResponse?.product
-                                      ?.unitAdvance
-                                  }
-                                </p>
-                                <p className="text-muted">
-                                  Phân loại: {item.productSKUCode}
-                                </p>
-                              </div>
-                              {/* Đơn vị */}
-                              <div className="col-1 text-center">
-                                <strong className="text-muted">
-                                  {convertUnitToVietnamese(
-                                    item.productSKUResponse?.product?.unit
-                                  )}
-                                </strong>
-                              </div>
+                                {/* Product name */}
+                                <div className="col-3">
+                                  <h6>Tên sản phẩm: {item.productName}</h6>
+                                  <p className="text-muted">
+                                    {
+                                      item.productSKUResponse?.product
+                                        ?.unitAdvance
+                                    }
+                                  </p>
+                                  <p className="text-muted">
+                                    Phân loại: {item.productSKUCode}
+                                  </p>
+                                </div>
+                                {/* Unit */}
+                                <div className="col-1 text-center">
+                                  <strong className="text-muted">
+                                    {convertUnitToVietnamese(
+                                      item.productSKUResponse?.product?.unit
+                                    )}
+                                  </strong>
+                                </div>
 
-                              {/* Đơn giá */}
-                              <div className="col-2 text-center">
-                                <strong className="text-muted">
-                                  {item.productSKUResponse.sellingPrice.toLocaleString(
-                                    "vi-VN"
-                                  )}
-                                  đ
-                                </strong>
-                              </div>
+                                {/* Price */}
+                                <div className="col-2 text-center">
+                                  <strong className="text-muted">
+                                    {item.productSKUResponse.sellingPrice.toLocaleString(
+                                      "vi-VN"
+                                    )}
+                                    đ
+                                  </strong>
+                                </div>
 
-                              {/* Số lượng */}
-                              <div className="col-2 text-center">
-                                <span className="mx-2">{item.quantity}</span>
-                              </div>
+                                {/* Quantity */}
+                                <div className="col-2 text-center">
+                                  <span className="mx-2">{item.quantity}</span>
+                                </div>
 
-                              {/* Số tiền */}
-                              <div className="col-2 text-center">
-                                <strong className="text-danger">
-                                  {(
-                                    item.quantity *
-                                    item.productSKUResponse.sellingPrice
-                                  ).toLocaleString("vi-VN")}
-                                  đ
-                                </strong>
+                                {/* Total */}
+                                <div className="col-2 text-center">
+                                  <strong className="text-danger">
+                                    {(
+                                      item.quantity *
+                                      item.productSKUResponse.sellingPrice
+                                    ).toLocaleString("vi-VN")}
+                                    đ
+                                  </strong>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))
+                        )}
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* Cột bên phải */}
+                {/* Right Column */}
                 <div className="col-md-4">
-                  {/* Phương thức thanh toán */}
+                  {/* Payment Method */}
                   <div className="card mb-3">
                     <div className="card-header bg-warning fw-bold text-black">
                       Phương thức thanh toán
                     </div>
                     <div className="card-body">
-                      {/* Trả góp - DEBT */}
-                      {/* <div className="form-check border-bottom border-1 pb-3">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="paymentMethod"
-                          id="installment"
-                          value="DEBT"
-                          checked={selectedPayment === "DEBT"}
-                          onChange={(e) => setSelectedPayment(e.target.value)}
-                        />
-                        <label
-                          className="form-check-label"
-                          htmlFor="installment"
-                        >
-                          Trả góp
-                        </label>
-                      </div> */}
-
-                      {/* Thanh toán khi nhận hàng - COD */}
                       <div className="form-check pb-3">
                         <input
                           className="form-check-input"
@@ -488,23 +554,6 @@ const ShopCheckOut = () => {
                         </label>
                       </div>
 
-                      {/* Thanh toán qua VNPay - VNPAY */}
-                      {/* <div className="form-check pt-3">
-                        <input
-                          className="form-check-input"
-                          type="radio"
-                          name="paymentMethod"
-                          id="vnpay"
-                          value="VNPAY"
-                          checked={selectedPayment === "VNPAY"}
-                          onChange={(e) => setSelectedPayment(e.target.value)}
-                        />
-                        <label className="form-check-label" htmlFor="vnpay">
-                          Thanh toán qua ví VNPay
-                        </label>
-                      </div> */}
-
-                      {/* Hiển thị PaymentMethod nếu chọn VNPay */}
                       {selectedPayment === "VNPAY" && <PaymentMethod />}
                     </div>
                   </div>
@@ -529,6 +578,7 @@ const ShopCheckOut = () => {
                       <button
                         className="btn btn-warning w-100 mt-3"
                         onClick={handleCheckout}
+                        disabled={!selectedAddressId || cartItems.length === 0}
                       >
                         Đặt hàng
                       </button>
@@ -536,154 +586,184 @@ const ShopCheckOut = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            )}
+          </div>
 
-            <Modal show={showModal} onHide={handleClose}>
-              <Modal.Header closeButton>
-                <Modal.Title>Địa chỉ vận chuyển mới</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <p className="small mb-0 text-danger">
-                  Thêm địa chỉ vận chuyển mới cho giao hàng đơn đặt hàng của
-                  bạn.
-                </p>
-                <Form>
-                  <Form.Group controlId="recipientName" className="mb-3">
-                    <Form.Label>Tên người nhận:</Form.Label>
+          {/* Add Address Modal */}
+          <Modal show={showModal} onHide={handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Địa chỉ vận chuyển mới</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <p className="small mb-0 text-danger">
+                Thêm địa chỉ vận chuyển mới cho giao hàng đơn đặt hàng của bạn.
+              </p>
+              <Form>
+                <Form.Group controlId="recipientName" className="mb-3">
+                  <Form.Label>Tên người nhận:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="recipientName"
+                    placeholder="Họ và Tên"
+                    value={formData.recipientName}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.recipientName}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.recipientName}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <Form.Group controlId="phone" className="mb-3">
+                  <Form.Label>Số điện thoại:</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="phone"
+                    placeholder="Số điện thoại"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.phone}
+                    required
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.phone}
+                  </Form.Control.Feedback>
+                </Form.Group>
+
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Form.Group
+                    controlId="postalCode"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Mã bưu điện:</Form.Label>
                     <Form.Control
                       type="text"
-                      name="recipientName"
-                      placeholder="Họ và Tên"
-                      value={formData.recipientName}
+                      name="postalCode"
+                      placeholder="Mã bưu điện"
+                      value={formData.postalCode}
                       onChange={handleChange}
-                      required
                     />
                   </Form.Group>
 
-                  <Form.Group controlId="phone" className="mb-3">
-                    <Form.Label>Số điện thoại:</Form.Label>
+                  <Form.Group
+                    controlId="address"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Địa chỉ:</Form.Label>
                     <Form.Control
                       type="text"
-                      name="phone"
-                      placeholder="Số điện thoại"
-                      value={formData.phone}
+                      name="address"
+                      placeholder="Địa chỉ"
+                      value={formData.address}
                       onChange={handleChange}
+                      isInvalid={!!formErrors.address}
                       required
                     />
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.address}
+                    </Form.Control.Feedback>
                   </Form.Group>
+                </div>
 
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <Form.Group
-                      controlId="postalCode"
-                      className="mb-3"
-                      style={{ flex: 1 }}
-                    >
-                      <Form.Label>Mã bưu điện:</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="postalCode"
-                        placeholder="Mã bưu điện"
-                        value={formData.postalCode}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
+                <Form.Group controlId="provinceId" className="mb-3">
+                  <Form.Label>Tỉnh:</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="provinceId"
+                    value={formData.provinceId}
+                    onChange={handleChange}
+                    isInvalid={!!formErrors.provinceId}
+                    required
+                  >
+                    <option value="">Chọn thành phố</option>
+                    {provinces.map((province) => (
+                      <option
+                        key={province.ProvinceID}
+                        value={province.ProvinceID}
+                      >
+                        {province.ProvinceName}
+                      </option>
+                    ))}
+                  </Form.Control>
+                  <Form.Control.Feedback type="invalid">
+                    {formErrors.provinceId}
+                  </Form.Control.Feedback>
+                </Form.Group>
 
-                    <Form.Group
-                      controlId="address"
-                      className="mb-3"
-                      style={{ flex: 1 }}
-                    >
-                      <Form.Label>Địa chỉ:</Form.Label>
-                      <Form.Control
-                        type="text"
-                        name="address"
-                        placeholder="Địa chỉ"
-                        value={formData.address}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-                  </div>
-
-                  <Form.Group controlId="provinceId" className="mb-3">
-                    <Form.Label>Tỉnh:</Form.Label>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <Form.Group
+                    controlId="districtId"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Huyện:</Form.Label>
                     <Form.Control
                       as="select"
-                      name="provinceId"
-                      value={formData.provinceId}
+                      name="districtId"
+                      value={formData.districtId}
                       onChange={handleChange}
+                      isInvalid={!!formErrors.districtId}
+                      required
+                      disabled={!formData.provinceId}
                     >
-                      <option value="">Chọn thành phố</option>
-                      {provinces.map((province) => (
+                      <option value="">Chọn huyện</option>
+                      {districts.map((district) => (
                         <option
-                          key={province.ProvinceID}
-                          value={province.ProvinceID}
+                          key={district.DistrictID}
+                          value={district.DistrictID}
                         >
-                          {province.ProvinceName}
+                          {district.DistrictName}
                         </option>
                       ))}
                     </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.districtId}
+                    </Form.Control.Feedback>
                   </Form.Group>
 
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <Form.Group
-                      controlId="districtId"
-                      className="mb-3"
-                      style={{ flex: 1 }}
+                  <Form.Group
+                    controlId="wardId"
+                    className="mb-3"
+                    style={{ flex: 1 }}
+                  >
+                    <Form.Label>Phường:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="wardId"
+                      value={formData.wardId}
+                      onChange={handleChange}
+                      isInvalid={!!formErrors.wardId}
+                      required
+                      disabled={!formData.districtId}
                     >
-                      <Form.Label>Huyện:</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="districtId"
-                        value={formData.districtId}
-                        onChange={handleChange}
-                      >
-                        <option value="">Chọn huyện</option>
-                        {districts.map((district) => (
-                          <option
-                            key={district.DistrictID}
-                            value={district.DistrictID}
-                          >
-                            {district.DistrictName}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-
-                    <Form.Group
-                      controlId="wardId"
-                      className="mb-3"
-                      style={{ flex: 1 }}
-                    >
-                      <Form.Label>Phường:</Form.Label>
-                      <Form.Control
-                        as="select"
-                        name="wardId"
-                        value={formData.WardCode}
-                        onChange={handleChange}
-                      >
-                        <option value="">Chọn phường</option>
-                        {wards.map((ward) => (
-                          <option key={ward.WardCode} value={ward.WardCode}>
-                            {ward.WardName}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                  </div>
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                  Hủy
-                </Button>
-                <Button variant="primary" onClick={handleSubmit}>
-                  Lưu địa chỉ
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          </>
-        )}
-      </div>
+                      <option value="">Chọn phường</option>
+                      {wards.map((ward) => (
+                        <option key={ward.WardCode} value={ward.WardCode}>
+                          {ward.WardName}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {formErrors.wardId}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </div>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Hủy
+              </Button>
+              <Button variant="primary" onClick={handleSubmit}>
+                Lưu địa chỉ
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </>
+      )}
     </div>
   );
 };

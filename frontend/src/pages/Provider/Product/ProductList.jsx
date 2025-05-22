@@ -213,7 +213,7 @@ const ProductList = ({ setSelectedProductId }) => {
 
     fetchData();
   }, []);
-console.log(data);
+  console.log(data);
 
   return (
     <div className="p-3 mb-10">
@@ -246,30 +246,39 @@ console.log(data);
                 />
               </div>
             </div>
-            <p style={{ marginLeft: "4px" }}>Tên nhà cung cấp: {data?.name}</p>
+            <strong style={{ marginLeft: "4px" }} className="me-2">
+              Tên nhà cung cấp:{" "}
+            </strong>
+            <span>{data?.name}</span>
           </div>
-          <div className="d-flex align-items-center">
-            <p>
-              Hình thức kinh doanh:{" "}
+          <div className="d-flex align-items-center mt-2">
+            <strong className="me-2">Hình thức kinh doanh: </strong>
+            <span>
               {data?.shopType === "ENTERPRISE"
                 ? "Doanh nghiệp lớn"
                 : "Doanh nghiệp nhỏ"}
-            </p>
+            </span>
           </div>
-          <div className="d-flex align-items-center">
-            <p>Địa chỉ: {data?.address?.address}</p>
+          <div className="d-flex align-items-center mt-2">
+            <strong className="me-2">Địa chỉ:</strong>
+            <span> {data?.address?.address}</span>
           </div>
-          <div className="d-flex align-items-center">
-            <p>Số điện thoại: {data?.address?.phone}</p>
+          <div className="d-flex align-items-center mt-2">
+            <strong className="me-2">Số điện thoại:</strong>
+            <span>{data?.address?.phone}</span>
           </div>
-          <div className="d-flex flex-wrap justify-content-between">
+          <div className="d-flex flex-wrap justify-content-between mt-2">
             <p className="mb-0">
               <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
             </p>
           </div>
           <div className=" w-100 align-item text-right">
             {address && (
-              <EditShopModal currentShopData={data} address={address} shopId={data?.id}/>
+              <EditShopModal
+                currentShopData={data}
+                address={address}
+                shopId={data?.id}
+              />
             )}
           </div>
         </div>

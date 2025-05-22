@@ -10,7 +10,7 @@ const AdminSideBar = ({ setActive, active }) => {
     "Thống kê",
     "Danh mục",
     "Sản phẩm",
-    // "Khách hàng",
+    "Người dùng",
     "Tài Khoản",
     "Nhà cung cấp",
   ];

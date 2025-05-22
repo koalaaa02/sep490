@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BASE_URL } from "../../../Utils/config";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom"; // Link was not used
 import { Alert, Button, Form, Modal } from "react-bootstrap";
 
 const AddProduct = ({ onAddProduct, onCancel }) => {
@@ -10,47 +10,63 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [newSupplier, setNewSupplier] = useState({
+
+  const initialNewSupplierState = {
     name: "",
     contactEmail: "",
     phone: "",
     address: "",
-  });
-  const [product, setProduct] = useState({
+  };
+  const [newSupplier, setNewSupplier] = useState(initialNewSupplierState);
+  const [supplierApiError, setSupplierApiError] = useState(null); // For general API errors in supplier modal
+  const [supplierFormErrors, setSupplierFormErrors] = useState({});
+
+  const initialProductState = {
     name: "",
     description: "",
     specifications: "",
     unit: "PCS",
-    images: "string",
-    active: false,
+    // images: "string", // This will be derived from productImages state for submission
+    active: false, // Default to false, user can activate if needed
     unitAdvance: "",
     categoryId: "",
     supplierId: "",
     shopId: shopId,
-  });
-  const [error, setError] = useState(null);
+  };
+  const [product, setProduct] = useState(initialProductState);
+  const [productFormErrors, setProductFormErrors] = useState({});
+  const [productImages, setProductImages] = useState([]); // Stores image preview URLs or File objects
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitialData = async () => {
       try {
         const params = new URLSearchParams({
           page: 1,
-          size: 100,
+          size: 100, // Fetch a reasonable number for dropdowns
           sortBy: "id",
           direction: "ASC",
         });
 
-        const response = await fetch(
+        // Fetch Categories
+        const categoriesResponse = await fetch(
           `${BASE_URL}/api/public/categories?${params.toString()}`,
           {
             method: "GET",
             credentials: "include",
           }
         );
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        if (!categoriesResponse.ok) {
+          console.error(
+            "Failed to fetch categories:",
+            categoriesResponse.statusText
+          );
+          throw new Error("Network response was not ok for categories");
         }
-        const response2 = await fetch(
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData || []); // Ensure categories is an array
+
+        // Fetch Suppliers
+        const suppliersResponse = await fetch(
           `${BASE_URL}/api/provider/suppliers/?${params.toString()}`,
           {
             method: "GET",
@@ -60,37 +76,80 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
             },
           }
         );
-        if (!response2.ok) {
-          throw new Error("Network response was not ok");
+        if (!suppliersResponse.ok) {
+          console.error(
+            "Failed to fetch suppliers:",
+            suppliersResponse.statusText
+          );
+          throw new Error("Network response was not ok for suppliers");
         }
-
-        const data = await response.json();
-        setCategories(data);
-        const data2 = await response2.json();
-        setSuppliers(data2?.content);
+        const suppliersData = await suppliersResponse.json();
+        setSuppliers(suppliersData?.content || []); // Ensure suppliers is an array
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching initial data:", error);
+        // Optionally set an error state here to display to the user
       }
     };
-    fetchCategories();
-  }, []);
-
-  const [productImages, setProductImages] = useState([]);
+    if (token && shopId) {
+      // Ensure token and shopId are available
+      fetchInitialData();
+    }
+  }, [token, shopId]); // Added token and shopId as dependencies
 
   const handleChange = (e) => {
-    setProduct({ ...product, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setProduct((prevProduct) => ({
+      ...prevProduct,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+    // Clear validation error for the field being changed
+    if (productFormErrors[name]) {
+      setProductFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [name]: null,
+      }));
+    }
+  };
+
+  const handleNewSupplierChange = (e) => {
+    const { name, value } = e.target;
+    setNewSupplier((prev) => ({ ...prev, [name]: value }));
+    if (supplierFormErrors[name]) {
+      setSupplierFormErrors((prev) => ({ ...prev, [name]: null }));
+    }
+    if (supplierApiError) setSupplierApiError(null); // Clear general API error on input change
+  };
+
+  const validateProductForm = () => {
+    const errors = {};
+    if (!product.name.trim()) errors.name = "Tên sản phẩm không được để trống.";
+    if (!product.description.trim())
+      errors.description = "Mô tả sản phẩm không được để trống.";
+    if (!product.categoryId) errors.categoryId = "Vui lòng chọn danh mục.";
+    if (!product.supplierId) errors.supplierId = "Vui lòng chọn nhà cung cấp.";
+    if (!product.unitAdvance.trim())
+      errors.unitAdvance = "Tính theo đơn vị không được để trống.";
+    // Example: if at least one image is required
+    if (productImages.length === 0)
+      errors.images = "Vui lòng thêm ít nhất một hình ảnh sản phẩm.";
+
+    setProductFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSave = async () => {
-    if (!product.name || !product.description) {
-      alert("Vui lòng nhập tên sản phẩm và mô tả!");
+    if (!validateProductForm()) {
+      alert(
+        "Vui lòng điền đầy đủ các trường bắt buộc và sửa các lỗi được chỉ ra."
+      );
       return;
     }
 
     try {
       const bodyData = {
         ...product,
-        images: JSON.stringify(productImages),
+        images: JSON.stringify(productImages), // Assuming backend expects a JSON string of image URLs/identifiers
+        shopId: shopId, // Ensure shopId is correctly included
       };
 
       const response = await fetch(`${BASE_URL}/api/provider/products`, {
@@ -104,29 +163,21 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
 
       const responseData = await response.json();
       if (!response.ok) {
-        console.error("Lỗi API:", responseData);
+        console.error("Lỗi API khi thêm sản phẩm:", responseData);
         alert(
           "Lỗi khi thêm sản phẩm: " +
-            (responseData.message || "Không rõ nguyên nhân")
+            (responseData.message ||
+              responseData.error ||
+              "Không rõ nguyên nhân")
         );
+        // Potentially map specific API errors to productFormErrors if backend provides field-specific errors
+        // For example: if (responseData.errors) setProductFormErrors(responseData.errors);
         return;
       }
-      onAddProduct(responseData);
-      setProduct({
-        name: "",
-        description: "",
-        specifications: "",
-        unit: "PCS",
-        images: "",
-        active: false,
-        unitAdvance: "",
-        categoryId: "",
-        supplierId: "",
-        shopId: shopId,
-      });
-
-      setProductImages([]);
-
+      onAddProduct(responseData); // Callback with the new product data
+      setProduct(initialProductState); // Reset product form
+      setProductImages([]); // Reset images
+      setProductFormErrors({}); // Clear validation errors
       alert("Thêm sản phẩm thành công!");
     } catch (error) {
       console.error("Lỗi thêm sản phẩm:", error);
@@ -134,34 +185,32 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     }
   };
 
-  // Xử lý thêm ảnh sản phẩm
   const handleProductImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // For simplicity, using object URL. In a real app, you'd upload this file
+      // and then use the returned URL or identifier.
       const imageUrl = URL.createObjectURL(file);
-      setProductImages([imageUrl]);
+      setProductImages([imageUrl]); // Assuming only one image for now based on UI.
+      // If multiple, setProductImages(prev => [...prev, imageUrl]);
+      if (productFormErrors.images) {
+        setProductFormErrors((prev) => ({ ...prev, images: null }));
+      }
     }
   };
 
-  // Xóa ảnh sản phẩm
-  const handleRemoveProductImage = (index) => {
-    setProductImages((prev) => prev.filter((_, i) => i !== index));
+  const handleRemoveProductImage = () => {
+    // Simplified for a single image
+    if (productImages.length > 0) {
+      URL.revokeObjectURL(productImages[0]); // Clean up object URL
+      setProductImages([]);
+    }
   };
 
   const handleCancel = () => {
-    setProduct({
-      name: "",
-      categoryId: "",
-      quantity: 0,
-      unit: "PCS",
-      price: "",
-      description: "",
-      images: "",
-      specifications: "",
-      active: true,
-    });
-
+    setProduct(initialProductState);
     setProductImages([]);
+    setProductFormErrors({});
     if (typeof onCancel === "function") {
       onCancel();
     }
@@ -179,10 +228,37 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
       BOX: "Hộp",
       TON: "Tấn",
     };
-
     return unitMap[unit] || unit;
   };
+
+  const validateSupplierForm = () => {
+    const errors = {};
+    if (!newSupplier.name.trim())
+      errors.name = "Tên nhà cung cấp không được để trống.";
+    if (!newSupplier.contactEmail.trim()) {
+      errors.contactEmail = "Email không được để trống.";
+    } else if (!/\S+@\S+\.\S+/.test(newSupplier.contactEmail)) {
+      errors.contactEmail = "Email không hợp lệ.";
+    }
+    if (!newSupplier.phone.trim()) {
+      errors.phone = "Số điện thoại không được để trống.";
+    } else if (!/^\d{10,11}$/.test(newSupplier.phone)) {
+      // Basic Vietnamese phone validation (10-11 digits)
+      errors.phone = "Số điện thoại không hợp lệ (yêu cầu 10-11 số).";
+    }
+    // Address can be optional, add validation if it's required
+    // if (!newSupplier.address.trim()) errors.address = "Địa chỉ không được để trống.";
+
+    setSupplierFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleCreateSupplier = async () => {
+    setSupplierApiError(null); // Clear previous general API errors
+    if (!validateSupplierForm()) {
+      return; // Stop if client-side validation fails
+    }
+
     try {
       const response = await fetch(`${BASE_URL}/api/provider/suppliers`, {
         method: "POST",
@@ -193,27 +269,62 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         body: JSON.stringify(newSupplier),
       });
 
-      if (!response.ok) {
-        const errorDetails = await response.json();
-        setError(errorDetails);
+      const responseData = await response.json();
 
+      if (!response.ok) {
+        // Handle backend validation errors or other API errors
+        if (responseData.errors && typeof responseData.errors === "object") {
+          // Assuming backend returns errors like { fieldName: "error message" }
+          setSupplierFormErrors((prevErrors) => ({
+            ...prevErrors,
+            ...responseData.errors,
+          }));
+        } else if (responseData.message) {
+          setSupplierApiError(responseData.message);
+        } else if (responseData.error) {
+          setSupplierApiError(responseData.error);
+        } else {
+          setSupplierApiError("Đã có lỗi xảy ra khi tạo nhà cung cấp.");
+        }
+        console.error("API Error creating supplier:", responseData);
         return;
       }
 
       // Success handling
+      const addedSupplier = responseData; // Assuming the response is the new supplier object
+      setSuppliers((prevSuppliers) => [...prevSuppliers, addedSupplier]);
+      // Automatically select the newly added supplier in the product form
+      setProduct((prevProduct) => ({
+        ...prevProduct,
+        supplierId: addedSupplier.id,
+      }));
+      if (productFormErrors.supplierId) {
+        setProductFormErrors((prev) => ({ ...prev, supplierId: null })); // Clear product form error for supplier
+      }
+
       setShowModal(false);
-      alert("Tạo supplier thành công");
-      setSuppliers([...suppliers, await response.json()]);
-      setNewSupplier({
-        name: "",
-        contactEmail: "",
-        phone: "",
-        address: "",
-      });
+      alert("Tạo nhà cung cấp thành công!");
+      setNewSupplier(initialNewSupplierState); // Reset form
+      setSupplierFormErrors({}); // Clear validation errors
+      setSupplierApiError(null);
     } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("An unexpected error occurred. Please try again.");
+      console.error("Unexpected error creating supplier:", err);
+      setSupplierApiError("Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.");
     }
+  };
+
+  const openSupplierModal = () => {
+    setNewSupplier(initialNewSupplierState);
+    setSupplierFormErrors({});
+    setSupplierApiError(null);
+    setShowModal(true);
+  };
+
+  const closeSupplierModal = () => {
+    setShowModal(false);
+    setNewSupplier(initialNewSupplierState);
+    setSupplierFormErrors({});
+    setSupplierApiError(null);
   };
 
   return (
@@ -224,10 +335,10 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         <div className="mb-3">
           <label className="form-label fw-bold">Hình ảnh sản phẩm:</label>
           <div className="d-flex flex-wrap align-items-center">
-            {productImages.length > 0 && (
+            {productImages.length > 0 ? (
               <div className="position-relative me-2">
                 <img
-                  src={productImages[0]}
+                  src={productImages[0]} // Displaying the first image
                   alt="product preview"
                   className="border rounded"
                   style={{
@@ -240,14 +351,16 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
                   type="button"
                   className="btn btn-sm btn-danger position-absolute top-0 end-0"
                   onClick={handleRemoveProductImage}
+                  aria-label="Remove image"
                 >
-                  x
+                  &times;
                 </button>
               </div>
-            )}
-            {productImages.length === 0 && (
+            ) : (
               <label
-                className="d-flex flex-column align-items-center justify-content-center border rounded bg-white"
+                className={`d-flex flex-column align-items-center justify-content-center border rounded bg-white ${
+                  productFormErrors.images ? "border-danger" : ""
+                }`}
                 style={{ width: "120px", height: "120px", cursor: "pointer" }}
               >
                 <span>+</span>
@@ -261,46 +374,78 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
               </label>
             )}
           </div>
+          {productFormErrors.images && (
+            <div className="text-danger mt-1" style={{ fontSize: "0.875em" }}>
+              {productFormErrors.images}
+            </div>
+          )}
         </div>
 
         {/* Thông tin sản phẩm */}
         <div className="row mb-3">
           <div className="col-md-12">
-            <label className="form-label fw-bold">Tên sản phẩm:</label>
+            <label className="form-label fw-bold" htmlFor="productName">
+              Tên sản phẩm:
+            </label>
             <input
+              id="productName"
               type="text"
-              className="form-control"
+              className={`form-control ${
+                productFormErrors.name ? "is-invalid" : ""
+              }`}
               name="name"
               value={product.name}
               onChange={handleChange}
-              required
             />
+            {productFormErrors.name && (
+              <div className="invalid-feedback">{productFormErrors.name}</div>
+            )}
           </div>
         </div>
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Tên nhà phân phối:</label>
-            {suppliers?.length > 0 ? (
-              <select
-                className="form-control"
-                name="supplierId"
-                onChange={handleChange}
-                value={product.supplierId}
-              >
-                <option value="">-- Chọn nhà cung cấp --</option>
-                {suppliers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+            <label className="form-label fw-bold" htmlFor="supplierId">
+              Tên nhà phân phối:
+            </label>
+            {suppliers && suppliers.length > 0 ? (
+              <>
+                <select
+                  id="supplierId"
+                  className={`form-select ${
+                    productFormErrors.supplierId ? "is-invalid" : ""
+                  }`}
+                  name="supplierId"
+                  onChange={handleChange}
+                  value={product.supplierId}
+                >
+                  <option value="">-- Chọn nhà cung cấp --</option>
+                  {suppliers.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+                {productFormErrors.supplierId && (
+                  <div className="invalid-feedback">
+                    {productFormErrors.supplierId}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="d-flex flex-column gap-2">
-                <div className="text-danger">Chưa có nhà cung cấp nào</div>
+                <div
+                  className={`${
+                    productFormErrors.supplierId ? "text-danger" : "text-muted"
+                  }`}
+                >
+                  {productFormErrors.supplierId
+                    ? productFormErrors.supplierId
+                    : "Chưa có nhà cung cấp nào."}
+                </div>
                 <Button
-                  onClick={() => setShowModal(true)}
-                  className="btn btn-primary"
+                  onClick={openSupplierModal}
+                  className="btn btn-primary btn-sm"
                 >
                   <i className="fas fa-plus me-2"></i>
                   Thêm nhà cung cấp mới
@@ -309,28 +454,54 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
             )}
           </div>
           <div className="col-md-6">
-            <label className="form-label fw-bold">Danh mục:</label>
+            <label className="form-label fw-bold" htmlFor="categoryId">
+              Danh mục:
+            </label>
             <select
-              className="form-control"
+              id="categoryId"
+              className={`form-select ${
+                productFormErrors.categoryId ? "is-invalid" : ""
+              }`}
               name="categoryId"
               onChange={handleChange}
               value={product.categoryId}
+              disabled={!categories || categories.length === 0}
             >
               <option value="">-- Chọn danh mục --</option>
-              {categories?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
+              {categories && categories.length > 0 ? (
+                categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>
+                  Chưa có danh mục nào khả dụng
                 </option>
-              ))}
+              )}
             </select>
+            {productFormErrors.categoryId && (
+              <div className="invalid-feedback">
+                {productFormErrors.categoryId}
+              </div>
+            )}
+            {(!categories || categories.length === 0) && (
+              <div className="text-muted mt-1" style={{ fontSize: "0.875em" }}>
+                Không có danh mục nào. Bạn có thể cần phải thêm danh mục trong
+                phần quản lý danh mục.
+              </div>
+            )}
           </div>
         </div>
 
         <div className="row mb-3">
           <div className="col-md-6">
-            <label className="form-label fw-bold">Đơn vị:</label>
+            <label className="form-label fw-bold" htmlFor="unit">
+              Đơn vị:
+            </label>
             <select
-              className="form-control"
+              id="unit"
+              className="form-select"
               name="unit"
               value={product.unit}
               onChange={handleChange}
@@ -347,28 +518,41 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
                 "TON",
               ].map((unit) => (
                 <option key={unit} value={unit}>
-                  {convertUnitToVietnamese(unit)}
+                  {convertUnitToVietnamese(unit)} ({unit})
                 </option>
               ))}
             </select>
           </div>
           <div className="col-md-6">
-            <label className="form-label fw-bold">Tính theo đơn vị:</label>
+            <label className="form-label fw-bold" htmlFor="unitAdvance">
+              Tính theo đơn vị (VD: 1 thùng 24 lon):
+            </label>
             <input
+              id="unitAdvance"
               type="text"
-              className="form-control"
+              className={`form-control ${
+                productFormErrors.unitAdvance ? "is-invalid" : ""
+              }`}
               name="unitAdvance"
               value={product.unitAdvance}
               onChange={handleChange}
-              required
+              placeholder="VD: Thùng, Hộp, Gói..."
             />
+            {productFormErrors.unitAdvance && (
+              <div className="invalid-feedback">
+                {productFormErrors.unitAdvance}
+              </div>
+            )}
           </div>
         </div>
 
         <div className="mb-3">
-          <label className="form-label fw-bold">Thông số sản phẩm:</label>
+          <label className="form-label fw-bold" htmlFor="specifications">
+            Thông số sản phẩm:
+          </label>
           <textarea
-            className="form-control"
+            id="specifications"
+            className="form-control" // No specific validation for this one in the example, add if needed
             name="specifications"
             rows="3"
             value={product.specifications}
@@ -377,87 +561,134 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
         </div>
 
         <div className="mb-3">
-          <label className="form-label fw-bold">Mô tả sản phẩm:</label>
+          <label className="form-label fw-bold" htmlFor="description">
+            Mô tả sản phẩm:
+          </label>
           <textarea
-            className="form-control"
+            id="description"
+            className={`form-control ${
+              productFormErrors.description ? "is-invalid" : ""
+            }`}
             name="description"
             rows="3"
             value={product.description}
             onChange={handleChange}
           />
+          {productFormErrors.description && (
+            <div className="invalid-feedback">
+              {productFormErrors.description}
+            </div>
+          )}
+        </div>
+
+        <div className="form-check mb-3">
+          <input
+            className="form-check-input"
+            type="checkbox"
+            name="active"
+            id="productActive"
+            checked={product.active}
+            onChange={handleChange}
+          />
+          <label className="form-check-label" htmlFor="productActive">
+            Cho phép bán (Active)
+          </label>
         </div>
 
         {/* Nút Lưu và Hủy */}
-        <button className="btn btn-success me-2" onClick={handleSave}>
+        <button
+          type="button"
+          className="btn btn-success me-2"
+          onClick={handleSave}
+        >
           Lưu sản phẩm
         </button>
-        <button className="btn btn-danger" onClick={handleCancel}>
+        <button
+          type="button"
+          className="btn btn-outline-secondary"
+          onClick={handleCancel}
+        >
           Hủy
         </button>
       </div>
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+
+      <Modal show={showModal} onHide={closeSupplierModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Thêm nhà đối tác</Modal.Title>
+          <Modal.Title>Thêm nhà cung cấp mới</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            {error?.name && <Alert variant="danger">{error?.name}</Alert>}
-            <Form.Group className="mb-3">
-              <Form.Label>Tên</Form.Label>
+          <Form noValidate>
+            {supplierApiError && (
+              <Alert variant="danger">{supplierApiError}</Alert>
+            )}
+            <Form.Group className="mb-3" controlId="supplierName">
+              <Form.Label>Tên nhà cung cấp</Form.Label>
               <Form.Control
                 type="text"
-                value={newSupplier?.name}
-                onChange={(e) =>
-                  setNewSupplier({ ...newSupplier, name: e.target.value })
-                }
+                name="name"
+                value={newSupplier.name}
+                onChange={handleNewSupplierChange}
+                isInvalid={!!supplierFormErrors.name}
+                required
               />
+              <Form.Control.Feedback type="invalid">
+                {supplierFormErrors.name}
+              </Form.Control.Feedback>
             </Form.Group>
-            {error?.contactEmail && (
-              <Alert variant="danger">{error?.contactEmail}</Alert>
-            )}
-            <Form.Group className="mb-3">
-              <Form.Label>Email</Form.Label>
+
+            <Form.Group className="mb-3" controlId="supplierEmail">
+              <Form.Label>Email liên hệ</Form.Label>
               <Form.Control
                 type="email"
+                name="contactEmail"
                 value={newSupplier.contactEmail}
-                onChange={(e) =>
-                  setNewSupplier({
-                    ...newSupplier,
-                    contactEmail: e.target.value,
-                  })
-                }
+                onChange={handleNewSupplierChange}
+                isInvalid={!!supplierFormErrors.contactEmail}
+                required
               />
+              <Form.Control.Feedback type="invalid">
+                {supplierFormErrors.contactEmail}
+              </Form.Control.Feedback>
             </Form.Group>
-            {error?.phone && <Alert variant="danger">{error?.phone}</Alert>}
-            <Form.Group className="mb-3">
+
+            <Form.Group className="mb-3" controlId="supplierPhone">
               <Form.Label>Số điện thoại</Form.Label>
               <Form.Control
                 type="tel"
+                name="phone"
                 value={newSupplier.phone}
-                onChange={(e) =>
-                  setNewSupplier({ ...newSupplier, phone: e.target.value })
-                }
+                onChange={handleNewSupplierChange}
+                isInvalid={!!supplierFormErrors.phone}
+                required
               />
+              <Form.Control.Feedback type="invalid">
+                {supplierFormErrors.phone}
+              </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group className="mb-3">
+
+            <Form.Group className="mb-3" controlId="supplierAddress">
               <Form.Label>Địa chỉ</Form.Label>
               <Form.Control
                 as="textarea"
+                name="address"
                 rows={3}
                 value={newSupplier.address}
-                onChange={(e) =>
-                  setNewSupplier({ ...newSupplier, address: e.target.value })
-                }
+                onChange={handleNewSupplierChange}
+                isInvalid={!!supplierFormErrors.address}
+                // Add 'required' if address is mandatory
               />
+              <Form.Control.Feedback type="invalid">
+                {supplierFormErrors.address}
+              </Form.Control.Feedback>
             </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={closeSupplierModal}>
             Hủy
           </Button>
           <Button variant="primary" onClick={handleCreateSupplier}>
-            Lưu
+            Lưu nhà cung cấp
           </Button>
         </Modal.Footer>
       </Modal>

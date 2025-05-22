@@ -139,10 +139,13 @@ const ChatBox = () => {
   };
 
   return (
-    <div className="container p-3" style={{ backgroundColor: "#f8f9fa" }}>
+    <div className="p-3" style={{ backgroundColor: "#f8f9fa" }}>
       <div className="row mt-2">
         <h4>Đoạn chat</h4>
-        <div className="col-md-4">
+        <div
+          className="col-md-4"
+          style={{ height: "690px", overflowY: "auto" }}
+        >
           {data?.map((d) => (
             <div className="list-group mb-1" key={d.id}>
               <div
@@ -174,11 +177,7 @@ const ChatBox = () => {
                   style={{ height: "50px", width: "50px" }}
                 />
                 <div className="flex-grow-1 d-flex flex-column">
-                  <strong
-                    className="text-black"
-                  >
-                    {d?.dealer?.name}
-                  </strong>
+                  <strong className="text-black">{d?.dealer?.name}</strong>
                   <small className="text-muted">
                     {formatTimestamp(d.updatedAt)}
                   </small>

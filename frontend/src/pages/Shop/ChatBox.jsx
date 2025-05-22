@@ -7,7 +7,7 @@ import { BASE_URL } from "../../Utils/config";
 import { useSelector } from "react-redux";
 import img from "../../images/member6.jpg";
 
-const ChatBox = () => {
+const ChatBox = ({ selectedShopId }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const token = sessionStorage.getItem("access_token");
   const [data, setData] = useState(null);
@@ -55,6 +55,37 @@ const ChatBox = () => {
     }
   };
 
+  const createChatRoom = async (dealerId, selectedShopId) => {
+    try {
+      const params = new URLSearchParams({
+        dealerId: dealerId,
+        shopId: selectedShopId,
+      });
+
+      const response = await fetch(
+        `${BASE_URL}/api/chat/rooms/create?${params.toString()}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Không thể tạo phòng chat.");
+      } else {
+        console.log("Tạo phòng chat thành công.");
+        const newRoom = await response.json();
+        setData((prevData) => [...prevData, newRoom]);
+        setSelectedChat(newRoom.id);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo phòng chat:", error);
+    }
+  };
+
   const fetchMessages = async () => {
     try {
       const params = new URLSearchParams({
@@ -85,8 +116,20 @@ const ChatBox = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    const checkAndCreateRoom = async () => {
+      if (!userId || !selectedShopId) return;
+
+      await fetchData();
+
+      const roomExists = data?.some((room) => room.shop?.id === selectedShopId);
+      if (!roomExists) {
+        await createChatRoom(userId, selectedShopId);
+        await fetchData();
+      }
+    };
+
+    checkAndCreateRoom();
+  }, [userId, selectedShopId]);
 
   useEffect(() => {
     if (selectedChatId) {

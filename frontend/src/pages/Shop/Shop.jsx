@@ -433,6 +433,8 @@ function Dropdown() {
                                     {p.description}
                                   </p>
                                 )}
+                                {/* <strong >Nhà phân phối:</strong> */}
+                                <span className="text-muted">{p?.supplier?.name}</span>
 
                                 <div className="d-flex justify-content-between align-items-center mt-3">
                                   <div>
