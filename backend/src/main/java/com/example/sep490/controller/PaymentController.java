@@ -35,14 +35,13 @@ public class PaymentController {
         String status = request.getParameter("vnp_ResponseCode");
         if (status.equals("00")) {
             PaymentMethod paymentMethod = paymentFactory.getPaymentMethod(PaymentProvider.VNPAY);
-
             PaymentResultResponse result=  paymentMethod.handleWebHook(request);
-            return "redirect:http://localhost:3000?result=success"
+            return "redirect:http://localhost:3000/payment-result?result=success"
                     + "&vnp_Amount="+ result.getVnp_Amount()
                     + "&vnp_BankCode=" + result.getVnp_BankCode()
                     + "&vnp_TransactionNo=" + result.getVnp_TransactionNo();
         } else {
-            return "redirect:http://localhost:3000?result=fail";
+            return "redirect:http://localhost:3000/payment-result?result=fail";
         }
     }
 
