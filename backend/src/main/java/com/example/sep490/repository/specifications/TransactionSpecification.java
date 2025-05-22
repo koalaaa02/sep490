@@ -26,6 +26,10 @@ public class TransactionSpecification {
                 predicates.add(cb.lessThanOrEqualTo(root.get("paymentDate"), filter.getToDate()));
             }
 
+            if (filter.getPaymentType() != null) {
+                predicates.add(cb.equal(root.get("paymentType"), filter.getPaymentType() ));
+            }
+
             predicates.add(cb.equal(root.get("isDelete"),false));
             return cb.and(predicates.toArray(new Predicate[0]));
         };

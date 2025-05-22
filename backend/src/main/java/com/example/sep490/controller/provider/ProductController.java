@@ -8,6 +8,7 @@ import com.example.sep490.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -98,6 +99,16 @@ public class ProductController {
             return ResponseEntity.badRequest().body("id và id của sản phẩm không trùng khớp.");
         }
         return ResponseEntity.ok().body(productService.updateProduct(id, product));
+    }
+
+    @PutMapping("/stop/{id}")
+    public ResponseEntity<?> stopProduct(@PathVariable Long id) {
+        try {
+            productService.stopProduct(id);
+            return ResponseEntity.ok().body("Cập nhật trạng thái sản phẩm thành công.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi trong quá trình kích hoạt sản phẩm.");
+        }
     }
 
     @PostMapping(value = "/{id}/upload", consumes = "multipart/form-data")
