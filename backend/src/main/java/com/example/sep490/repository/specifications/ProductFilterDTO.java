@@ -19,6 +19,8 @@ public class ProductFilterDTO {
     private String direction = "ASC";
     @Schema(defaultValue = "true", description = "mặc định là true đối với public api")
     private boolean active = true;
+    private boolean stop = false;
+
 
     private String name;
     @Schema(description = "Category ID (null nếu không lọc)", nullable = true)

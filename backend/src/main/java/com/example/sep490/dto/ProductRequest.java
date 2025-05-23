@@ -20,6 +20,7 @@ public class ProductRequest {
     private String unitAdvance;
     private String images;
     private boolean active = false;
+    private boolean stop = false;
 
     // Relationship
     private Long categoryId;

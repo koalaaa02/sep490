@@ -1,5 +1,6 @@
 package com.example.sep490.repository.specifications;
 
+import com.example.sep490.entity.enums.PaymentType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,5 +32,9 @@ public class TransactionFilterDTO {
 
     @JsonIgnore
     private Long createdBy;
+
+    @JsonIgnore
+    private PaymentType paymentType;
+
 }
 

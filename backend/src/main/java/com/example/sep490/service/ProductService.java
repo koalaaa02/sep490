@@ -58,6 +58,7 @@ public class ProductService {
 //		return pagination.createPageResponse(productPage);
 //	}
 	public PageResponse<ProductResponsePublic> getProductsPublicByFilter(ProductFilterDTO filter) {
+		filter.setStop(false);
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
 		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
 		Page<Product> productPage = productRepository.findAll(spec, pageable);
@@ -163,6 +164,15 @@ public class ProductService {
 		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
 				.map(existingProduct -> {
 					existingProduct.setActive(!existingProduct.isActive());
+					return productRepo.save(existingProduct);
+				})
+				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));
+	}
+
+	public void stopProduct(Long id) {
+		Product updatedProduct = productRepo.findByIdAndIsDeleteFalse(id)
+				.map(existingProduct -> {
+					existingProduct.setStop(!existingProduct.isStop());
 					return productRepo.save(existingProduct);
 				})
 				.orElseThrow(() -> new RuntimeException("Sản phẩm không tồn tại với ID: " + id));

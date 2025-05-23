@@ -46,6 +46,10 @@ public class Product extends Auditable{//chi tiết cơ bản của sản phẩm
     @ColumnDefault("false")
     private boolean active = false;
 
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean stop = false;
+
     // Relationship
 //    @JsonManagedReference
     @JsonIgnoreProperties("products")

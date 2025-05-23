@@ -3,6 +3,7 @@ package com.example.sep490.service;
 import java.util.Optional;
 
 import com.example.sep490.entity.*;
+import com.example.sep490.entity.enums.PaymentType;
 import com.example.sep490.repository.*;
 import com.example.sep490.repository.specifications.TransactionFilterDTO;
 import com.example.sep490.repository.specifications.TransactionSpecification;
@@ -41,6 +42,15 @@ public class TransactionService {
         Shop shop = userService.getShopByContextUser();
         if(shop == null ) throw new RuntimeException("Không tìm thấy cửa hàng.");
         filter.setShopId(shop.getId());
+        Specification<Transaction> spec = TransactionSpecification.filterTransactiones(filter);
+        Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
+        Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);
+        Page<TransactionResponse> transactionResponsePage = transactionPage.map(transactionMapper::EntityToResponse);
+        return pagination.createPageResponse(transactionResponsePage);
+    }
+
+    public PageResponse<TransactionResponse> getTransactionsAdmin(TransactionFilterDTO filter) {
+        filter.setPaymentType(PaymentType.PLATFORMFEE);
         Specification<Transaction> spec = TransactionSpecification.filterTransactiones(filter);
         Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
         Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);

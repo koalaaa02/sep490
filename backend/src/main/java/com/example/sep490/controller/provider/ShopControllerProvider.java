@@ -1,6 +1,8 @@
 package com.example.sep490.controller.provider;
 
+import com.example.sep490.dto.ShopRequest;
 import com.example.sep490.service.ShopService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,4 +49,11 @@ public class ShopControllerProvider {
         return ResponseEntity.ok().body(shopService.uploadCCCD(file, false)) ;
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateShop(@PathVariable Long id,@Valid @RequestBody ShopRequest shopRequest) {
+        if (!id.equals(shopRequest.getId())) {
+            return ResponseEntity.badRequest().body("id và id trong url không trùng khớp.");
+        }
+        return ResponseEntity.ok().body(shopService.updateShop(id, shopRequest));
+    }
 }

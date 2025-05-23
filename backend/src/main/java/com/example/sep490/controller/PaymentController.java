@@ -7,12 +7,13 @@ import com.example.sep490.factory.PaymentFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
 @RequestMapping("${spring.application.api-prefix}/payment")
 @RequiredArgsConstructor
 public class PaymentController {
@@ -30,16 +31,23 @@ public class PaymentController {
     }
 
     @GetMapping("/vn-pay-callback")//ResponseObject<PaymentDTO.VNPayResponse>
-    public ResponseEntity<?> payCallbackHandler(HttpServletRequest request) {
+    public String payCallbackHandler(HttpServletRequest request) {
         String status = request.getParameter("vnp_ResponseCode");
         if (status.equals("00")) {
             PaymentMethod paymentMethod = paymentFactory.getPaymentMethod(PaymentProvider.VNPAY);
-
             PaymentResultResponse result=  paymentMethod.handleWebHook(request);
-            return ResponseEntity.ok().body(result);
+            return "redirect:http://localhost:3000/payment-result?result=success"
+                    + "&vnp_Amount="+ result.getVnp_Amount()
+                    + "&vnp_BankCode=" + result.getVnp_BankCode()
+                    + "&vnp_TransactionNo=" + result.getVnp_TransactionNo();
         } else {
-            return ResponseEntity.badRequest().body("Payment failed");
+            return "redirect:http://localhost:3000/payment-result?result=fail";
         }
+    }
+
+    @GetMapping("/vn-pay-test")
+    public String payCallbackHandddler(HttpServletRequest request) {
+        return "redirect:http://localhost:3000?";
     }
 }
 
