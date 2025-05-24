@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,8 +29,9 @@ public class ProductSKURequest {
     
     @Min(value = 0, message = "listPrice không được là số âm.")
     private BigDecimal listPrice;
-    
-    @Min(value = 0, message = "sellingPrice không được là số âm.")
+
+    @NotNull(message = "Giá bán không được để trống.")
+    @Min(value = 1000, message = "sellingPrice phải lớn hơn hoặc bằng 1000.")
     private BigDecimal sellingPrice;
     
     @Min(value = 0, message = "wholesalePrice không được là số âm.")

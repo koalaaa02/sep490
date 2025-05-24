@@ -143,7 +143,7 @@ public class ShopService {
             UserInfoUserDetails userInfo = (UserInfoUserDetails) authentication.getPrincipal();
             User user = getUser(userInfo.getId());
             Address address = getAddress(shopRequest.getAddressId());
-            BankAccount bankAccount = getBankAccount(shopRequest.getBankAccountId());
+//            BankAccount bankAccount = getBankAccount(shopRequest.getBankAccountId());
             try {
                 objectMapper.updateValue(address, shopRequest);
             } catch (JsonMappingException e) {
@@ -151,7 +151,9 @@ public class ShopService {
             }
             shop.setManager(user);
             shop.setAddress(address);
-            shop.setBankAccount(bankAccount);
+            shop.setName(shopRequest.getName());
+            shop.setHotline(shopRequest.getHotline());
+//            shop.setBankAccount(bankAccount);
             return shopMapper.EntityToResponse(shopRepo.save(shop));
         }else throw new RuntimeException("");
 
