@@ -59,6 +59,7 @@ public class ProductService {
 //	}
 	public PageResponse<ProductResponsePublic> getProductsPublicByFilter(ProductFilterDTO filter) {
 		filter.setStop(false);
+		filter.setActive(true);
 		Specification<Product> spec = ProductSpecification.filterProducts(filter);
 		Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
 		Page<Product> productPage = productRepository.findAll(spec, pageable);
