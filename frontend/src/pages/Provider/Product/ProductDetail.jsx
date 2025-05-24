@@ -35,7 +35,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
     if (
       !window.confirm(
         `Bạn có chắc chắn muốn ${
-          product.active ? "ẩn" : "kích hoạt"
+          !product.stop ? "ẩn" : "kích hoạt"
         } sản phẩm này không?`
       )
     ) {
@@ -55,7 +55,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             ...product,
             categoryId: product.category?.id || null,
             supplierId: product.supplier?.id || null,
-            active: !product.active,
+            stop: !product.stop,
           }),
         }
       );
@@ -65,7 +65,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
         const updatedProduct = await response.json();
         setProduct(updatedProduct);
         alert(
-          `${updatedProduct.active ? "Kích hoạt" : "Ẩn"} sản phẩm thành công!`
+          `${!updatedProduct.stop ? "Kích hoạt" : "Ẩn"} sản phẩm thành công!`
         );
       } else {
         alert("Cập nhật trạng thái sản phẩm thất bại!");
@@ -287,6 +287,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             unitAdvance: product.unitAdvance,
             // images: product.images,
             active: product.active,
+            stop: product.stop,
             categoryId: product.category?.id || 1,
             supplierId: product.supplier?.id || 1,
             shopId: shopId,
@@ -1003,7 +1004,7 @@ const ProductDetail = ({ productId, setSelectedProductId }) => {
             >
               Chỉnh sửa
             </button>
-            {product?.active ? (
+            {!product?.stop ? (
               <button
                 className="btn btn-danger ms-2"
                 onClick={() => toggleProductActive(product.id)}

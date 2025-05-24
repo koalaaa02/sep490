@@ -92,7 +92,7 @@ const OrderDetail = ({ order, status }) => {
       <div className="d-flex justify-content-between align-items-center my-2">
         <div>
           {order.products.map((p) => (
-            <div className="d-flex w-70">
+            <div className="d-flex w-70 mb-2">
               <div>
                 <img
                   style={{
@@ -113,7 +113,7 @@ const OrderDetail = ({ order, status }) => {
             </div>
           ))}
         </div>
-        <div className="text-center w-30">
+        <div className="text-center w-30 align-self-end">
           <div className="d-flex align-items-center">
             <small className="fw-normal mr-2">Thành tiền:</small>
             <div className="fs-4 fw-semibold text-danger">{`${totalSum.toLocaleString()} vnd`}</div>

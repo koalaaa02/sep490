@@ -39,7 +39,7 @@ const EditShopModal = ({ shopId, currentShopData, address }) => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/dealer/shop/update/${shopId}`,
+        `${BASE_URL}/api/provider/shop/${shopId}`,
         {
           method: "PUT",
           headers: {

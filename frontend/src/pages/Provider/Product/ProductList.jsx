@@ -12,7 +12,7 @@ const ProductList = ({ setSelectedProductId }) => {
   const [address, setAddress] = useState(null);
   const [products, setProducts] = useState(null);
   const [page, setPage] = useState(1);
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [rf, setRF] = useState(true);
   const fileInputRef = React.useRef(null);
@@ -67,7 +67,7 @@ const ProductList = ({ setSelectedProductId }) => {
         size: pageSize,
         sortBy: "id",
         direction: "ASC",
-        active: isActive,
+        stop: isActive,
         shopId: data?.id,
       });
 
@@ -121,11 +121,11 @@ const ProductList = ({ setSelectedProductId }) => {
   };
 
   const handleActive = () => {
-    setIsActive(true);
+    setIsActive(false);
   };
 
   const handleInactive = () => {
-    setIsActive(false);
+    setIsActive(true);
   };
 
   const handlePageSizeChange = (e) => {
@@ -217,107 +217,7 @@ const ProductList = ({ setSelectedProductId }) => {
 
   return (
     <div className="p-3 mb-10">
-      <div className="p-3 row shadow bg-light rounded">
-        <div className="col-6">
-          <div className="d-flex align-items-center ">
-            <div
-              className="position-relative"
-              style={{ width: "80px", height: "80px" }}
-            >
-              <img
-                src={data?.logoImage}
-                alt="Shop Logo"
-                className="rounded-circle me-3"
-                width="80"
-                height="80"
-              />
-              <div className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center rounded-circle hover-overlay">
-                <input
-                  type="file"
-                  ref={fileInputRef2}
-                  onChange={(e) => handleFileChange(e, "shopLogo")}
-                  style={{ display: "none" }}
-                  accept="image/*" // Optional: restrict to image files
-                />
-                <FaEdit
-                  onClick={() => fileInputRef2.current.click()}
-                  className="text-white fs-4 d-none"
-                  style={{ cursor: "pointer" }}
-                />
-              </div>
-            </div>
-            <strong style={{ marginLeft: "4px" }} className="me-2">
-              Tên nhà cung cấp:{" "}
-            </strong>
-            <span>{data?.name}</span>
-          </div>
-          <div className="d-flex align-items-center mt-2">
-            <strong className="me-2">Hình thức kinh doanh: </strong>
-            <span>
-              {data?.shopType === "ENTERPRISE"
-                ? "Doanh nghiệp lớn"
-                : "Doanh nghiệp nhỏ"}
-            </span>
-          </div>
-          <div className="d-flex align-items-center mt-2">
-            <strong className="me-2">Địa chỉ:</strong>
-            <span> {data?.address?.address}</span>
-          </div>
-          <div className="d-flex align-items-center mt-2">
-            <strong className="me-2">Số điện thoại:</strong>
-            <span>{data?.address?.phone}</span>
-          </div>
-          <div className="d-flex flex-wrap justify-content-between mt-2">
-            <p className="mb-0">
-              <strong>Số lượng sản phẩm:</strong> {products?.totalElements}
-            </p>
-          </div>
-          <div className=" w-100 align-item text-right">
-            {address && (
-              <EditShopModal
-                currentShopData={data}
-                address={address}
-                shopId={data?.id}
-              />
-            )}
-          </div>
-        </div>
-        <div className="col-6">
-          <div className="text-center d-flex flex-column">
-            <p className="fw-bold"> Registration Certificate</p>
-
-            <div className="position-relative">
-              <img
-                src={data?.registrationCertificateImages}
-                alt="certificate"
-                style={{ height: "200px", objectFit: "contain" }}
-                onerror="this.src='placeholder.jpg';"
-              />
-              <div
-                style={{ height: "200px", objectFit: "contain" }}
-                className="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center hover-overlay"
-              >
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={(e) =>
-                    handleFileChange(e, "registrationCertificate")
-                  }
-                  style={{ display: "none" }}
-                  accept="image/*" // Optional: restrict to image files
-                />
-                <div
-                  className="px-auto py-auto"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  <FaEdit size={25} color="white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>{" "}
-        {/* <hr /> */}
-      </div>
+      
 
       <h5 className="mb-3 mt-3">Danh sách sản phẩm</h5>
       <Row className="mb-3 justify-content-end">
@@ -351,14 +251,14 @@ const ProductList = ({ setSelectedProductId }) => {
         <div>
           <button
             className={`btn ${
-              isActive ? "btn-success" : "btn-outline-success"
+              !isActive ? "btn-success" : "btn-outline-success"
             } me-2`}
             onClick={handleActive}
           >
             Kích hoạt
           </button>
           <button
-            className={`btn ${!isActive ? "btn-danger" : "btn-outline-danger"}`}
+            className={`btn ${isActive ? "btn-danger" : "btn-outline-danger"}`}
             onClick={handleInactive}
           >
             Chưa kích hoạt

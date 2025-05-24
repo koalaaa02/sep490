@@ -216,7 +216,7 @@ const ProductItem = () => {
                     </h2>
                     <div>
                       <small className="text-warning">
-                        {[...Array(5)].map((_, index) => (
+                        {[...Array(5)]?.map((_, index) => (
                           <i
                             key={index}
                             className={

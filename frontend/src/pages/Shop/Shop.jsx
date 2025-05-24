@@ -166,65 +166,44 @@ function Dropdown() {
                 <div>
                   <div className="py-4">
                     <h5 className="mb-3">Danh sách nhà cung cấp</h5>
-                    <div className="my-4">
-                      {/* input */}
-                      <input
-                        type="search"
-                        className="form-control"
-                        placeholder="Tìm kiếm nhà cung cấp..."
-                      />
-                    </div>
                     {stores?.length > 0 ? (
-                      stores.map((stores, index) => (
-                        <div className="form-check mb-2" key={index}>
-                          {/* input */}
+                      stores.slice(0, 10).map((store, index) => (
+                        <div
+                          key={index}
+                          className="mb-2"
+                        >
                           <Link
-                            to={`/SingleShop/${stores.id}`}
-                            className="form-check-label text-decoration-none text-warning"
-                            htmlFor="eGrocery"
+                            to={`/SingleShop/${store.id}`}
+                            className="text-decoration-none d-block px-3 py-1"
+                            style={{
+                              color: "#212529",
+                              fontWeight: "bold",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.target.style.fontWeight = "bold";
+                              e.target.style.color = "#ffc107";
+                              e.target.innerHTML = "&#9656; " + store.name;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.target.style.color = "#212529";
+                              e.target.innerHTML = store.name;
+                            }}
                           >
-                            {stores.name}
+                            {store.name}
                           </Link>
                         </div>
                       ))
                     ) : (
                       <p className="dropdown-item">Đang tải...</p>
                     )}
+
                     {/* form check */}
                   </div>
-                  <div className="py-4">
-                    {/* price */}
-                    <h5 className="mb-3">{categories?.name}</h5>
-                    <div>
-                      {categories?.subCategories.length > 0 ? (
-                        categories?.subCategories.map((cate, index) => (
-                          <div className="form-check mb-2" key={index}>
-                            {/* input */}
-                            <Link
-                              to={`/shop/${cate.id}`}
-                              className="form-check-label text-decoration-none text-warning"
-                              htmlFor="eGrocery"
-                            >
-                              {cate.name}
-                            </Link>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="dropdown-item">Không có</p>
-                      )}
-                    </div>
-                  </div>
-
                   <div className="py-4">
                     {/* Banner Design */}
                     {/* Banner Content */}
                     <div className="position-absolute p-5 py-8">
-                      <h3 className="mb-0">Sell Off </h3>
-                      <p className=" text-white">Get Upto 25%</p>
-                      <Link to="#" className="btn btn-warning">
-                        Shop Now
-                        <i className="feather-icon icon-arrow-right ms-1" />
-                      </Link>
                     </div>
                     {/* Banner Content */}
                     {/* Banner Image */}
@@ -321,199 +300,198 @@ function Dropdown() {
                     </div>
                     {/* row */}
                     <div className="row g-4 row-cols-xl-12 row-cols-lg-4 row-cols-md-3 row-cols-2 mt-2">
-                      {products.content.map((p, index) => {
-                        const isInWishlist = storedWishlist.some(
-                          (item) => item.id === p.id
-                        );
-                        return (
-                          <div key={p.id} className="col fade-zoom">
-                            <div className="card card-product">
-                              <div className="card-body">
-                                <div className="text-center position-relative">
-                                  <Link onClick={() => setSelectedProduct(p)}>
-                                    <img
-                                      src={p.images || image1}
-                                      alt={p.images}
-                                      className="mb-3 img-fluid"
-                                      style={{
-                                        height: "200px",
-                                        width: "200px",
-                                        objectFit: "cover",
-                                      }}
-                                    />
-                                  </Link>
-                                  <div className="card-product-action">
-                                    <Link
-                                      className="btn-action"
-                                      onClick={() => setSelectedProduct(p)}
-                                    >
-                                      <i
-                                        className="bi bi-eye"
-                                        title="Quick View"
+                      {products.content && products.content.length > 0 ? (
+                        products.content?.map((p, index) => {
+                          const isInWishlist = storedWishlist.some(
+                            (item) => item.id === p.id
+                          );
+                          return (
+                            <div key={p.id} className="col fade-zoom">
+                              <div className="card card-product">
+                                <div className="card-body">
+                                  <div className="text-center position-relative">
+                                    <Link onClick={() => setSelectedProduct(p)}>
+                                      <img
+                                        src={p.images || image1}
+                                        alt={p.images}
+                                        className="mb-3 img-fluid"
+                                        style={{
+                                          height: "200px",
+                                          width: "200px",
+                                          objectFit: "cover",
+                                        }}
                                       />
                                     </Link>
-                                    <Link
-                                      onClick={
-                                        isInWishlist
-                                          ? null
-                                          : () => handleAddWishList(p)
-                                      }
-                                      className={`btn-action ${
-                                        isInWishlist
+                                    <div className="card-product-action">
+                                      <Link
+                                        className="btn-action"
+                                        onClick={() => setSelectedProduct(p)}
+                                      >
+                                        <i
+                                          className="bi bi-eye"
+                                          title="Quick View"
+                                        />
+                                      </Link>
+                                      <Link
+                                        onClick={
+                                          isInWishlist
+                                            ? null
+                                            : () => handleAddWishList(p)
+                                        }
+                                        className={`btn-action ${isInWishlist
                                           ? "disabled text-warning"
                                           : ""
-                                      }`}
-                                      data-bs-toggle="tooltip"
-                                      data-bs-html="true"
-                                      title="Wishlist"
-                                    >
-                                      <i
-                                        className={`bi ${
-                                          isInWishlist
+                                          }`}
+                                        data-bs-toggle="tooltip"
+                                        data-bs-html="true"
+                                        title="Wishlist"
+                                      >
+                                        <i
+                                          className={`bi ${isInWishlist
                                             ? "bi-heart-fill"
                                             : "bi-heart"
-                                        }`}
-                                      />
-                                    </Link>
-                                  </div>
-                                </div>
-
-                                <h2 className="fs-6">
-                                  <Link
-                                    onClick={() => setSelectedProduct(p)}
-                                    className="text-inherit text-decoration-none"
-                                    title={p?.name}
-                                    style={{
-                                      display: "inline-block",
-                                      maxWidth: "100%",
-                                      whiteSpace: "nowrap",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                    }}
-                                  >
-                                    {p?.name}
-                                  </Link>
-                                </h2>
-
-                                {p.rating && (
-                                  <div>
-                                    <small className="text-warning">
-                                      {[...Array(5)].map((_, index) => (
-                                        <i
-                                          key={index}
-                                          className={
-                                            index < Math.floor(p.rating)
-                                              ? "bi bi-star-fill"
-                                              : "bi bi-star"
-                                          }
+                                            }`}
                                         />
-                                      ))}
-                                    </small>
-                                    <span className="text-muted small">
-                                      {p.rating} {p.reviews && `(${p.reviews})`}
-                                    </span>
+                                      </Link>
+                                    </div>
                                   </div>
-                                )}
 
-                                {/* Description - added back from original */}
-                                {p.description && (
-                                  <p
-                                    className="text-muted mt-2"
-                                    style={{
-                                      height: "30px",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      display: "-webkit-box",
-                                      WebkitBoxOrient: "vertical",
-                                      WebkitLineClamp: 1,
-                                      whiteSpace: "normal",
-                                    }}
-                                    title={p.description}
-                                  >
-                                    {p.description}
-                                  </p>
-                                )}
-                                {/* <strong >Nhà phân phối:</strong> */}
-                                <span className="text-muted">{p?.supplier?.name}</span>
+                                  <h2 className="fs-6">
+                                    <Link
+                                      onClick={() => setSelectedProduct(p)}
+                                      className="text-inherit text-decoration-none"
+                                      title={p?.name}
+                                      style={{
+                                        display: "inline-block",
+                                        maxWidth: "100%",
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                      }}
+                                    >
+                                      {p?.name}
+                                    </Link>
+                                  </h2>
 
-                                <div className="d-flex justify-content-between align-items-center mt-3">
-                                  <div>
-                                    <span className="text-danger">
-                                      Còn hàng
-                                    </span>
-                                    {p.originalPrice && (
-                                      <span className="text-decoration-line-through text-muted ms-2">
-                                        {p.originalPrice}
+                                  {p.rating && (
+                                    <div>
+                                      <small className="text-warning">
+                                        {[...Array(5)]?.map((_, index) => (
+                                          <i
+                                            key={index}
+                                            className={
+                                              index < Math.floor(p.rating)
+                                                ? "bi bi-star-fill"
+                                                : "bi bi-star"
+                                            }
+                                          />
+                                        ))}
+                                      </small>
+                                      <span className="text-muted small">
+                                        {p.rating} {p.reviews && `(${p.reviews})`}
                                       </span>
-                                    )}
+                                    </div>
+                                  )}
+
+                                  {/* Description - added back from original */}
+                                  {p.description && (
+                                    <p
+                                      className="text-muted mt-2"
+                                      style={{
+                                        height: "30px",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        display: "-webkit-box",
+                                        WebkitBoxOrient: "vertical",
+                                        WebkitLineClamp: 1,
+                                        whiteSpace: "normal",
+                                      }}
+                                      title={p.description}
+                                    >
+                                      {p.description}
+                                    </p>
+                                  )}
+                                  {/* <strong >Nhà phân phối:</strong> */}
+                                  <span className="text-muted">{p?.supplier?.name}</span>
+
+                                  <div className="d-flex justify-content-between align-items-center mt-3">
+                                    <div>
+                                      <span className="text-danger">
+                                        Còn hàng
+                                      </span>
+                                      {p.originalPrice && (
+                                        <span className="text-decoration-line-through text-muted ms-2">
+                                          {p.originalPrice}
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })
+                      ) : (
+                        <div className="text-center my-5 w-100">
+                          <h5>Chưa có sản phẩm nào</h5>
+                        </div>
+                      )}
                     </div>
-                    <div className="row mt-8">
-                      <div className="col">
-                        <nav>
-                          <ul className="pagination">
-                            {/* Nút Previous */}
-                            <li
-                              className={`page-item ${
-                                page === 1 ? "disabled" : ""
-                              }`}
-                            >
-                              <Link
-                                className="page-link mx-1 rounded-3"
-                                to="#"
-                                onClick={() => handlePageChange(page - 1)}
-                                aria-label="Previous"
-                              >
-                                <i className="fa fa-chevron-left" />
-                              </Link>
-                            </li>
-
-                            {/* Hiển thị số trang */}
-                            {[...Array(totalPages)].map((_, index) => {
-                              const pageNumber = index + 1;
-                              return (
-                                <li
-                                  key={pageNumber}
-                                  className={`page-item ${
-                                    page === pageNumber ? "active" : ""
-                                  }`}
+                    {products.content && products.content.length > 0 && (
+                      <div className="row mt-8">
+                        <div className="col">
+                          <nav>
+                            <ul className="pagination">
+                              {/* Nút Previous */}
+                              <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                                <Link
+                                  className="page-link mx-1 rounded-3"
+                                  to="#"
+                                  onClick={() => handlePageChange(page - 1)}
+                                  aria-label="Previous"
                                 >
-                                  <Link
-                                    className="page-link mx-1 rounded-3 text-body"
-                                    to="#"
-                                    onClick={() => handlePageChange(pageNumber)}
-                                  >
-                                    {pageNumber}
-                                  </Link>
-                                </li>
-                              );
-                            })}
+                                  <i className="fa fa-chevron-left" />
+                                </Link>
+                              </li>
 
-                            {/* Nút Next */}
-                            <li
-                              className={`page-item ${
-                                page === totalPages ? "disabled" : ""
-                              }`}
-                            >
-                              <Link
-                                className="page-link mx-1 rounded-3"
-                                to="#"
-                                onClick={() => handlePageChange(page + 1)}
-                                aria-label="Next"
+                              {/* Hiển thị số trang */}
+                              {[...Array(totalPages)]?.map((_, index) => {
+                                const pageNumber = index + 1;
+                                return (
+                                  <li
+                                    key={pageNumber}
+                                    className={`page-item ${page === pageNumber ? "active" : ""}`}
+                                  >
+                                    <Link
+                                      className="page-link mx-1 rounded-3 text-body"
+                                      to="#"
+                                      onClick={() => handlePageChange(pageNumber)}
+                                    >
+                                      {pageNumber}
+                                    </Link>
+                                  </li>
+                                );
+                              })}
+
+                              {/* Nút Next */}
+                              <li
+                                className={`page-item ${page === totalPages ? "disabled" : ""}`}
                               >
-                                <i className="fa fa-chevron-right" />
-                              </Link>
-                            </li>
-                          </ul>
-                        </nav>
+                                <Link
+                                  className="page-link mx-1 rounded-3"
+                                  to="#"
+                                  onClick={() => handlePageChange(page + 1)}
+                                  aria-label="Next"
+                                >
+                                  <i className="fa fa-chevron-right" />
+                                </Link>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
                       </div>
-                    </div>
+                    )}
+
                   </>
                 )}
               </div>

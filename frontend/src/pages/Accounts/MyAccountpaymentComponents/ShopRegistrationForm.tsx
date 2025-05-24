@@ -31,13 +31,13 @@ const ShopRegistrationForm = ({
     handleSubmit();
   };
 
-  // if (userInfo.roles.includes("ROLE_PROVIDER"))
-  //   return (
-  //     <div className="text-center fs-4 h-25 mt-3">
-  //       {" "}
-  //       Bạn đã là người bán hàng rồi!!!
-  //     </div>
-  //   );
+  if (userInfo.roles.includes("ROLE_PROVIDER"))
+    return (
+      <div className="text-center fs-4 h-25 mt-3">
+        {" "}
+        Bạn đã là người bán hàng rồi!!!
+      </div>
+    );
 
   return (
     <div className="p-6 p-lg-10">

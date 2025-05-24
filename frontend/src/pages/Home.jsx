@@ -153,13 +153,6 @@ const Home = () => {
                               Cung cấp một loạt các vật liệu xây dựng với giá
                               cạnh tranh
                             </p>
-                            <Link
-                              to="#!"
-                              className="btn mt-3 text-bg-warning border-0"
-                            >
-                              Mua ngay
-                              <i className="feather-icon icon-arrow-right ms-1" />
-                            </Link>
                           </div>
                         </div>
                       </div>
@@ -183,13 +176,6 @@ const Home = () => {
                               Vật liệu xây dựng chất lượng cao ở mức giá tốt
                               nhất
                             </p>
-                            <Link
-                              to="#!"
-                              className="btn mt-3 text-bg-warning border-0"
-                            >
-                              Mua ngay
-                              <i className="feather-icon icon-arrow-right ms-1" />
-                            </Link>
                           </div>
                         </div>
                       </div>
@@ -329,13 +315,6 @@ const Home = () => {
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
                               </div>
-                              <Link
-                                to="#!"
-                                className="btn text-bg-warning border-0"
-                              >
-                                Mua ngay
-                                <i className="feather-icon icon-arrow-right ms-1" />
-                              </Link>
                             </div>
                           </div>
                         </div>
@@ -363,13 +342,6 @@ const Home = () => {
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
                               </div>
-                              <Link
-                                to="#!"
-                                className="btn text-bg-warning border-0"
-                              >
-                                Mua ngay
-                                <i className="feather-icon icon-arrow-right ms-1" />
-                              </Link>
                             </div>
                           </div>
                         </div>
@@ -397,13 +369,6 @@ const Home = () => {
                               <div className="mt-4 mb-5 fs-5 text-white">
                                 <br />
                               </div>
-                              <Link
-                                to="#!"
-                                className="btn text-bg-warning border-0"
-                              >
-                                Mua ngay
-                                <i className="feather-icon icon-arrow-right ms-1" />
-                              </Link>
                             </div>
                           </div>
                         </div>
