@@ -33,7 +33,6 @@ public class TransactionFilterDTO {
     @JsonIgnore
     private Long createdBy;
 
-    @JsonIgnore
     private PaymentType paymentType;
 
 }

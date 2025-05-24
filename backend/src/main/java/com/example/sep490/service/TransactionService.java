@@ -50,7 +50,6 @@ public class TransactionService {
     }
 
     public PageResponse<TransactionResponse> getTransactionsAdmin(TransactionFilterDTO filter) {
-        filter.setPaymentType(PaymentType.PLATFORMFEE);
         Specification<Transaction> spec = TransactionSpecification.filterTransactiones(filter);
         Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
         Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);
