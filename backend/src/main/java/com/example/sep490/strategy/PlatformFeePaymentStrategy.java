@@ -94,6 +94,7 @@ public class PlatformFeePaymentStrategy implements PaymentStrategy {
         Shop shop = shopRepo.findByIdAndIsDeleteFalse(shopId).orElseThrow(() -> new IllegalArgumentException("Không tìm thấy shop."));
 
         //Lưu transaction
+        newTransaction.setShopId(shopId);
         transactionService.createTransaction(newTransaction);
 
         shop.setActive(true);

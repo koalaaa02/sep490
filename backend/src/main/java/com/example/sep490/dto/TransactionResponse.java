@@ -8,6 +8,7 @@ import com.example.sep490.entity.DebtPayment;
 import com.example.sep490.entity.Order;
 import com.example.sep490.entity.enums.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,8 @@ public class TransactionResponse{
     private PaymentType paymentType;
     private TransactionStatus status;
 
+    private Long shopId;
+    private Long invoiceId;
 
     private boolean isDelete;
     private Long createdBy;

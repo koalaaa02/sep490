@@ -61,6 +61,11 @@ public class Transaction  extends Auditable{//lưu thông tin dòng tiền vào,
     @OneToOne
     @JoinColumn(name = "debtPayment_id", nullable = true)
     private DebtPayment debtPayment;
+
+    @Column(nullable = true)
+    private Long shopId;
+    @Column(nullable = true)
+    private Long invoiceId;
 }
 //String vnp_Amount ;
 //String vnp_BankCode ;

@@ -29,6 +29,8 @@ public class TransactionFilterDTO {
     private LocalDateTime toDate;
 
     private Long shopId;
+    @JsonIgnore
+    private Long invoiceId;
 
     @JsonIgnore
     private Long createdBy;

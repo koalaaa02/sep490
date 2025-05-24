@@ -42,6 +42,7 @@ public class TransactionService {
         Shop shop = userService.getShopByContextUser();
         if(shop == null ) throw new RuntimeException("Không tìm thấy cửa hàng.");
         filter.setShopId(shop.getId());
+
         Specification<Transaction> spec = TransactionSpecification.filterTransactiones(filter);
         Pageable pageable = pagination.createPageRequest(filter.getPage(), filter.getSize(), filter.getSortBy(), filter.getDirection());
         Page<Transaction> transactionPage = transactionRepo.findAll(spec, pageable);

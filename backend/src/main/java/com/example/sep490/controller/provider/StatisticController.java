@@ -25,7 +25,10 @@ public class StatisticController {
     }
 
     @GetMapping("/order/period")
-    public ResponseEntity<Map<String, Integer>> getOrderStatisticsPeriod(@RequestParam Long sellerId, @RequestParam(value = "month",required = false, defaultValue = "0") int month,@RequestParam(value = "year",required = false) int year ) {
+    public ResponseEntity<Map<String, Integer>> getOrderStatisticsPeriod(
+            @RequestParam Long sellerId,
+            @RequestParam(value = "month",required = false) Integer month,
+            @RequestParam(value = "year",required = false) Integer year ) {
         return ResponseEntity.ok().body(statisticsService.getOrderStatisticsByPeriod(sellerId,month, year));
     }
 

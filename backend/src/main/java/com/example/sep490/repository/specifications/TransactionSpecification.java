@@ -13,7 +13,7 @@ public class TransactionSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (filter.getShopId() != null) {
-                predicates.add(cb.equal(root.get("order").get("id"), filter.getShopId()));
+                predicates.add(cb.equal(root.get("shopId"), filter.getShopId()));
             }
             if (filter.getCreatedBy() != null) {
                 predicates.add(cb.equal(root.get("createdBy"), filter.getCreatedBy() ));
@@ -25,8 +25,6 @@ public class TransactionSpecification {
             if (filter.getToDate() != null) {
                 predicates.add(cb.lessThanOrEqualTo(root.get("paymentDate"), filter.getToDate()));
             }
-
-
 
             if (filter.getPaymentType() != null) {
                 predicates.add(cb.equal(root.get("paymentType"), filter.getPaymentType() ));

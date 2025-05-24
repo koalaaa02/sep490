@@ -114,6 +114,8 @@ public class InvoicePaymentStrategy implements PaymentStrategy {
         newTransaction.setDebtPaymentId(debtPayment.getId());
 
         //Lưu transaction
+        newTransaction.setInvoiceId(invoiceId);
+        newTransaction.setOrderId(invoice.getOrder().getId());
         transactionService.createTransaction(newTransaction);
 
         PaymentResultResponse result = PaymentResultResponse.builder()

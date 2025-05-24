@@ -62,7 +62,7 @@ public class StatisticsService {
     public Map<String, Integer> getOrderStatisticsByPeriod(Long sellerId, Integer month, Integer year) {
         LinkedHashMap<String, Integer> statisticsMap = new LinkedHashMap<>();
 
-        if (month == 0) {
+        if (month == null || year == null) {
             // Initialize map with all months and set counts to 0
             initializeMonthlyStatistics(statisticsMap);
 

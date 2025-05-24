@@ -49,4 +49,6 @@ public class TransactionRequest {
 
 
     // Relationship
+    private Long shopId;
+    private Long invoiceId;
 }
