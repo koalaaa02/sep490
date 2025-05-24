@@ -134,7 +134,7 @@ const ShopList = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4" style={{ height: "90vh" }}>
       <h2 className="mb-4">Danh sách nhà cung cấp</h2>
 
       <ShopSearch searchTerm={searchTerm} onSearchChange={setSearchTerm} />

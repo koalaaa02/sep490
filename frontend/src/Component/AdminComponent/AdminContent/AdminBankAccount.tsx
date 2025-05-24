@@ -71,7 +71,7 @@ const AdminBankAccount = () => {
         } else {
           const accountData = await accountResponse.json();
           console.log(accountData?.content[0]);
-          
+
           setAccount(accountData?.content[0]);
           setOriginalAccount(accountData?.content[0]);
         }
@@ -244,7 +244,7 @@ const AdminBankAccount = () => {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4" style={{ height: "90vh" }}>
       <Card>
         <Card.Header>
           <h4>Thông tin tài khoản ngân hàng</h4>

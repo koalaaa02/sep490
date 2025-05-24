@@ -13,7 +13,7 @@ const OrderList = ({ orders, status }) => {
   };
   if (!orders || orders.length === 0) {
     return (
-      <div className="text-center mt-5">
+      <div className="text-center mt-5" style={{ minHeight: "55vh" }}>
         <img width={200} src={empty} alt="" />
         <p>
           Không có đơn hàng nào{" "}

@@ -8,6 +8,7 @@ interface Product {
   specifications: string;
   unit: string;
   images: string;
+  stop: boolean;
   active: boolean;
   category: {
     id: number;
@@ -99,8 +100,8 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
               </div>
               <div className="mb-3">
                 <strong>Trạng thái:</strong>{" "}
-                <Badge bg={product.active ? "success" : "secondary"}>
-                  {product.active ? "Kích hoạt" : "Ngừng kích hoạt"}
+                <Badge bg={!product.active ? "success" : "secondary"}>
+                  {!product.active ? "Kích hoạt" : "Ngừng kích hoạt"}
                 </Badge>
               </div>
             </Col>
@@ -250,10 +251,10 @@ const ProductDetail: React.FC<ProductDetailProps> = ({
         <Card.Footer className="d-flex justify-content-between align-items-center">
           <div>
             <Button
-              variant={product.active ? "danger" : "success"}
+              variant={!product.stop ? "danger" : "success"}
               onClick={(e) => onStatusToggle(product.id, e)}
             >
-              {product.active ? "Ngừng kích hoạt" : "Kích hoạt"}
+              {!product.stop ? "Ngừng kích hoạt" : "Kích hoạt"}
             </Button>
           </div>
         </Card.Footer>

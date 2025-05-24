@@ -27,7 +27,8 @@ const AddProduct = ({ onAddProduct, onCancel }) => {
     specifications: "",
     unit: "PCS",
     // images: "string", // This will be derived from productImages state for submission
-    active: false, // Default to false, user can activate if needed
+    active: true,
+    stop: false,
     unitAdvance: "",
     categoryId: "",
     supplierId: "",

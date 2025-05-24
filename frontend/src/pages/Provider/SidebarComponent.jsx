@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BiTask } from "react-icons/bi";
-import { RiShoppingCart2Line } from "react-icons/ri";
-import { FaClipboardList, FaChartBar } from "react-icons/fa";
+import { RiMoneyDollarCircleLine, RiShoppingCart2Line } from "react-icons/ri";
+import { FaClipboardList, FaChartBar, FaEdit } from "react-icons/fa";
 import { HiChatBubbleBottomCenterText } from "react-icons/hi2";
 import { MdAddBox, MdOutlineBusAlert, MdOutlineNoteAlt } from "react-icons/md";
 
@@ -31,6 +31,15 @@ const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
   return (
     <div className="d-flex flex-column p-3 bg-light" style={{ width: "250px" }}>
       <ul className="nav flex-column navbar-nav navbar-light">
+        <li>
+          <button
+            className="nav-link"
+            style={getItemStyle("EditShop")}
+            onClick={() => handleClick("EditShop")}
+          >
+            <FaEdit size={30} className="ms-1" />Thông tin cửa hàng
+          </button>
+        </li>
         <li>
           <button
             className="nav-link"
@@ -105,7 +114,7 @@ const SidebarComponent = ({ setSelectedComponent, selectedComponent }) => {
             style={getItemStyle("transaction")}
             onClick={() => handleClick("transaction")}
           >
-            <MdOutlineNoteAlt size={30} className="ms-1" /> Chi Phí
+            <RiMoneyDollarCircleLine  size={30} className="ms-1" /> Chi Phí
           </button>
         </li>
         <li>

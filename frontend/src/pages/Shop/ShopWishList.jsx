@@ -121,7 +121,7 @@ const ShopWishList = () => {
                                       <th> </th>
                                     </tr>
                                   </thead>
-                                  {wishItems.map((item) => (
+                                  {wishItems?.map((item) => (
                                     <tbody>
                                       <tr>
                                         <td className="align-middle">

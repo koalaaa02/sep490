@@ -12,10 +12,11 @@ import DeliveryList from "./Product/DeliveryList.jsx";
 import AddPayment from "./Invoice/AddPayment";
 import SupplierList from "./Product/SupplierList.jsx";
 import Transaction from "./Product/Transaction.tsx";
+import EditShopProduct from "./Product/ProductEdit.jsx";
 
 const ProviderDashBoard = () => {
   const [selectedComponent, setSelectedComponent] = useState(
-    "ProviderDashBoardDetail"
+    "EditShop"
   );
   const [selectedProductId, setSelectedProductId] = useState(null);
 
@@ -35,6 +36,8 @@ const ProviderDashBoard = () => {
     }
 
     switch (selectedComponent) {
+      case "EditShop":
+        return <EditShopProduct />;
       case "ProviderDashBoardDetail":
         return <ProviderDashBoardDetail />;
       case "InvoiceManagement":
